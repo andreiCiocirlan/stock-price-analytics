@@ -1,0 +1,41 @@
+package com.example.stockprices.controller;
+
+import com.example.stockprices.model.dto.StockPerformanceDTO;
+import com.example.stockprices.model.prices.enums.StockTimeframe;
+import com.example.stockprices.service.StockPerformanceService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Controller
+@Slf4j
+@RequiredArgsConstructor
+public class StockHeatmapController {
+
+    private final StockPerformanceService stockPerformanceService;
+
+    @GetMapping("/stock-performance")
+    @ResponseBody
+    public ModelAndView getStockPerformanceView(@RequestParam(required = false, value = "timeFrame") String timeFrame) {
+        return new ModelAndView("stock-performance");
+    }
+
+    @GetMapping("/stock-performance-json")
+    @ResponseBody
+    public List<StockPerformanceDTO> getStockPerformance(@RequestParam(required = false, value = "timeFrame") StockTimeframe timeFrame,
+                                                         @RequestParam(required = false, value = "xtb") boolean xtbOnly) {
+        return stockPerformanceService.stockPerformanceByTimeframeDateXTBOnly(
+                timeFrame != null ? timeFrame : StockTimeframe.MONTHLY,
+                LocalDate.of(2024, 6, 28),
+                xtbOnly
+        );
+    }
+
+}

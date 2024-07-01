@@ -1,0 +1,46 @@
+-- DROP and CREATE weekly, monthly, yearly tables from SQL (to preserve column order)
+DROP TABLE IF EXISTS yearly_ohlc
+DROP TABLE IF EXISTS monthly_ohlc
+DROP TABLE IF EXISTS weekly_ohlc
+
+CREATE TABLE IF NOT EXISTS weekly_ohlc
+(
+    id bigint NOT NULL,
+    ticker character varying(255) COLLATE pg_catalog."default",
+    start_date date,
+    end_date date,
+    high double precision,
+    low double precision,
+    open double precision,
+    close double precision,
+    performance double precision,
+    CONSTRAINT weekly_ohlc_pkey PRIMARY KEY (id)
+)
+
+CREATE TABLE IF NOT EXISTS monthly_ohlc
+(
+    id bigint NOT NULL,
+    ticker character varying(255) COLLATE pg_catalog."default",
+    start_date date,
+    end_date date,
+    high double precision,
+    low double precision,
+    open double precision,
+    close double precision,
+    performance double precision,
+    CONSTRAINT monthly_ohlc_pkey PRIMARY KEY (id)
+)
+
+CREATE TABLE IF NOT EXISTS yearly_ohlc
+(
+    id bigint NOT NULL,
+    ticker character varying(255) COLLATE pg_catalog."default",
+    start_date date,
+    end_date date,
+    high double precision,
+    low double precision,
+    open double precision,
+    close double precision,
+    performance double precision,
+    CONSTRAINT yearly_ohlc_pkey PRIMARY KEY (id)
+)

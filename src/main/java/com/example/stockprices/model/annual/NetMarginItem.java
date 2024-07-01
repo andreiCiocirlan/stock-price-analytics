@@ -1,0 +1,14 @@
+package com.example.stockprices.model.annual;
+
+//@Entity
+public class NetMarginItem extends PeriodWithValue {
+
+    @Override
+    public String toString() {
+        return
+                "NetMarginItem{" +
+                        "period = '" + period + '\'' +
+                        ",v = '" + V + '\'' +
+                        "}";
+    }
+}
