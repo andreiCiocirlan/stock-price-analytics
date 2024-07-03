@@ -8,6 +8,7 @@ import stock.price.analytics.model.prices.ohlc.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Year;
@@ -27,17 +28,21 @@ import static java.time.LocalDate.parse;
 
 @Component
 @Slf4j
-public class StockPriceOHLCUtil {
+public class PricesOHLCUtil {
     public static final AtomicInteger OPEN_IS_ZERO_ERROR = new AtomicInteger(0);
     public static final AtomicInteger HIGH_LOW_ERROR = new AtomicInteger(0);
 
-    public static List<AbstractPriceOHLC> pricesOHLCFromFileAndTimeframe(Path srcFile, StockTimeframe stockTimeframe) throws IOException {
-        List<DailyPriceOHLC> dailyPrices = dailyPricesOHLCFromFile(srcFile);
+    public static List<AbstractPriceOHLC> pricesOHLCForTimeframe(StockTimeframe stockTimeframe) throws IOException {
+        List<DailyPriceOHLC> dailyPrices = dailyPricesOHLCFromFile(Paths.get(Constants.STOCKS_LOCATION));
 
+        return getPriceOHLCsForTimeframe(dailyPrices, stockTimeframe);
+    }
+
+    public static List<AbstractPriceOHLC> getPriceOHLCsForTimeframe(List<DailyPriceOHLC> dailyPrices, StockTimeframe stockTimeframe) {
         return new ArrayList<>(
                 dailyPrices.stream()
                         .collect(Collectors.groupingBy(
-                                shp -> groupFunctionBy(stockTimeframe).apply(shp.getDate()),
+                                shp -> groupingFunctionFor(stockTimeframe).apply(shp.getDate()),
                                 Collectors.collectingAndThen(
                                         Collectors.toList(),
                                         pricesOHLC -> extractOHLCForTimeframe(pricesOHLC, stockTimeframe)
@@ -45,7 +50,7 @@ public class StockPriceOHLCUtil {
                         )).values());
     }
 
-    private static Function<LocalDate, ? extends Temporal> groupFunctionBy(StockTimeframe stockTimeframe) {
+    private static Function<LocalDate, ? extends Temporal> groupingFunctionFor(StockTimeframe stockTimeframe) {
         return switch (stockTimeframe) {
             case WEEKLY -> shp -> shp.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
             case MONTHLY -> YearMonth::from;
@@ -71,7 +76,6 @@ public class StockPriceOHLCUtil {
                 .orElseThrow();
 
         CandleOHLC candleOHLC = new CandleOHLC(open, high, low, close);
-
         return switch (stockTimeframe) {
             case WEEKLY -> new WeeklyPriceOHLC(ticker, startDate, endDate, candleOHLC);
             case MONTHLY -> new MonthlyPriceOHLC(ticker, startDate, endDate, candleOHLC);
@@ -87,14 +91,13 @@ public class StockPriceOHLCUtil {
     }
 
     public static List<DailyPriceOHLC> dailyPricesFromFileLastWeek(Path srcFile, int lastDays) throws IOException {
-        List<DailyPriceOHLC> stockHistoricalPricesList = new ArrayList<>();
+        List<DailyPriceOHLC> dailyPrices = new ArrayList<>();
         final String ticker = tickerFrom(srcFile);
 
         List<String> lines = Files.readAllLines(srcFile);
         int skipCount = Math.max(1, lines.size() + 1 - lastDays);
-        lines.stream().skip(skipCount)
-                .parallel().forEachOrdered(line -> addDailyPrices(line, ticker, stockHistoricalPricesList));
-        return stockHistoricalPricesList;
+        lines.stream().skip(skipCount).parallel().forEachOrdered(line -> addDailyPrices(line, ticker, dailyPrices));
+        return dailyPrices;
     }
 
     private static void addDailyPrices(String line, String ticker, List<DailyPriceOHLC> dailyPrices) {

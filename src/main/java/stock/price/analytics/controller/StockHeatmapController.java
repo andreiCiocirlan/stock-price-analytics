@@ -31,7 +31,7 @@ public class StockHeatmapController {
     @ResponseBody
     public List<StockPerformanceDTO> getStockPerformance(@RequestParam(required = false, value = "timeFrame") StockTimeframe timeFrame,
                                                          @RequestParam(required = false, value = "xtb") boolean xtbOnly) {
-        return stockPerformanceService.stockPerformanceByTimeframeDateXTBOnly(
+        return stockPerformanceService.stockPerformanceForDateAndTimeframeAndFilters(
                 timeFrame != null ? timeFrame : StockTimeframe.MONTHLY,
                 LocalDate.of(2024, 6, 28),
                 xtbOnly

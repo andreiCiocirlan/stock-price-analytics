@@ -17,7 +17,7 @@ public class StockPerformanceService {
 
     private final PricesOHLCRepository pricesOHLCRepository;
 
-    public List<StockPerformanceDTO> stockPerformanceByTimeframeDateXTBOnly(StockTimeframe timeFrame, LocalDate date, boolean xtbOnly) {
+    public List<StockPerformanceDTO> stockPerformanceForDateAndTimeframeAndFilters(StockTimeframe timeFrame, LocalDate date, boolean xtbOnly) {
         if (Boolean.TRUE.equals(xtbOnly)) {
             return switch (timeFrame) {
                 case WEEKLY ->

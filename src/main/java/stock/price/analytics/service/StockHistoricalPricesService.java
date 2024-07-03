@@ -9,8 +9,7 @@ import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.repository.PricesOHLCRepository;
 import stock.price.analytics.util.Constants;
-import stock.price.analytics.util.PriceEntityPartitionAndSaveUtil;
-import stock.price.analytics.util.StockPriceOHLCUtil;
+import stock.price.analytics.util.PricesOHLCUtil;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -24,23 +23,28 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static java.nio.file.Files.walk;
+import static stock.price.analytics.util.PriceEntityPartitionAndSaveUtil.partitionDataAndSave;
+import static stock.price.analytics.util.PricesOHLCUtil.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class StockHistoPricesService {
+public class StockHistoricalPricesService {
 
     private final PricesOHLCRepository pricesOhlcRepository;
 
     @Transactional
     public void saveLastWeekPricesFromFiles() {
         List<DailyPriceOHLC> lastWeekDailyPrices = new ArrayList<>();
+        List<AbstractPriceOHLC> lastWeekPrices = new ArrayList<>();
         try (Stream<Path> walk = walk(Paths.get(Constants.STOCKS_LOCATION))) {
             walk.filter(Files::isRegularFile)
                     .parallel().forEachOrdered(srcFile -> { // must be forEachOrdered
                         try {
                             if (!srcFile.getFileName().toString().equals("RDDT.csv")) {
-                                lastWeekDailyPrices.addAll(StockPriceOHLCUtil.dailyPricesFromFileLastWeek(srcFile, 7)); // some files might end with empty line -> 7 for good measure instead of 5
+                                List<DailyPriceOHLC> dailyPriceOHLCS = dailyPricesFromFileLastWeek(srcFile, 7);
+                                lastWeekDailyPrices.addAll(dailyPriceOHLCS); // some files might end with empty line -> 7 for good measure instead of 5
+                                lastWeekPrices.addAll(getPriceOHLCsForTimeframe(dailyPriceOHLCS, StockTimeframe.WEEKLY)); // some files might end with empty line -> 7 for good measure instead of 5
                             }
                         } catch (IOException e) {
                             throw new RuntimeException(e);
@@ -54,7 +58,8 @@ public class StockHistoPricesService {
         LocalDate lastMonday = LocalDate.now().with(TemporalAdjusters.previous(DayOfWeek.MONDAY));
         List<DailyPriceOHLC> lastWeekDailyPricesFinal = lastWeekDailyPrices.stream().filter(dailyPriceOHLC -> dailyPriceOHLC.getDate().equals(lastMonday) || dailyPriceOHLC.getDate().isAfter(lastMonday)).toList();
 
-        PriceEntityPartitionAndSaveUtil.partitionDataAndSave(lastWeekDailyPricesFinal, pricesOhlcRepository);
+        partitionDataAndSave(lastWeekDailyPricesFinal, pricesOhlcRepository);
+        partitionDataAndSave(lastWeekPrices, pricesOhlcRepository);
     }
 
     @Transactional
@@ -65,7 +70,7 @@ public class StockHistoPricesService {
                 .parallel().forEachOrdered(srcFile -> { // must be forEachOrdered
                     try {
                         if (!srcFile.getFileName().toString().equals("RDDT.csv")) {
-                            ohlcList.addAll(StockPriceOHLCUtil.dailyPricesOHLCFromFile(srcFile));
+                            ohlcList.addAll(dailyPricesOHLCFromFile(Paths.get(Constants.STOCKS_LOCATION)));
                         }
                     } catch (IOException e) {
                         throw new RuntimeException(e);
@@ -75,28 +80,28 @@ public class StockHistoPricesService {
             throw new RuntimeException(e);
         }
 
-        List<? extends DailyPriceOHLC> dailyOHLCList = ohlcList.stream()
+        List<DailyPriceOHLC> dailyOHLCList = ohlcList.stream()
                 .map(DailyPriceOHLC.class::cast)
                 .toList();
-        log.info("OPEN_IS_ZERO_ERROR {} problems", StockPriceOHLCUtil.OPEN_IS_ZERO_ERROR.get());
-        log.info("HIGH_LOW_ERROR {} problems", StockPriceOHLCUtil.HIGH_LOW_ERROR.get());
+        log.info("OPEN_IS_ZERO_ERROR {} problems", PricesOHLCUtil.OPEN_IS_ZERO_ERROR.get());
+        log.info("HIGH_LOW_ERROR {} problems", PricesOHLCUtil.HIGH_LOW_ERROR.get());
         log.info("ohlcList size {}", dailyOHLCList.size());
-        PriceEntityPartitionAndSaveUtil.partitionDataAndSave(dailyOHLCList, pricesOhlcRepository);
+        partitionDataAndSave(dailyOHLCList, pricesOhlcRepository);
     }
 
     @Transactional
     public void savePricesFromFileAndTimeframe(StockTimeframe stockTimeframe) {
-        PriceEntityPartitionAndSaveUtil.partitionDataAndSave(pricesOHLCForTimeframe(stockTimeframe), pricesOhlcRepository);
+        partitionDataAndSave(pricesOHLCForTimeframe(stockTimeframe), pricesOhlcRepository);
     }
 
     private static List<? extends AbstractPriceOHLC> pricesOHLCForTimeframe(StockTimeframe stockTimeframe) {
-        List<AbstractPriceOHLC> pricesOhlcList = new ArrayList<>();
+        List<AbstractPriceOHLC> priceOHLCS = new ArrayList<>();
         try (Stream<Path> walk = walk(Paths.get(Constants.STOCKS_LOCATION))) {
             walk.filter(Files::isRegularFile)
                     .parallel().forEachOrdered(srcFile -> { // must be forEachOrdered
                         try {
                             if (!srcFile.getFileName().toString().equals("RDDT.csv")) {
-                                pricesOhlcList.addAll(StockPriceOHLCUtil.pricesOHLCFromFileAndTimeframe(srcFile, stockTimeframe));
+                                priceOHLCS.addAll(PricesOHLCUtil.pricesOHLCForTimeframe(stockTimeframe));
                             }
                         } catch (IOException e) {
                             throw new RuntimeException(e);
@@ -107,9 +112,9 @@ public class StockHistoPricesService {
         }
 
         return switch (stockTimeframe) {
-            case WEEKLY -> pricesOhlcList.stream().map(WeeklyPriceOHLC.class::cast).toList();
-            case MONTHLY -> pricesOhlcList.stream().map(MonthlyPriceOHLC.class::cast).toList();
-            case YEARLY -> pricesOhlcList.stream().map(YearlyPriceOHLC.class::cast).toList();
+            case WEEKLY -> priceOHLCS.stream().map(WeeklyPriceOHLC.class::cast).toList();
+            case MONTHLY -> priceOHLCS.stream().map(MonthlyPriceOHLC.class::cast).toList();
+            case YEARLY -> priceOHLCS.stream().map(YearlyPriceOHLC.class::cast).toList();
         };
     }
 

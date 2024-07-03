@@ -33,21 +33,28 @@ public class StockService {
     public void saveStocks() throws IOException {
         List<String> tickersXTB = FileUtils.readTickersXTB().stream().map(s -> s.concat(".csv")).toList();
         List<Stock> stocks = new ArrayList<>();
+        List<String> existingStocks = stockRepository.findAll().stream().map(Stock::getTicker).toList();
         try (Stream<Path> walk = walk(Paths.get(Constants.STOCKS_LOCATION))) {
             walk.filter(Files::isRegularFile)
-                .parallel().forEachOrdered(srcFile -> { // must be forEachOrdered
-                    String fileName = srcFile.getFileName().toString();
-                    String ticker = fileName.substring(0, fileName.length() - 4);
-                    if (tickersXTB.contains(fileName)) {
-                        stocks.add(new Stock(ticker, LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.FRIDAY)), true));
-                    } else {
-                        stocks.add(new Stock(ticker, LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.FRIDAY))));
-                    }
-                });
+                    .filter(srcFile -> isNotAlreadyPersistedStock(srcFile, existingStocks))
+                    .parallel().forEachOrdered(srcFile -> { // must be forEachOrdered
+                        String fileName = srcFile.getFileName().toString();
+                        String ticker = fileName.substring(0, fileName.length() - 4);
+                        if (tickersXTB.contains(fileName)) {
+                            stocks.add(new Stock(ticker, LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.FRIDAY)), true));
+                        } else {
+                            stocks.add(new Stock(ticker, LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.FRIDAY))));
+                        }
+                    });
         }
-        stocks.removeAll(stockRepository.findAll());
+        boolean removed = stocks.removeAll(stockRepository.findAll());
         log.info("remaining stocks {}", stocks);
-        stockRepository.saveAll(stocks);
+        log.info("removed {}", removed);
+        //stockRepository.saveAll(stocks);
+    }
+
+    private static boolean isNotAlreadyPersistedStock(Path srcFile, List<String> existingStocks) {
+        return !existingStocks.contains(srcFile.getFileName().toString().substring(0, srcFile.getFileName().toString().length() - 4));
     }
 
 }

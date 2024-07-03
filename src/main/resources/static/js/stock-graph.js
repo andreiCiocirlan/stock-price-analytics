@@ -33,7 +33,6 @@ function openStockGraph(stockData) {
             ohlcWindow.addEventListener('unload', () => {
                 // Remove the chart container when the window is closed
                 ohlcContainer.remove();
-//                ohlcContainer = null;
                 chart = null;
             });
 
@@ -99,9 +98,7 @@ function updateOHLCChart(stockData) {
                                 opposite: true // Position the y-axis on the right side
                            },
                            legend: {
-                                itemStyle: {
-                                    color: '#FFFFFF', bold: true
-                                }
+                                itemStyle: { color: '#FFFFFF', bold: true }
                            },
                            plotOptions: {
                                candlestick: {

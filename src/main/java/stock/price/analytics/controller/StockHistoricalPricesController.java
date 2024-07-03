@@ -7,43 +7,43 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.service.StockHistoPricesService;
+import stock.price.analytics.service.StockHistoricalPricesService;
 
 @Slf4j
 @Controller
 @RequiredArgsConstructor
-public class StockHistoPricesController {
+public class StockHistoricalPricesController {
 
-    private final StockHistoPricesService stockHistoPricesService;
+    private final StockHistoricalPricesService stockHistoricalPricesService;
 
     @PostMapping("/last_week_prices")
     @ResponseStatus(HttpStatus.OK)
     public void saveLastWeekPricesFromFiles() {
-        stockHistoPricesService.saveLastWeekPricesFromFiles();
+        stockHistoricalPricesService.saveLastWeekPricesFromFiles();
     }
 
     @PostMapping("/daily_prices")
     @ResponseStatus(HttpStatus.OK)
     public void saveDailyPrices() {
-        stockHistoPricesService.saveDailyPricesFromFiles();
+        stockHistoricalPricesService.saveDailyPricesFromFiles();
     }
 
     @PostMapping("/weekly_prices")
     @ResponseStatus(HttpStatus.OK)
     public void saveWeeklyPrices() {
-        stockHistoPricesService.savePricesFromFileAndTimeframe(StockTimeframe.WEEKLY);
+        stockHistoricalPricesService.savePricesFromFileAndTimeframe(StockTimeframe.WEEKLY);
     }
 
     @PostMapping("/monthly_prices")
     @ResponseStatus(HttpStatus.OK)
     public void saveMonthlyPrices() {
-        stockHistoPricesService.savePricesFromFileAndTimeframe(StockTimeframe.MONTHLY);
+        stockHistoricalPricesService.savePricesFromFileAndTimeframe(StockTimeframe.MONTHLY);
     }
 
     @PostMapping("/yearly_prices")
     @ResponseStatus(HttpStatus.OK)
     public void saveYearlyPrices() {
-        stockHistoPricesService.savePricesFromFileAndTimeframe(StockTimeframe.YEARLY);
+        stockHistoricalPricesService.savePricesFromFileAndTimeframe(StockTimeframe.YEARLY);
     }
 
 }

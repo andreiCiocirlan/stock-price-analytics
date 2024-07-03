@@ -12,8 +12,6 @@ import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.repository.HighLowRepository;
 import stock.price.analytics.util.Constants;
 import stock.price.analytics.util.FileUtils;
-import stock.price.analytics.util.HighLowPeriodPricesUtil;
-import stock.price.analytics.util.PriceEntityPartitionAndSaveUtil;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,6 +24,8 @@ import java.util.stream.Stream;
 
 import static java.nio.file.Files.walk;
 import static java.time.LocalDate.of;
+import static stock.price.analytics.util.HighLowPeriodPricesUtil.highLowFromFileForPeriod;
+import static stock.price.analytics.util.PriceEntityPartitionAndSaveUtil.partitionDataAndSave;
 
 @Slf4j
 @Service
@@ -38,11 +38,6 @@ public class HighLowForPeriodService {
 
     @Transactional
     public void saveHighLowPricesForPeriod(StockPerformanceInterval stockPerformanceInterval) throws IOException {
-        List<? extends PriceEntity> highLowPrices = processForInterval(stockPerformanceInterval);
-        PriceEntityPartitionAndSaveUtil.partitionDataAndSave(highLowPrices, highLowRepository);
-    }
-
-    private static List<? extends PriceEntity>  processForInterval(StockPerformanceInterval stockPerformanceInterval) throws IOException {
         List<String> tickersXTB = FileUtils.readTickersXTB().stream().map(s -> s.concat(".csv")).toList();
         List<HighLowForPeriod> highLowForPeriod = new ArrayList<>();
         try (Stream<Path> walk = walk(Paths.get(Constants.STOCKS_LOCATION))) {
@@ -51,14 +46,7 @@ public class HighLowForPeriodService {
                         try {
 //                            if (tickersXTB.contains(srcFile.getFileName().toString())) {
                             if ("MBLY.csv".contains(srcFile.getFileName().toString())) {
-                                highLowForPeriod.addAll(HighLowPeriodPricesUtil.highLowFromFileForPeriod(srcFile, START_DATE, END_DATE, stockPerformanceInterval));
-
-//                                if (StockPerformanceInterval.STOCK_PERF_INTERVAL_30D == stockPerformanceInterval) {
-//                                    highLowForPeriod.addAll(hhighLowFromFileForPeriod(srcFile, START_DATE, END_DATE, StockPerformanceInterval.STOCK_PERF_INTERVAL_30D));
-//                                } else if (StockPerformanceInterval.STOCK_PERF_INTERVAL_52W == stockPerformanceInterval) {
-//                                    log.info("STOCK_PERF_INTERVAL_52W");
-//                                    highLowForPeriod.addAll(hhighLowFromFileForPeriod(srcFile, START_DATE, END_DATE, StockPerformanceInterval.STOCK_PERF_INTERVAL_52W));
-//                                }
+                                highLowForPeriod.addAll(highLowFromFileForPeriod(START_DATE, END_DATE, stockPerformanceInterval));
                             }
                         } catch (IOException e) {
                             throw new RuntimeException(e);
@@ -68,14 +56,15 @@ public class HighLowForPeriodService {
             throw new RuntimeException(e);
         }
 
-        return switch (stockPerformanceInterval) {
+        List<? extends PriceEntity> highLowPrices = switch (stockPerformanceInterval) {
             case STOCK_PERF_INTERVAL_30D -> highLowForPeriod.stream()
                     .map(HighLow30Days.class::cast)
                     .toList();
             case STOCK_PERF_INTERVAL_52W -> highLowForPeriod.stream()
                     .map(HighLow52Week.class::cast)
                     .toList();
-        } ;
+        };
+        partitionDataAndSave(highLowPrices, highLowRepository);
     }
 
 }
