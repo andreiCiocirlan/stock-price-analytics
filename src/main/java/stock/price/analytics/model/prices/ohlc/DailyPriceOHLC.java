@@ -11,7 +11,7 @@ import java.time.LocalDate;
 
 @Getter
 @Entity
-@Table(name = "daily_price")
+@Table(name = "daily_prices")
 @NoArgsConstructor
 public class DailyPriceOHLC extends AbstractPriceOHLC {
 

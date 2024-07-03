@@ -11,7 +11,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "yearly_price")
+@Table(name = "yearly_prices")
 @Getter
 @Setter
 @NoArgsConstructor
