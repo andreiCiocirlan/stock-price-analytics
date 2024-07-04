@@ -9,7 +9,6 @@ import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.repository.PricesOHLCRepository;
 import stock.price.analytics.util.Constants;
-import stock.price.analytics.util.PricesOHLCUtil;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,11 +40,9 @@ public class StockHistoricalPricesService {
             walk.filter(Files::isRegularFile)
                     .parallel().forEachOrdered(srcFile -> { // must be forEachOrdered
                         try {
-                            if (!srcFile.getFileName().toString().equals("RDDT.csv")) {
-                                List<DailyPriceOHLC> dailyPriceOHLCS = dailyPricesFromFileLastWeek(srcFile, 7);
-                                lastWeekDailyPrices.addAll(dailyPriceOHLCS); // some files might end with empty line -> 7 for good measure instead of 5
-                                lastWeekPrices.addAll(getPriceOHLCsForTimeframe(dailyPriceOHLCS, StockTimeframe.WEEKLY)); // some files might end with empty line -> 7 for good measure instead of 5
-                            }
+                            List<DailyPriceOHLC> dailyPriceOHLCS = dailyPricesFromFileLastWeek(srcFile, 7);
+                            lastWeekDailyPrices.addAll(dailyPriceOHLCS); // some files might end with empty line -> 7 for good measure instead of 5
+                            lastWeekPrices.addAll(getPriceOHLCsForTimeframe(dailyPriceOHLCS, StockTimeframe.WEEKLY)); // some files might end with empty line -> 7 for good measure instead of 5
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
@@ -69,9 +66,7 @@ public class StockHistoricalPricesService {
             walk.filter(Files::isRegularFile)
                 .parallel().forEachOrdered(srcFile -> { // must be forEachOrdered
                     try {
-                        if (!srcFile.getFileName().toString().equals("RDDT.csv")) {
-                            ohlcList.addAll(dailyPricesOHLCFromFile(Paths.get(Constants.STOCKS_LOCATION)));
-                        }
+                        ohlcList.addAll(dailyPricesOHLCFromFile(srcFile));
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -83,15 +78,16 @@ public class StockHistoricalPricesService {
         List<DailyPriceOHLC> dailyOHLCList = ohlcList.stream()
                 .map(DailyPriceOHLC.class::cast)
                 .toList();
-        log.info("OPEN_IS_ZERO_ERROR {} problems", PricesOHLCUtil.OPEN_IS_ZERO_ERROR.get());
-        log.info("HIGH_LOW_ERROR {} problems", PricesOHLCUtil.HIGH_LOW_ERROR.get());
+        log.info("OPEN_IS_ZERO_ERROR {} problems", OPEN_IS_ZERO_ERROR.get());
+        log.info("HIGH_LOW_ERROR {} problems", HIGH_LOW_ERROR.get());
         log.info("ohlcList size {}", dailyOHLCList.size());
         partitionDataAndSave(dailyOHLCList, pricesOhlcRepository);
     }
 
     @Transactional
-    public void savePricesFromFileAndTimeframe(StockTimeframe stockTimeframe) {
-        partitionDataAndSave(pricesOHLCForTimeframe(stockTimeframe), pricesOhlcRepository);
+    public void savePricesForTimeframe(StockTimeframe stockTimeframe) {
+        List<? extends AbstractPriceOHLC> pricesOHLCs = pricesOHLCForTimeframe(stockTimeframe);
+        partitionDataAndSave(pricesOHLCs, pricesOhlcRepository);
     }
 
     private static List<? extends AbstractPriceOHLC> pricesOHLCForTimeframe(StockTimeframe stockTimeframe) {
@@ -100,9 +96,7 @@ public class StockHistoricalPricesService {
             walk.filter(Files::isRegularFile)
                     .parallel().forEachOrdered(srcFile -> { // must be forEachOrdered
                         try {
-                            if (!srcFile.getFileName().toString().equals("RDDT.csv")) {
-                                priceOHLCS.addAll(PricesOHLCUtil.pricesOHLCForTimeframe(stockTimeframe));
-                            }
+                            priceOHLCS.addAll(pricesOHLCForFileAndTimeframe(srcFile, stockTimeframe));
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }

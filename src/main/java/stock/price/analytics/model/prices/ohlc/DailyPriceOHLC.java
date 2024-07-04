@@ -25,6 +25,11 @@ public class DailyPriceOHLC extends AbstractPriceOHLC {
     }
 
     @Override
+    public double getPerformance() {
+        throw new UnsupportedOperationException("Performance not supported for daily prices!");
+    }
+
+    @Override
     public String toString() {
         return "Daily_OHLC { " + super.toString();
     }

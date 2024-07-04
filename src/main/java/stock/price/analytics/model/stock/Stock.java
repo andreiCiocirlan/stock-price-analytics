@@ -1,4 +1,4 @@
-package stock.price.analytics.model.prices;
+package stock.price.analytics.model.stock;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -47,17 +47,6 @@ public class Stock {
         this.ticker= ticker;
         this.date = date;
     }
-
-//    @Override
-//    public String toString() {
-//        return "Stock{" +
-//                "ticker='" + ticker + '\'' +
-//                ", xtbStock=" + xtbStock +
-//                ", date=" + date +
-//                '}';
-//    }
-//
-//
 
     @Override
     public String toString() {

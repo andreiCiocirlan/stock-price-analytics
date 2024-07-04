@@ -11,7 +11,6 @@ import stock.price.analytics.model.prices.highlow.HighLow52Week;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.repository.HighLowRepository;
 import stock.price.analytics.util.Constants;
-import stock.price.analytics.util.FileUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -37,17 +36,13 @@ public class HighLowForPeriodService {
     private final HighLowRepository highLowRepository;
 
     @Transactional
-    public void saveHighLowPricesForPeriod(StockPerformanceInterval stockPerformanceInterval) throws IOException {
-        List<String> tickersXTB = FileUtils.readTickersXTB().stream().map(s -> s.concat(".csv")).toList();
+    public void saveHighLowPricesForPeriod(StockPerformanceInterval stockPerformanceInterval) {
         List<HighLowForPeriod> highLowForPeriod = new ArrayList<>();
         try (Stream<Path> walk = walk(Paths.get(Constants.STOCKS_LOCATION))) {
             walk.filter(Files::isRegularFile)
                     .parallel().forEachOrdered(srcFile -> {
                         try {
-//                            if (tickersXTB.contains(srcFile.getFileName().toString())) {
-                            if ("MBLY.csv".contains(srcFile.getFileName().toString())) {
-                                highLowForPeriod.addAll(highLowFromFileForPeriod(START_DATE, END_DATE, stockPerformanceInterval));
-                            }
+                            highLowForPeriod.addAll(highLowFromFileForPeriod(srcFile, START_DATE, END_DATE, stockPerformanceInterval));
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }

@@ -8,7 +8,6 @@ import stock.price.analytics.model.prices.ohlc.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Year;
@@ -32,8 +31,8 @@ public class PricesOHLCUtil {
     public static final AtomicInteger OPEN_IS_ZERO_ERROR = new AtomicInteger(0);
     public static final AtomicInteger HIGH_LOW_ERROR = new AtomicInteger(0);
 
-    public static List<AbstractPriceOHLC> pricesOHLCForTimeframe(StockTimeframe stockTimeframe) throws IOException {
-        List<DailyPriceOHLC> dailyPrices = dailyPricesOHLCFromFile(Paths.get(Constants.STOCKS_LOCATION));
+    public static List<AbstractPriceOHLC> pricesOHLCForFileAndTimeframe(Path srcFile, StockTimeframe stockTimeframe) throws IOException {
+        List<DailyPriceOHLC> dailyPrices = dailyPricesOHLCFromFile(srcFile);
 
         return getPriceOHLCsForTimeframe(dailyPrices, stockTimeframe);
     }

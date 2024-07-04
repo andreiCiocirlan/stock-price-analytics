@@ -54,7 +54,7 @@ function updateOHLCChart(stockData) {
             if (ohlcContainer) {
                 // If the chart container exists, create or update the chart
                 if (chart) {
-                    console.log('chart is defined UPDATE');
+
                     chart.update({
                         title: {
                             text: `${stockData.ticker} - ${timeFrame}`
@@ -72,7 +72,7 @@ function updateOHLCChart(stockData) {
                         }]
                     });
                 } else {
-                    console.log('chart is not defined');
+
                        // If the chart doesn't exist, create a new one
                        chart = Highcharts.chart(ohlcContainer, {
                            chart: {

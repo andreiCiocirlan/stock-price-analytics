@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import stock.price.analytics.model.prices.Stock;
+import stock.price.analytics.model.stock.Stock;
 import stock.price.analytics.repository.StockRepository;
 import stock.price.analytics.util.Constants;
 import stock.price.analytics.util.FileUtils;

@@ -42,6 +42,8 @@ public abstract class AbstractPriceOHLC  implements PriceEntity {
         this.close = candleOHLC.close();
     }
 
+    public abstract double getPerformance();
+
     @Override
     public String toString() {
         return "ticker=" + ticker +

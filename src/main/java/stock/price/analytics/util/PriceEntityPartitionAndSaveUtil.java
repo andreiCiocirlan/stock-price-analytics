@@ -27,17 +27,16 @@ public class PriceEntityPartitionAndSaveUtil {
         for (int i = 0; i < entities.size(); i += 250) { // default batchSize to 250 like in application.properties
             partitions.add(entities.subList(i, Math.min(i + 250, entities.size())));
         }
-        log.info("Didn't Save {} rows of type: {} ", entities.size(), entities.getFirst().getClass().getName());
-        log.info("Printing entities {} ", entities);
-
-        //saveHistoricalPrices(partitions, repository);
-        //log.info("Saved {} rows of type: {} ", entities.size(), entities.getFirst().getClass().getName());
+        save(partitions, repository);
+        log.info("Saved {} rows of type: {} ", entities.size(), entities.getFirst().getClass().getName());
     }
 
-    private static <T, R extends PriceEntity> void saveHistoricalPrices(List<List<T>> partitions, JpaRepository<R, Long> repository) {
+    private static <T, R extends PriceEntity> void save(List<List<T>> partitions, JpaRepository<R, Long> repository) {
         List<Callable<Void>> callables = partitions.stream().map(sublist ->
                 (Callable<Void>) () -> {
-                    repository.saveAll((List<R>) sublist);
+                    @SuppressWarnings("unchecked")
+                    List<R> rs = (List<R>) sublist;
+                    repository.saveAll( rs);
                     return null;
                 }).collect(Collectors.toList());
         ExecutorService executorService = Executors.newFixedThreadPool(NR_THREADS);

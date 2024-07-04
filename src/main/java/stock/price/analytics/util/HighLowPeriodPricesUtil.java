@@ -9,7 +9,7 @@ import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 import stock.price.analytics.model.prices.ohlc.WeeklyPriceOHLC;
 
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Period;
@@ -19,8 +19,8 @@ import java.util.List;
 
 public class HighLowPeriodPricesUtil extends PricesOHLCUtil {
 
-    public static List<HighLowForPeriod> highLowFromFileForPeriod(LocalDate startDate, LocalDate endDate, StockPerformanceInterval stockPerformanceInterval) throws IOException {
-        List<DailyPriceOHLC> dailyPrices = dailyPricesOHLCFromFile(Paths.get(Constants.STOCKS_LOCATION));
+    public static List<HighLowForPeriod> highLowFromFileForPeriod(Path srcFile, LocalDate startDate, LocalDate endDate, StockPerformanceInterval stockPerformanceInterval) throws IOException {
+        List<DailyPriceOHLC> dailyPrices = dailyPricesOHLCFromFile(srcFile);
         List<WeeklyPriceOHLC> weeklyGroupedPrices = getPriceOHLCsForTimeframe(dailyPrices, StockTimeframe.WEEKLY).stream().map(WeeklyPriceOHLC.class::cast).toList();
         return getHighLowForPeriod(
                 weeklyGroupedPrices.stream().filter(whp -> whp.getStartDate().isAfter(startDate) && whp.getStartDate().isBefore(endDate)).toList(),

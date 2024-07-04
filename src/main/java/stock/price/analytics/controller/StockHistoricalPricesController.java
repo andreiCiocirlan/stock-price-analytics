@@ -31,19 +31,19 @@ public class StockHistoricalPricesController {
     @PostMapping("/weekly_prices")
     @ResponseStatus(HttpStatus.OK)
     public void saveWeeklyPrices() {
-        stockHistoricalPricesService.savePricesFromFileAndTimeframe(StockTimeframe.WEEKLY);
+        stockHistoricalPricesService.savePricesForTimeframe(StockTimeframe.WEEKLY);
     }
 
     @PostMapping("/monthly_prices")
     @ResponseStatus(HttpStatus.OK)
     public void saveMonthlyPrices() {
-        stockHistoricalPricesService.savePricesFromFileAndTimeframe(StockTimeframe.MONTHLY);
+        stockHistoricalPricesService.savePricesForTimeframe(StockTimeframe.MONTHLY);
     }
 
     @PostMapping("/yearly_prices")
     @ResponseStatus(HttpStatus.OK)
     public void saveYearlyPrices() {
-        stockHistoricalPricesService.savePricesFromFileAndTimeframe(StockTimeframe.YEARLY);
+        stockHistoricalPricesService.savePricesForTimeframe(StockTimeframe.YEARLY);
     }
 
 }

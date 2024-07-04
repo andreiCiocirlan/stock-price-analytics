@@ -3,8 +3,8 @@ fetchStockPerformance();
 function fetchStockPerformance() {
     const urlParams = new URLSearchParams(window.location.search);
     const timeFrame = urlParams.has('timeFrame') ? urlParams.get('timeFrame') : 'MONTHLY';
-    const numRows = urlParams.has('rows') ? urlParams.get('rows') : 30;
-    const numCols = urlParams.has('cols') ? urlParams.get('cols') : 33;
+    const numRows = urlParams.has('rows') ? urlParams.get('rows') : 20;
+    const numCols = urlParams.has('cols') ? urlParams.get('cols') : 25;
     const xtbOnly = urlParams.has('xtb') ? urlParams.get('xtb') : true;
     let url = '/stock-performance-json';
     if (timeFrame) {
@@ -43,7 +43,7 @@ function fetchStockPerformance() {
                 series: [{
                     name: 'Stock Performance',
                     borderWidth: 0.2,
-                    data: data  .sort((a, b) => b.performance - a.performance)
+                    data:   data.sort((a, b) => b.performance - a.performance)
                                 .slice(0, numRows * numCols).reduce((acc, item, index) => {
                                     const rowIndex = Math.floor(index / numRows); // Adjust the number of columns per row as needed
                                     const ticker = item.ticker;
