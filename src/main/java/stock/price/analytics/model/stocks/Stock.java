@@ -1,4 +1,4 @@
-package stock.price.analytics.model.stock;
+package stock.price.analytics.model.stocks;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -34,18 +34,29 @@ public class Stock {
     private double cfdMargin; // 20% for 5:1, 50% for 2:1 etc.
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Column(name = "date")
-    private LocalDate date; // date stock was added (IPO)
+    @Column(name = "ipo_date")
+    private LocalDate ipoDate; // date stock was added (IPO)
 
-    public Stock(String ticker, LocalDate date, boolean xtbStock) {
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Column(name = "delisted_date")
+    private LocalDate delistedDate; // date stock was added (IPO)
+
+    public Stock(String ticker, LocalDate ipoDate, LocalDate delistedDate, boolean xtbStock) {
         this.ticker= ticker;
-        this.date = date;
+        this.ipoDate = ipoDate;
+        this.delistedDate = delistedDate;
         this.xtbStock = xtbStock;
     }
 
-    public Stock(String ticker, LocalDate date) {
+    public Stock(String ticker, LocalDate ipoDate, boolean xtbStock) {
         this.ticker= ticker;
-        this.date = date;
+        this.ipoDate = ipoDate;
+        this.xtbStock = xtbStock;
+    }
+
+    public Stock(String ticker, LocalDate ipoDate) {
+        this.ticker= ticker;
+        this.ipoDate = ipoDate;
     }
 
     @Override
@@ -53,7 +64,8 @@ public class Stock {
         return "Stock{" +
                 "ticker='" + ticker + '\'' +
                 ", xtbStock=" + xtbStock +
-                ", date=" + date +
+                ", ipoDate=" + ipoDate +
+                ", delistedDate=" + delistedDate +
                 ", shortSell=" + shortSell +
                 ", cfdMargin=" + cfdMargin +
                 '}';

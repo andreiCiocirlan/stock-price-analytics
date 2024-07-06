@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import stock.price.analytics.model.stock.Stock;
+import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.StockRepository;
 import stock.price.analytics.util.Constants;
 import stock.price.analytics.util.FileUtils;
@@ -36,21 +36,18 @@ public class StockService {
         List<String> existingStocks = stockRepository.findAll().stream().map(Stock::getTicker).toList();
         try (Stream<Path> walk = walk(Paths.get(Constants.STOCKS_LOCATION))) {
             walk.filter(Files::isRegularFile)
-                    .filter(srcFile -> isNotAlreadyPersistedStock(srcFile, existingStocks))
-                    .parallel().forEachOrdered(srcFile -> { // must be forEachOrdered
-                        String fileName = srcFile.getFileName().toString();
-                        String ticker = fileName.substring(0, fileName.length() - 4);
-                        if (tickersXTB.contains(fileName)) {
-                            stocks.add(new Stock(ticker, LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.FRIDAY)), true));
-                        } else {
-                            stocks.add(new Stock(ticker, LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.FRIDAY))));
-                        }
-                    });
+                .filter(srcFile -> isNotAlreadyPersistedStock(srcFile, existingStocks))
+                .parallel().forEachOrdered(srcFile -> { // must be forEachOrdered
+                    String fileName = srcFile.getFileName().toString();
+                    String ticker = fileName.substring(0, fileName.length() - 4);
+                    boolean xtbStock = tickersXTB.contains(fileName);
+                    stocks.add(new Stock(ticker, LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.FRIDAY)), xtbStock));
+                });
         }
         boolean removed = stocks.removeAll(stockRepository.findAll());
         log.info("remaining stocks {}", stocks);
         log.info("removed {}", removed);
-        //stockRepository.saveAll(stocks);
+        stockRepository.saveAll(stocks);
     }
 
     private static boolean isNotAlreadyPersistedStock(Path srcFile, List<String> existingStocks) {
