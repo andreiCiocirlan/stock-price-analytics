@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.service.StockHistoricalPricesService;
@@ -18,8 +19,8 @@ public class StockHistoricalPricesController {
 
     @PostMapping("/last_week_prices")
     @ResponseStatus(HttpStatus.OK)
-    public void saveLastWeekPricesFromFiles() {
-        stockHistoricalPricesService.saveLastWeekPricesFromFiles();
+    public void saveLastWeekPricesFromFiles(@RequestParam(required = false, value = "tickers") String tickers) {
+        stockHistoricalPricesService.saveLastWeekPricesFromFiles(tickers);
     }
 
     @PostMapping("/daily_prices")

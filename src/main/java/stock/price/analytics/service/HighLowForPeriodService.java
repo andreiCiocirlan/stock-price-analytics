@@ -9,7 +9,7 @@ import stock.price.analytics.model.prices.enums.StockPerformanceInterval;
 import stock.price.analytics.model.prices.highlow.HighLow30Days;
 import stock.price.analytics.model.prices.highlow.HighLow52Week;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
-import stock.price.analytics.repository.HighLowRepository;
+import stock.price.analytics.repository.prices.HighLowRepository;
 import stock.price.analytics.util.Constants;
 
 import java.io.IOException;
@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 import static java.nio.file.Files.walk;
 import static java.time.LocalDate.of;
 import static stock.price.analytics.util.HighLowPeriodPricesUtil.highLowFromFileForPeriod;
-import static stock.price.analytics.util.PriceEntityPartitionAndSaveUtil.partitionDataAndSave;
+import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 
 @Slf4j
 @Service

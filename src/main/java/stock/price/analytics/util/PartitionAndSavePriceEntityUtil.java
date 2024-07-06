@@ -16,7 +16,7 @@ import static stock.price.analytics.util.Constants.NR_THREADS;
 
 @Slf4j
 @Component
-public class PriceEntityPartitionAndSaveUtil {
+public class PartitionAndSavePriceEntityUtil {
 
     public static <T, R extends PriceEntity> void partitionDataAndSave(List<T> entities, JpaRepository<R, Long> repository) {
         if (entities.isEmpty()) {

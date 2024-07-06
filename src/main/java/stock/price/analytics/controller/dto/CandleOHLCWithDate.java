@@ -1,4 +1,4 @@
-package stock.price.analytics.model.dto;
+package stock.price.analytics.controller.dto;
 
 
 import java.time.LocalDate;

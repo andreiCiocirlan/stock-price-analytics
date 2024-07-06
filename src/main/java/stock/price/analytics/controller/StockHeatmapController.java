@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
-import stock.price.analytics.model.dto.StockPerformanceDTO;
+import stock.price.analytics.controller.dto.StockPerformanceDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.service.StockPerformanceService;
 
@@ -31,10 +31,11 @@ public class StockHeatmapController {
     @ResponseBody
     public List<StockPerformanceDTO> getStockPerformance(@RequestParam(required = false, value = "timeFrame") StockTimeframe timeFrame,
                                                          @RequestParam(required = false, value = "xtb") Boolean xtb,
-                                                         @RequestParam(required = false, value = "cfdMargin") Double cfdMargin) {
+                                                         @RequestParam(required = false, value = "cfdMargin") Double cfdMargin,
+                                                         @RequestParam(required = false, value = "date") LocalDate date) {
         return stockPerformanceService.stockPerformanceForDateAndTimeframeAndFilters(
                 timeFrame != null ? timeFrame : StockTimeframe.MONTHLY,
-                LocalDate.of(2024, 6, 26),
+                date != null ? date : LocalDate.now(),
                 xtb,
                 cfdMargin
         );

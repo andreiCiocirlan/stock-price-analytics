@@ -6,7 +6,6 @@ import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -31,7 +30,7 @@ public class PricesOHLCUtil {
     public static final AtomicInteger OPEN_IS_ZERO_ERROR = new AtomicInteger(0);
     public static final AtomicInteger HIGH_LOW_ERROR = new AtomicInteger(0);
 
-    public static List<AbstractPriceOHLC> pricesOHLCForFileAndTimeframe(Path srcFile, StockTimeframe stockTimeframe) throws IOException {
+    public static List<AbstractPriceOHLC> pricesOHLCForFileAndTimeframe(Path srcFile, StockTimeframe stockTimeframe) {
         List<DailyPriceOHLC> dailyPrices = dailyPricesOHLCFromFile(srcFile);
 
         return getPriceOHLCsForTimeframe(dailyPrices, stockTimeframe);
@@ -82,18 +81,27 @@ public class PricesOHLCUtil {
         };
     }
 
-    public static List<DailyPriceOHLC> dailyPricesOHLCFromFile(Path srcFile) throws IOException {
+    public static List<DailyPriceOHLC> dailyPricesOHLCFromFile(Path srcFile) {
         List<DailyPriceOHLC> dailyPricesOHLC = new ArrayList<>();
         final String ticker = tickerFrom(srcFile);
-        readAllLines(srcFile).stream().skip(1).parallel().forEachOrdered(line -> addDailyPrices(line, ticker, dailyPricesOHLC));
+        try {
+            readAllLines(srcFile).stream().skip(1).parallel().forEachOrdered(line -> addDailyPrices(line, ticker, dailyPricesOHLC));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return dailyPricesOHLC;
     }
 
-    public static List<DailyPriceOHLC> dailyPricesFromFileLastWeek(Path srcFile, int lastDays) throws IOException {
+    public static List<DailyPriceOHLC> dailyPricesFromFileLastWeek(Path srcFile, int lastDays) {
         List<DailyPriceOHLC> dailyPrices = new ArrayList<>();
         final String ticker = tickerFrom(srcFile);
 
-        List<String> lines = Files.readAllLines(srcFile);
+        List<String> lines;
+        try {
+            lines = readAllLines(srcFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         int skipCount = Math.max(1, lines.size() + 1 - lastDays);
         lines.stream().skip(skipCount).parallel().forEachOrdered(line -> addDailyPrices(line, ticker, dailyPrices));
         return dailyPrices;
@@ -116,7 +124,7 @@ public class PricesOHLCUtil {
         }
     }
 
-    private static String tickerFrom(Path srcFile) {
+    public static String tickerFrom(Path srcFile) {
         String fileName = srcFile.getFileName().toString();
         return fileName.substring(0, fileName.length() - 4); // remove .csv
     }

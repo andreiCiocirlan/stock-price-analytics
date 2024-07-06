@@ -1,4 +1,4 @@
-package stock.price.analytics.repository;
+package stock.price.analytics.repository.stocks;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

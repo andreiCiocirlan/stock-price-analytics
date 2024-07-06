@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.model.stocks.Stock;
-import stock.price.analytics.repository.StockRepository;
+import stock.price.analytics.repository.stocks.StockRepository;
 import stock.price.analytics.util.Constants;
 import stock.price.analytics.util.FileUtils;
 
