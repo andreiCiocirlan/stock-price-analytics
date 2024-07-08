@@ -67,7 +67,8 @@ function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, 
             legend: { itemStyle: { color: '#FFFFFF' } },
             colorAxis: {
                  dataClasses: [
-                        { from: -100, to: -10.3, color: '#E53935' }, // Bright red for performance < -8.3
+//                        { from: -100, to: -10.3, color: '#E53935' }, // Bright red for performance < -8.3
+                        { from: -100, to: -10.3, color: '#171B26' }, // Bright red for performance < -8.3
                         { from: -10.3, to: -5.6, color: '#C82925' },
                         { from: -5.6, to: -2.9, color: '#AF3835' },
                         { from: -2.9, to: -0.5, color: '#7D2A27' },
@@ -76,7 +77,8 @@ function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, 
                         { from: 0.5, to: 2.9, color: '#165E45' },
                         { from: 2.9, to: 5.6, color: '#027B52' },
                         { from: 5.6, to: 10.3, color: '#00A06A' },
-                        { from: 10.3, to: 10000, color: '#00B24D' } // Very green for performance > 8.3
+//                        { from: 10.3, to: 10000, color: '#00B24D' } // Very green for performance > 8.3
+                        { from: 10.3, to: 10000, color: '#171B26' } // Very green for performance > 8.3
                  ]
             },
             plotOptions: {
@@ -87,6 +89,7 @@ function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, 
                 dataLabels: {
                     enabled: true,
                     color: '#FFFFFF',
+                    style: {fontSize : 25},
                     formatter: function() { return data[this.point.index].ticker + '<br>' + data[this.point.index].performance; }
                 },
                 point: {
