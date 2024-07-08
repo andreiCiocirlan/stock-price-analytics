@@ -9,7 +9,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.controller.dto.StockPerformanceDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.model.prices.ohlc.AbstractPriceOHLC;
+import stock.price.analytics.model.prices.ohlc.dto.PerformanceHeatmapDto;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -29,7 +29,7 @@ public class StockHeatmapPerformanceService {
     public List<StockPerformanceDTO> stockPerformanceForDateAndTimeframeAndFilters(StockTimeframe timeFrame, Boolean xtb, Boolean positivePerfFirst, Integer limit, Double cfdMargin) {
         String queryStr = queryFrom(timeFrame, positivePerfFirst, limit, xtb);
 
-        Query nativeQuery = entityManager.createNativeQuery(queryStr, tableClassFrom(timeFrame));
+        Query nativeQuery = entityManager.createNativeQuery(queryStr, PerformanceHeatmapDto.class);
         LocalDate date = LocalDate.now();
         if (timeFrame == WEEKLY && date.getDayOfWeek().equals(DayOfWeek.MONDAY)) { // Monday import not done (use past week)
             date = date.minusDays(5);
@@ -40,17 +40,17 @@ public class StockHeatmapPerformanceService {
         nativeQuery.setParameter("cfdMargin", cfdMargin);
 
         @SuppressWarnings("unchecked")
-        List<? extends AbstractPriceOHLC> priceOHLCs = (List<? extends AbstractPriceOHLC>) nativeQuery.getResultList();
+        List<? extends PerformanceHeatmapDto> priceOHLCs = (List<? extends PerformanceHeatmapDto>) nativeQuery.getResultList();
 
         return priceOHLCs.stream()
-                .map(item -> new StockPerformanceDTO(item.getTicker(), item.getPerformance()))
+                .map(item -> new StockPerformanceDTO(item.ticker(), item.performance()))
                 .toList();
     }
 
     private static String queryFrom(StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, Boolean xtb) {
         String dbTable = dbTableForPerfHeatmapFrom(timeFrame);
         String query = STR."""
-            SELECT p.* FROM \{dbTable} p JOIN Stocks s ON s.ticker = p.ticker
+            SELECT p.ticker, p.performance FROM \{dbTable} p JOIN Stocks s ON s.ticker = p.ticker
             """;
 
         if (Boolean.TRUE.equals(xtb)) {
