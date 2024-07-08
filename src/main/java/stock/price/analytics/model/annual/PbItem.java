@@ -6,9 +6,6 @@ public class PbItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "PbItem{" +
-                        "period = '" + getPeriod() + '\'' +
-                        ",v = '" + getV() + '\'' +
-                        "}";
+                STR."PbItem{period = '\{getPeriod()}\{'\''},v = '\{getV()}\{'\''}}";
     }
 }

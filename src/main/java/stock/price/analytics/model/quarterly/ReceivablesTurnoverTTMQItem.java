@@ -9,9 +9,6 @@ public class ReceivablesTurnoverTTMQItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "ReceivablesTurnoverTTMQItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."ReceivablesTurnoverTTMQItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

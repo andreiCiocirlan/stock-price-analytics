@@ -6,9 +6,6 @@ public class LongtermDebtTotalCapitalItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "LongtermDebtTotalCapitalItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."LongtermDebtTotalCapitalItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

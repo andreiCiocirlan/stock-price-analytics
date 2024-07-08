@@ -47,9 +47,6 @@ public abstract class HighLowForPeriod implements PriceEntity {
 
     @Override
     public String toString() {
-        return  "ticker=" + ticker +
-                ", weeklyClose=" + weeklyClose +
-                ", startDate=" + startDate +
-                ", endDate=" + endDate;
+        return STR."ticker=\{ticker}, weeklyClose=\{weeklyClose}, startDate=\{startDate}, endDate=\{endDate}";
     }
 }

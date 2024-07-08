@@ -9,9 +9,6 @@ public class InventoryTurnoverTTMQItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "InventoryTurnoverTTMQItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."InventoryTurnoverTTMQItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

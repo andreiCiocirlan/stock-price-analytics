@@ -36,10 +36,7 @@ public class WeeklyPriceOHLC extends AbstractPriceOHLC {
 
     @Override
     public String toString() {
-        return "Weekly_OHLC { " +
-                " StartDate=" + startDate +
-                " EndDate=" + endDate +
-                super.toString();
+        return STR."Weekly_OHLC {  StartDate=\{startDate} EndDate=\{endDate}\{super.toString()}";
     }
 
 }

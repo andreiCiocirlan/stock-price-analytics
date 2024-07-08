@@ -9,9 +9,6 @@ public class RoeTTMQItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "RoeTTMQItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."RoeTTMQItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

@@ -9,9 +9,6 @@ public class FcfMarginQItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "FcfMarginQItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."FcfMarginQItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

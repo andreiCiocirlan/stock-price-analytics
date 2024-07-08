@@ -9,9 +9,6 @@ public class QuickRatioQItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "QuickRatioQItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."QuickRatioQItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

@@ -6,9 +6,6 @@ public class PfcfItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "PfcfItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."PfcfItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

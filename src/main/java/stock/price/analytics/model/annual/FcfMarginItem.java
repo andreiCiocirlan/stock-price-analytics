@@ -6,9 +6,6 @@ public class FcfMarginItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "FcfMarginItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."FcfMarginItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

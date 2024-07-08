@@ -9,9 +9,6 @@ public class PfcfTTMQItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "PfcfTTMQItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."PfcfTTMQItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

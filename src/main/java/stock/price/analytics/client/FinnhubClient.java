@@ -46,7 +46,7 @@ public class FinnhubClient {
 
     public ResponseEntity<FinancialData> financialDataFor(String ticker) {
         try {
-            return restTemplate.getForEntity(Constants.BASE_URL + "/stock/metric?symbol={ticker}&metric=all&token={apiKey}",
+            return restTemplate.getForEntity(STR."\{Constants.BASE_URL}/stock/metric?symbol={ticker}&metric=all&token={apiKey}",
                     FinancialData.class, ticker, apiKey);
         } catch (RestClientException e) {
             log.error("Failed retrieving financial data for ticker {}", ticker);
@@ -56,7 +56,7 @@ public class FinnhubClient {
 
     public ResponseEntity<String> financialDataStringFor(String ticker) {
         try {
-            return restTemplate.getForEntity(Constants.BASE_URL + "/stock/metric?symbol={ticker}&metric=all&token={apiKey}",
+            return restTemplate.getForEntity(STR."\{Constants.BASE_URL}/stock/metric?symbol={ticker}&metric=all&token={apiKey}",
                     String.class, ticker, apiKey);
         } catch (RestClientException e) {
             log.error("Failed retrieving financial data String for ticker {}", ticker);

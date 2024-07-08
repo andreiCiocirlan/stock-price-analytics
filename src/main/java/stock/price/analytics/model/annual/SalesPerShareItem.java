@@ -6,9 +6,6 @@ public class SalesPerShareItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "SalesPerShareItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."SalesPerShareItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

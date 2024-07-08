@@ -6,9 +6,6 @@ public class CurrentRatioItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "CurrentRatioItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."CurrentRatioItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

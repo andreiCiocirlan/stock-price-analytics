@@ -9,9 +9,6 @@ public class PsTTMQItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "PsTTMQItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."PsTTMQItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

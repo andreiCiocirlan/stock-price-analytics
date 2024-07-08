@@ -6,9 +6,6 @@ public class EbitPerShareItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "EbitPerShareItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."EbitPerShareItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

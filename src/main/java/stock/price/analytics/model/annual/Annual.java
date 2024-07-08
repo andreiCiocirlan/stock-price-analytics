@@ -444,43 +444,6 @@ public class Annual {
     @Override
     public String toString() {
         return
-                "Annual{" +
-                        "operatingMargin = '" + operatingMargin + '\'' +
-                        ",ps = '" + ps + '\'' +
-                        ",quickRatio = '" + quickRatio + '\'' +
-                        ",roa = '" + roa + '\'' +
-                        ",cashRatio = '" + cashRatio + '\'' +
-                        ",roe = '" + roe + '\'' +
-                        ",pretaxMargin = '" + pretaxMargin + '\'' +
-                        ",fcfMargin = '" + fcfMargin + '\'' +
-                        ",totalRatio = '" + totalRatio + '\'' +
-                        ",totalDebtToEquity = '" + totalDebtToEquity + '\'' +
-                        ",totalDebtToTotalCapital = '" + totalDebtToTotalCapital + '\'' +
-                        ",rotc = '" + rotc + '\'' +
-                        ",currentRatio = '" + currentRatio + '\'' +
-                        ",longtermDebtTotalCapital = '" + longtermDebtTotalCapital + '\'' +
-                        ",bookValue = '" + bookValue + '\'' +
-                        ",tangibleBookValue = '" + tangibleBookValue + '\'' +
-                        ",roic = '" + roic + '\'' +
-                        ",sgaToSale = '" + sgaToSale + '\'' +
-                        ",ebitPerShare = '" + ebitPerShare + '\'' +
-                        ",inventoryTurnover = '" + inventoryTurnover + '\'' +
-                        ",eps = '" + eps + '\'' +
-                        ",netMargin = '" + netMargin + '\'' +
-                        ",ptbv = '" + ptbv + '\'' +
-                        ",receivablesTurnover = '" + receivablesTurnover + '\'' +
-                        ",pfcf = '" + pfcf + '\'' +
-                        ",netDebtToTotalEquity = '" + netDebtToTotalEquity + '\'' +
-                        ",ev = '" + ev + '\'' +
-                        ",pb = '" + pb + '\'' +
-                        ",salesPerShare = '" + salesPerShare + '\'' +
-                        ",pe = '" + pe + '\'' +
-                        ",longtermDebtTotalAsset = '" + longtermDebtTotalAsset + '\'' +
-                        ",totalDebtToTotalAsset = '" + totalDebtToTotalAsset + '\'' +
-                        ",longtermDebtTotalEquity = '" + longtermDebtTotalEquity + '\'' +
-                        ",grossMargin = '" + grossMargin + '\'' +
-                        ",payoutRatio = '" + payoutRatio + '\'' +
-                        ",netDebtToTotalCapital = '" + netDebtToTotalCapital + '\'' +
-                        "}";
+                STR."Annual{operatingMargin = '\{operatingMargin}\{'\''},ps = '\{ps}\{'\''},quickRatio = '\{quickRatio}\{'\''},roa = '\{roa}\{'\''},cashRatio = '\{cashRatio}\{'\''},roe = '\{roe}\{'\''},pretaxMargin = '\{pretaxMargin}\{'\''},fcfMargin = '\{fcfMargin}\{'\''},totalRatio = '\{totalRatio}\{'\''},totalDebtToEquity = '\{totalDebtToEquity}\{'\''},totalDebtToTotalCapital = '\{totalDebtToTotalCapital}\{'\''},rotc = '\{rotc}\{'\''},currentRatio = '\{currentRatio}\{'\''},longtermDebtTotalCapital = '\{longtermDebtTotalCapital}\{'\''},bookValue = '\{bookValue}\{'\''},tangibleBookValue = '\{tangibleBookValue}\{'\''},roic = '\{roic}\{'\''},sgaToSale = '\{sgaToSale}\{'\''},ebitPerShare = '\{ebitPerShare}\{'\''},inventoryTurnover = '\{inventoryTurnover}\{'\''},eps = '\{eps}\{'\''},netMargin = '\{netMargin}\{'\''},ptbv = '\{ptbv}\{'\''},receivablesTurnover = '\{receivablesTurnover}\{'\''},pfcf = '\{pfcf}\{'\''},netDebtToTotalEquity = '\{netDebtToTotalEquity}\{'\''},ev = '\{ev}\{'\''},pb = '\{pb}\{'\''},salesPerShare = '\{salesPerShare}\{'\''},pe = '\{pe}\{'\''},longtermDebtTotalAsset = '\{longtermDebtTotalAsset}\{'\''},totalDebtToTotalAsset = '\{totalDebtToTotalAsset}\{'\''},longtermDebtTotalEquity = '\{longtermDebtTotalEquity}\{'\''},grossMargin = '\{grossMargin}\{'\''},payoutRatio = '\{payoutRatio}\{'\''},netDebtToTotalCapital = '\{netDebtToTotalCapital}\{'\''}}";
     }
 }

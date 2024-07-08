@@ -9,9 +9,6 @@ public class GrossMarginQItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "GrossMarginQItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."GrossMarginQItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

@@ -470,45 +470,6 @@ public class Quarterly {
     @Override
     public String toString() {
         return
-                "Quarterly{" +
-                        ",pfcfTTM_q = '" + pfcfTTMQ + '\'' +
-                        ",receivablesTurnoverTTM_q = '" + receivablesTurnoverTTMQ + '\'' +
-                        ",netMargin_q = '" + netMarginQ + '\'' +
-                        ",totalDebtToTotalAsset_q = '" + totalDebtToTotalAssetQ + '\'' +
-                        ",totalDebtToTotalCapital_q = '" + totalDebtToTotalCapitalQ + '\'' +
-                        ",longtermDebtTotalEquity_q = '" + longtermDebtTotalEquityQ + '\'' +
-                        ",roicTTM_q = '" + roicTTMQ + '\'' +
-                        ",ev_q = '" + evQ + '\'' +
-                        ",roeTTM_q = '" + roeTTMQ + '\'' +
-                        ",bookValue_q = '" + bookValueQ + '\'' +
-                        ",longtermDebtTotalAsset_q = '" + longtermDebtTotalAssetQ + '\'' +
-                        ",grossMargin_q = '" + grossMarginQ + '\'' +
-                        ",pb_q = '" + pbQ + '\'' +
-                        ",netDebtToTotalCapital_q = '" + netDebtToTotalCapitalQ + '\'' +
-                        ",ebitPerShare_q = '" + ebitPerShareQ + '\'' +
-                        ",totalDebtToEquity_q = '" + totalDebtToEquityQ + '\'' +
-                        ",inventoryTurnoverTTM_q = '" + inventoryTurnoverTTMQ + '\'' +
-                        ",currentRatio_q = '" + currentRatioQ + '\'' +
-                        ",sgaToSale_q = '" + sgaToSaleQ + '\'' +
-                        ",eps_q = '" + epsQ + '\'' +
-                        ",cashRatio_q = '" + cashRatioQ + '\'' +
-                        ",roaTTM_q = '" + roaTTMQ + '\'' +
-                        ",payoutRatioTTM_q = '" + payoutRatioTTMQ + '\'' +
-                        ",psTTM_q = '" + psTTMQ + '\'' +
-                        ",assetTurnoverTTM_q = '" + assetTurnoverTTMQ + '\'' +
-                        ",ptbv_q = '" + ptbvQ + '\'' +
-                        ",tangibleBookValue_q = '" + tangibleBookValueQ + '\'' +
-                        ",quickRatio_q = '" + quickRatioQ + '\'' +
-                        ",totalRatio_q = '" + totalRatioQ + '\'' +
-                        ",fcfMargin_q = '" + fcfMarginQ + '\'' +
-                        ",longtermDebtTotalCapital_q = '" + longtermDebtTotalCapitalQ + '\'' +
-                        ",peTTM_q = '" + peTTMQ + '\'' +
-                        ",operatingMargin_q = '" + operatingMarginQ + '\'' +
-                        ",pretaxMargin_q = '" + pretaxMarginQ + '\'' +
-                        ",rotcTTM_q = '" + rotcTTMQ + '\'' +
-                        ",salesPerShare_q = '" + salesPerShareQ + '\'' +
-                        ",fcfPerShareTTM_q = '" + fcfPerShareTTMQ + '\'' +
-                        ",netDebtToTotalEquity_q = '" + netDebtToTotalEquityQ + '\'' +
-                        "}";
+                STR."Quarterly{,pfcfTTM_q = '\{pfcfTTMQ}\{'\''},receivablesTurnoverTTM_q = '\{receivablesTurnoverTTMQ}\{'\''},netMargin_q = '\{netMarginQ}\{'\''},totalDebtToTotalAsset_q = '\{totalDebtToTotalAssetQ}\{'\''},totalDebtToTotalCapital_q = '\{totalDebtToTotalCapitalQ}\{'\''},longtermDebtTotalEquity_q = '\{longtermDebtTotalEquityQ}\{'\''},roicTTM_q = '\{roicTTMQ}\{'\''},ev_q = '\{evQ}\{'\''},roeTTM_q = '\{roeTTMQ}\{'\''},bookValue_q = '\{bookValueQ}\{'\''},longtermDebtTotalAsset_q = '\{longtermDebtTotalAssetQ}\{'\''},grossMargin_q = '\{grossMarginQ}\{'\''},pb_q = '\{pbQ}\{'\''},netDebtToTotalCapital_q = '\{netDebtToTotalCapitalQ}\{'\''},ebitPerShare_q = '\{ebitPerShareQ}\{'\''},totalDebtToEquity_q = '\{totalDebtToEquityQ}\{'\''},inventoryTurnoverTTM_q = '\{inventoryTurnoverTTMQ}\{'\''},currentRatio_q = '\{currentRatioQ}\{'\''},sgaToSale_q = '\{sgaToSaleQ}\{'\''},eps_q = '\{epsQ}\{'\''},cashRatio_q = '\{cashRatioQ}\{'\''},roaTTM_q = '\{roaTTMQ}\{'\''},payoutRatioTTM_q = '\{payoutRatioTTMQ}\{'\''},psTTM_q = '\{psTTMQ}\{'\''},assetTurnoverTTM_q = '\{assetTurnoverTTMQ}\{'\''},ptbv_q = '\{ptbvQ}\{'\''},tangibleBookValue_q = '\{tangibleBookValueQ}\{'\''},quickRatio_q = '\{quickRatioQ}\{'\''},totalRatio_q = '\{totalRatioQ}\{'\''},fcfMargin_q = '\{fcfMarginQ}\{'\''},longtermDebtTotalCapital_q = '\{longtermDebtTotalCapitalQ}\{'\''},peTTM_q = '\{peTTMQ}\{'\''},operatingMargin_q = '\{operatingMarginQ}\{'\''},pretaxMargin_q = '\{pretaxMarginQ}\{'\''},rotcTTM_q = '\{rotcTTMQ}\{'\''},salesPerShare_q = '\{salesPerShareQ}\{'\''},fcfPerShareTTM_q = '\{fcfPerShareTTMQ}\{'\''},netDebtToTotalEquity_q = '\{netDebtToTotalEquityQ}\{'\''}}";
     }
 }

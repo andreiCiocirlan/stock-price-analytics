@@ -9,9 +9,6 @@ public class PtbvQItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "PtbvQItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."PtbvQItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

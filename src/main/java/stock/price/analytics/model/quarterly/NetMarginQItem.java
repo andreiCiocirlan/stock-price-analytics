@@ -9,9 +9,6 @@ public class NetMarginQItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "NetMarginQItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."NetMarginQItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

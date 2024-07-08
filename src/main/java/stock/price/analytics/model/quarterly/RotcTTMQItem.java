@@ -9,9 +9,6 @@ public class RotcTTMQItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "RotcTTMQItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."RotcTTMQItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

@@ -9,9 +9,6 @@ public class EvQItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "EvQItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."EvQItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

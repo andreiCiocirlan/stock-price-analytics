@@ -35,8 +35,6 @@ public class Series {
     @Override
     public String toString() {
         return
-                "Series{" +
-                        "annual = '" + annual + '\'' +
-                        "}";
+                STR."Series{annual = '\{annual}\{'\''}}";
     }
 }

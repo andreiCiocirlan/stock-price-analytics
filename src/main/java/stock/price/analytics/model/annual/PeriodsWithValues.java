@@ -16,8 +16,6 @@ public class PeriodsWithValues {
 
     @Override
     public String toString() {
-        return "PeriodsWithValues{" +
-                "periodWithValueList=" + periodWithValueList +
-                '}';
+        return STR."PeriodsWithValues{periodWithValueList=\{periodWithValueList}\{'}'}";
     }
 }

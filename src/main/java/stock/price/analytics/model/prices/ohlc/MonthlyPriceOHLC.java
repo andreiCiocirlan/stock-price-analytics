@@ -36,10 +36,7 @@ public class MonthlyPriceOHLC extends AbstractPriceOHLC {
 
     @Override
     public String toString() {
-        return "Monthly_OHLC { " +
-                " StartDate=" + startDate +
-                " EndDate=" + endDate +
-                super.toString();
+        return STR."Monthly_OHLC {  StartDate=\{startDate} EndDate=\{endDate}\{super.toString()}";
     }
 
 }

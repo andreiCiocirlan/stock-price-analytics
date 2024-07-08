@@ -9,9 +9,6 @@ public class PeTTMQItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "PeTTMQItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."PeTTMQItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

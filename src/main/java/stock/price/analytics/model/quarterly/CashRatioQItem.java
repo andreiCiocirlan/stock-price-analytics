@@ -9,9 +9,6 @@ public class CashRatioQItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "CashRatioQItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."CashRatioQItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

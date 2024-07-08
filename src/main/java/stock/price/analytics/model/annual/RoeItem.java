@@ -6,9 +6,6 @@ public class RoeItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "RoeItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."RoeItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

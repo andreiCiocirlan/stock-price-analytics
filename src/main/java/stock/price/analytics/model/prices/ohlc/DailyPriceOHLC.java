@@ -32,9 +32,7 @@ public class DailyPriceOHLC extends AbstractPriceOHLC {
 
     @Override
     public String toString() {
-        return "Daily_OHLC { "
-                + " date=" + date
-                + super.toString();
+        return STR."Daily_OHLC {  date=\{date}\{super.toString()}";
     }
 
     @Override

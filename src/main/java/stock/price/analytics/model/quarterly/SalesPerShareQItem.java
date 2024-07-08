@@ -9,9 +9,6 @@ public class SalesPerShareQItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "SalesPerShareQItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."SalesPerShareQItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

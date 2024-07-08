@@ -37,10 +37,6 @@ public class HighLow30Days extends HighLowForPeriod {
 
     @Override
     public String toString() {
-        return "HighLow30Days { " +
-                super.toString() +
-                ", low30day=" + low30day +
-                ", high30day=" + high30day +
-                "} ";
+        return STR."HighLow30Days { \{super.toString()}, low30day=\{low30day}, high30day=\{high30day}} ";
     }
 }

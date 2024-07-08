@@ -6,9 +6,6 @@ public class PsItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "PsItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."PsItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

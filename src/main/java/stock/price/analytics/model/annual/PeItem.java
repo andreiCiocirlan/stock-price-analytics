@@ -6,9 +6,6 @@ public class PeItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "PeItem{" +
-                        "period = '" + getPeriod() + '\'' +
-                        ",v = '" + getV() + '\'' +
-                        "}";
+                STR."PeItem{period = '\{getPeriod()}\{'\''},v = '\{getV()}\{'\''}}";
     }
 }

@@ -9,9 +9,6 @@ public class OperatingMarginQItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "OperatingMarginQItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."OperatingMarginQItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

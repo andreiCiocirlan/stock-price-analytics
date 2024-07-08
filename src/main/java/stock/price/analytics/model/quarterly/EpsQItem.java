@@ -9,9 +9,6 @@ public class EpsQItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "EpsQItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."EpsQItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

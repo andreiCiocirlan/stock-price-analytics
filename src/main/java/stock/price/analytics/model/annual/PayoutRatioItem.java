@@ -6,9 +6,6 @@ public class PayoutRatioItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "PayoutRatioItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."PayoutRatioItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

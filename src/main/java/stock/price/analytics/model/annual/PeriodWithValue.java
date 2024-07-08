@@ -36,9 +36,6 @@ public class PeriodWithValue {
     @Override
     public String toString() {
         return
-                "ResponseItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."ResponseItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

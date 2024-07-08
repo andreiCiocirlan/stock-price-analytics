@@ -9,9 +9,6 @@ public class SgaToSaleQItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "SgaToSaleQItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."SgaToSaleQItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

@@ -46,12 +46,7 @@ public abstract class AbstractPriceOHLC  implements PriceEntity {
 
     @Override
     public String toString() {
-        return "ticker=" + ticker +
-                ", Open=" + open +
-                ", High=" + high +
-                ", Low=" + low +
-                ", Close=" + close +
-                '}';
+        return STR."ticker=\{ticker}, Open=\{open}, High=\{high}, Low=\{low}, Close=\{close}\{'}'}";
     }
 
 }

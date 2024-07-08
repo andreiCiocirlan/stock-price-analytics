@@ -9,9 +9,6 @@ public class TotalDebtToTotalCapitalQItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "TotalDebtToTotalCapitalQItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."TotalDebtToTotalCapitalQItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

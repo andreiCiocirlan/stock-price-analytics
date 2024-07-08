@@ -58,11 +58,6 @@ public class FinancialData {
     @Override
     public String toString() {
         return
-                "Response{" +
-                        "metricType = '" + metricType + '\'' +
-                        ",symbol = '" + symbol + '\'' +
-                        ",metric = '" + metric + '\'' +
-                        ",series = '" + series + '\'' +
-                        "}";
+                STR."Response{metricType = '\{metricType}\{'\''},symbol = '\{symbol}\{'\''},metric = '\{metric}\{'\''},series = '\{series}\{'\''}}";
     }
 }

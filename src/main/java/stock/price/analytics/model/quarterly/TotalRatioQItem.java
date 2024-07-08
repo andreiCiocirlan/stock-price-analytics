@@ -9,9 +9,6 @@ public class TotalRatioQItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "TotalRatioQItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."TotalRatioQItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

@@ -9,9 +9,6 @@ public class TangibleBookValueQItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "TangibleBookValueQItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."TangibleBookValueQItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

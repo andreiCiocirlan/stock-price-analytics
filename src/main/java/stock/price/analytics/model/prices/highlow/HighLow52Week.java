@@ -35,10 +35,6 @@ public class HighLow52Week extends HighLowForPeriod {
 
     @Override
     public String toString() {
-        return "HighLow52Weeks { " +
-                super.toString() +
-                ", low52week=" + low52week +
-                ", high52week=" + high52week +
-                "} ";
+        return STR."HighLow52Weeks { \{super.toString()}, low52week=\{low52week}, high52week=\{high52week}} ";
     }
 }

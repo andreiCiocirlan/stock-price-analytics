@@ -6,9 +6,6 @@ public class PretaxMarginItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "PretaxMarginItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."PretaxMarginItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

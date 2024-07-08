@@ -6,9 +6,6 @@ public class RoicItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "RoicItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."RoicItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

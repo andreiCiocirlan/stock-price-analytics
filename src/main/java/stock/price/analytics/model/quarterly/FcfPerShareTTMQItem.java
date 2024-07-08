@@ -9,9 +9,6 @@ public class FcfPerShareTTMQItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "FcfPerShareTTMQItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."FcfPerShareTTMQItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

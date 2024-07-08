@@ -9,9 +9,6 @@ public class PayoutRatioTTMQItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "PayoutRatioTTMQItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."PayoutRatioTTMQItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

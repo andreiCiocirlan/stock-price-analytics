@@ -6,9 +6,6 @@ public class BookValueItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "BookValueItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."BookValueItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }

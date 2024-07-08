@@ -9,9 +9,6 @@ public class AssetTurnoverTTMQItem extends PeriodWithValue {
     @Override
     public String toString() {
         return
-                "AssetTurnoverTTMQItem{" +
-                        "period = '" + period + '\'' +
-                        ",v = '" + V + '\'' +
-                        "}";
+                STR."AssetTurnoverTTMQItem{period = '\{period}\{'\''},v = '\{V}\{'\''}}";
     }
 }
