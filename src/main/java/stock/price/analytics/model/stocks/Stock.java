@@ -61,14 +61,7 @@ public class Stock {
 
     @Override
     public String toString() {
-        return "Stock{" +
-                "ticker='" + ticker + '\'' +
-                ", xtbStock=" + xtbStock +
-                ", ipoDate=" + ipoDate +
-                ", delistedDate=" + delistedDate +
-                ", shortSell=" + shortSell +
-                ", cfdMargin=" + cfdMargin +
-                '}';
+        return STR."Stock{ticker='\{ticker}\{'\''}, xtbStock=\{xtbStock}, ipoDate=\{ipoDate}, delistedDate=\{delistedDate}, shortSell=\{shortSell}, cfdMargin=\{cfdMargin}\{'}'}";
     }
 
     @Override
