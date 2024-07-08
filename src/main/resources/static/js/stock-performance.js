@@ -15,15 +15,15 @@ function updateStockPerformanceChart(timeFrame) {
     const numCols = document.getElementById('numCols').value || 5;
     const positivePerfFirst = document.getElementById('positivePerfFirst').checked || false;
     const xtb = document.getElementById('xtbOnly').checked;
-    const cfdMargin = urlParams.get('cfdMargin');
+    const cfdMargin = document.getElementById('cfdMargin');
 
     if (timeFrame == undefined) {
         timeFrame = 'MONTHLY';
     }
     const limit = numRows * numCols;
     url = `/stock-performance-json?timeFrame=${timeFrame}&positivePerfFirst=${positivePerfFirst}&limit=${limit}`;
-    if (urlParams.has(('cfdMargin'))) {
-        url += '&cfdMargin=' + urlParams.get('cfdMargin');
+    if (cfdMargin) {
+        url += '&cfdMargin=' + cfdMargin.value;
     }
     if (xtb) {
         url += '&xtb=true';
@@ -32,83 +32,67 @@ function updateStockPerformanceChart(timeFrame) {
     fetch(url)
         .then(response => response.json())
         .then(data => {
-            console.log('ticker: ' + data[0].ticker + ' performance: ' + data[0].performance);
             updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, positivePerfFirst);
         })
         .catch(error => console.error(error));
 }
 
 function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, positivePerfFirst) {
-    if (stockPerformanceChart) {
-        stockPerformanceChart.update({
-            title: { text: `${timeFrame} Heatmap` },
-            series: [{
-                dataLabels: {
-                    enabled: true,
-                    color: '#FFFFFF',
-                    formatter: function() { return data[this.point.index].ticker + '<br>' + data[this.point.index].performance; }
-                },
-                data:
-                    data.map((item, index) => [
-                            Math.floor(index / numRows),
-                            index % numRows,
-                            item.performance,
-                            item.ticker
-                    ])
-            }]
-        });
-    } else {
-        stockPerformanceChart = Highcharts.chart('container', {
-            chart: { type: 'heatmap', backgroundColor: '#171B26' },
-            tooltip: { enabled: false },
-            title: { text: `${timeFrame}` + ' Heatmap', style: { color: '#FFFFFF' } },
-            xAxis: { visible: false, categories: Array.from({ length: numCols }, (_, i) => `Col ${i + 1}`) },
-            yAxis: { visible: false, categories: Array.from({ length: numRows }, (_, i) => `Row ${i + 1}`) },
-            legend: { itemStyle: { color: '#FFFFFF' } },
-            colorAxis: {
-                 dataClasses: [
+    stockPerformanceChart = Highcharts.chart('container', {
+        chart: { type: 'heatmap', backgroundColor: '#171B26' },
+        tooltip: { enabled: false },
+        title: { text: `${timeFrame}` + ' Heatmap', style: { color: '#FFFFFF' } },
+        xAxis: { visible: false, categories: Array.from({ length: numCols }, (_, i) => `Col ${i + 1}`) },
+        yAxis: { visible: false, categories: Array.from({ length: numRows }, (_, i) => `Row ${i + 1}`) },
+        legend: { itemStyle: { color: '#FFFFFF' } },
+        colorAxis: {
+             dataClasses: [
 //                        { from: -100, to: -10.3, color: '#E53935' }, // Bright red for performance < -8.3
-                        { from: -100, to: -10.3, color: '#171B26' }, // Bright red for performance < -8.3
-                        { from: -10.3, to: -5.6, color: '#C82925' },
-                        { from: -5.6, to: -2.9, color: '#AF3835' },
-                        { from: -2.9, to: -0.5, color: '#7D2A27' },
-                        { from: -0.5, to: 0, color: '#494949' }, // Gray for performance between -0.5 and 0
-                        { from: 0, to: 0.5, color: '#494949' },
-                        { from: 0.5, to: 2.9, color: '#165E45' },
-                        { from: 2.9, to: 5.6, color: '#027B52' },
-                        { from: 5.6, to: 10.3, color: '#00A06A' },
+                    { from: -100, to: -10.3, color: '#171B26' }, // Bright red for performance < -8.3
+                    { from: -10.3, to: -5.6, color: '#171B26' },
+                    { from: -5.6, to: -2.9, color: '#171B26' },
+                    { from: -2.9, to: -0.5, color: '#171B26' },
+                    { from: -0.5, to: 0, color: '#494949' }, // Gray for performance between -0.5 and 0
+                    { from: 0, to: 0.5, color: '#494949' },
+                    { from: 0.5, to: 2.9, color: '#171B26' },
+                    { from: 2.9, to: 5.6, color: '#171B26' },
+                    { from: 5.6, to: 10.3, color: '#171B26' },
 //                        { from: 10.3, to: 10000, color: '#00B24D' } // Very green for performance > 8.3
-                        { from: 10.3, to: 10000, color: '#171B26' } // Very green for performance > 8.3
-                 ]
-            },
-            plotOptions: {
-                heatmap: { borderWidth: 1 }
-            },
-            series: [{
-                name: 'Stock Performance',
-                dataLabels: {
-                    enabled: true,
-                    color: '#FFFFFF',
-                    style: {fontSize : 25},
-                    formatter: function() { return data[this.point.index].ticker + '<br>' + data[this.point.index].performance; }
+                    { from: 10.3, to: 10000, color: '#171B26' } // Very green for performance > 8.3
+             ]
+        },
+        plotOptions: {
+            heatmap: { borderWidth: 1 }
+        },
+        series: [{
+            name: 'Stock Performance',
+            dataLabels: {
+                enabled: true,
+                color: '#FFFFFF',
+                style: {
+                    fontSize: '100%',
+                    fontWeight: 'bold',
+                    textAlign: 'center',
+                    verticalAlign: 'middle'
                 },
-                point: {
-                    events: {
-                        click: function() {
-                         openStockGraph({ ticker: data[this.index].ticker });
-                        }
+                formatter: function() { return data[this.point.index].ticker + '<br>' + data[this.point.index].performance + ' %'; }
+            },
+            point: {
+                events: {
+                    click: function() {
+                     openStockGraph({ ticker: data[this.index].ticker });
                     }
-                },
-                data:
-                    data.map((item, index) => [
-                            Math.floor(index / numRows),
-                            index % numRows,
-                            item.performance,
-                            item.ticker
-                    ])
-            }]
-        });
-    }
+                }
+            },
+            data:
+                data.map((item, index) => [
+                        Math.floor(index / numRows),
+                        index % numRows,
+                        item.performance,
+                        item.ticker
+                ])
+        }]
+    });
 }
 
 updateStockPerformanceChart();

@@ -11,18 +11,58 @@ body, html {
     height: 95vh;
 }
 
+#container .highcharts-data-labels text {
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+.time-frame-button-group {
+    display: inline-flex;
+    border-radius: 4px;
+    border: 1px solid #FFFFFF;
+    overflow: hidden;
+}
+
+.time-frame-button-group button {
+    flex: 1;
+    padding: 10px 20px;
+    background-color: #171B26;
+    color: #FFFFFF;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.time-frame-button-group button:hover {
+    background-color: #2C3040;
+}
+
+.time-frame-button-group button.active {
+    background-color: #4A5166;
+    font-weight: bold;
+}
+
 .time-frame-buttons {
     display: flex;
     justify-content: center;
     margin-bottom: 20px;
 }
 
+.time-frame-buttons select,
+.time-frame-buttons input[type="checkbox"],
+.time-frame-buttons label {
+    margin-left: 10px;
+}
+
 .time-frame-buttons button,
+.time-frame-buttons input,
+.time-frame-buttons label,
 .time-frame-buttons select {
     background-color: #171B26;
     color: #FFFFFF;
-    border: none;
+    border: 5;
     padding: 10px 20px;
+    align-items: center;
     text-align: center;
     text-decoration: none;
     display: inline-block;
@@ -40,4 +80,41 @@ body, html {
 .time-frame-buttons button.active,
 .time-frame-buttons select.active {
     background-color: #4A5166;
+}
+
+input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 25px;
+    height: 25px;
+    border: 2px solid #FFFFFF;
+    border-radius: 4px;
+    background-color: #171B26;
+    cursor: pointer;
+}
+
+input[type="checkbox"]:hover {
+    background-color: #2C3040;
+}
+
+input[type="checkbox"]:checked {
+    background-color: #4A5166;
+    border-color: #4A5166;
+    position: relative;
+}
+
+input[type="checkbox"]:checked::before {
+    content: "✓";
+    color: #FFFFFF;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 16px;
+}
+
+.time-frame-buttons label {
+    margin-right: 5px;
+    vertical-align: middle;
 }

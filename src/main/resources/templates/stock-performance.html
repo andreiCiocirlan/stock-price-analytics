@@ -6,29 +6,37 @@
 </head>
 <body>
 <div class="time-frame-buttons">
-    <button onclick="handleTimeFrameButtonClick('WEEKLY')">Weekly</button>
-    <button onclick="handleTimeFrameButtonClick('MONTHLY')">Monthly</button>
-    <button onclick="handleTimeFrameButtonClick('YEARLY')">Yearly</button>
-    <select id="numRows" class="time-frame-button">
-        <option value="5" selected>5 Rows</option>
+    <div class="time-frame-button-group">
+        <button onclick="handleTimeFrameButtonClick('WEEKLY')">Weekly</button>
+        <button onclick="handleTimeFrameButtonClick('MONTHLY')">Monthly</button>
+        <button onclick="handleTimeFrameButtonClick('YEARLY')">Yearly</button>
+    </div>
+    <select id="numRows">
+        <option value="5">5 Rows</option>
         <option value="10">10 Rows</option>
         <option value="15">15 Rows</option>
-        <option value="20">20 Rows</option>
+        <option value="20" selected>20 Rows</option>
         <option value="25">25 Rows</option>
         <option value="30">30 Rows</option>
     </select>
-    <select id="numCols" class="time-frame-button">
+    <select id="numCols">
         <option value="5" selected>5 Cols</option>
         <option value="10">10 Cols</option>
         <option value="15">15 Cols</option>
         <option value="20">20 Cols</option>
-        <option value="25">25 Cols</option>
+        <option value="25" selected>25 Cols</option>
         <option value="30">30 Cols</option>
     </select>
-    <input type="checkbox" id="positivePerfFirst" checked>
+    <select id="cfdMargin">
+        <option value="0.2" selected>5:1</option>
+        <option value="0.25">4:1</option>
+        <option value="0.33">3:1</option>
+        <option value="0.5">2:1</option>
+    </select>
     <label for="positivePerfFirst">Positive Performance First</label>
-    <input type="checkbox" id="xtbOnly" checked>
+    <input type="checkbox" id="positivePerfFirst" checked>
     <label for="xtbOnly">XTB Tickers</label>
+    <input type="checkbox" id="xtbOnly" checked>
 </div>
 <div id="container"></div>
 <script src="https://code.highcharts.com/stock/highstock.js"></script> <!-- needed for ohlc -->
