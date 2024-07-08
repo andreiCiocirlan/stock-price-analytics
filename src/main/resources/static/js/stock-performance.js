@@ -2,6 +2,14 @@ let currentTimeFrame = 'MONTHLY';
 let stockPerformanceChart;
 
 function handleTimeFrameButtonClick(timeFrame) {
+    // Remove 'active' class from all buttons
+    const buttons = document.querySelectorAll('.time-frame-button-group button');
+    buttons.forEach(button => button.classList.remove('active'));
+
+    // Add 'active' class to the selected button
+    const selectedButton = document.querySelector(`.time-frame-button-group button[onclick*="${timeFrame}"]`);
+    selectedButton.classList.add('active');
+
     currentTimeFrame = timeFrame;
     const url = new URL(window.location);
     url.searchParams.set('timeFrame', timeFrame);
