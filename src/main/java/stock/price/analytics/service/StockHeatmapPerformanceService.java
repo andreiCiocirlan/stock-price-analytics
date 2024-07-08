@@ -16,7 +16,8 @@ import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
-import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
+import static stock.price.analytics.model.prices.enums.StockTimeframe.WEEKLY;
+import static stock.price.analytics.model.prices.enums.StockTimeframe.dbTableForPerfHeatmapFrom;
 
 @Slf4j
 @Service
