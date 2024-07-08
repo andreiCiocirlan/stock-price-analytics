@@ -11,11 +11,11 @@ public enum StockTimeframe {
     MONTHLY,
     YEARLY;
 
-    public static String dbTableFromTimeframe(StockTimeframe timeframe) {
+    public static String dbTableForPerfHeatmapFrom(StockTimeframe timeframe) {
         return switch (timeframe) {
-            case WEEKLY -> "weekly_prices_view";
-            case MONTHLY -> "monthly_prices_view";
-            case YEARLY -> "yearly_prices_view";
+            case WEEKLY -> "weekly_prices_performance_view";
+            case MONTHLY -> "monthly_prices_performance_view";
+            case YEARLY -> "yearly_prices_performance_view";
         };
     }
 

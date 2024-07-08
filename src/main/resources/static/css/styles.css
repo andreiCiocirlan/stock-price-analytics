@@ -3,9 +3,41 @@ body, html {
     padding: 0;
     height: 100%;
     overflow: hidden;
+    background-color: #171B26;
 }
 
 #container {
     width: 100%;
-    height: 100vh;
+    height: 95vh;
+}
+
+.time-frame-buttons {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.time-frame-buttons button,
+.time-frame-buttons select {
+    background-color: #171B26;
+    color: #FFFFFF;
+    border: none;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.time-frame-buttons button:hover,
+.time-frame-buttons select:hover {
+    background-color: #2C3040;
+}
+
+.time-frame-buttons button.active,
+.time-frame-buttons select.active {
+    background-color: #4A5166;
 }

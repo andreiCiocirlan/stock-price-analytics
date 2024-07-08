@@ -5,12 +5,37 @@
     <link rel="stylesheet" href="../static/css/styles.css">
 </head>
 <body>
-    <div id="container"></div>
-    <script src="https://code.highcharts.com/stock/highstock.js"></script> <!-- needed for ohlc -->
-    <script src="https://code.highcharts.com/modules/heatmap.js"></script>
-    <script src="https://code.highcharts.com/modules/exporting.js"></script>
-    <script src="https://code.highcharts.com/modules/export-data.js"></script>
-    <script src="../static/js/stock-performance.js"></script>
-    <script src="../static/js/stock-graph.js"></script>
+<div class="time-frame-buttons">
+    <button onclick="handleTimeFrameButtonClick('WEEKLY')">Weekly</button>
+    <button onclick="handleTimeFrameButtonClick('MONTHLY')">Monthly</button>
+    <button onclick="handleTimeFrameButtonClick('YEARLY')">Yearly</button>
+    <select id="numRows" class="time-frame-button">
+        <option value="5" selected>5 Rows</option>
+        <option value="10">10 Rows</option>
+        <option value="15">15 Rows</option>
+        <option value="20">20 Rows</option>
+        <option value="25">25 Rows</option>
+        <option value="30">30 Rows</option>
+    </select>
+    <select id="numCols" class="time-frame-button">
+        <option value="5" selected>5 Cols</option>
+        <option value="10">10 Cols</option>
+        <option value="15">15 Cols</option>
+        <option value="20">20 Cols</option>
+        <option value="25">25 Cols</option>
+        <option value="30">30 Cols</option>
+    </select>
+    <input type="checkbox" id="positivePerfFirst" checked>
+    <label for="positivePerfFirst">Positive Performance First</label>
+    <input type="checkbox" id="xtbOnly" checked>
+    <label for="xtbOnly">XTB Tickers</label>
+</div>
+<div id="container"></div>
+<script src="https://code.highcharts.com/stock/highstock.js"></script> <!-- needed for ohlc -->
+<script src="https://code.highcharts.com/modules/heatmap.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="../static/js/stock-performance.js"></script>
+<script src="../static/js/stock-graph.js"></script>
 </body>
 </html>

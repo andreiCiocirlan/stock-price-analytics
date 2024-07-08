@@ -9,17 +9,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import stock.price.analytics.controller.dto.StockPerformanceDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.service.StockPerformanceService;
+import stock.price.analytics.service.StockHeatmapPerformanceService;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Controller
 @Slf4j
 @RequiredArgsConstructor
-public class StockHeatmapController {
+public class StockHeatmapPerformanceController {
 
-    private final StockPerformanceService stockPerformanceService;
+    private final StockHeatmapPerformanceService stockHeatmapPerformanceService;
 
     @GetMapping("/stock-performance")
     @ResponseBody
@@ -29,14 +28,17 @@ public class StockHeatmapController {
 
     @GetMapping("/stock-performance-json")
     @ResponseBody
-    public List<StockPerformanceDTO> getStockPerformance(@RequestParam(required = false, value = "timeFrame") StockTimeframe timeFrame,
+    public List<StockPerformanceDTO> getStockPerformance(@RequestParam(required = false, value = "timeFrame") String timeFrame,
                                                          @RequestParam(required = false, value = "xtb") Boolean xtb,
-                                                         @RequestParam(required = false, value = "cfdMargin") Double cfdMargin,
-                                                         @RequestParam(required = false, value = "date") LocalDate date) {
-        return stockPerformanceService.stockPerformanceForDateAndTimeframeAndFilters(
-                timeFrame != null ? timeFrame : StockTimeframe.MONTHLY,
-                date != null ? date : LocalDate.now(),
+                                                         @RequestParam(required = false, value = "positivePerfFirst") Boolean positivePerfFirst,
+                                                         @RequestParam(required = false, value = "limit") Integer limit,
+                                                         @RequestParam(required = false, value = "cfdMargin") Double cfdMargin) {
+        StockTimeframe stockTimeframe = ("undefined".equals(timeFrame)) ? StockTimeframe.MONTHLY : StockTimeframe.valueOf(timeFrame);
+        return stockHeatmapPerformanceService.stockPerformanceForDateAndTimeframeAndFilters(
+                stockTimeframe,
                 xtb,
+                positivePerfFirst,
+                limit,
                 cfdMargin
         );
     }
