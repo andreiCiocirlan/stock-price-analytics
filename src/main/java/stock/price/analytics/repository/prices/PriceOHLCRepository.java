@@ -10,18 +10,18 @@ import java.util.List;
 
 
 @Repository
-public interface PricesOHLCRepository extends JpaRepository<AbstractPriceOHLC, Long> {
+public interface PriceOHLCRepository extends JpaRepository<AbstractPriceOHLC, Long> {
 
     @Query("SELECT p FROM DailyPriceOHLC p WHERE p.ticker = :ticker ORDER BY date DESC")
     List<DailyPriceOHLC> findDailyOHLCByTicker(@Param("ticker") String ticker);
 
-    @Query("SELECT p FROM WeeklyPriceOHLC p WHERE p.ticker = :ticker ORDER BY startDate DESC")
+    @Query("SELECT p FROM WeeklyPriceOHLC p WHERE p.ticker = :ticker ORDER BY startDate")
     List<WeeklyPriceOHLC> findWeeklyOHLCByTicker(@Param("ticker") String ticker);
 
-    @Query("SELECT p FROM MonthlyPriceOHLC p WHERE p.ticker = :ticker ORDER BY startDate DESC")
+    @Query("SELECT p FROM MonthlyPriceOHLC p WHERE p.ticker = :ticker ORDER BY startDate")
     List<MonthlyPriceOHLC> findMonthlyOHLCByTicker(@Param("ticker") String ticker);
 
-    @Query("SELECT p FROM YearlyPriceOHLC p WHERE p.ticker = :ticker ORDER BY startDate DESC")
+    @Query("SELECT p FROM YearlyPriceOHLC p WHERE p.ticker = :ticker ORDER BY startDate")
     List<YearlyPriceOHLC> findYearlyOHLCByTicker(@Param("ticker") String ticker);
 
 }

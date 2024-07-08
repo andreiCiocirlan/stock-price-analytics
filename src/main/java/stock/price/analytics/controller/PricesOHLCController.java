@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import stock.price.analytics.controller.dto.CandleOHLCWithDate;
-import stock.price.analytics.repository.prices.PricesOHLCRepository;
+import stock.price.analytics.repository.prices.PriceOHLCRepository;
 
 import java.util.List;
 
@@ -17,11 +17,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PricesOHLCController {
 
-    private final PricesOHLCRepository pricesOhlcRepository;
+    private final PriceOHLCRepository priceOhlcRepository;
 
     @GetMapping("/daily")
     public List<CandleOHLCWithDate> dailyOHLC(@RequestParam("ticker") String ticker) {
-        return pricesOhlcRepository.findDailyOHLCByTicker(ticker)
+        return priceOhlcRepository.findDailyOHLCByTicker(ticker)
                 .stream()
                 .map(dp -> new CandleOHLCWithDate(dp.getDate(), dp.getOpen(), dp.getHigh(), dp.getLow(), dp.getClose()))
                 .toList();
@@ -29,28 +29,25 @@ public class PricesOHLCController {
 
     @GetMapping("/weekly")
     public List<CandleOHLCWithDate> weeklyOHLC(@RequestParam("ticker") String ticker) {
-        return pricesOhlcRepository.findWeeklyOHLCByTicker(ticker)
+        return priceOhlcRepository.findWeeklyOHLCByTicker(ticker)
                 .stream()
                 .map(dp -> new CandleOHLCWithDate(dp.getStartDate(), dp.getOpen(), dp.getHigh(), dp.getLow(), dp.getClose()))
-//                .sorted(Comparator.comparing(CandleOHLCWithDate::date))
                 .toList();
     }
 
     @GetMapping("/monthly")
     public List<CandleOHLCWithDate> monthlyOHLC(@RequestParam("ticker") String ticker) {
-        return pricesOhlcRepository.findMonthlyOHLCByTicker(ticker)
+        return priceOhlcRepository.findMonthlyOHLCByTicker(ticker)
                 .stream()
                 .map(dp -> new CandleOHLCWithDate(dp.getStartDate(), dp.getOpen(), dp.getHigh(), dp.getLow(), dp.getClose()))
-//                .sorted(Comparator.comparing(CandleOHLCWithDate::date))
                 .toList();
     }
 
     @GetMapping("/yearly")
     public List<CandleOHLCWithDate> yearlyOHLC(@RequestParam("ticker") String ticker) {
-        return pricesOhlcRepository.findYearlyOHLCByTicker(ticker)
+        return priceOhlcRepository.findYearlyOHLCByTicker(ticker)
                 .stream()
                 .map(dp -> new CandleOHLCWithDate(dp.getStartDate(), dp.getOpen(), dp.getHigh(), dp.getLow(), dp.getClose()))
-//                .sorted(Comparator.comparing(CandleOHLCWithDate::date))
                 .toList();
     }
 
