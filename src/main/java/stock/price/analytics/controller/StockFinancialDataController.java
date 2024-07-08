@@ -40,7 +40,7 @@ public class StockFinancialDataController {
             Thread.sleep(1100); // do nothing for 1.1 second to prevent rate-limiting
 
             ResponseEntity<String> responseEntity = finnhubClient.financialDataStringFor(ticker);
-            File outputFile = new File(stockFinancialDataInputDirectory + ticker + ".json");
+            File outputFile = new File(STR."\{stockFinancialDataInputDirectory}\{ticker}.json");
             log.info("Writing data to file {}", outputFile.getAbsolutePath());
             FileUtils.writeToFile(Collections.singletonList(responseEntity.getBody()), outputFile);
         }
@@ -49,8 +49,7 @@ public class StockFinancialDataController {
     @GetMapping("/{ticker}")
     public ResponseEntity<String> financialData(@PathVariable String ticker) {
         ResponseEntity<String> responseEntity = finnhubClient.financialDataStringFor(ticker);
-        File outputFile = new File("C:\\Users/andre/IdeaProjects/stock-price-analytics/src/main/resources/financial_data_"
-                + ticker + ".json");
+        File outputFile = new File(STR."C:\\Users/andre/IdeaProjects/stock-price-analytics/src/main/resources/financial_data_\{ticker}.json");
         FileUtils.writeToFile(Collections.singletonList(responseEntity.getBody()), outputFile);
 
         return responseEntity;
@@ -59,7 +58,7 @@ public class StockFinancialDataController {
     @PostMapping("/db_save/{ticker}")
     @ResponseStatus(HttpStatus.OK)
     public void financialDataSave(@PathVariable String ticker) {
-        File file = new File(stockFinancialDataInputDirectory + ticker + ".json");
+        File file = new File(STR."\{stockFinancialDataInputDirectory}\{ticker}.json");
 //        stockFinancialDataService.saveFinancialDataFromJSON(file);
     }
 
