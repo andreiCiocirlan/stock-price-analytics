@@ -78,18 +78,19 @@ public class StockHistoricalPricesService {
         LocalDate lastSunday = LocalDate.now().with(TemporalAdjusters.previous(DayOfWeek.SUNDAY));
         List<DailyPriceOHLC> lastWeekDailyPricesFinal = lastWeekDailyPrices.stream().filter(dp -> dp.getDate().isAfter(lastSunday)).toList();
 
-//        partitionDataAndSave(lastWeekDailyPricesFinal, pricesOhlcRepository);
+        partitionDataAndSave(lastWeekDailyPricesFinal, priceOhlcRepository);
 
-        String dateFormat = "yyyy-MM-dd";
-        LocalDate localDate = LocalDate.of(2024, 5, 4);
-        while (localDate.isBefore(LocalDate.now())) {
-            String dateStr = localDate.format(DateTimeFormatter.ofPattern(dateFormat));
-//            insertOrUpdatePrices("month", "monthly_prices", dateStr);
-            insertOrUpdatePrices("year", "yearly_prices", dateStr);
-            localDate = localDate.plusDays(7);
-        }
+        // insert/update the prices for weekly, monthly, yearly prices
+        updateHigherTimeframesPricesFor(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
 
-//        refreshMaterializedViews();
+        // finally refresh all the materialized views that use the above data
+        refreshMaterializedViews();
+    }
+
+    private void updateHigherTimeframesPricesFor(String dateFormatted) {
+        updateStockHistoricalPrices("week", "weekly_prices", dateFormatted);
+        updateStockHistoricalPrices("month", "monthly_prices", dateFormatted);
+        updateStockHistoricalPrices("year", "yearly_prices", dateFormatted);
     }
 
     @Transactional
@@ -120,7 +121,7 @@ public class StockHistoricalPricesService {
     }
 
     @Transactional
-    public void insertOrUpdatePrices(String timeframe, String tableName, String date) {
+    public void updateStockHistoricalPrices(String timeframe, String tableName, String date) {
         String query = STR."""
             WITH interval_data AS (
             SELECT
@@ -181,13 +182,10 @@ public class StockHistoricalPricesService {
     }
 
     @Transactional
-    public void saveWeeklyMonthlyYearlyPricesAfterDate(LocalDate startDate) {
-        String dateFormat = "yyyy-MM-dd";
-        while (startDate.isBefore(LocalDate.now())) {
-            String dateStr = startDate.format(DateTimeFormatter.ofPattern(dateFormat));
-            insertOrUpdatePrices("week", "weekly_prices", dateStr);
-            insertOrUpdatePrices("month", "monthly_prices", dateStr);
-            insertOrUpdatePrices("year", "yearly_prices", dateStr);
+    public void saveWeeklyMonthlyYearlyPricesAfterDate(LocalDate startDate, LocalDate endDate) {
+        while (startDate.isBefore(endDate)) {
+            String dateStr = startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            updateHigherTimeframesPricesFor(dateStr);
             startDate = startDate.plusDays(7);
         }
 
