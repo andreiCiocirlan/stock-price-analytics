@@ -51,7 +51,7 @@ function openStockGraph(stockData) {
 
 function updateOHLCChart(stockData) {
     const urlParams = new URLSearchParams(window.location.search);
-    const timeFrame = (urlParams.get('timeFrame') || 'monthly').toLowerCase();
+    const timeFrame = (urlParams.get('timeFrame') || 'weekly').toLowerCase();
 
     let rangeSelect = {
         buttons: [
@@ -116,65 +116,107 @@ function updateOHLCChart(stockData) {
                         }]
                     });
                 } else {
-                       // If the chart doesn't exist, create a new one
-                       chart = Highcharts.stockChart(ohlcContainer, {
-                            chart: { type: 'candlestick', backgroundColor: '#171B26' },
-                            title: { text: `${stockData.ticker} - ${timeFrame}`, style: { color: '#FFFFFF' } },
-                            xAxis: {
-                                type: 'datetime',
-                                dateTimeLabelFormats: { month: '%b', year: '%Y' },
-                                labels: { style: { color: '#FFFFFF' }, }
+                   // If the chart doesn't exist, create a new one
+                   chart = Highcharts.stockChart(ohlcContainer, {
+                        chart: { type: 'candlestick', backgroundColor: '#171B26' },
+                        title: { text: `${stockData.ticker} - ${timeFrame}`, style: { color: '#FFFFFF' } },
+//                        getExtremesFromAll: true, // Ensure all data points are considered for extremes
+                        gapSize: 0, // Disable gap size optimization
+                        xAxis: {
+                            type: 'datetime',
+                            dateTimeLabelFormats: { month: '%b', year: '%Y' },
+                            labels: { style: { color: '#FFFFFF' }, }
+                        },
+                        yAxis: {
+                            title: { text: 'Price' },
+                            labels: { style: { color: '#FFFFFF'} },
+                            opposite: true, // Position the y-axis on the right side
+                            offset: 30 // Position the y-axis on the right side
+                        },
+                        legend: {
+                            itemStyle: { color: '#FFFFFF', bold: true }
+                        },
+                        plotOptions: {
+                            candlestick: {
+                                color: '#E53935', // Red color for negative change
+                                upColor: '#00B34D', // Green color for positive change
+                                lineColor: '#E53935', // Red color for negative wicks
+                                upLineColor: '#00B34D', // Green color for positive wicks
+                                minPointLength: 8, // Minimum height of the candlestick
+                                pointPadding: 0.15, // Padding between candlesticks
+                                groupPadding: 0.02 // Padding between groups of candlesticks
+                            }
+                        },
+                        rangeSelector: rangeSelect,
+                        series: [{
+                            id: 'main-series',
+                            name: 'Stock Data',
+                            data: priceData.map(item => [
+                               new Date(item.date).getTime(),
+                               item.open,
+                               item.high,
+                               item.low,
+                               item.close
+                            ])
+                        },
+                        {
+                            type: 'ema',
+                            name: '40-week SMA',
+                            linkedTo: 'main-series',
+                            params: { period: 40 },
+                            color: '#FF0000',
+                            lineWidth: 0.5,
+                            marker: {
+                              enabled: false // Disable the markers on the SMA line
                             },
-                            yAxis: {
-                                title: { text: 'Price' },
-                                labels: { style: { color: '#FFFFFF'} },
-                                opposite: true, // Position the y-axis on the right side
-                                offset: 30 // Position the y-axis on the right side
+                            tooltip: {
+                                enabled: false
+                            }
+                        }],
+                        tooltip: {
+                            enabled: true,
+                            useHTML: true,
+                            borderColor: '#999999',
+                            borderRadius: 5,
+                            borderWidth: 1,
+                            shadow: true,
+                            style: {
+                                color: '#333333',
+                                fontSize: '12px',
+                                padding: '10px'
                             },
-                            legend: {
-                                itemStyle: { color: '#FFFFFF', bold: true }
+                            positioner: function() {
+                                return {
+                                    x: this.chart.chartWidth - this.label.width - 10,
+                                    y: 10
+                                };
                             },
-                            plotOptions: {
-                                candlestick: {
-                                    color: '#E53935', // Red color for negative change
-                                    upColor: '#00B34D', // Green color for positive change
-                                    lineColor: '#E53935', // Red color for negative wicks
-                                    upLineColor: '#00B34D', // Green color for positive wicks
-                                    minPointLength: 8, // Minimum height of the candlestick
-                                    pointPadding: 0.15, // Padding between candlesticks
-                                    groupPadding: 0.02 // Padding between groups of candlesticks
-                               }
-                            },
-
-                            rangeSelector: rangeSelect,
-                            series: [{
-                                name: stockData.ticker,
-                                data: priceData.map(item => [
-                                   new Date(item.date).getTime(),
-                                   item.open,
-                                   item.high,
-                                   item.low,
-                                   item.close
-                                ]),
-                                tooltip: {
-                                    pointFormat: '<span style="color:{point.color}">\u25CF</span> <b>{series.name}</b><br/>' +
-                                              'Date: {point.x:%Y-%m-%d}<br/>' +
-                                              'O: {point.open}<br/>' +
-                                              'H: {point.high}<br/>' +
-                                              'L: {point.low}<br/>' +
-                                              'C: {point.close}<br/>'
-                                }
-                            }]
-                       });
-                       ohlcContainer.addEventListener('resize', () => {
-                           if (!isResizing) {
-                               chart.reflow();
-                           }
-                       });
+                            pointFormat: '<span style="color:{point.color}">\u25CF</span> <b>{series.name}</b><br/>' +
+                                      'Date: {point.x:%Y-%m-%d}<br/>' +
+                                      'O: {point.open}<br/>' +
+                                      'H: {point.high}<br/>' +
+                                      'L: {point.low}<br/>' +
+                                      'C: {point.close}<br/>'
+                        }
+                   });
+                   ohlcContainer.addEventListener('resize', () => {
+                       if (!isResizing) {
+                           chart.reflow();
+                       }
+                   });
                }
            } else {
                console.error('ohlcContainer is not defined');
            }
        })
        .catch(error => console.error(error));
+}
+
+function calculateSMA(data, period) {
+  const sma = [];
+  for (let i = period - 1; i < data.length; i++) {
+    const sum = data.slice(i - period + 1, i + 1).reduce((a, b) => a + b[4], 0); // Sum the close prices
+    sma.push([data[i][0], sum / period]); // Add the date and SMA value
+  }
+  return sma;
 }
