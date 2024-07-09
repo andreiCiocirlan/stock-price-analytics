@@ -13,9 +13,9 @@ window.addEventListener('timeFrameChange', (event) => {
 function determineSelectedTimeFrame() {
     let selectedButton = document.querySelector('.time-frame-button-group button.active');
     if (!selectedButton) {
-        selectedButton = document.querySelector('.time-frame-button-group button[onclick*="MONTHLY"]');
+        selectedButton = document.querySelector('.time-frame-button-group button[onclick*="WEEKLY"]');
         selectedButton.classList.add('active');
-        currentTimeFrame = 'MONTHLY';
+        currentTimeFrame = 'WEEKLY';
     } else {
         currentTimeFrame = selectedButton.textContent.trim().toUpperCase();
     }
@@ -47,7 +47,7 @@ function updateStockPerformanceChart(timeFrame) {
     const cfdMargin = document.getElementById('cfdMargin');
 
     if (timeFrame == undefined) {
-        timeFrame = 'MONTHLY';
+        timeFrame = 'WEEKLY';
     }
     const limit = numRows * numCols;
     url = `/stock-performance-json?timeFrame=${timeFrame}&positivePerfFirst=${positivePerfFirst}&limit=${limit}`;
