@@ -115,12 +115,16 @@ function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, 
                 enabled: true,
                 color: '#FFFFFF',
                 style: {
-                    fontSize: '100%',
                     fontWeight: 'bold',
                     textAlign: 'center',
                     verticalAlign: 'middle'
                 },
-                formatter: function() { return data[this.point.index].ticker + '<br>' + data[this.point.index].performance + ' %'; }
+                formatter: function() {
+                    const tickerPerformance = `${data[this.point.index].ticker}<br>${data[this.point.index].performance}%`;
+                    const squareSize = Math.min(this.point.shapeArgs.width, this.point.shapeArgs.height);
+                    const fontSize = `${squareSize * 0.28}px`; // Adjust the scaling factor as needed
+                    return `<span style="display: flex;vertical-align: middle !important;align-items: center !important;font-size: ${fontSize};">${tickerPerformance}</span>`;
+                }
             },
             point: {
                 events: {
