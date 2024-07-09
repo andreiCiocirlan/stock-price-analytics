@@ -123,35 +123,58 @@ body, html {
     background-color: #4A5166;
 }
 
-input[type="checkbox"] {
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.checkbox-item label {
+    margin-left: 10px;
+}
+
+.checkbox-item input[type="checkbox"] {
+    width: 30px;
+    height: 30px;
+    background-color: #4A5166;
+    border: 2px solid #4A5166;
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    width: 30px;
-    height: 30px;
-    border-radius: 4px;
-    background-color: #2C3040;
     cursor: pointer;
-}
-
-input[type="checkbox"]:hover {
-    background-color: #2C3040;
-}
-
-input[type="checkbox"]:checked {
-    background-color: #4A5166;
-    border-color: #4A5166;
     position: relative;
 }
 
-input[type="checkbox"]:checked::before {
-    content: "✓";
-    color: #FFFFFF;
+.checkbox-item input[type="checkbox"]::before {
+    content: "X";
+    color: #de0e54;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 20px;
+    font-weight: bold;
+    display: none;
+}
+
+.checkbox-item input[type="checkbox"]::after {
+    content: "✓";
+    color: #00B24D;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+    font-weight: bold;
+    display: none;
+}
+
+.checkbox-item input[type="checkbox"]:checked::before {
+    display: block;
+}
+
+.checkbox-item input[type="checkbox"]:not(:checked)::after {
+    display: block;
 }
 
 .time-frame-buttons label {
