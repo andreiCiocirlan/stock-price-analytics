@@ -36,6 +36,13 @@ function openStockGraph(stockData) {
                 chart = null;
             });
 
+            // Add a keydown event listener to the window
+            ohlcWindow.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    ohlcWindow.close();
+                }
+            });
+
             // Fetch the price data and render the OHLC chart
             updateOHLCChart(stockData);
         };
@@ -134,8 +141,8 @@ function updateOHLCChart(stockData) {
                                     lineColor: '#E53935', // Red color for negative wicks
                                     upLineColor: '#00B34D', // Green color for positive wicks
                                     minPointLength: 8, // Minimum height of the candlestick
-                                    pointPadding: 0.25, // Padding between candlesticks
-                                    groupPadding: 0.1 // Padding between groups of candlesticks
+                                    pointPadding: 0.15, // Padding between candlesticks
+                                    groupPadding: 0.02 // Padding between groups of candlesticks
                                }
                             },
 
