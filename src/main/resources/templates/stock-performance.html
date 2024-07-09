@@ -6,37 +6,55 @@
 </head>
 <body>
 <div class="time-frame-buttons">
-    <div class="time-frame-button-group">
-        <button onclick="handleTimeFrameButtonClick('WEEKLY')">Weekly</button>
-        <button onclick="handleTimeFrameButtonClick('MONTHLY')">Monthly</button>
-        <button onclick="handleTimeFrameButtonClick('YEARLY')">Yearly</button>
+    <div class="select-item">
+        <label for="numRows">Rows</label>
+        <select id="numRows" onchange="dispatchTimeFrameChangeEvent()">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+            <option value="20" selected>20</option>
+            <option value="25">25</option>
+            <option value="30">30</option>
+        </select>
     </div>
-    <select id="numRows" onchange="dispatchTimeFrameChangeEvent()">
-        <option value="5">5 Rows</option>
-        <option value="10">10 Rows</option>
-        <option value="15">15 Rows</option>
-        <option value="20" selected>20 Rows</option>
-        <option value="25">25 Rows</option>
-        <option value="30">30 Rows</option>
-    </select>
-    <select id="numCols" onchange="dispatchTimeFrameChangeEvent()">
-        <option value="5" selected>5 Cols</option>
-        <option value="10">10 Cols</option>
-        <option value="15">15 Cols</option>
-        <option value="20">20 Cols</option>
-        <option value="25" selected>25 Cols</option>
-        <option value="30">30 Cols</option>
-    </select>
-    <select id="cfdMargin" onchange="dispatchTimeFrameChangeEvent()">
-        <option value="0.2" selected>5:1</option>
-        <option value="0.25">4:1</option>
-        <option value="0.33">3:1</option>
-        <option value="0.5">2:1</option>
-    </select>
-    <label for="positivePerfFirst">Positive Performance First</label>
-    <input type="checkbox" id="positivePerfFirst" onchange="dispatchTimeFrameChangeEvent()" checked>
-    <label for="xtbOnly">XTB Tickers</label>
-    <input type="checkbox" id="xtbOnly" onchange="dispatchTimeFrameChangeEvent()" checked>
+    <div class="select-item">
+        <label for="numCols">Cols</label>
+        <select id="numCols" onchange="dispatchTimeFrameChangeEvent()">
+            <option value="5" selected>5</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+            <option value="25" selected>25</option>
+            <option value="30">30</option>
+        </select>
+    </div>
+    <div class="select-item">
+        <label for="cfdMargin">CFD</label>
+        <select id="cfdMargin" onchange="dispatchTimeFrameChangeEvent()">
+            <option value="0.2" selected>5:1</option>
+            <option value="0.25">4:1</option>
+            <option value="0.33">3:1</option>
+            <option value="0.5">2:1</option>
+        </select>
+    </div>
+    <div class="time-frame-label-container">
+        <label for="timeFrameGroup">Timeframe</label>
+        <div id="timeFrameGroup" class="time-frame-button-group">
+            <button onclick="handleTimeFrameButtonClick('WEEKLY')">Weekly</button>
+            <button onclick="handleTimeFrameButtonClick('MONTHLY')">Monthly</button>
+            <button onclick="handleTimeFrameButtonClick('YEARLY')">Yearly</button>
+        </div>
+    </div>
+    <div class="checkbox-group">
+        <div class="checkbox-item">
+            <label for="positivePerfFirst">Positive First</label>
+            <input type="checkbox" id="positivePerfFirst" onchange="dispatchTimeFrameChangeEvent()" checked>
+        </div>
+        <div class="checkbox-item">
+            <label for="xtbOnly">XTB Tickers</label>
+            <input type="checkbox" id="xtbOnly" onchange="dispatchTimeFrameChangeEvent()" checked>
+        </div>
+    </div>
 </div>
 <div id="container"></div>
 <script src="https://code.highcharts.com/stock/highstock.js"></script> <!-- needed for ohlc -->
