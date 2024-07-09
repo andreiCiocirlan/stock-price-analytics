@@ -11,7 +11,7 @@
         <button onclick="handleTimeFrameButtonClick('MONTHLY')">Monthly</button>
         <button onclick="handleTimeFrameButtonClick('YEARLY')">Yearly</button>
     </div>
-    <select id="numRows">
+    <select id="numRows" onchange="dispatchTimeFrameChangeEvent()">
         <option value="5">5 Rows</option>
         <option value="10">10 Rows</option>
         <option value="15">15 Rows</option>
@@ -19,7 +19,7 @@
         <option value="25">25 Rows</option>
         <option value="30">30 Rows</option>
     </select>
-    <select id="numCols">
+    <select id="numCols" onchange="dispatchTimeFrameChangeEvent()">
         <option value="5" selected>5 Cols</option>
         <option value="10">10 Cols</option>
         <option value="15">15 Cols</option>
@@ -27,16 +27,16 @@
         <option value="25" selected>25 Cols</option>
         <option value="30">30 Cols</option>
     </select>
-    <select id="cfdMargin">
+    <select id="cfdMargin" onchange="dispatchTimeFrameChangeEvent()">
         <option value="0.2" selected>5:1</option>
         <option value="0.25">4:1</option>
         <option value="0.33">3:1</option>
         <option value="0.5">2:1</option>
     </select>
     <label for="positivePerfFirst">Positive Performance First</label>
-    <input type="checkbox" id="positivePerfFirst" checked>
+    <input type="checkbox" id="positivePerfFirst" onchange="dispatchTimeFrameChangeEvent()" checked>
     <label for="xtbOnly">XTB Tickers</label>
-    <input type="checkbox" id="xtbOnly" checked>
+    <input type="checkbox" id="xtbOnly" onchange="dispatchTimeFrameChangeEvent()" checked>
 </div>
 <div id="container"></div>
 <script src="https://code.highcharts.com/stock/highstock.js"></script> <!-- needed for ohlc -->

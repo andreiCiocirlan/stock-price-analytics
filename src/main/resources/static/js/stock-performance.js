@@ -1,6 +1,27 @@
 let currentTimeFrame = 'MONTHLY';
 let stockPerformanceChart;
 
+function dispatchTimeFrameChangeEvent() {
+    currentTimeFrame = determineSelectedTimeFrame();
+    window.dispatchEvent(new CustomEvent('timeFrameChange', { detail: { timeFrame: currentTimeFrame } }));
+}
+
+window.addEventListener('timeFrameChange', (event) => {
+    handleTimeFrameButtonClick(event.detail.timeFrame);
+});
+
+function determineSelectedTimeFrame() {
+    let selectedButton = document.querySelector('.time-frame-button-group button.active');
+    if (!selectedButton) {
+        selectedButton = document.querySelector('.time-frame-button-group button[onclick*="MONTHLY"]');
+        selectedButton.classList.add('active');
+        currentTimeFrame = 'MONTHLY';
+    } else {
+        currentTimeFrame = selectedButton.textContent.trim().toUpperCase();
+    }
+    return currentTimeFrame;
+}
+
 function handleTimeFrameButtonClick(timeFrame) {
     // Remove 'active' class from all buttons
     const buttons = document.querySelectorAll('.time-frame-button-group button');
@@ -54,20 +75,18 @@ function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, 
         yAxis: { visible: false, categories: Array.from({ length: numRows }, (_, i) => `Row ${i + 1}`) },
         legend: { itemStyle: { color: '#FFFFFF' } },
         colorAxis: {
-             dataClasses: [
-//                        { from: -100, to: -10.3, color: '#E53935' }, // Bright red for performance < -8.3
-                    { from: -100, to: -10.3, color: '#171B26' }, // Bright red for performance < -8.3
-                    { from: -10.3, to: -5.6, color: '#171B26' },
-                    { from: -5.6, to: -2.9, color: '#171B26' },
-                    { from: -2.9, to: -0.5, color: '#171B26' },
-                    { from: -0.5, to: 0, color: '#494949' }, // Gray for performance between -0.5 and 0
-                    { from: 0, to: 0.5, color: '#494949' },
-                    { from: 0.5, to: 2.9, color: '#171B26' },
-                    { from: 2.9, to: 5.6, color: '#171B26' },
-                    { from: 5.6, to: 10.3, color: '#171B26' },
-//                        { from: 10.3, to: 10000, color: '#00B24D' } // Very green for performance > 8.3
-                    { from: 10.3, to: 10000, color: '#171B26' } // Very green for performance > 8.3
-             ]
+            dataClasses: [
+                { from: -100, to: -10.3, color: '#E53935' }, // Bright red for performance < -8.3
+                { from: -10.3, to: -5.6, color: '#C82925' },
+                { from: -5.6, to: -2.9, color: '#AF3835' },
+                { from: -2.9, to: -0.5, color: '#7D2A27' },
+                { from: -0.5, to: 0, color: '#494949' }, // Gray for performance between -0.5 and 0
+                { from: 0, to: 0.5, color: '#494949' },
+                { from: 0.5, to: 2.9, color: '#165E45' },
+                { from: 2.9, to: 5.6, color: '#027B52' },
+                { from: 5.6, to: 10.3, color: '#00A06A' },
+                { from: 10.3, to: 10000, color: '#00B24D' } // Very green for performance > 8.3
+            ]
         },
         plotOptions: {
             heatmap: { borderWidth: 1 }
@@ -102,5 +121,8 @@ function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, 
         }]
     });
 }
+
+// Call the function to determine the selected timeframe
+const selectedTimeFrame = determineSelectedTimeFrame();
 
 updateStockPerformanceChart();
