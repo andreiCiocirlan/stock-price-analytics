@@ -146,8 +146,8 @@ body, html {
 }
 
 .checkbox-item input[type="checkbox"]::before {
-    content: "X";
-    color: #de0e54;
+    content: "✓";
+    color: #00B24D;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -158,8 +158,8 @@ body, html {
 }
 
 .checkbox-item input[type="checkbox"]::after {
-    content: "✓";
-    color: #00B24D;
+    content: "X";
+    color: #de0e54;
     position: absolute;
     top: 50%;
     left: 50%;
