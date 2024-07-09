@@ -79,12 +79,8 @@ function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, 
             symbolType: 'square',
             labelFormatter: function() {
                 let legendItem = `${this.to.toFixed(1)}`;
-                if (legendItem != 0.5) {
-                    if (legendItem > 0) {
-                        legendItem = `${this.from.toFixed(1)}`;
-                    }
-                } else {
-                    legendItem = 0;
+                if (`${legendItem}` >= 50) { // 2nd to last is 10.3
+                    return null; // prevent showing last green color value as it goes to 10000
                 }
                 return `<div class="legend-item-container">
                              <div class="legend-item" style="background-color:${this.color};color:white;font-weight:bold;">${legendItem}%</div>
