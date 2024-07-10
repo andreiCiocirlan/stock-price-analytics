@@ -77,6 +77,7 @@ function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, 
             align: 'center',
             layout: 'horizontal',
             symbolType: 'square',
+            itemDistance: -21,  // this glues legend items together
             labelFormatter: function() {
                 let legendItem = `${this.to.toFixed(1)}`;
                 if (`${legendItem}` >= 10) {
