@@ -68,8 +68,8 @@ function updateStockPerformanceChart(timeFrame) {
 
 function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, positivePerfFirst) {
     stockPerformanceChart = Highcharts.chart('container', {
-        chart: { type: 'heatmap', backgroundColor: '#171B26' },
-        tooltip: { enabled: false },
+        chart: { type: 'heatmap',backgroundColor: '#171B26' },
+        navigation: { buttonOptions: { enabled: false}},
         title: null,
         xAxis: { visible: false, categories: Array.from({ length: numCols }, (_, i) => `Col ${i + 1}`) },
         yAxis: { visible: false, categories: Array.from({ length: numRows }, (_, i) => `Row ${i + 1}`) },
@@ -79,8 +79,14 @@ function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, 
             symbolType: 'square',
             labelFormatter: function() {
                 let legendItem = `${this.to.toFixed(1)}`;
-                if (`${legendItem}` >= 50) { // 2nd to last is 10.3
-                    return null; // prevent showing last green color value as it goes to 10000
+                if (`${legendItem}` >= 10) {
+                    return `<div class="legend-item-container">
+                                         <div class="legend-item" style="background-color:${this.color};color:white;font-weight:bold;">${this.from.toFixed(1)}%</div>
+                                      </div>`;
+                    if (`${legendItem}` >= 100) {
+                        // prevent showing last colorAxis as it is the same as 2nd to last
+                        return null;
+                    }
                 }
                 return `<div class="legend-item-container">
                              <div class="legend-item" style="background-color:${this.color};color:white;font-weight:bold;">${legendItem}%</div>
@@ -98,34 +104,25 @@ function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, 
                 { from: 0.5, to: 2.9, color: '#165E45' },
                 { from: 2.9, to: 5.6, color: '#027B52' },
                 { from: 5.6, to: 10.3, color: '#00A06A' },
-                { from: 10.3, to: 100, color: '#00B24D' },
-                { from: 100, to: 100000, color: '#00B24D' } // Very green for performance > 10.3
+                { from: 10.3, to: 100000, color: '#00B24D' } // Very green for performance > 10.3
             ]
         },
-        plotOptions: {
-            heatmap: { borderWidth: 1 }
-        },
+        plotOptions: { heatmap: { borderWidth: 1 } },
         series: [{
             name: 'Stock Performance',
             dataLabels: {
                 enabled: true,
                 color: '#FFFFFF',
-                style: {
-                    fontWeight: 'bold',
-                    textAlign: 'center',
-                    verticalAlign: 'middle'
-                },
                 formatter: function() {
-                    const tickerPerformance = `${data[this.point.index].ticker}<br>${data[this.point.index].performance}%`;
                     const squareSize = Math.min(this.point.shapeArgs.width, this.point.shapeArgs.height);
-                    const fontSize = `${squareSize * 0.28}px`; // Adjust the scaling factor as needed
-                    return `<span style="display: flex;vertical-align: middle !important;align-items: center !important;font-size: ${fontSize};">${tickerPerformance}</span>`;
+                    const fontSize = `${squareSize} * 3.1%`; // Adjust the scaling factor as needed
+                    return `<span style="font-size: ${fontSize};">${data[this.point.index].ticker}<br>${data[this.point.index].performance}%</span>`;
                 }
             },
             point: {
                 events: {
                     click: function() {
-                     openStockGraph({ ticker: data[this.index].ticker });
+                        openStockGraph({ ticker: data[this.index].ticker });
                     }
                 }
             },
