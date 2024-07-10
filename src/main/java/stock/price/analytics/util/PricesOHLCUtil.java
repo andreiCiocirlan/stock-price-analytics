@@ -33,6 +33,9 @@ public class PricesOHLCUtil {
     public static List<AbstractPriceOHLC> pricesOHLCForFileAndTimeframe(Path srcFile, StockTimeframe stockTimeframe) {
         List<DailyPriceOHLC> dailyPrices = dailyPricesOHLCFromFile(srcFile);
 
+        if (StockTimeframe.DAILY == stockTimeframe)
+            return new ArrayList<>(dailyPrices);
+
         return getPriceOHLCsForTimeframe(dailyPrices, stockTimeframe);
     }
 
@@ -53,6 +56,7 @@ public class PricesOHLCUtil {
             case WEEKLY -> shp -> shp.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
             case MONTHLY -> YearMonth::from;
             case YEARLY -> Year::from;
+            case DAILY -> throw new IllegalStateException("Unexpected value: " + stockTimeframe);
         };
     }
 
@@ -78,6 +82,7 @@ public class PricesOHLCUtil {
             case WEEKLY -> new WeeklyPriceOHLC(ticker, startDate, endDate, candleOHLC);
             case MONTHLY -> new MonthlyPriceOHLC(ticker, startDate, endDate, candleOHLC);
             case YEARLY -> new YearlyPriceOHLC(ticker, startDate, endDate, candleOHLC);
+            case DAILY -> throw new IllegalStateException("Unexpected value: " + stockTimeframe);
         };
     }
 
@@ -116,10 +121,10 @@ public class PricesOHLCUtil {
             dailyPrices.add(new DailyPriceOHLC(ticker, parse(split[1], DateTimeFormatter.ISO_LOCAL_DATE),
                     new CandleOHLC(parseDouble(split[2]), parseDouble(split[3]), parseDouble(split[4]), parseDouble(split[5]))));
         } catch (NumberFormatException e) {
-            log.error("HIGH_LOW_ERROR ticker {} date {} error: {}",ticker, parse(split[1], DateTimeFormatter.ISO_LOCAL_DATE), e.getMessage());
+            log.error("HIGH_LOW_ERROR ticker {} date {} error: {}", ticker, parse(split[1], DateTimeFormatter.ISO_LOCAL_DATE), e.getMessage());
             HIGH_LOW_ERROR.incrementAndGet();
         } catch (IllegalArgumentException e) {
-            log.error("OPEN_IS_ZERO_ERROR ticker {} date {} error: {}",ticker, parse(split[1], DateTimeFormatter.ISO_LOCAL_DATE), e.getMessage());
+            log.error("OPEN_IS_ZERO_ERROR ticker {} date {} error: {}", ticker, parse(split[1], DateTimeFormatter.ISO_LOCAL_DATE), e.getMessage());
             OPEN_IS_ZERO_ERROR.incrementAndGet();
         }
     }
