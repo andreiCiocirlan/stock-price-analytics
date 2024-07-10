@@ -168,15 +168,6 @@ body, html {
     vertical-align: middle;
 }
 
-.highcharts-legend-item {
-    display: inline-block !important;
-    vertical-align: top;
-}
-
-.legend-item-container {
-    display: inline-block !important;
-}
-
 .legend-item {
     width: 60px;
     height: 25px;
