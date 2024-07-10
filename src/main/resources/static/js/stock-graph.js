@@ -120,8 +120,6 @@ function updateOHLCChart(stockData) {
                    chart = Highcharts.stockChart(ohlcContainer, {
                         chart: { type: 'candlestick', backgroundColor: '#171B26' },
                         title: { text: `${stockData.ticker} - ${timeFrame}`, style: { color: '#FFFFFF' } },
-//                        getExtremesFromAll: true, // Ensure all data points are considered for extremes
-                        gapSize: 0, // Disable gap size optimization
                         xAxis: {
                             type: 'datetime',
                             dateTimeLabelFormats: { month: '%b', year: '%Y' },
@@ -137,6 +135,22 @@ function updateOHLCChart(stockData) {
                             itemStyle: { color: '#FFFFFF', bold: true }
                         },
                         plotOptions: {
+                            series: {
+                              sma: {
+                                id: 'sma-20',
+                                type: 'sma',
+                                linkedTo: 'main-series',
+                                params: { period: 20 },
+                                color: '#FF0000',
+                                lineWidth: 0.5,
+                                marker: {
+                                  enabled: false
+                                },
+                                tooltip: {
+                                  enabled: false // Disable the tooltip for the SMA series
+                                }
+                              }
+                            },
                             candlestick: {
                                 color: '#E53935', // Red color for negative change
                                 upColor: '#00B34D', // Green color for positive change
@@ -149,54 +163,52 @@ function updateOHLCChart(stockData) {
                         },
                         rangeSelector: rangeSelect,
                         series: [{
-                            id: 'main-series',
-                            name: 'Stock Data',
-                            data: priceData.map(item => [
-                               new Date(item.date).getTime(),
-                               item.open,
-                               item.high,
-                               item.low,
-                               item.close
-                            ])
-                        },
-                        {
-                            type: 'ema',
-                            name: '40-week SMA',
-                            linkedTo: 'main-series',
-                            params: { period: 40 },
-                            color: '#FF0000',
-                            lineWidth: 0.5,
-                            marker: {
-                              enabled: false // Disable the markers on the SMA line
-                            },
-                            tooltip: {
-                                enabled: false
+                                id: 'main-series',
+                                name: 'Stock Data',
+                                data: priceData.map(item => [
+                                   new Date(item.date).getTime(),
+                                   item.open,
+                                   item.high,
+                                   item.low,
+                                   item.close
+                                ]),
+                                  tooltip: {
+                                      pointFormat: '<span style="color:{point.color}">\u25CF</span> <b>{series.name}</b><br/>' +
+                                                'Date: {point.x:%Y-%m-%d}<br/>' +
+                                                'O: {point.open} ' +
+                                                'H: {point.high} ' +
+                                                'L: {point.low} ' +
+                                                'C: {point.close} '
+                                  }
                             }
-                        }],
+//                            {
+//                                type: 'ema',
+//                                name: '40-week SMA',
+//                                linkedTo: 'main-series',
+//                                params: { period: 40 },
+//                                color: '#FF0000',
+//                                lineWidth: 0.5,
+//                                marker: {
+//                                  enabled: false // Disable the markers on the SMA line
+//                                },
+//                                tooltip: {enabled : false}
+//                            }
+                        ],
                         tooltip: {
                             enabled: true,
+                            shared: true,
                             useHTML: true,
-                            borderColor: '#999999',
-                            borderRadius: 5,
-                            borderWidth: 1,
-                            shadow: true,
                             style: {
-                                color: '#333333',
                                 fontSize: '12px',
-                                padding: '10px'
+                                padding: '10px',
+                                color: '#FFFFFF'
                             },
                             positioner: function() {
                                 return {
                                     x: this.chart.chartWidth - this.label.width - 10,
-                                    y: 10
+                                      y: 10
                                 };
-                            },
-                            pointFormat: '<span style="color:{point.color}">\u25CF</span> <b>{series.name}</b><br/>' +
-                                      'Date: {point.x:%Y-%m-%d}<br/>' +
-                                      'O: {point.open}<br/>' +
-                                      'H: {point.high}<br/>' +
-                                      'L: {point.low}<br/>' +
-                                      'C: {point.close}<br/>'
+                            }
                         }
                    });
                    ohlcContainer.addEventListener('resize', () => {
