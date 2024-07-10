@@ -118,14 +118,26 @@ function updateOHLCChart(stockData) {
                 } else {
                    // If the chart doesn't exist, create a new one
                    chart = Highcharts.stockChart(ohlcContainer, {
-                        chart: { type: 'candlestick', backgroundColor: '#171B26' },
+                        chart: {
+                            type: 'candlestick',
+                            backgroundColor: '#171B26',
+                            events: {
+                                load: function() {
+                                    if (`${timeFrame}` == 'weekly')  this.series[1].update({ params: { period: 29 } }); // 29 weeks for 200SMA
+                                    else if (`${timeFrame}` == 'monthly')  this.series[1].update({ params: { period: 7 } }); // 7 months for 200SMA
+                                    else this.series[1].update({ params: { period: 0 } });  // none for yearly
+                                }
+                             }
+                        },
                         title: { text: `${stockData.ticker} - ${timeFrame}`, style: { color: '#FFFFFF' } },
+                        navigation: { buttonOptions: { enabled: false}}, // remove corner button tooltip
                         xAxis: {
+                            crosshair: { width : 0.25, dashStyle: 'Dash'},
                             type: 'datetime',
-                            dateTimeLabelFormats: { month: '%b', year: '%Y' },
-                            labels: { style: { color: '#FFFFFF' }, }
+                            labels: { style: { color: '#FFFFFF' } }
                         },
                         yAxis: {
+                            gridLineWidth: 0.2,
                             title: { text: 'Price' },
                             labels: { style: { color: '#FFFFFF'} },
                             opposite: true, // Position the y-axis on the right side
@@ -135,22 +147,6 @@ function updateOHLCChart(stockData) {
                             itemStyle: { color: '#FFFFFF', bold: true }
                         },
                         plotOptions: {
-                            series: {
-                              sma: {
-                                id: 'sma-20',
-                                type: 'sma',
-                                linkedTo: 'main-series',
-                                params: { period: 20 },
-                                color: '#FF0000',
-                                lineWidth: 0.5,
-                                marker: {
-                                  enabled: false
-                                },
-                                tooltip: {
-                                  enabled: false // Disable the tooltip for the SMA series
-                                }
-                              }
-                            },
                             candlestick: {
                                 color: '#E53935', // Red color for negative change
                                 upColor: '#00B34D', // Green color for positive change
@@ -162,37 +158,39 @@ function updateOHLCChart(stockData) {
                             }
                         },
                         rangeSelector: rangeSelect,
-                        series: [{
+                        series: [
+                            {
                                 id: 'main-series',
                                 name: 'Stock Data',
+                                type: 'candlestick',
                                 data: priceData.map(item => [
-                                   new Date(item.date).getTime(),
-                                   item.open,
-                                   item.high,
-                                   item.low,
-                                   item.close
+                                    new Date(item.date).getTime(),
+                                    item.open,
+                                    item.high,
+                                    item.low,
+                                    item.close
                                 ]),
-                                  tooltip: {
-                                      pointFormat: '<span style="color:{point.color}">\u25CF</span> <b>{series.name}</b><br/>' +
-                                                'Date: {point.x:%Y-%m-%d}<br/>' +
-                                                'O: {point.open} ' +
-                                                'H: {point.high} ' +
-                                                'L: {point.low} ' +
-                                                'C: {point.close} '
-                                  }
+                                tooltip: {
+                                     pointFormat:
+                                            '<span style="font-size:15px;color:white">' +
+                                                  'O:<span style="color:{point.color}">{point.open:.2f}</span> ' +
+                                                  'H:<span style="color:{point.color}">{point.high:.2f}</span> ' +
+                                                  'L:<span style="color:{point.color}">{point.low:.2f}</span> ' +
+                                                  'C:<span style="color:{point.color}">{point.close:.2f}</span></span>'
+                                }
+                            },
+                            {
+                                type: 'sma',
+                                id: 'sma-200',
+                                name: '200SMA',
+                                linkedTo: 'main-series',
+                                params: { period: 29 },
+                                lineWidth: 0.5,
+                                marker: { enabled: false },
+                                tooltip: {
+                                    pointFormat: '<span style="font-size:15px;color:{point.color}">{series.name}: {point.y}</span>'
+                                }
                             }
-//                            {
-//                                type: 'ema',
-//                                name: '40-week SMA',
-//                                linkedTo: 'main-series',
-//                                params: { period: 40 },
-//                                color: '#FF0000',
-//                                lineWidth: 0.5,
-//                                marker: {
-//                                  enabled: false // Disable the markers on the SMA line
-//                                },
-//                                tooltip: {enabled : false}
-//                            }
                         ],
                         tooltip: {
                             enabled: true,
@@ -200,14 +198,27 @@ function updateOHLCChart(stockData) {
                             useHTML: true,
                             style: {
                                 fontSize: '12px',
-                                padding: '10px',
-                                color: '#FFFFFF'
+                                color: '#FFFFFF',
+                                backgroundColor: 'transparent'
                             },
-                            positioner: function() {
-                                return {
-                                    x: this.chart.chartWidth - this.label.width - 10,
-                                      y: 10
-                                };
+                            backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                            borderColor: 'transparent',
+                            borderWidth: 0,
+                            shadow: false,
+                            split: true,
+                            xDateFormat: '%d %b \'%y',
+                            positioner: function(labelWidth, labelHeight, point) {
+                                const chart = this.chart;
+                                let x, y;
+
+                                if (point.isHeader) {
+                                    return {
+                                        x: point.plotX + this.chart.plotLeft - labelWidth / 2,
+                                        y: this.chart.chartHeight - labelHeight
+                                    };
+                                } else {
+                                    return { x : 10, y : 0 };
+                                }
                             }
                         }
                    });
@@ -222,13 +233,4 @@ function updateOHLCChart(stockData) {
            }
        })
        .catch(error => console.error(error));
-}
-
-function calculateSMA(data, period) {
-  const sma = [];
-  for (let i = period - 1; i < data.length; i++) {
-    const sum = data.slice(i - period + 1, i + 1).reduce((a, b) => a + b[4], 0); // Sum the close prices
-    sma.push([data[i][0], sum / period]); // Add the date and SMA value
-  }
-  return sma;
 }
