@@ -37,7 +37,7 @@ public class StockHistoricalPricesService {
     private final EntityManager entityManager;
 
     private final PriceOHLCRepository priceOhlcRepository;
-    private final RefreshMaterializedViewsRepository refreshMaterializedViewsRepository;
+    private final RefreshMaterializedViewsService refreshMaterializedViewsService;
 
     private static List<? extends AbstractPriceOHLC> pricesOHLCForTimeframe(StockTimeframe stockTimeframe) {
         List<AbstractPriceOHLC> priceOHLCS = new ArrayList<>();
@@ -74,7 +74,8 @@ public class StockHistoricalPricesService {
         }
 
         // filter out spillover data from previous weeks, or from files that end in empty line
-        LocalDate lastSunday = LocalDate.now().with(TemporalAdjusters.previous(DayOfWeek.SUNDAY));
+//        LocalDate lastSunday = LocalDate.now().with(TemporalAdjusters.previous(DayOfWeek.SUNDAY));
+        LocalDate lastSunday = LocalDate.now().minusDays(2);
         List<DailyPriceOHLC> lastWeekDailyPricesFinal = lastWeekDailyPrices.stream().filter(dp -> dp.getDate().isAfter(lastSunday)).toList();
 
         partitionDataAndSave(lastWeekDailyPricesFinal, priceOhlcRepository);
@@ -83,7 +84,7 @@ public class StockHistoricalPricesService {
         updateHigherTimeframesPricesFor(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
 
         // finally refresh all the materialized views that use the above data
-        refreshMaterializedViews();
+        refreshMaterializedViewsService.refreshMaterializedViews();
     }
 
     private void updateHigherTimeframesPricesFor(String dateFormatted) {
@@ -188,15 +189,7 @@ public class StockHistoricalPricesService {
             startDate = startDate.plusDays(7);
         }
 
-        refreshMaterializedViews();
-    }
-
-    private void refreshMaterializedViews() {
-        refreshMaterializedViewsRepository.refreshWeeklyPerformanceHeatmapPrices();
-        refreshMaterializedViewsRepository.refreshMonthlyPerformanceHeatmapPrices();
-        refreshMaterializedViewsRepository.refreshYearlyPerformanceHeatmapPrices();
-        refreshMaterializedViewsRepository.refreshHighLow4w();
-        refreshMaterializedViewsRepository.refreshHighLow52w();
+        refreshMaterializedViewsService.refreshMaterializedViews();
     }
 
 }
