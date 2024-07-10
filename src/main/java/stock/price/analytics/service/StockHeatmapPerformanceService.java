@@ -9,7 +9,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.controller.dto.StockPerformanceDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.model.prices.ohlc.dto.PerformanceHeatmapDto;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -30,7 +29,7 @@ public class StockHeatmapPerformanceService {
     public List<StockPerformanceDTO> stockPerformanceForDateAndTimeframeAndFilters(StockTimeframe timeFrame, Boolean xtb, Boolean positivePerfFirst, Integer limit, Double cfdMargin) {
         String queryStr = queryFrom(timeFrame, positivePerfFirst, limit, xtb);
 
-        Query nativeQuery = entityManager.createNativeQuery(queryStr, PerformanceHeatmapDto.class);
+        Query nativeQuery = entityManager.createNativeQuery(queryStr, StockPerformanceDTO.class);
         LocalDate date = LocalDate.now();
         if (timeFrame == WEEKLY && date.getDayOfWeek().equals(DayOfWeek.MONDAY)) { // Monday import not done (use past week)
             date = date.minusDays(5);
@@ -41,11 +40,9 @@ public class StockHeatmapPerformanceService {
         nativeQuery.setParameter("cfdMargin", cfdMargin);
 
         @SuppressWarnings("unchecked")
-        List<? extends PerformanceHeatmapDto> priceOHLCs = (List<? extends PerformanceHeatmapDto>) nativeQuery.getResultList();
+        List<StockPerformanceDTO> priceOHLCs = (List<StockPerformanceDTO>) nativeQuery.getResultList();
 
-        return priceOHLCs.stream()
-                .map(item -> new StockPerformanceDTO(item.ticker(), item.performance()))
-                .toList();
+        return priceOHLCs;
     }
 
     private static String queryFrom(StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, Boolean xtb) {
@@ -80,6 +77,7 @@ public class StockHeatmapPerformanceService {
             case WEEKLY -> Pair.of(date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)), date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY)));
             case MONTHLY -> Pair.of(date.with(TemporalAdjusters.firstDayOfMonth()), date.with(TemporalAdjusters.lastDayOfMonth()));
             case YEARLY -> Pair.of(date.with(TemporalAdjusters.firstDayOfYear()), date.with(TemporalAdjusters.lastDayOfYear()));
+            case DAILY -> throw new IllegalStateException("Unexpected value: " + timeFrame);
         };
     }
 
