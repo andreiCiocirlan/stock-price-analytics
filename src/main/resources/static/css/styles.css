@@ -48,7 +48,6 @@ body, html {
 
 .time-frame-label-container label {
     position: absolute;
-    top: -10px;
     color: #FFFFFF;
 }
 
@@ -84,7 +83,6 @@ body, html {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    margin-bottom: 5px;
 }
 
 .time-frame-buttons select,
@@ -101,13 +99,9 @@ body, html {
     color: #FFFFFF;
     border: 5;
     padding: 5px 15px;
-    align-items: center;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
     margin: 4px 2px;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 7px;
 }
 
 .time-frame-buttons label {
@@ -123,21 +117,14 @@ body, html {
     background-color: #4A5166;
 }
 
-.checkbox-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
 .checkbox-item label {
     margin-left: 10px;
 }
 
 .checkbox-item input[type="checkbox"] {
-    width: 30px;
-    height: 30px;
+    width: 25px;
+    height: 25px;
     background-color: #4A5166;
-    border: 2px solid #4A5166;
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -178,7 +165,6 @@ body, html {
 }
 
 .time-frame-buttons label {
-    margin-right: 5px;
     vertical-align: middle;
 }
 
@@ -192,8 +178,8 @@ body, html {
 }
 
 .legend-item {
-    width: 70px;
-    height: 30px;
+    width: 60px;
+    height: 25px;
     display: flex !important;
     justify-content: center;
     align-items: center;
