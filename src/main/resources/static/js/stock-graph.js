@@ -169,22 +169,23 @@ function updateOHLCChart(stockData) {
                                 tooltip: {
                                      pointFormat:
                                             '<span style="font-size:15px;color:white">' +
-                                                  'O:<span style="color:{point.color}">{point.open:.2f}</span> ' +
-                                                  'H:<span style="color:{point.color}">{point.high:.2f}</span> ' +
-                                                  'L:<span style="color:{point.color}">{point.low:.2f}</span> ' +
-                                                  'C:<span style="color:{point.color}">{point.close:.2f}</span></span>'
+                                                  'O<span style="color:{point.color}">{point.open:.2f}</span> ' +
+                                                  'H<span style="color:{point.color}">{point.high:.2f}</span> ' +
+                                                  'L<span style="color:{point.color}">{point.low:.2f}</span> ' +
+                                                  'C<span style="color:{point.color}">{point.close:.2f}</span></span>'
                                 }
                             },
                             {
                                 type: 'sma',
                                 id: 'sma-200',
                                 name: '200SMA',
+                                color: 'red',
                                 linkedTo: 'main-series',
                                 params: { period: 200 },
-                                lineWidth: 1,
+                                lineWidth: 0.5,
                                 marker: { enabled: false },
                                 tooltip: {
-                                    pointFormat: '<span style="font-size:15px;color:{point.color}">{series.name}: {point.y}</span>'
+                                    pointFormat: '<span style="font-size:15px;color:red">{series.name}: {point.y}</span>'
                                 }
                             }
                         ],
