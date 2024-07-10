@@ -1,4 +1,4 @@
-let currentTimeFrame = 'MONTHLY';
+let currentTimeFrame = 'WEEKLY';
 let stockPerformanceChart;
 
 function dispatchTimeFrameChangeEvent() {
