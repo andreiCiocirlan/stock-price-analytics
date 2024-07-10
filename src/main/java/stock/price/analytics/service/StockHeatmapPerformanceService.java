@@ -16,7 +16,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 import static stock.price.analytics.model.prices.enums.StockTimeframe.WEEKLY;
-import static stock.price.analytics.model.prices.enums.StockTimeframe.dbTableForPerfHeatmapFrom;
+import static stock.price.analytics.model.prices.enums.StockTimeframe.dbTablePerfHeatmapFrom;
 
 @Slf4j
 @Service
@@ -46,7 +46,7 @@ public class StockHeatmapPerformanceService {
     }
 
     private static String queryFrom(StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, Boolean xtb) {
-        String dbTable = dbTableForPerfHeatmapFrom(timeFrame);
+        String dbTable = dbTablePerfHeatmapFrom(timeFrame);
         String query = STR."""
             SELECT p.ticker, p.performance FROM \{dbTable} p JOIN Stocks s ON s.ticker = p.ticker
             """;
@@ -77,7 +77,7 @@ public class StockHeatmapPerformanceService {
             case WEEKLY -> Pair.of(date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)), date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY)));
             case MONTHLY -> Pair.of(date.with(TemporalAdjusters.firstDayOfMonth()), date.with(TemporalAdjusters.lastDayOfMonth()));
             case YEARLY -> Pair.of(date.with(TemporalAdjusters.firstDayOfYear()), date.with(TemporalAdjusters.lastDayOfYear()));
-            case DAILY -> throw new IllegalStateException("Unexpected value: " + timeFrame);
+            case DAILY -> Pair.of(date.minusDays(1), date.minusDays(1)); // yesterday's performance
         };
     }
 
