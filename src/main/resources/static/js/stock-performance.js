@@ -68,7 +68,7 @@ function updateStockPerformanceChart(timeFrame) {
 
 function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, positivePerfFirst) {
     stockPerformanceChart = Highcharts.chart('container', {
-        chart: { type: 'heatmap',backgroundColor: '#171B26' },
+        chart: { type: 'heatmap', backgroundColor: '#171B26' },
         tooltip: { enabled: false },
         title: null,
         xAxis: { visible: false, categories: Array.from({ length: numCols }, (_, i) => `Col ${i + 1}`) },
@@ -116,15 +116,16 @@ function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, 
                     verticalAlign: 'middle'
                 },
                 formatter: function() {
+                    const tickerPerformance = `${data[this.point.index].ticker}<br>${data[this.point.index].performance}%`;
                     const squareSize = Math.min(this.point.shapeArgs.width, this.point.shapeArgs.height);
-                    const fontSize = `${squareSize} * 3.1%`; // Adjust the scaling factor as needed
-                    return `<span style="font-weight:bold;font-size: ${fontSize};">${data[this.point.index].ticker}<br>${data[this.point.index].performance}%</span>`;
+                    const fontSize = `${squareSize * 0.28}px`; // Adjust the scaling factor as needed
+                    return `<span style="display: flex;vertical-align: middle !important;align-items: center !important;font-size: ${fontSize};">${tickerPerformance}</span>`;
                 }
             },
             point: {
                 events: {
                     click: function() {
-                        openStockGraph({ ticker: data[this.index].ticker });
+                     openStockGraph({ ticker: data[this.index].ticker });
                     }
                 }
             },
