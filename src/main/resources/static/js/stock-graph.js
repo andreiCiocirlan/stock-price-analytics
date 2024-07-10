@@ -13,6 +13,9 @@ function openStockGraph(stockData) {
         // If the window is not open, create a new one
         ohlcWindow = window.open('', 'OHLC Chart', 'width=1200,height=750');
         ohlcWindow.onload = () => {
+            // Set the background color of the <body> element
+            ohlcWindow.document.body.style.backgroundColor = '#171B26';
+
             // Create the OHLC chart container in the new window
             ohlcContainer = ohlcWindow.document.createElement('div');
             ohlcContainer.id = 'ohlc-container';
@@ -51,7 +54,7 @@ function openStockGraph(stockData) {
 
 function updateOHLCChart(stockData) {
     const urlParams = new URLSearchParams(window.location.search);
-    const timeFrame = (urlParams.get('timeFrame') || 'weekly').toLowerCase();
+    const timeFrame = (urlParams.get('timeFrame') || 'daily').toLowerCase();
 
     let rangeSelect = {
         buttons: [
@@ -92,7 +95,7 @@ function updateOHLCChart(stockData) {
             break;
     };
 
-    let URL = `/ohlc/${timeFrame}?ticker=${stockData.ticker}`;
+    let URL = `/ohlc/prices?timeFrame=daily&ticker=${stockData.ticker}`;
     fetch(URL)
         .then(response => response.json())
         .then(priceData => {
@@ -102,7 +105,7 @@ function updateOHLCChart(stockData) {
                 if (chart) {
                     chart.update({
                         title: {
-                            text: `${stockData.ticker} - ${timeFrame}`
+                            text: `${stockData.ticker}`
                         },
                         series: [{
                             name: stockData.ticker,
@@ -120,16 +123,9 @@ function updateOHLCChart(stockData) {
                    chart = Highcharts.stockChart(ohlcContainer, {
                         chart: {
                             type: 'candlestick',
-                            backgroundColor: '#171B26',
-                            events: {
-                                load: function() {
-                                    if (`${timeFrame}` == 'weekly')  this.series[1].update({ params: { period: 29 } }); // 29 weeks for 200SMA
-                                    else if (`${timeFrame}` == 'monthly')  this.series[1].update({ params: { period: 7 } }); // 7 months for 200SMA
-                                    else this.series[1].update({ params: { period: 0 } });  // none for yearly
-                                }
-                             }
+                            backgroundColor: '#171B26'
                         },
-                        title: { text: `${stockData.ticker} - ${timeFrame}`, style: { color: '#FFFFFF' } },
+                        title: { text: `${stockData.ticker}`, style: { color: '#FFFFFF' } },
                         navigation: { buttonOptions: { enabled: false}}, // remove corner button tooltip
                         xAxis: {
                             crosshair: { width : 0.25, dashStyle: 'Dash'},
@@ -184,8 +180,8 @@ function updateOHLCChart(stockData) {
                                 id: 'sma-200',
                                 name: '200SMA',
                                 linkedTo: 'main-series',
-                                params: { period: 29 },
-                                lineWidth: 0.5,
+                                params: { period: 200 },
+                                lineWidth: 1,
                                 marker: { enabled: false },
                                 tooltip: {
                                     pointFormat: '<span style="font-size:15px;color:{point.color}">{series.name}: {point.y}</span>'
