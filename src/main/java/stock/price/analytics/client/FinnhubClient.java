@@ -7,8 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import stock.price.analytics.client.dto.StockPrices;
 import stock.price.analytics.model.annual.FinancialData;
-import stock.price.analytics.util.Constants;
+
+import java.time.LocalDate;
+
+import static stock.price.analytics.util.Constants.FINNHUB_BASE_URL;
 
 @Slf4j
 @Component
@@ -22,31 +26,31 @@ public class FinnhubClient {
         this.restTemplate = restTemplate;
     }
 
-//    public ResponseEntity<StockPrices> stockPricesFor(String ticker) {
-//        ResponseEntity<StockPrices> response;
-//        try {
-//            response = restTemplate.getForEntity(BASE_URL + "/quote?symbol={ticker}&token={apiKey}",
-//                    StockPrices.class, ticker, apiKey);
-//
-//            StockPrices stockPrices = response.getBody();
-//            if (stockPrices != null) {
-//                stockPrices.setTicker(ticker);
-//                stockPrices.setDate(LocalDate.now());
-//                if (stockPrices.getCurrentPrice() == 0.00d) {
-//                    log.error("Data for ticker {} not found", ticker);
-//                    return ResponseEntity.notFound().build();
-//                }
-//            }
-//        } catch (RestClientException e) {
-//            log.error("Failed retrieving prices data for ticker {}", ticker);
-//            return ResponseEntity.internalServerError().build();
-//        }
-//        return response;
-//    }
+    public ResponseEntity<StockPrices> stockPricesFor(String ticker) {
+        ResponseEntity<StockPrices> response;
+        try {
+            response = restTemplate.getForEntity(FINNHUB_BASE_URL + "/quote?symbol={ticker}&token={apiKey}",
+                    StockPrices.class, ticker, apiKey);
+
+            StockPrices stockPrices = response.getBody();
+            if (stockPrices != null) {
+                stockPrices.setTicker(ticker);
+                stockPrices.setDate(LocalDate.now());
+                if (stockPrices.getCurrentPrice() == 0.00d) {
+                    log.error("Data for ticker {} not found", ticker);
+                    return ResponseEntity.notFound().build();
+                }
+            }
+        } catch (RestClientException e) {
+            log.error("Failed retrieving prices data for ticker {}", ticker);
+            return ResponseEntity.internalServerError().build();
+        }
+        return response;
+    }
 
     public ResponseEntity<FinancialData> financialDataFor(String ticker) {
         try {
-            return restTemplate.getForEntity(STR."\{Constants.BASE_URL}/stock/metric?symbol={ticker}&metric=all&token={apiKey}",
+            return restTemplate.getForEntity(STR."\{FINNHUB_BASE_URL}/stock/metric?symbol={ticker}&metric=all&token={apiKey}",
                     FinancialData.class, ticker, apiKey);
         } catch (RestClientException e) {
             log.error("Failed retrieving financial data for ticker {}", ticker);
@@ -56,7 +60,7 @@ public class FinnhubClient {
 
     public ResponseEntity<String> financialDataStringFor(String ticker) {
         try {
-            return restTemplate.getForEntity(STR."\{Constants.BASE_URL}/stock/metric?symbol={ticker}&metric=all&token={apiKey}",
+            return restTemplate.getForEntity(STR."\{FINNHUB_BASE_URL}/stock/metric?symbol={ticker}&metric=all&token={apiKey}",
                     String.class, ticker, apiKey);
         } catch (RestClientException e) {
             log.error("Failed retrieving financial data String for ticker {}", ticker);
