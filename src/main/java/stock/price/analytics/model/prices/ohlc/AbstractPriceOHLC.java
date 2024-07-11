@@ -34,6 +34,9 @@ public abstract class AbstractPriceOHLC  implements PriceEntity {
     @Column(name = "close")
     private double close;
 
+    @Column(name = "performance")
+    private double performance;
+
     public AbstractPriceOHLC(String ticker, CandleOHLC candleOHLC) {
         this.ticker = ticker;
         this.high = candleOHLC.high();
@@ -42,11 +45,9 @@ public abstract class AbstractPriceOHLC  implements PriceEntity {
         this.close = candleOHLC.close();
     }
 
-    public abstract double getPerformance();
-
     @Override
     public String toString() {
-        return STR."ticker=\{ticker}, Open=\{open}, High=\{high}, Low=\{low}, Close=\{close}\{'}'}";
+        return STR."ticker=\{ticker}, Open=\{open}, High=\{high}, Low=\{low}, Close=\{close}, Performance=\{performance}\{'}'}";
     }
 
 }

@@ -25,9 +25,6 @@ public class WeeklyPriceOHLC extends AbstractPriceOHLC {
     @Column(name = "start_date")
     private LocalDate startDate;
 
-    @Column(name = "performance")
-    private double performance;
-
     public WeeklyPriceOHLC(String ticker, LocalDate startDate, LocalDate endDate, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
         this.startDate = startDate;
