@@ -15,8 +15,7 @@ import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
-import static stock.price.analytics.model.prices.enums.StockTimeframe.WEEKLY;
-import static stock.price.analytics.model.prices.enums.StockTimeframe.dbTablePerfHeatmapFrom;
+import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
 
 @Slf4j
 @Service
@@ -47,6 +46,7 @@ public class StockHeatmapPerformanceService {
 
     private static String queryFrom(StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, Boolean xtb) {
         String dbTable = dbTablePerfHeatmapFrom(timeFrame);
+        String dateField = DAILY == timeFrame ? "date" : "start_date";
         String query = STR."""
             SELECT p.ticker, p.performance FROM \{dbTable} p JOIN Stocks s ON s.ticker = p.ticker
             """;
@@ -55,7 +55,7 @@ public class StockHeatmapPerformanceService {
             query += " AND s.xtb_stock = true ";
         }
         query += STR."""
-                WHERE p.start_date >= :startDate AND p.start_date <= :endDate
+                WHERE p.\{dateField} >= :startDate AND p.\{dateField} <= :endDate
                 AND (COALESCE(:cfdMargin, 0) = 0 OR s.cfd_margin = :cfdMargin)
                 """;
 
