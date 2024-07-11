@@ -97,7 +97,7 @@ public class PricesOHLCUtil {
         return dailyPricesOHLC;
     }
 
-    public static List<DailyPriceOHLC> dailyPricesFromFileLastWeek(Path srcFile, int lastDays) {
+    public static List<DailyPriceOHLC> dailyPricesFromFileLastDays(Path srcFile, int lastDays) {
         List<DailyPriceOHLC> dailyPrices = new ArrayList<>();
         final String ticker = tickerFrom(srcFile);
 
@@ -107,7 +107,7 @@ public class PricesOHLCUtil {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        int skipCount = Math.max(1, lines.size() + 1 - lastDays);
+        int skipCount = Math.max(1, lines.size() - lastDays);
         lines.stream().skip(skipCount).parallel().forEachOrdered(line -> addDailyPrices(line, ticker, dailyPrices));
         return dailyPrices;
     }
