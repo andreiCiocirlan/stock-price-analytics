@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static java.nio.file.Files.walk;
+import static stock.price.analytics.util.PricesOHLCUtil.tickerFrom;
 
 @Slf4j
 @Service
@@ -36,7 +37,7 @@ public class StockService {
         List<String> existingStocks = stockRepository.findAll().stream().map(Stock::getTicker).toList();
         try (Stream<Path> walk = walk(Paths.get(Constants.STOCKS_LOCATION))) {
             walk.filter(Files::isRegularFile)
-                .filter(srcFile -> isNotAlreadyPersistedStock(srcFile, existingStocks))
+                .filter(srcFile -> !existingStocks.contains(tickerFrom(srcFile)))
                 .parallel().forEachOrdered(srcFile -> { // must be forEachOrdered
                     String fileName = srcFile.getFileName().toString();
                     String ticker = fileName.substring(0, fileName.length() - 4);
@@ -48,10 +49,6 @@ public class StockService {
         log.info("remaining stocks {}", stocks);
         log.info("removed {}", removed);
         stockRepository.saveAll(stocks);
-    }
-
-    private static boolean isNotAlreadyPersistedStock(Path srcFile, List<String> existingStocks) {
-        return !existingStocks.contains(srcFile.getFileName().toString().substring(0, srcFile.getFileName().toString().length() - 4));
     }
 
 }
