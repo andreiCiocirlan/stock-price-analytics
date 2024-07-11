@@ -3,13 +3,14 @@ package stock.price.analytics.service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import stock.price.analytics.controller.dto.StockWithPrevCloseDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
-import stock.price.analytics.repository.materializedviews.RefreshMaterializedViewsRepository;
 import stock.price.analytics.repository.prices.PriceOHLCRepository;
 import stock.price.analytics.util.Constants;
 
@@ -19,9 +20,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.nio.file.Files.walk;
@@ -59,42 +59,75 @@ public class StockHistoricalPricesService {
     }
 
     @Transactional
-    public void saveLastWeekPricesFromFiles(String tickers) {
-        List<DailyPriceOHLC> lastWeekDailyPrices = new ArrayList<>();
+    public void savePricesForTradingDate(String tickers, int prevDaysCount, LocalDate tradingDate) {
+        List<DailyPriceOHLC> prevDaysHistPrices = new ArrayList<>();
+        Map<String, List<DailyPriceOHLC>> tickerAndPrevDaysPricesImported = new HashMap<>();
         try (Stream<Path> walk = walk(Paths.get(Constants.STOCKS_LOCATION))) {
             walk.filter(Files::isRegularFile)
-                    .parallel().forEachOrdered(srcFile -> { // must be forEachOrdered
-                        if (tickers != null && Arrays.stream(tickers.split(",")).noneMatch(ticker -> ticker.equals(tickerFrom(srcFile))))
-                            return;
-                        List<DailyPriceOHLC> dailyPriceOHLCS = dailyPricesFromFileLastWeek(srcFile, 5);
-                        lastWeekDailyPrices.addAll(dailyPriceOHLCS); // some files might end with empty line -> 7 for good measure instead of 5
-                    });
+                .parallel().forEachOrdered(srcFile -> { // must be forEachOrdered
+                    String stockTicker = tickerFrom(srcFile);
+                    if (tickers != null && Arrays.stream(tickers.split(",")).noneMatch(ticker -> ticker.equals(stockTicker)))
+                        return;
+                    List<DailyPriceOHLC> dailyPriceOHLCS = dailyPricesFromFileLastDays(srcFile, prevDaysCount + 1); // +1 to get previous day close
+                    if (dailyPriceOHLCS.getLast().getDate().isEqual(tradingDate)) {
+                        tickerAndPrevDaysPricesImported.put(stockTicker, dailyPriceOHLCS);
+                    } else {
+                        log.info("Didn't save daily prices for ticker {} and date {}", stockTicker, dailyPriceOHLCS.getLast().getDate());
+                    }
+                });
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        // filter out spillover data from previous weeks, or from files that end in empty line
-//        LocalDate lastSunday = LocalDate.now().with(TemporalAdjusters.previous(DayOfWeek.SUNDAY));
-        LocalDate lastSunday = LocalDate.now().minusDays(2);
-        List<DailyPriceOHLC> lastWeekDailyPricesFinal = lastWeekDailyPrices.stream().filter(dp -> dp.getDate().isAfter(lastSunday)).toList();
+        tickerAndPrevDaysPricesImported.forEach((_, dailyPricesPrevDays) -> prevDaysHistPrices.add(latestDailyPricesWithPerformance(dailyPricesPrevDays, dailyPricesPrevDays.getFirst(), dailyPricesPrevDays.getLast())));
 
-        partitionDataAndSave(lastWeekDailyPricesFinal, priceOhlcRepository);
+        partitionDataAndSave(prevDaysHistPrices, priceOhlcRepository);
 
-        // insert/update the prices for weekly, monthly, yearly prices
-        updateHigherTimeframesPricesFor(LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        // insert/update higher timeframe prices
+        updateHigherTimeframesPricesFor(tradingDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
 
         // finally refresh all the materialized views that use the above data
         refreshMaterializedViewsService.refreshMaterializedViews();
     }
 
+    // may be used to provide price performance between latest trading date and N days in the past (depends on dailyPrices size)
+    private DailyPriceOHLC latestDailyPricesWithPerformance(List<DailyPriceOHLC> dailyPrices, DailyPriceOHLC dailyOHLCInThePast, DailyPriceOHLC latestOHLCPrices) {
+        if (dailyPrices.size() < 2) { // IPO (dailyOHLCInThePast = latestOHLCPrices)
+            latestOHLCPrices.setPerformance(0);
+        } else {
+            double previousClose = dailyOHLCInThePast.getClose();
+            double performance = ((latestOHLCPrices.getClose() - previousClose) / previousClose) * 100;
+            latestOHLCPrices.setPerformance(Math.round(performance * 100.0) / 100.0);
+        }
+        return latestOHLCPrices;
+    }
+
+    private Map<String, StockWithPrevCloseDTO> tickerAndPrevCloseFor(int prevDaysCount) {
+        String queryStr = STR."""
+            SELECT ticker, date, close as prev_close
+            FROM (SELECT ticker, date, close, ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY date DESC) AS rn FROM daily_prices) AS subquery
+            WHERE rn = \{prevDaysCount}
+        """;
+
+        Query nativeQuery = entityManager.createNativeQuery(queryStr, StockWithPrevCloseDTO.class);
+
+        @SuppressWarnings("unchecked")
+        List<StockWithPrevCloseDTO> prevDayTickerAndClosingPrices = (List<StockWithPrevCloseDTO>) nativeQuery.getResultList();
+
+        return prevDayTickerAndClosingPrices.stream().collect(Collectors.toMap(
+                StockWithPrevCloseDTO::ticker,
+                stock -> new StockWithPrevCloseDTO(stock.ticker(), stock.date(), stock.prevClose())
+        ));
+    }
+
     private void updateHigherTimeframesPricesFor(String dateFormatted) {
-        updateStockHistoricalPrices("week", "weekly_prices", dateFormatted);
-        updateStockHistoricalPrices("month", "monthly_prices", dateFormatted);
-        updateStockHistoricalPrices("year", "yearly_prices", dateFormatted);
+        updateHigherTimeframeHistPrices("week", "weekly_prices", dateFormatted);
+        updateHigherTimeframeHistPrices("month", "monthly_prices", dateFormatted);
+        updateHigherTimeframeHistPrices("year", "yearly_prices", dateFormatted);
     }
 
     @Transactional
-    public void saveDailyPricesFromFiles() {
+    public void saveAllDailyPricesFromFiles() {
         List<AbstractPriceOHLC> ohlcList = new ArrayList<>();
         try (Stream<Path> walk = walk(Paths.get(Constants.STOCKS_LOCATION))) {
             walk.filter(Files::isRegularFile)
@@ -111,6 +144,7 @@ public class StockHistoricalPricesService {
         log.info("OPEN_IS_ZERO_ERROR {} problems", OPEN_IS_ZERO_ERROR.get());
         log.info("HIGH_LOW_ERROR {} problems", HIGH_LOW_ERROR.get());
         log.info("ohlcList size {}", dailyOHLCList.size());
+
         partitionDataAndSave(dailyOHLCList, priceOhlcRepository);
     }
 
@@ -121,7 +155,7 @@ public class StockHistoricalPricesService {
     }
 
     @Transactional
-    public void updateStockHistoricalPrices(String timeframe, String tableName, String date) {
+    public void updateHigherTimeframeHistPrices(String timeframe, String tableName, String date) {
         String query = STR."""
             WITH interval_data AS (
             SELECT
@@ -178,11 +212,13 @@ public class StockHistoricalPricesService {
         int savedOrUpdatedCount = entityManager.createNativeQuery(
                 String.format(query, timeframe, tableName)
         ).executeUpdate();
-        log.info("saved/updated {} {} rows for date {}", savedOrUpdatedCount, timeframe,date);
+        if (savedOrUpdatedCount != 0) {
+            log.info("saved/updated {} {} rows for date {}", savedOrUpdatedCount, timeframe, date);
+        }
     }
 
     @Transactional
-    public void saveWeeklyMonthlyYearlyPricesAfterDate(LocalDate startDate, LocalDate endDate) {
+    public void saveHigherTimeframePricesBetween(LocalDate startDate, LocalDate endDate) {
         while (startDate.isBefore(endDate)) {
             String dateStr = startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
             updateHigherTimeframesPricesFor(dateStr);
