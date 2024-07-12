@@ -7,10 +7,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import stock.price.analytics.client.dto.StockPrices;
+import stock.price.analytics.client.dto.IntradayPriceDTO;
+import stock.price.analytics.config.MarketHours;
 import stock.price.analytics.model.annual.FinancialData;
+import stock.price.analytics.model.prices.ohlc.CandleOHLC;
+import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static stock.price.analytics.util.Constants.FINNHUB_BASE_URL;
 
@@ -26,26 +31,35 @@ public class FinnhubClient {
         this.restTemplate = restTemplate;
     }
 
-    public ResponseEntity<StockPrices> stockPricesFor(String ticker) {
-        ResponseEntity<StockPrices> response;
+    public Optional<DailyPriceOHLC> intraDayPricesFor(String ticker) {
+        DailyPriceOHLC response = null;
         try {
-            response = restTemplate.getForEntity(FINNHUB_BASE_URL + "/quote?symbol={ticker}&token={apiKey}",
-                    StockPrices.class, ticker, apiKey);
+            ResponseEntity<IntradayPriceDTO> finnHubResponse = restTemplate.getForEntity(FINNHUB_BASE_URL + "/quote?symbol={ticker}&token={apiKey}",
+                    IntradayPriceDTO.class, ticker, apiKey);
 
-            StockPrices stockPrices = response.getBody();
-            if (stockPrices != null) {
-                stockPrices.setTicker(ticker);
-                stockPrices.setDate(LocalDate.now());
-                if (stockPrices.getCurrentPrice() == 0.00d) {
-                    log.error("Data for ticker {} not found", ticker);
-                    return ResponseEntity.notFound().build();
-                }
+            IntradayPriceDTO intraDayPrice = finnHubResponse.getBody();
+            LocalDate tradingDate = MarketHours.isBetweenMarketHours(LocalDateTime.now().toLocalTime()) ? LocalDate.now()
+                    : LocalDate.now().minusDays(1); // not within market hours (previous trading date)
+            if (intraDayPrice != null) {
+                response = new DailyPriceOHLC(ticker, tradingDate, Math.round(intraDayPrice.getPercentChange() * 100.0) / 100.0,
+                        getCandleOHLC(intraDayPrice));
+            } else {
+                log.error("intraDayPrice null for ticker {}", ticker);
             }
-        } catch (RestClientException e) {
+        } catch (RestClientException | IllegalArgumentException e) {
             log.error("Failed retrieving prices data for ticker {}", ticker);
-            return ResponseEntity.internalServerError().build();
+            return Optional.empty();
         }
-        return response;
+        return Optional.ofNullable(response);
+    }
+
+    private CandleOHLC getCandleOHLC(IntradayPriceDTO intraDayPrice) {
+        return new CandleOHLC(
+                Math.round(intraDayPrice.getOpen() * 100.0) / 100.0,
+                Math.round(intraDayPrice.getHigh() * 100.0) / 100.0,
+                Math.round(intraDayPrice.getLow() * 100.0) / 100.0,
+                Math.round(intraDayPrice.getClose() * 100.0) / 100.0
+        );
     }
 
     public ResponseEntity<FinancialData> financialDataFor(String ticker) {
