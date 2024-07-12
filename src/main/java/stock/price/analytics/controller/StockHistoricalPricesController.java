@@ -20,12 +20,12 @@ public class StockHistoricalPricesController {
 
     private final StockHistoricalPricesService stockHistoricalPricesService;
 
-    @PostMapping("/prices_for_trading_date")
+    @PostMapping("/prices_after_trading_date")
     @ResponseStatus(HttpStatus.OK)
-    public void saveAllPricesForTradingDate(@RequestParam(required = false, value = "tickers") String tickers,
-                                          @RequestParam(value = "prevDaysCount") int prevDaysCount,
-                                          @RequestParam(name = "tradingDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate tradingDate) {
-        stockHistoricalPricesService.savePricesForTradingDate(tickers, prevDaysCount, tradingDate);
+    public void savePricesAfterTradingDate(@RequestParam(required = false, value = "tickers") String tickers,
+                                           @RequestParam(value = "prevDaysCount") int prevDaysCount,
+                                           @RequestParam(name = "tradingDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate tradingDate) {
+        stockHistoricalPricesService.savePricesAfterTradingDate(tickers, prevDaysCount, tradingDate);
     }
 
     @PostMapping("/daily_prices")

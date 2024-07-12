@@ -59,7 +59,7 @@ public class StockHistoricalPricesService {
     }
 
     @Transactional
-    public void savePricesForTradingDate(String tickers, int prevDaysCount, LocalDate tradingDate) {
+    public void savePricesAfterTradingDate(String tickers, int prevDaysCount, LocalDate tradingDate) {
         List<DailyPriceOHLC> prevDaysHistPrices = new ArrayList<>();
         Map<String, List<DailyPriceOHLC>> tickerAndPrevDaysPricesImported = new HashMap<>();
         try (Stream<Path> walk = walk(Paths.get(Constants.STOCKS_LOCATION))) {
@@ -69,7 +69,7 @@ public class StockHistoricalPricesService {
                     if (tickers != null && Arrays.stream(tickers.split(",")).noneMatch(ticker -> ticker.equals(stockTicker)))
                         return;
                     List<DailyPriceOHLC> dailyPriceOHLCS = dailyPricesFromFileLastDays(srcFile, prevDaysCount + 1); // +1 to get previous day close
-                    if (dailyPriceOHLCS.getLast().getDate().isEqual(tradingDate)) {
+                    if (dailyPriceOHLCS.getLast().getDate().isAfter(tradingDate.minusDays(1))) {
                         tickerAndPrevDaysPricesImported.put(stockTicker, dailyPriceOHLCS);
                     } else {
                         log.info("Didn't save daily prices for ticker {} and date {}", stockTicker, dailyPriceOHLCS.getLast().getDate());
