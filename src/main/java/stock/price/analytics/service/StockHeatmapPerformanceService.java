@@ -5,17 +5,13 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.controller.dto.StockPerformanceDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
-import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
+import static stock.price.analytics.model.prices.enums.StockTimeframe.dbTablePerfHeatmapFrom;
 
 @Slf4j
 @Service
@@ -26,17 +22,9 @@ public class StockHeatmapPerformanceService {
     private final EntityManager entityManager;
 
     public List<StockPerformanceDTO> stockPerformanceForDateAndTimeframeAndFilters(StockTimeframe timeFrame, Boolean xtb, Boolean positivePerfFirst, Integer limit, Double cfdMargin) {
-        String queryStr = queryFrom(timeFrame, positivePerfFirst, limit, xtb);
+        String queryStr = queryFrom(timeFrame, positivePerfFirst, limit, xtb, cfdMargin);
 
         Query nativeQuery = entityManager.createNativeQuery(queryStr, StockPerformanceDTO.class);
-        LocalDate date = LocalDate.now();
-        if (timeFrame == WEEKLY && date.getDayOfWeek().equals(DayOfWeek.MONDAY)) { // Monday import not done (use past week)
-            date = date.minusDays(5);
-        }
-        Pair<LocalDate, LocalDate> intervalPair = intervalFor(date, timeFrame);
-        nativeQuery.setParameter("startDate", intervalPair.getLeft());
-        nativeQuery.setParameter("endDate", intervalPair.getRight());
-        nativeQuery.setParameter("cfdMargin", cfdMargin);
 
         @SuppressWarnings("unchecked")
         List<StockPerformanceDTO> priceOHLCs = (List<StockPerformanceDTO>) nativeQuery.getResultList();
@@ -44,23 +32,21 @@ public class StockHeatmapPerformanceService {
         return priceOHLCs;
     }
 
-    private static String queryFrom(StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, Boolean xtb) {
+    private static String queryFrom(StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, Boolean xtb, Double cfdMargin) {
         String dbTable = dbTablePerfHeatmapFrom(timeFrame);
-        String dateField = DAILY == timeFrame ? "date" : "start_date";
         String query = STR."""
             SELECT p.ticker, p.performance FROM \{dbTable} p JOIN Stocks s ON s.ticker = p.ticker
             """;
 
         if (Boolean.TRUE.equals(xtb)) {
             query += " AND s.xtb_stock = true ";
+            query += STR."""
+                WHERE (COALESCE(\{cfdMargin}, 0) = 0 OR s.cfd_margin = \{cfdMargin})
+                """; // only XTB tickers use cfdMargin field
         }
-        query += STR."""
-                WHERE p.\{dateField} >= :startDate AND p.\{dateField} <= :endDate
-                AND (COALESCE(:cfdMargin, 0) = 0 OR s.cfd_margin = :cfdMargin)
-                """;
 
         // default negative performance first (ascending by performance)
-        query += STR."""
+        query += """
                 ORDER BY p.performance
                 """;
         if (Boolean.TRUE.equals(positivePerfFirst)) {
@@ -70,15 +56,6 @@ public class StockHeatmapPerformanceService {
             query += STR." LIMIT \{limit}";
         }
         return query;
-    }
-
-    private Pair<LocalDate, LocalDate> intervalFor(LocalDate date, StockTimeframe timeFrame) {
-        return switch (timeFrame) {
-            case WEEKLY -> Pair.of(date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)), date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY)));
-            case MONTHLY -> Pair.of(date.with(TemporalAdjusters.firstDayOfMonth()), date.with(TemporalAdjusters.lastDayOfMonth()));
-            case YEARLY -> Pair.of(date.with(TemporalAdjusters.firstDayOfYear()), date.with(TemporalAdjusters.lastDayOfYear()));
-            case DAILY -> Pair.of(date.minusDays(1), date.minusDays(1)); // yesterday's performance
-        };
     }
 
 
