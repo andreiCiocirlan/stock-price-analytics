@@ -1,4 +1,4 @@
-package stock.price.analytics.client;
+package stock.price.analytics.client.finnhub;
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -7,14 +7,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import stock.price.analytics.client.dto.IntradayPriceDTO;
-import stock.price.analytics.config.MarketHours;
+import stock.price.analytics.client.finnhub.dto.IntradayPriceDTO;
+import stock.price.analytics.config.TradingDateUtil;
 import stock.price.analytics.model.annual.FinancialData;
 import stock.price.analytics.model.prices.ohlc.CandleOHLC;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static stock.price.analytics.util.Constants.FINNHUB_BASE_URL;
@@ -38,8 +37,7 @@ public class FinnhubClient {
                     IntradayPriceDTO.class, ticker, apiKey);
 
             IntradayPriceDTO intraDayPrice = finnHubResponse.getBody();
-            LocalDate tradingDate = MarketHours.isBetweenMarketHours(LocalDateTime.now().toLocalTime()) ? LocalDate.now()
-                    : LocalDate.now().minusDays(1); // not within market hours (previous trading date)
+            LocalDate tradingDate = TradingDateUtil.tradingDateNow();
             if (intraDayPrice != null) {
                 response = new DailyPriceOHLC(ticker, tradingDate, Math.round(intraDayPrice.getPercentChange() * 100.0) / 100.0,
                         getCandleOHLC(intraDayPrice));

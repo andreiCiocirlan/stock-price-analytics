@@ -1,4 +1,4 @@
-package stock.price.analytics.client.dto;
+package stock.price.analytics.client.finnhub.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
