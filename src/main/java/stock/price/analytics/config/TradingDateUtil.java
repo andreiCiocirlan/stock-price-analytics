@@ -1,8 +1,10 @@
 package stock.price.analytics.config;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
 
 public class TradingDateUtil {
 
@@ -22,6 +24,9 @@ public class TradingDateUtil {
     }
 
     public static LocalDate tradingDateNow() {
+        if (LocalDate.now().getDayOfWeek().equals(DayOfWeek.SATURDAY) || LocalDate.now().getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+            return LocalDate.now().with(TemporalAdjusters.previous(DayOfWeek.FRIDAY));
+        }
         if (isBetweenMarketHours() || (isAfterMarketHours() && LocalDateTime.now().toLocalTime().getHour() == 23))
             return LocalDate.now();
 
