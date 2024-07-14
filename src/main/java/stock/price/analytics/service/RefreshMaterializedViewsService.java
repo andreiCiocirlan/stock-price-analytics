@@ -13,6 +13,7 @@ public class RefreshMaterializedViewsService {
     private final RefreshMaterializedViewsRepository refreshMaterializedViewsRepository;
 
     public void refreshMaterializedViews() {
+        refreshMaterializedViewsRepository.refreshLatestPrices();
         refreshMaterializedViewsRepository.refreshDailyPerformanceHeatmapPrices();
         refreshMaterializedViewsRepository.refreshWeeklyPerformanceHeatmapPrices();
         refreshMaterializedViewsRepository.refreshMonthlyPerformanceHeatmapPrices();
