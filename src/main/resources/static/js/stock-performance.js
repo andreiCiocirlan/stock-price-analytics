@@ -79,15 +79,11 @@ function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, 
             symbolType: 'square',
             itemDistance: -21,  // this glues legend items together
             labelFormatter: function() {
-                let legendItem = `${this.to.toFixed(1)}`;
-                if (`${legendItem}` >= 10) {
+                let legendItem = `${this.from.toFixed(1)}`;
+                if (`${legendItem}` >= 0.5) {
                     return `<div class="legend-item-container">
-                                         <div class="legend-item" style="background-color:${this.color};color:white;font-weight:bold;">${this.from.toFixed(1)}%</div>
+                                         <div class="legend-item" style="background-color:${this.color};color:white;font-weight:bold;">${this.to.toFixed(1)}%</div>
                                       </div>`;
-                    if (`${legendItem}` >= 100) {
-                        // prevent showing last colorAxis as it is the same as 2nd to last
-                        return null;
-                    }
                 }
                 return `<div class="legend-item-container">
                              <div class="legend-item" style="background-color:${this.color};color:white;font-weight:bold;">${legendItem}%</div>
