@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -20,20 +21,20 @@ public class DailyPriceOHLC extends AbstractPriceOHLC {
     @Column(name = "date")
     private LocalDate date;
 
-    public DailyPriceOHLC(String ticker, LocalDate date, CandleOHLC candleOHLC) {
+    public DailyPriceOHLC(String ticker, @NonNull LocalDate date, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
         this.date = date;
     }
 
-    public DailyPriceOHLC(String ticker, LocalDate tradingDate, double percentChange, CandleOHLC candleOHLC) {
+    public DailyPriceOHLC(String ticker, @NonNull LocalDate date, double percentChange, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
-        this.date = tradingDate;
+        this.date = date;
         this.setPerformance(percentChange);
     }
 
     @Override
     public String toString() {
-        return STR."Daily_OHLC {  date=\{date}\{super.toString()}";
+        return STR."Daily_OHLC {  date=\{date} \{super.toString()}";
     }
 
     @Override
