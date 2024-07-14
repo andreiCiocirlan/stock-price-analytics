@@ -28,9 +28,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class YahooQuoteService {
 
-    public static final String USER_AGENT_VALUE = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0";
     private final YahooFinanceClient yahooFinanceClient;
     private final DailyPriceOHLCService dailyPriceOHLCService;
+    private final RefreshMaterializedViewsService refreshMaterializedViewsService;
+
+    private static final String USER_AGENT_VALUE = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0";
     private static final int MAX_RETRIES_CRUMB = 5;
     private int RETRY_COUNT_CRUMB = 0;
     private String COOKIE_FC_YAHOO = "";
@@ -62,6 +64,7 @@ public class YahooQuoteService {
             start = end;
             end = Math.min(start + maxTickersPerRequest, latestByTicker.size());
         }
+        refreshMaterializedViewsService.refreshMaterializedViews();
     }
 
     public String quotePricesJSON(String tickers, String crumb) {
