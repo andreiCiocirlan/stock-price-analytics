@@ -12,8 +12,12 @@ import stock.price.analytics.config.TradingDateUtil;
 import stock.price.analytics.model.annual.FinancialData;
 import stock.price.analytics.model.prices.ohlc.CandleOHLC;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
+import stock.price.analytics.util.FileUtils;
 
+import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static stock.price.analytics.util.Constants.FINNHUB_BASE_URL;
@@ -78,5 +82,26 @@ public class FinnhubClient {
             log.error("Failed retrieving financial data String for ticker {}", ticker);
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    public List<DailyPriceOHLC> intraDayPricesXTB() {
+        try {
+            List<String> tickers = FileUtils.readTickersXTB();
+            List<DailyPriceOHLC> dailyPriceOHLCs = new ArrayList<>();
+
+            for (String ticker : tickers) {
+                Optional<DailyPriceOHLC> intraDayPrice = intraDayPricesFor(ticker);
+                intraDayPrice.ifPresent(dailyPrices -> addToListAndLog(dailyPrices, dailyPriceOHLCs));
+                Thread.sleep(1005); // rate limit 60 req / min
+            }
+            return dailyPriceOHLCs;
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void addToListAndLog(DailyPriceOHLC dailyPrices, List<DailyPriceOHLC> dailyPriceOHLCs) {
+        log.info("{}", dailyPrices);
+        dailyPriceOHLCs.add(dailyPrices);
     }
 }
