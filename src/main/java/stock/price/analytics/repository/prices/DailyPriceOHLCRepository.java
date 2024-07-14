@@ -1,6 +1,7 @@
 package stock.price.analytics.repository.prices;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 
@@ -18,4 +19,15 @@ public interface DailyPriceOHLCRepository extends JpaRepository<DailyPriceOHLC, 
     List<DailyPriceOHLC> findByDateBefore(LocalDate date);
     List<DailyPriceOHLC> findByDateAfter(LocalDate date);
     List<DailyPriceOHLC> findByDateBetween(LocalDate startDate, LocalDate endDate);
+
+    @Query(value = "SELECT * from latest_prices", nativeQuery = true)
+    List<DailyPriceOHLC> findLatestByTicker();
+
+    @Query(value ="""
+            select lp.* from latest_prices lp
+            join stocks s on s.ticker = lp.ticker and s.xtb_stock = false
+            where lp.date >= :date
+    """, nativeQuery = true)
+    List<DailyPriceOHLC> findLatestByTickerWithDateAfter(LocalDate date);
+
 }
