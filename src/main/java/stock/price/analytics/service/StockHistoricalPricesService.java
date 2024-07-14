@@ -36,6 +36,7 @@ public class StockHistoricalPricesService {
     @PersistenceContext
     private final EntityManager entityManager;
 
+    private final PriceOHLCService priceOHLCService;
     private final PriceOHLCRepository priceOhlcRepository;
     private final RefreshMaterializedViewsService refreshMaterializedViewsService;
 
@@ -64,42 +65,35 @@ public class StockHistoricalPricesService {
         Map<String, List<DailyPriceOHLC>> tickerAndPrevDaysPricesImported = new HashMap<>();
         try (Stream<Path> walk = walk(Paths.get(Constants.STOCKS_LOCATION))) {
             walk.filter(Files::isRegularFile)
-                .parallel().forEachOrdered(srcFile -> { // must be forEachOrdered
-                    String stockTicker = tickerFrom(srcFile);
-                    if (tickers != null && Arrays.stream(tickers.split(",")).noneMatch(ticker -> ticker.equals(stockTicker)))
-                        return;
-                    List<DailyPriceOHLC> dailyPriceOHLCS = dailyPricesFromFileLastDays(srcFile, prevDaysCount + 1); // +1 to get previous day close
-                    if (dailyPriceOHLCS.getLast().getDate().isAfter(tradingDate.minusDays(1))) {
-                        tickerAndPrevDaysPricesImported.put(stockTicker, dailyPriceOHLCS);
-                    } else {
-                        log.info("Didn't save daily prices for ticker {} and date {}", stockTicker, dailyPriceOHLCS.getLast().getDate());
-                    }
-                });
+                    .parallel().forEachOrdered(srcFile -> { // must be forEachOrdered
+                        String stockTicker = tickerFrom(srcFile);
+                        if (tickers != null && Arrays.stream(tickers.split(",")).noneMatch(ticker -> ticker.equals(stockTicker)))
+                            return;
+                        List<DailyPriceOHLC> dailyPrices = dailyPricesFromFileWithCount(srcFile, prevDaysCount + 1); // +1 to get previous day close
+                        tickerAndPrevDaysPricesImported.put(stockTicker, dailyPrices.stream().filter(dp -> dp.getDate().isAfter(tradingDate)).toList());
+                    });
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        tickerAndPrevDaysPricesImported.forEach((_, dailyPricesPrevDays) -> prevDaysHistPrices.add(latestDailyPricesWithPerformance(dailyPricesPrevDays, dailyPricesPrevDays.getFirst(), dailyPricesPrevDays.getLast())));
+        tickerAndPrevDaysPricesImported.forEach((_, dailyPricesPrevDays) -> prevDaysHistPrices.addAll(dailyPriceWithPerformance(dailyPricesPrevDays)));
 
         partitionDataAndSave(prevDaysHistPrices, priceOhlcRepository);
 
         // insert/update higher timeframe prices
-        updateHigherTimeframesPricesFor(tradingDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        priceOHLCService.updateHigherTimeframesPricesFor(tradingDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
 
         // finally refresh all the materialized views that use the above data
         refreshMaterializedViewsService.refreshMaterializedViews();
     }
 
-    // may be used to provide price performance between latest trading date and N days in the past (depends on dailyPrices size)
-    private DailyPriceOHLC latestDailyPricesWithPerformance(List<DailyPriceOHLC> dailyPrices, DailyPriceOHLC dailyOHLCInThePast, DailyPriceOHLC latestOHLCPrices) {
-        if (dailyPrices.size() < 2) { // IPO (dailyOHLCInThePast = latestOHLCPrices)
-            latestOHLCPrices.setPerformance(0);
-        } else {
-            double previousClose = dailyOHLCInThePast.getClose();
-            double performance = ((latestOHLCPrices.getClose() - previousClose) / previousClose) * 100;
-            latestOHLCPrices.setPerformance(Math.round(performance * 100.0) / 100.0);
+    private List<DailyPriceOHLC> dailyPriceWithPerformance(List<DailyPriceOHLC> dailyPrices) {
+        for (int i = dailyPrices.size() - 1; i >= 1; i--) {
+            double previousClose = dailyPrices.get(i - 1).getClose();
+            double performance = ((dailyPrices.get(i).getClose() - previousClose) / previousClose) * 100;
+            dailyPrices.get(i).setPerformance(Math.round(performance * 100.0) / 100.0);
         }
-        return latestOHLCPrices;
+        return dailyPrices;
     }
 
     private Map<String, StockWithPrevCloseDTO> tickerAndPrevCloseFor(int prevDaysCount) {
@@ -118,12 +112,6 @@ public class StockHistoricalPricesService {
                 StockWithPrevCloseDTO::ticker,
                 stock -> new StockWithPrevCloseDTO(stock.ticker(), stock.date(), stock.prevClose())
         ));
-    }
-
-    private void updateHigherTimeframesPricesFor(String dateFormatted) {
-        updateHigherTimeframeHistPrices("week", "weekly_prices", dateFormatted);
-        updateHigherTimeframeHistPrices("month", "monthly_prices", dateFormatted);
-        updateHigherTimeframeHistPrices("year", "yearly_prices", dateFormatted);
     }
 
     @Transactional
@@ -152,80 +140,6 @@ public class StockHistoricalPricesService {
     public void savePricesForTimeframe(StockTimeframe stockTimeframe) {
         List<? extends AbstractPriceOHLC> pricesOHLCs = pricesOHLCForTimeframe(stockTimeframe);
         partitionDataAndSave(pricesOHLCs, priceOhlcRepository);
-    }
-
-    @Transactional
-    public void updateHigherTimeframeHistPrices(String timeframe, String tableName, String date) {
-        String query = STR."""
-            WITH interval_data AS (
-            SELECT
-                ticker,
-                MIN(date) AS start_date,
-                MAX(date) AS end_date,
-                MAX(high) AS high,
-                MIN(low) AS low
-            FROM daily_prices
-            WHERE date BETWEEN '\{date}'::date - INTERVAL '2 \{timeframe}' AND '\{date}'
-            GROUP BY ticker, DATE_TRUNC('\{timeframe}', date)
-            ),
-            last_week AS (
-                SELECT
-                    dp_o.ticker,
-                    start_date,
-                    end_date,
-                    interval_data.high,
-                    interval_data.low,
-                    dp_o.open,
-                    dp_c.close,
-                    CASE
-                        WHEN (dp_o.date >= DATE_TRUNC('\{timeframe}', CURRENT_DATE)) THEN
-                                    ROUND((100.0 * (dp_c.close - dp_o.open) / dp_o.open)::numeric, 2)
-                        WHEN (LAG(dp_c.close, 1) OVER (PARTITION BY dp_o.ticker ORDER BY start_date) IS NULL) THEN
-                            CASE
-                                WHEN (dp_o.open <> 0) THEN ROUND((100.0 * (dp_c.close - dp_o.open) / dp_o.open)::numeric, 2)
-                                ELSE NULL
-                            END
-                        ELSE
-                            ROUND(((dp_c.close - LAG(dp_c.close) OVER (PARTITION BY dp_o.ticker ORDER BY start_date)) / LAG(dp_c.close) OVER (PARTITION BY dp_o.ticker ORDER BY start_date) * 100)::numeric, 2)
-                    END AS performance
-                FROM interval_data
-                JOIN daily_prices dp_o ON dp_o.ticker = interval_data.ticker AND dp_o.date = interval_data.start_date
-                JOIN daily_prices dp_c ON dp_c.ticker = interval_data.ticker AND dp_c.date = interval_data.end_date
-            ),
-            final_result AS (
-                SELECT *
-                FROM last_week
-                    WHERE end_date BETWEEN DATE_TRUNC('week', '\{date}'::date) AND '\{date}' -- 'week' to capture EOY/EOM where 31st on Mon/Tue/Wed/Thu
-            )
-            INSERT INTO \{tableName} (ticker, start_date, end_date, high, low, open, close, performance)
-            SELECT ticker, start_date, end_date, high, low, open, close, performance
-            FROM final_result
-            ON CONFLICT (ticker, start_date)
-                DO UPDATE SET
-                    high = EXCLUDED.high,
-                    low = EXCLUDED.low,
-                    close = EXCLUDED.close,
-                    performance = EXCLUDED.performance,
-                    end_date = EXCLUDED.end_date
-            """;
-
-        int savedOrUpdatedCount = entityManager.createNativeQuery(
-                String.format(query, timeframe, tableName)
-        ).executeUpdate();
-        if (savedOrUpdatedCount != 0) {
-            log.info("saved/updated {} {} rows for date {}", savedOrUpdatedCount, timeframe, date);
-        }
-    }
-
-    @Transactional
-    public void saveHigherTimeframePricesBetween(LocalDate startDate, LocalDate endDate) {
-        while (startDate.isBefore(endDate)) {
-            String dateStr = startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            updateHigherTimeframesPricesFor(dateStr);
-            startDate = startDate.plusDays(7);
-        }
-
-        refreshMaterializedViewsService.refreshMaterializedViews();
     }
 
 }
