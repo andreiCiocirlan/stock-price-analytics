@@ -97,7 +97,7 @@ public class PricesOHLCUtil {
         return dailyPricesOHLC;
     }
 
-    public static List<DailyPriceOHLC> dailyPricesFromFileLastDays(Path srcFile, int lastDays) {
+    public static List<DailyPriceOHLC> dailyPricesFromFileWithCount(Path srcFile, int lastDays) {
         List<DailyPriceOHLC> dailyPrices = new ArrayList<>();
         final String ticker = tickerFrom(srcFile);
 
