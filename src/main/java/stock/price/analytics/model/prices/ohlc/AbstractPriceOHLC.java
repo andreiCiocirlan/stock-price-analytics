@@ -11,7 +11,7 @@ import stock.price.analytics.model.prices.PriceEntity;
 @Setter
 @MappedSuperclass
 @NoArgsConstructor
-public abstract class AbstractPriceOHLC  implements PriceEntity {
+public abstract class AbstractPriceOHLC implements PriceEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequence_prices")
