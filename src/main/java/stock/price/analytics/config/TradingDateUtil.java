@@ -24,7 +24,8 @@ public class TradingDateUtil {
     }
 
     public static LocalDate tradingDateNow() {
-        if (LocalDate.now().getDayOfWeek().equals(DayOfWeek.SATURDAY) || LocalDate.now().getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+        if (LocalDate.now().getDayOfWeek().equals(DayOfWeek.SATURDAY) || LocalDate.now().getDayOfWeek().equals(DayOfWeek.SUNDAY)
+                || (LocalDate.now().getDayOfWeek().equals(DayOfWeek.MONDAY) && isBeforeMarketHours())) {
             return LocalDate.now().with(TemporalAdjusters.previous(DayOfWeek.FRIDAY));
         }
         if (isBetweenMarketHours() || (isAfterMarketHours() && LocalDateTime.now().toLocalTime().getHour() == 23))
