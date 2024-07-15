@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static stock.price.analytics.config.TradingDateUtil.tradingDateNow;
 import static stock.price.analytics.util.Constants.FINNHUB_BASE_URL;
 
 @Slf4j
@@ -41,7 +42,7 @@ public class FinnhubClient {
                     IntradayPriceDTO.class, ticker, apiKey);
 
             IntradayPriceDTO intraDayPrice = finnHubResponse.getBody();
-            LocalDate tradingDate = TradingDateUtil.tradingDateNow();
+            LocalDate tradingDate = tradingDateNow();
             if (intraDayPrice != null) {
                 response = new DailyPriceOHLC(ticker, tradingDate, Math.round(intraDayPrice.getPercentChange() * 100.0) / 100.0,
                         getCandleOHLC(intraDayPrice));
