@@ -36,7 +36,7 @@ public class PartitionAndSavePriceEntityUtil {
                 (Callable<Void>) () -> {
                     @SuppressWarnings("unchecked")
                     List<R> rs = (List<R>) sublist;
-                    repository.saveAll( rs);
+                    repository.saveAll(rs);
                     return null;
                 }).collect(Collectors.toList());
         ExecutorService executorService = Executors.newFixedThreadPool(NR_THREADS);
