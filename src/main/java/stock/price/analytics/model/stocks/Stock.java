@@ -42,20 +42,20 @@ public class Stock {
     private LocalDate delistedDate; // date stock was added (IPO)
 
     public Stock(String ticker, LocalDate ipoDate, LocalDate delistedDate, boolean xtbStock) {
-        this.ticker= ticker;
+        this.ticker = ticker;
         this.ipoDate = ipoDate;
         this.delistedDate = delistedDate;
         this.xtbStock = xtbStock;
     }
 
     public Stock(String ticker, LocalDate ipoDate, boolean xtbStock) {
-        this.ticker= ticker;
+        this.ticker = ticker;
         this.ipoDate = ipoDate;
         this.xtbStock = xtbStock;
     }
 
     public Stock(String ticker, LocalDate ipoDate) {
-        this.ticker= ticker;
+        this.ticker = ticker;
         this.ipoDate = ipoDate;
     }
 
