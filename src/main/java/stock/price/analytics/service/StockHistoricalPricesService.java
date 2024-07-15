@@ -84,7 +84,7 @@ public class StockHistoricalPricesService {
         priceOHLCService.updateHigherTimeframesPricesFor(tradingDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
 
         // finally refresh all the materialized views that use the above data
-        refreshMaterializedViewsService.refreshMaterializedViews();
+        refreshMaterializedViewsService.refreshMaterializedViews(false);
     }
 
     private List<DailyPriceOHLC> dailyPriceWithPerformance(List<DailyPriceOHLC> dailyPrices) {

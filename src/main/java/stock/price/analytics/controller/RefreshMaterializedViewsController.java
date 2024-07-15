@@ -3,6 +3,7 @@ package stock.price.analytics.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import stock.price.analytics.service.RefreshMaterializedViewsService;
 
@@ -14,8 +15,8 @@ public class RefreshMaterializedViewsController {
     private final RefreshMaterializedViewsService refreshMaterializedViewsService;
 
     @GetMapping("/views")
-    public void refreshMaterializedViews() {
-        refreshMaterializedViewsService.refreshMaterializedViews();
+    public void refreshMaterializedViews(@RequestParam("refreshHighLow") Boolean refreshHighLow) {
+        refreshMaterializedViewsService.refreshMaterializedViews(Boolean.TRUE.equals(refreshHighLow));
     }
 
 }

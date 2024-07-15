@@ -30,6 +30,6 @@ public class PricesOHLCController {
     @PostMapping("/update-higher-timeframes")
     public void updateHigherTimeframesForDate(@RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         priceOHLCService.updateHigherTimeframesPricesFor(date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        refreshMaterializedViewsService.refreshMaterializedViews();
+        refreshMaterializedViewsService.refreshMaterializedViews(false);
     }
 }
