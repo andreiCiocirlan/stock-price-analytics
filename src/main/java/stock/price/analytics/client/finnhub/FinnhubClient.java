@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import stock.price.analytics.client.finnhub.dto.IntradayPriceDTO;
-import stock.price.analytics.config.TradingDateUtil;
 import stock.price.analytics.model.annual.FinancialData;
 import stock.price.analytics.model.prices.ohlc.CandleOHLC;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
