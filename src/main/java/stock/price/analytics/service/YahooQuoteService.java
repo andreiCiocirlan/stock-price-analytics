@@ -16,7 +16,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.client.yahoo.YahooFinanceClient;
-import stock.price.analytics.config.TradingDateUtil;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 
 import java.io.File;
@@ -27,6 +26,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static stock.price.analytics.config.TradingDateUtil.previousTradingDate;
 
 @Slf4j
 @Service
@@ -48,7 +49,7 @@ public class YahooQuoteService {
     @Transactional
     public void dailyPricesImport() {
         int maxTickersPerRequest = 1200;
-        List<DailyPriceOHLC> latestByTicker = dailyPriceOHLCService.findLatestByTickerWithDateAfter(TradingDateUtil.previousTradingDate());
+        List<DailyPriceOHLC> latestByTicker = dailyPriceOHLCService.findXTBLatestByTickerWithDateAfter(previousTradingDate());
 
         int start = 0;
         int end = Math.min(maxTickersPerRequest, latestByTicker.size());
@@ -59,7 +60,8 @@ public class YahooQuoteService {
             String pricesJSON = quotePricesJSON(tickers, getCrumb());
 
             List<DailyPriceOHLC> dailyPriceOHLCs = yahooFinanceClient.yFinDailyPricesFrom(pricesJSON);
-            dailyPriceOHLCService.saveDailyImportedPrices(dailyPriceOHLCs);
+            dailyPriceOHLCService.saveDailyImportedPrices(dailyPriceOHLCs, latestByTicker.stream()
+                    .collect(Collectors.toMap(DailyPriceOHLC::getTicker, p -> p)));
 
             String fileName = dailyPriceOHLCs.getFirst().getDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_" + fileCounter + ".json";
             String path = "./yahoo-daily-prices/" + fileName;
@@ -73,7 +75,6 @@ public class YahooQuoteService {
             start = end;
             end = Math.min(start + maxTickersPerRequest, latestByTicker.size());
             fileCounter++;
-
         }
         refreshMaterializedViewsService.refreshMaterializedViews(false);
     }

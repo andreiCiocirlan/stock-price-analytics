@@ -11,7 +11,6 @@ import stock.price.analytics.repository.prices.DailyPriceOHLCRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -21,13 +20,10 @@ public class DailyPriceOHLCService {
     private final DailyPriceOHLCRepository dailyPriceOHLCRepository;
 
     @Transactional
-    public void saveDailyImportedPrices(List<DailyPriceOHLC> dailyPrices) {
-        Map<String, DailyPriceOHLC> latestPricesByTicker = dailyPriceOHLCRepository.findLatestByTicker().stream()
-                .collect(Collectors.toMap(DailyPriceOHLC::getTicker, p -> p));
-
+    public void saveDailyImportedPrices(List<DailyPriceOHLC> dailyPrices, Map<String, DailyPriceOHLC> latestPricesByTicker) {
         for (DailyPriceOHLC dailyPrice : dailyPrices) {
             String ticker = dailyPrice.getTicker();
-            if (latestPricesByTicker.containsKey(ticker) && !latestPricesByTicker.get(ticker).getDate().isBefore(dailyPrice.getDate())) {
+            if (latestPricesByTicker.containsKey(ticker)) {
                 DailyPriceOHLC latestPrice = latestPricesByTicker.get(ticker);
                 if (latestPrice.getDate().equals(dailyPrice.getDate())) {
                     if (needsUpdate(dailyPrice, latestPrice)) { // update prices
@@ -47,8 +43,12 @@ public class DailyPriceOHLCService {
         }
     }
 
-    public List<DailyPriceOHLC> findLatestByTickerWithDateAfter(LocalDate date) {
-        return dailyPriceOHLCRepository.findLatestByTickerWithDateAfter(date);
+    public List<DailyPriceOHLC> findAllLatestByTickerWithDateAfter(LocalDate date) {
+        return dailyPriceOHLCRepository.findAllLatestByTickerWithDateAfter(date);
+    }
+
+    public List<DailyPriceOHLC> findXTBLatestByTickerWithDateAfter(LocalDate date) {
+        return dailyPriceOHLCRepository.findXTBLatestByTickerWithDateAfter(date);
     }
 
     private static boolean needsUpdate(DailyPriceOHLC dailyPrice, DailyPriceOHLC latestPrice) {
