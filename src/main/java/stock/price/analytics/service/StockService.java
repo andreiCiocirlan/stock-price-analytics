@@ -37,13 +37,13 @@ public class StockService {
         List<String> existingStocks = stockRepository.findAll().stream().map(Stock::getTicker).toList();
         try (Stream<Path> walk = walk(Paths.get(Constants.STOCKS_LOCATION))) {
             walk.filter(Files::isRegularFile)
-                .filter(srcFile -> !existingStocks.contains(tickerFrom(srcFile)))
-                .parallel().forEachOrdered(srcFile -> { // must be forEachOrdered
-                    String fileName = srcFile.getFileName().toString();
-                    String ticker = fileName.substring(0, fileName.length() - 4);
-                    boolean xtbStock = tickersXTB.contains(fileName);
-                    stocks.add(new Stock(ticker, LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.FRIDAY)), xtbStock));
-                });
+                    .filter(srcFile -> !existingStocks.contains(tickerFrom(srcFile)))
+                    .parallel().forEachOrdered(srcFile -> { // must be forEachOrdered
+                        String fileName = srcFile.getFileName().toString();
+                        String ticker = fileName.substring(0, fileName.length() - 4);
+                        boolean xtbStock = tickersXTB.contains(fileName);
+                        stocks.add(new Stock(ticker, LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.FRIDAY)), xtbStock));
+                    });
         }
         boolean removed = stocks.removeAll(stockRepository.findAll());
         log.info("remaining stocks {}", stocks);
