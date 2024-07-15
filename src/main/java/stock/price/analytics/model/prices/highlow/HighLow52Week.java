@@ -26,7 +26,9 @@ public class HighLow52Week extends HighLowForPeriod {
     }
 
     @Override
-    public void setLow(double low) {setLow52week(low);}
+    public void setLow(double low) {
+        setLow52week(low);
+    }
 
     @Override
     public void setHigh(double high) {
