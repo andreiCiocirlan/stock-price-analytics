@@ -19,7 +19,12 @@ import stock.price.analytics.client.yahoo.YahooFinanceClient;
 import stock.price.analytics.config.TradingDateUtil;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,12 +33,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class YahooQuoteService {
 
+    private static final String USER_AGENT_VALUE = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0";
+    private static final int MAX_RETRIES_CRUMB = 5;
     private final YahooFinanceClient yahooFinanceClient;
     private final DailyPriceOHLCService dailyPriceOHLCService;
     private final RefreshMaterializedViewsService refreshMaterializedViewsService;
-
-    private static final String USER_AGENT_VALUE = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0";
-    private static final int MAX_RETRIES_CRUMB = 5;
     private int RETRY_COUNT_CRUMB = 0;
     private String COOKIE_FC_YAHOO = "";
 
@@ -43,11 +47,12 @@ public class YahooQuoteService {
 
     @Transactional
     public void dailyPricesImport() {
-        int maxTickersPerRequest = 1500;
+        int maxTickersPerRequest = 1200;
         List<DailyPriceOHLC> latestByTicker = dailyPriceOHLCService.findLatestByTickerWithDateAfter(TradingDateUtil.previousTradingDate());
 
         int start = 0;
         int end = Math.min(maxTickersPerRequest, latestByTicker.size());
+        int fileCounter = 1;
         while (start < latestByTicker.size()) {
             List<DailyPriceOHLC> partition = latestByTicker.subList(start, end);
             String tickers = partition.stream().map(DailyPriceOHLC::getTicker).collect(Collectors.joining(","));
@@ -56,6 +61,10 @@ public class YahooQuoteService {
             List<DailyPriceOHLC> dailyPriceOHLCs = yahooFinanceClient.yFinDailyPricesFrom(pricesJSON);
             dailyPriceOHLCService.saveDailyImportedPrices(dailyPriceOHLCs);
 
+            String fileName = dailyPriceOHLCs.getFirst().getDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_" + fileCounter + ".json";
+            String path = "./yahoo-daily-prices/" + fileName;
+            writeToFile(path, pricesJSON);
+
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
@@ -63,11 +72,26 @@ public class YahooQuoteService {
             }
             start = end;
             end = Math.min(start + maxTickersPerRequest, latestByTicker.size());
+            fileCounter++;
+
         }
-        refreshMaterializedViewsService.refreshMaterializedViews();
+        refreshMaterializedViewsService.refreshMaterializedViews(false);
     }
 
-    public String quotePricesJSON(String tickers, String crumb) {
+    private void writeToFile(String filePath, String jsonData) {
+        try {
+            File jsonFile = new File(filePath);
+
+            try (OutputStream outputStream = new FileOutputStream(jsonFile)) {
+                outputStream.write(jsonData.getBytes(StandardCharsets.UTF_8));
+            }
+            log.info("saved daily prices file {}", jsonFile.getAbsolutePath());
+        } catch (IOException e) {
+            log.error("Error writing to file: {}", filePath, e);
+        }
+    }
+
+    private String quotePricesJSON(String tickers, String crumb) {
         String URL = String.join("", "https://query2.finance.yahoo.com/v7/finance/quote?lang=en-US&region=US&corsDomain=finance.yahoo.com&symbols=",
                 tickers, "&crumb=", crumb, "&fields=symbol,regularMarketChangePercent,regularMarketPrice,regularMarketDayHigh,regularMarketDayLow,regularMarketOpen");
         String quoteReponse = null;
@@ -128,7 +152,7 @@ public class YahooQuoteService {
                     }
                 } else {
                     RETRY_COUNT_CRUMB++;
-                    log.warn("Non-2xx status code received. Retrying ({}/{})...", RETRY_COUNT_CRUMB, MAX_RETRIES_CRUMB);
+                    log.warn("Non-2xx status code received for crumb. Retrying ({}/{})...", RETRY_COUNT_CRUMB, MAX_RETRIES_CRUMB);
                     Thread.sleep(1000L * RETRY_COUNT_CRUMB); // Add a backoff delay
                     continue;
                 }
@@ -140,7 +164,7 @@ public class YahooQuoteService {
             }
             log.info("crumb: {}", crumb);
             return crumb;
-    }
+        }
         // If we reach this point, all retries have been exhausted
         log.error("Maximum number of retries reached. Unable to get crumb.");
         throw new RuntimeException("Unable to get crumb after multiple attempts.");
