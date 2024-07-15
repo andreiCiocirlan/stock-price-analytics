@@ -73,6 +73,7 @@ function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, 
         title: null,
         xAxis: { visible: false, categories: Array.from({ length: numCols }, (_, i) => `Col ${i + 1}`) },
         yAxis: { visible: false, categories: Array.from({ length: numRows }, (_, i) => `Row ${i + 1}`) },
+        tooltip: { enabled: false },
         legend: {
             align: 'center',
             layout: 'horizontal',
@@ -101,7 +102,7 @@ function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, 
                 { from: 0.5, to: 2.9, color: '#165E45' },
                 { from: 2.9, to: 5.6, color: '#027B52' },
                 { from: 5.6, to: 10.3, color: '#00A06A' },
-                { from: 10.3, to: 100000, color: '#00B24D' } // Very green for performance > 10.3
+                { from: 10.3, to: 9999, color: '#00B24D' } // Very green for performance > 10.3
             ]
         },
         plotOptions: { heatmap: { borderWidth: 1 } },
