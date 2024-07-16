@@ -94,7 +94,7 @@ public class YahooQuoteService {
 
     private String quotePricesJSON(String tickers, String crumb) {
         String URL = String.join("", "https://query2.finance.yahoo.com/v7/finance/quote?lang=en-US&region=US&corsDomain=finance.yahoo.com&symbols=",
-                tickers, "&crumb=", crumb, "&fields=symbol,regularMarketChangePercent,regularMarketPrice,regularMarketDayHigh,regularMarketDayLow,regularMarketOpen");
+                tickers, "&crumb=", crumb);
         String quoteReponse = null;
         try (CloseableHttpClient httpClient = createHttpClient()) {
             HttpGet request = new HttpGet(URL);
