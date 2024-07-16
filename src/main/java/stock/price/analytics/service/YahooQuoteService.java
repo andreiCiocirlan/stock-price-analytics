@@ -48,7 +48,7 @@ public class YahooQuoteService {
 
     @Transactional
     public void dailyPricesImport() {
-        int maxTickersPerRequest = 1200;
+        int maxTickersPerRequest = 850;
         List<DailyPriceOHLC> latestByTicker = dailyPriceOHLCService.findXTBLatestByTickerWithDateAfter(previousTradingDate());
 
         int start = 0;
