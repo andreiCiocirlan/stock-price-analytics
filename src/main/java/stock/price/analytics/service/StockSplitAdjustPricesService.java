@@ -17,7 +17,6 @@ import java.util.List;
 public class SplitAdjustPricesService {
 
     private final PriceOHLCRepository priceOHLCRepository;
-    private final RefreshMaterializedViewsService refreshMaterializedViewsService;
 
     public void adjustPricesFor(String ticker, LocalDate stockSplitDate, double priceMultiplier) {
         List<DailyPriceOHLC> dailyPricesToUpdate = priceOHLCRepository.findByTickerAndDateLessThanEqual(ticker, stockSplitDate);
@@ -34,7 +33,6 @@ public class SplitAdjustPricesService {
         priceOHLCRepository.saveAll(weeklyPricesToUpdate);
         priceOHLCRepository.saveAll(monthlyPricesToUpdate);
         priceOHLCRepository.saveAll(yearlyPricesToUpdate);
-        refreshMaterializedViewsService.refreshMaterializedViews(false);
     }
 
     private void updatePrices(AbstractPriceOHLC dailyPriceOHLC, double priceMultiplier) {

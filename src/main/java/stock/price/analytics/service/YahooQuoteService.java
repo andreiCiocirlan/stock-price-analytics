@@ -38,7 +38,6 @@ public class YahooQuoteService {
     private static final int MAX_RETRIES_CRUMB = 5;
     private final YahooFinanceClient yahooFinanceClient;
     private final DailyPriceOHLCService dailyPriceOHLCService;
-    private final RefreshMaterializedViewsService refreshMaterializedViewsService;
     private int RETRY_COUNT_CRUMB = 0;
     private String COOKIE_FC_YAHOO = "";
 
@@ -76,7 +75,6 @@ public class YahooQuoteService {
             end = Math.min(start + maxTickersPerRequest, latestByTicker.size());
             fileCounter++;
         }
-        refreshMaterializedViewsService.refreshMaterializedViews(false);
     }
 
     private void writeToFile(String filePath, String jsonData) {

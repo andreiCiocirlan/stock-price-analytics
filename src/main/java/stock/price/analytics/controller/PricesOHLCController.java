@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.controller.dto.CandleOHLCWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.service.PriceOHLCService;
-import stock.price.analytics.service.RefreshMaterializedViewsService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -20,7 +19,6 @@ import java.util.List;
 public class PricesOHLCController {
 
     private final PriceOHLCService priceOHLCService;
-    private final RefreshMaterializedViewsService refreshMaterializedViewsService;
 
     @GetMapping("/prices")
     public List<CandleOHLCWithDateDTO> dailyOHLC(@RequestParam("ticker") String ticker, @RequestParam("timeFrame") String timeFrame) {
@@ -30,6 +28,5 @@ public class PricesOHLCController {
     @PostMapping("/update-higher-timeframes")
     public void updateHigherTimeframesForDate(@RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
         priceOHLCService.updateHigherTimeframesPricesFor(date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        refreshMaterializedViewsService.refreshMaterializedViews(false);
     }
 }
