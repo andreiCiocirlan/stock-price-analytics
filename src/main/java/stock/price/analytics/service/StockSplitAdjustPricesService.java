@@ -3,26 +3,28 @@ package stock.price.analytics.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.repository.prices.PriceOHLCRepository;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+
+import static java.time.temporal.TemporalAdjusters.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SplitAdjustPricesService {
+public class StockSplitAdjustPricesService {
 
     private final PriceOHLCRepository priceOHLCRepository;
 
     public void adjustPricesFor(String ticker, LocalDate stockSplitDate, double priceMultiplier) {
         List<DailyPriceOHLC> dailyPricesToUpdate = priceOHLCRepository.findByTickerAndDateLessThanEqual(ticker, stockSplitDate);
-        List<WeeklyPriceOHLC> weeklyPricesToUpdate = priceOHLCRepository.findWeeklyByTickerAndStartDateBefore(ticker, stockSplitDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)));
-        List<MonthlyPriceOHLC> monthlyPricesToUpdate = priceOHLCRepository.findMonthlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(TemporalAdjusters.firstDayOfMonth()));
-        List<YearlyPriceOHLC> yearlyPricesToUpdate = priceOHLCRepository.findYearlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(TemporalAdjusters.firstDayOfYear()));
+        List<WeeklyPriceOHLC> weeklyPricesToUpdate = priceOHLCRepository.findWeeklyByTickerAndStartDateBefore(ticker, stockSplitDate.with(previousOrSame(DayOfWeek.MONDAY)));
+        List<MonthlyPriceOHLC> monthlyPricesToUpdate = priceOHLCRepository.findMonthlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfMonth()));
+        List<YearlyPriceOHLC> yearlyPricesToUpdate = priceOHLCRepository.findYearlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfYear()));
 
         dailyPricesToUpdate.forEach(dailyPriceOHLC -> updatePrices(dailyPriceOHLC, priceMultiplier));
         weeklyPricesToUpdate.forEach(weeklyPriceOHLC -> updatePrices(weeklyPriceOHLC, priceMultiplier));
@@ -35,10 +37,32 @@ public class SplitAdjustPricesService {
         priceOHLCRepository.saveAll(yearlyPricesToUpdate);
     }
 
+    public List<? extends AbstractPriceOHLC> adjustPricesForDateAndTimeframe(String ticker, LocalDate date, double priceMultiplier, StockTimeframe timeframe, String ohlc) {
+        List<? extends AbstractPriceOHLC> pricesToUpdate = switch (timeframe) {
+            case DAILY -> priceOHLCRepository.findByTickerAndDate(ticker, date);
+            case WEEKLY -> priceOHLCRepository.findWeeklyByTickerAndStartDate(ticker, date);
+            case MONTHLY -> priceOHLCRepository.findMonthlyByTickerAndStartDate(ticker, date);
+            case YEARLY -> priceOHLCRepository.findYearlyByTickerAndStartDate(ticker, date);
+        };
+
+        pricesToUpdate.forEach(dailyPriceOHLC -> updatePrices(dailyPriceOHLC, ohlc, priceMultiplier));
+        log.info("{}", pricesToUpdate);
+        priceOHLCRepository.saveAll(pricesToUpdate);
+        return pricesToUpdate;
+    }
+
     private void updatePrices(AbstractPriceOHLC dailyPriceOHLC, double priceMultiplier) {
-        dailyPriceOHLC.setClose(Math.round((priceMultiplier * dailyPriceOHLC.getClose()) * 100.0) / 100.0);
         dailyPriceOHLC.setOpen(Math.round((priceMultiplier * dailyPriceOHLC.getOpen()) * 100.0) / 100.0);
-        dailyPriceOHLC.setLow(Math.round((priceMultiplier * dailyPriceOHLC.getLow()) * 100.0) / 100.0);
         dailyPriceOHLC.setHigh(Math.round((priceMultiplier * dailyPriceOHLC.getHigh()) * 100.0) / 100.0);
+        dailyPriceOHLC.setLow(Math.round((priceMultiplier * dailyPriceOHLC.getLow()) * 100.0) / 100.0);
+        dailyPriceOHLC.setClose(Math.round((priceMultiplier * dailyPriceOHLC.getClose()) * 100.0) / 100.0);
+    }
+
+    private void updatePrices(AbstractPriceOHLC dailyPriceOHLC, String ohlc, double priceMultiplier) {
+        ohlc = ohlc.toUpperCase();
+        if (ohlc.contains("O")) dailyPriceOHLC.setOpen(Math.round((priceMultiplier * dailyPriceOHLC.getOpen()) * 100.0) / 100.0);
+        if (ohlc.contains("H")) dailyPriceOHLC.setHigh(Math.round((priceMultiplier * dailyPriceOHLC.getHigh()) * 100.0) / 100.0);
+        if (ohlc.contains("L")) dailyPriceOHLC.setLow(Math.round((priceMultiplier * dailyPriceOHLC.getLow()) * 100.0) / 100.0);
+        if (ohlc.contains("C")) dailyPriceOHLC.setClose(Math.round((priceMultiplier * dailyPriceOHLC.getClose()) * 100.0) / 100.0);
     }
 }
