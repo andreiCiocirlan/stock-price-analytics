@@ -187,6 +187,32 @@ function updateOHLCChart(stockData) {
                                 tooltip: {
                                     pointFormat: '<span style="font-size:15px;color:red">{series.name}: {point.y}</span>'
                                 }
+                            },
+                            {
+                                type: 'sma',
+                                id: 'sma-21',
+                                name: '21SMA',
+                                color: 'yellow',
+                                linkedTo: 'main-series',
+                                params: { period: 21 },
+                                lineWidth: 0.5,
+                                marker: { enabled: false },
+                                tooltip: {
+                                    pointFormat: '<span style="font-size:15px;color:yellow">{series.name}: {point.y}</span>'
+                                }
+                            },
+                            {
+                                type: 'sma',
+                                id: 'sma-100',
+                                name: '100SMA',
+                                color: 'orange',
+                                linkedTo: 'main-series',
+                                params: { period: 100 },
+                                lineWidth: 0.5,
+                                marker: { enabled: false },
+                                tooltip: {
+                                    pointFormat: '<span style="font-size:15px;color:orange">{series.name}: {point.y}</span>'
+                                }
                             }
                         ],
                         tooltip: {
