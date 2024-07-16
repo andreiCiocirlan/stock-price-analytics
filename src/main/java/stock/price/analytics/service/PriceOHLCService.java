@@ -74,8 +74,8 @@ public class PriceOHLCService {
                     dp_o.open,
                     dp_c.close,
                     CASE
-                        WHEN (dp_o.date >= DATE_TRUNC('\{timeframe}', CURRENT_DATE)) THEN
-                                    ROUND((100.0 * (dp_c.close - dp_o.open) / dp_o.open)::numeric, 2)
+                        --WHEN (dp_o.date >= DATE_TRUNC('\{timeframe}', CURRENT_DATE)) THEN
+                        --           ROUND((100.0 * (dp_c.close - dp_o.open) / dp_o.open)::numeric, 2)
                         WHEN (LAG(dp_c.close, 1) OVER (PARTITION BY dp_o.ticker ORDER BY start_date) IS NULL) THEN
                             CASE
                                 WHEN (dp_o.open <> 0) THEN ROUND((100.0 * (dp_c.close - dp_o.open) / dp_o.open)::numeric, 2)
