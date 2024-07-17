@@ -41,7 +41,7 @@ public class StockHeatmapPerformanceService {
         if (Boolean.TRUE.equals(xtb)) {
             query += " AND s.xtb_stock = true ";
             query += STR."""
-                WHERE (COALESCE(\{cfdMargin}, 0) = 0 OR s.cfd_margin = \{cfdMargin})
+                WHERE (COALESCE(\{cfdMargin}, -1) = -1 OR s.cfd_margin = \{cfdMargin})
                 """; // only XTB tickers use cfdMargin field
         }
 
