@@ -128,11 +128,12 @@ function updateOHLCChart(stockData) {
                         title: { text: `${stockData.ticker}`, style: { color: '#FFFFFF' } },
                         navigation: { buttonOptions: { enabled: false}}, // remove corner button tooltip
                         xAxis: {
-                            crosshair: { width : 0.25, dashStyle: 'Dash'},
+                            crosshair: { width: 1, color: 'gray', dashStyle: 'Dash' },
                             type: 'datetime',
                             labels: { style: { color: '#FFFFFF' } }
                         },
                         yAxis: {
+                            crosshair: { width: 1, color: 'gray', dashStyle: 'Dash', label: { enabled: true } },
                             gridLineWidth: 0.2,
                             title: { text: 'Price' },
                             labels: { style: { color: '#FFFFFF'} },
