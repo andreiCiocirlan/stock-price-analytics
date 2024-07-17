@@ -31,9 +31,25 @@ public class MonthlyPriceOHLC extends AbstractPriceOHLC {
         this.endDate = endDate;
     }
 
+    public MonthlyPriceOHLC(String ticker, LocalDate startDate, LocalDate endDate, double performance, CandleOHLC candleOHLC) {
+        super(ticker, candleOHLC);
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.setPerformance(performance);
+    }
+
+    public static MonthlyPriceOHLC newFrom(DailyPriceOHLC dailyPrices, double previousClose) {
+        return new MonthlyPriceOHLC(
+                dailyPrices.getTicker(),
+                dailyPrices.getDate(),
+                dailyPrices.getDate(),
+                performanceFrom(dailyPrices, previousClose),
+                new CandleOHLC(dailyPrices.getOpen(), dailyPrices.getHigh(), dailyPrices.getLow(), dailyPrices.getClose()));
+    }
+
     @Override
     public String toString() {
-        return STR."Monthly_OHLC {  StartDate=\{startDate} EndDate=\{endDate}\{super.toString()}";
+        return STR."Monthly_OHLC { StartDate=\{startDate} EndDate=\{endDate} \{super.toString()}";
     }
 
 }

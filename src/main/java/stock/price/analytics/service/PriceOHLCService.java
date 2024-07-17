@@ -9,10 +9,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.controller.dto.CandleOHLCWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
+import stock.price.analytics.model.prices.ohlc.*;
+import stock.price.analytics.repository.prices.PriceOHLCRepository;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static stock.price.analytics.util.StockDateUtils.*;
+
 
 @Slf4j
 @Service
@@ -21,6 +29,8 @@ public class PriceOHLCService {
 
     @PersistenceContext
     private final EntityManager entityManager;
+
+    private final PriceOHLCRepository priceOHLCRepository;
 
     public List<CandleOHLCWithDateDTO> findOHLCFor(String ticker, StockTimeframe timeframe) {
         String tableNameOHLC = StockTimeframe.dbTableOHLCFrom(timeframe);
@@ -34,6 +44,99 @@ public class PriceOHLCService {
         List<CandleOHLCWithDateDTO> priceOHLCs = (List<CandleOHLCWithDateDTO>) nativeQuery.getResultList();
 
         return priceOHLCs;
+    }
+
+    public void updatePricesForHigherTimeframes(List<DailyPriceOHLC> importedDailyPrices) {
+        List<String> tickers = importedDailyPrices.stream().map(DailyPriceOHLC::getTicker).toList();
+        List<WeeklyPriceOHLC> previousTwoWeeklyPrices = priceOHLCRepository.findPreviousTwoWeeklyPricesForTickers(tickers);
+        List<MonthlyPriceOHLC> previousTwoMonthlyPrices = priceOHLCRepository.findPreviousTwoMonthlyPricesForTickers(tickers);
+        List<YearlyPriceOHLC> previousTwoYearlyPrices = priceOHLCRepository.findPreviousTwoYearlyPricesForTickers(tickers);
+        Map<String, List<AbstractPriceOHLC>> previousTwoWeeklyPricesByTicker = previousTwoWeeklyPrices.stream().collect(
+                Collectors.groupingBy(WeeklyPriceOHLC::getTicker, Collectors.mapping(p -> (AbstractPriceOHLC) p, Collectors.toList())));
+        Map<String, List<AbstractPriceOHLC>> previousTwoMonthlyPricesByTicker = previousTwoMonthlyPrices.stream().collect(
+                Collectors.groupingBy(MonthlyPriceOHLC::getTicker, Collectors.mapping(p -> (AbstractPriceOHLC) p, Collectors.toList())));
+        Map<String, List<AbstractPriceOHLC>> previousTwoYearlyPricesByTicker = previousTwoYearlyPrices.stream().collect(
+                Collectors.groupingBy(YearlyPriceOHLC::getTicker, Collectors.mapping(p -> (AbstractPriceOHLC) p, Collectors.toList())));
+
+        List<AbstractPriceOHLC> weeklyPrices = updatePricesAndPerformance(importedDailyPrices, StockTimeframe.WEEKLY, previousTwoWeeklyPricesByTicker);
+        priceOHLCRepository.saveAll(weeklyPrices);
+        List<AbstractPriceOHLC> monthlyPrices = updatePricesAndPerformance(importedDailyPrices, StockTimeframe.MONTHLY, previousTwoMonthlyPricesByTicker);
+        priceOHLCRepository.saveAll(monthlyPrices);
+        List<AbstractPriceOHLC> yearlyPrices = updatePricesAndPerformance(importedDailyPrices, StockTimeframe.YEARLY, previousTwoYearlyPricesByTicker);
+        priceOHLCRepository.saveAll(yearlyPrices);
+    }
+
+    private List<AbstractPriceOHLC> updatePricesAndPerformance(List<DailyPriceOHLC> dailyPrices, StockTimeframe timeframe, Map<String, List<AbstractPriceOHLC>> previousTwoWMYPricesByTicker) {
+        List<AbstractPriceOHLC> wmyPrices = new ArrayList<>();
+        for (DailyPriceOHLC dailyPrice : dailyPrices) {
+            String ticker = dailyPrice.getTicker();
+            if (previousTwoWMYPricesByTicker.containsKey(ticker)) {
+                wmyPrices.add(wmyPriceUpdatedFrom(previousTwoWMYPricesByTicker.get(ticker), dailyPrice, timeframe));
+            } else { // IPO first day, create new weekly, monthly, yearly
+                wmyPrices.add(createNewWMYPrice(dailyPrice, timeframe, dailyPrice.getOpen()));
+            }
+        }
+        return wmyPrices;
+    }
+
+    private AbstractPriceOHLC wmyPriceUpdatedFrom(List<AbstractPriceOHLC> previousTwoWMY, DailyPriceOHLC dailyPrice, StockTimeframe timeframe) {
+        AbstractPriceOHLC result;
+        AbstractPriceOHLC latestPriceWMY = previousTwoWMY.getFirst();
+        LocalDate latestEndDateWMY = latestPriceWMY.getEndDate();
+        LocalDate dailyPriceDate = dailyPrice.getDate();
+        if (latestEndDateWMY.equals(dailyPriceDate)) { // already imported (intraday update prices, performance)
+            // check for IPO week, month, year by size < 2
+            double previousClose = previousTwoWMY.size() < 2 ? latestPriceWMY.getOpen() : previousTwoWMY.getLast().getClose();
+            result = latestPriceWMY.convertFrom(dailyPrice, previousClose);
+        } else {
+            result = switch (timeframe) {
+                case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
+                case WEEKLY, MONTHLY, YEARLY -> updateOrCreateWMYPrice(previousTwoWMY, dailyPrice, latestEndDateWMY, timeframe);
+            };
+        }
+        return result;
+    }
+
+    private AbstractPriceOHLC updateOrCreateWMYPrice(List<AbstractPriceOHLC> previousTwoWMY, DailyPriceOHLC dailyPrice, LocalDate latestEndDateWMY, StockTimeframe timeframe) {
+        AbstractPriceOHLC result;
+        LocalDate dailyPriceDate = dailyPrice.getDate();
+        AbstractPriceOHLC latestPriceWMY = previousTwoWMY.getFirst();
+        if (isWithinSameTimeframe(dailyPriceDate, latestEndDateWMY, timeframe)) {
+            double previousClose = previousTwoWMY.size() < 2 ? latestPriceWMY.getOpen() : previousTwoWMY.getLast().getClose();
+            result = latestPriceWMY.convertFrom(dailyPrice, previousClose);
+            setEndDate(result, dailyPriceDate, timeframe);
+        } else { // new week, month, year
+            double previousClose = latestPriceWMY.getClose();
+            result = createNewWMYPrice(dailyPrice, timeframe, previousClose);
+        }
+        return result;
+    }
+
+    private boolean isWithinSameTimeframe(LocalDate date, LocalDate latestEndDateWMY, StockTimeframe timeframe) {
+        return switch (timeframe) {
+            case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
+            case WEEKLY -> sameWeek(date, latestEndDateWMY);
+            case MONTHLY -> sameMonth(date, latestEndDateWMY);
+            case YEARLY -> sameYear(date, latestEndDateWMY);
+        };
+    }
+
+    private AbstractPriceOHLC createNewWMYPrice(DailyPriceOHLC dailyPrice, StockTimeframe timeframe, double previousClose) {
+        return switch (timeframe) {
+            case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
+            case WEEKLY -> WeeklyPriceOHLC.newFrom(dailyPrice, previousClose);
+            case MONTHLY -> MonthlyPriceOHLC.newFrom(dailyPrice, previousClose);
+            case YEARLY -> YearlyPriceOHLC.newFrom(dailyPrice, previousClose);
+        };
+    }
+
+    private void setEndDate(AbstractPriceOHLC result, LocalDate endDate, StockTimeframe timeframe) {
+        switch (timeframe) {
+            case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
+            case WEEKLY -> ((WeeklyPriceOHLC) result).setEndDate(endDate);
+            case MONTHLY -> ((MonthlyPriceOHLC) result).setEndDate(endDate);
+            case YEARLY -> ((YearlyPriceOHLC) result).setEndDate(endDate);
+        }
     }
 
     @Transactional

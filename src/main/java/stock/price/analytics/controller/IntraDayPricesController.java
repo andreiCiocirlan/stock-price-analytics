@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 import stock.price.analytics.client.finnhub.FinnhubClient;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 import stock.price.analytics.repository.prices.PriceOHLCRepository;
+import stock.price.analytics.service.PriceOHLCService;
+import stock.price.analytics.service.RefreshMaterializedViewsService;
 import stock.price.analytics.service.YahooQuoteService;
 
 import java.util.List;
@@ -24,6 +26,8 @@ public class IntraDayPricesController {
     private final YahooQuoteService yahooQuoteService;
     private final FinnhubClient finnhubClient;
     private final PriceOHLCRepository priceOHLCRepository;
+    private final PriceOHLCService priceOHLCService;
+    private final RefreshMaterializedViewsService refreshMaterializedViewsService;
 
     @GetMapping("/finnhub")
     public DailyPriceOHLC intraDayPrices(@RequestParam("ticker") String ticker) {
@@ -41,12 +45,21 @@ public class IntraDayPricesController {
     @Transactional
     @GetMapping("/yahoo-prices")
     public void yahooPricesImport() {
-        yahooQuoteService.dailyPricesImport();
+        List<DailyPriceOHLC> dailyImportedPrices = yahooQuoteService.dailyPricesImport();
+        priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
+        refreshMaterializedViewsService.refreshMaterializedViews(false);
     }
 
     @GetMapping("/yahoo-prices/from-file")
-    public List<DailyPriceOHLC> yFinanceDailyPricesFrom(@RequestParam("fileName") String fileName) {
-        return yahooQuoteService.dailyPricesFromFile(fileName);
+    public void yFinanceDailyPricesFrom(@RequestParam("fileName") String fileName) {
+        List<DailyPriceOHLC> importedDailyPrices = yahooQuoteService.dailyPricesFromFile(fileName);
+        if (!importedDailyPrices.isEmpty()) {
+            priceOHLCService.updatePricesForHigherTimeframes(importedDailyPrices);
+        } else {
+            log.info("importedDailyPrices empty");
+        }
+        log.info("imported {}", importedDailyPrices.size());
+
     }
 
 }

@@ -9,6 +9,7 @@ import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 import stock.price.analytics.repository.prices.DailyPriceOHLCRepository;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +21,8 @@ public class DailyPriceOHLCService {
     private final DailyPriceOHLCRepository dailyPriceOHLCRepository;
 
     @Transactional
-    public void saveDailyImportedPrices(List<DailyPriceOHLC> dailyPrices, Map<String, DailyPriceOHLC> latestPricesByTicker) {
+    public List<DailyPriceOHLC> getDailyImportedPrices(List<DailyPriceOHLC> dailyPrices, Map<String, DailyPriceOHLC> latestPricesByTicker) {
+        List<DailyPriceOHLC> importedDailyPrices = new ArrayList<>();
         for (DailyPriceOHLC dailyPrice : dailyPrices) {
             String ticker = dailyPrice.getTicker();
             if (latestPricesByTicker.containsKey(ticker)) {
@@ -29,18 +31,19 @@ public class DailyPriceOHLCService {
                     if (needsUpdate(dailyPrice, latestPrice)) { // update prices
                         log.info("updated ticker {} which has different prices compared to DB {}", ticker, dailyPrice);
                         BeanUtils.copyProperties(dailyPrice, latestPrice, "id", "date", "open"); // date and opening price don't change
-                        dailyPriceOHLCRepository.save(latestPrice);
+                        importedDailyPrices.add(latestPrice);
                     } else {
                         log.info("same daily prices as in DB, not saved for {}", ticker);
                     }
                 } else { // insert new daily prices
-                    dailyPriceOHLCRepository.save(dailyPrice);
+                    importedDailyPrices.add(dailyPrice);
                 }
             } else {
                 log.info("new stock daily price: {}", dailyPrice);
-                dailyPriceOHLCRepository.save(dailyPrice);
+                importedDailyPrices.add(dailyPrice);
             }
         }
+        return importedDailyPrices;
     }
 
     public List<DailyPriceOHLC> findAllLatestByTickerWithDateAfter(LocalDate date) {
@@ -55,6 +58,10 @@ public class DailyPriceOHLCService {
         return dailyPrice.getClose() != latestPrice.getClose() || dailyPrice.getOpen() != latestPrice.getOpen()
                 || dailyPrice.getHigh() != latestPrice.getHigh() || dailyPrice.getLow() != latestPrice.getLow()
                 || dailyPrice.getPerformance() != latestPrice.getPerformance();
+    }
+
+    public void saveDailyPrices(List<DailyPriceOHLC> dailyImportedPrices) {
+        dailyPriceOHLCRepository.saveAll(dailyImportedPrices);
     }
 
 }

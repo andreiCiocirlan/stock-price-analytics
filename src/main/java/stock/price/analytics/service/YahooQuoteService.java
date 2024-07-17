@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,8 +47,9 @@ public class YahooQuoteService {
     }
 
     @Transactional
-    public void dailyPricesImport() {
+    public List<DailyPriceOHLC> dailyPricesImport() {
         int maxTickersPerRequest = 850;
+        List<DailyPriceOHLC> dailyImportedPrices = new ArrayList<>();
         List<DailyPriceOHLC> latestByTicker = dailyPriceOHLCService.findXTBLatestByTickerWithDateAfter(previousTradingDate());
 
         int start = 0;
@@ -58,9 +60,11 @@ public class YahooQuoteService {
             String tickers = partition.stream().map(DailyPriceOHLC::getTicker).collect(Collectors.joining(","));
             String pricesJSON = quotePricesJSON(tickers, getCrumb());
 
-            List<DailyPriceOHLC> dailyPriceOHLCs = yahooFinanceClient.yFinDailyPricesFrom(pricesJSON);
-            dailyPriceOHLCService.saveDailyImportedPrices(dailyPriceOHLCs, latestByTicker.stream()
+            List<DailyPriceOHLC> dailyPriceOHLCs = yahooFinanceClient.extractDailyPricesFromJSON(pricesJSON);
+            List<DailyPriceOHLC> dailyPrices = dailyPriceOHLCService.getDailyImportedPrices(dailyPriceOHLCs, latestByTicker.stream()
                     .collect(Collectors.toMap(DailyPriceOHLC::getTicker, p -> p)));
+            dailyPriceOHLCService.saveDailyPrices(dailyPrices);
+            dailyImportedPrices.addAll(dailyPrices);
 
             String fileName = dailyPriceOHLCs.getFirst().getDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_" + fileCounter + ".json";
             String path = "./yahoo-daily-prices/" + fileName;
@@ -75,6 +79,8 @@ public class YahooQuoteService {
             end = Math.min(start + maxTickersPerRequest, latestByTicker.size());
             fileCounter++;
         }
+
+        return dailyImportedPrices;
     }
 
     private void writeToFile(String filePath, String jsonData) {

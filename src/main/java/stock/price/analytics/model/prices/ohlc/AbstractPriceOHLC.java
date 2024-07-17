@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import stock.price.analytics.model.prices.PriceEntity;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @MappedSuperclass
@@ -43,6 +45,30 @@ public abstract class AbstractPriceOHLC implements PriceEntity {
         this.low = candleOHLC.low();
         this.open = candleOHLC.open();
         this.close = candleOHLC.close();
+    }
+
+    public abstract LocalDate getStartDate();
+    public abstract LocalDate getEndDate();
+
+    public AbstractPriceOHLC convertFrom(DailyPriceOHLC dailyPrice, Double previousClose) {
+        this.setClose(dailyPrice.getClose());
+        this.setLow(Math.min(getLow(), dailyPrice.getLow()));
+        this.setHigh(Math.max(getHigh(), dailyPrice.getHigh()));
+        this.setPerformance(performanceFrom(dailyPrice, previousClose));
+
+        return this;
+    }
+
+    protected static double performanceFrom(DailyPriceOHLC dailyPrice, Double previousClose) {
+        double currentClose = dailyPrice.getClose();
+        double performance;
+        if (previousClose != null) {
+            performance = Math.round((((currentClose - previousClose) / previousClose) * 100) * 100) / 100.0;
+        } else { // first week, month, year since IPO
+            double currentOpen = dailyPrice.getOpen();
+            performance = Math.round((((currentClose - currentOpen) / currentOpen) * 100) * 100) / 100.0;
+        }
+        return performance;
     }
 
     @Override

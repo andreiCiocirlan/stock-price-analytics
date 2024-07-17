@@ -31,9 +31,25 @@ public class WeeklyPriceOHLC extends AbstractPriceOHLC {
         this.endDate = endDate;
     }
 
+    public WeeklyPriceOHLC(String ticker, LocalDate startDate, LocalDate endDate, double performance, CandleOHLC candleOHLC) {
+        super(ticker, candleOHLC);
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.setPerformance(performance);
+    }
+
+    public static WeeklyPriceOHLC newFrom(DailyPriceOHLC dailyPrices, double previousClose) {
+        return new WeeklyPriceOHLC(
+                dailyPrices.getTicker(),
+                dailyPrices.getDate(),
+                dailyPrices.getDate(),
+                performanceFrom(dailyPrices, previousClose),
+                new CandleOHLC(dailyPrices.getOpen(), dailyPrices.getHigh(), dailyPrices.getLow(), dailyPrices.getClose()));
+    }
+
     @Override
     public String toString() {
-        return STR."Weekly_OHLC {  StartDate=\{startDate} EndDate=\{endDate}\{super.toString()}";
+        return STR."Weekly_OHLC {  StartDate=\{startDate} EndDate=\{endDate} \{super.toString()}";
     }
 
 }

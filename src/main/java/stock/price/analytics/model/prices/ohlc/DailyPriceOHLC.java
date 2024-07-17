@@ -33,6 +33,16 @@ public class DailyPriceOHLC extends AbstractPriceOHLC {
     }
 
     @Override
+    public LocalDate getStartDate() {
+        return LocalDate.now();
+    }
+
+    @Override
+    public LocalDate getEndDate() {
+        return LocalDate.now();
+    }
+
+    @Override
     public String toString() {
         return STR."Daily_OHLC {  date=\{date} \{super.toString()}";
     }

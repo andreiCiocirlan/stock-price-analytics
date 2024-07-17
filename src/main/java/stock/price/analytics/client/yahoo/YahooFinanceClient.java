@@ -36,34 +36,36 @@ public class YahooFinanceClient {
         }
     }
 
-    public List<DailyPriceOHLC> yFinDailyPricesFrom(String jsonData) {
-        try {
-            return extractDailyPricesFromJSON(jsonData);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static List<DailyPriceOHLC> extractDailyPricesFromJSON(String jsonData) throws JsonProcessingException {
+    public List<DailyPriceOHLC> extractDailyPricesFromJSON(String jsonData) {
         List<DailyPriceOHLC> intraDayPrices = new ArrayList<>();
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(jsonData);
+        JsonNode jsonNode;
+        try {
+            jsonNode = objectMapper.readTree(jsonData);
+        } catch (JsonProcessingException ex) {
+            throw new RuntimeException(ex);
+        }
+
         JsonNode quoteResponse = jsonNode.get("quoteResponse");
         JsonNode resultArray = quoteResponse.get("result");
 
         for (JsonNode node : resultArray) {
-            if ("null".equals(node.get("symbol").asText())) {
-                continue;
-            }
             String ticker = node.get("symbol").asText();
             if (node.has("regularMarketPrice") && node.has("regularMarketDayHigh") &&
                     node.has("regularMarketDayLow") && node.has("regularMarketOpen") &&
                     node.has("regularMarketChangePercent") && node.has("regularMarketTime")) {
                 try {
                     LocalDate tradingDate = Instant.ofEpochSecond(node.get("regularMarketTime").asLong()).atZone(ZoneId.systemDefault()).toLocalDate();
-                    if (!tradingDateNow().equals(tradingDate)) {
-                        log.warn("Not extracting delisted stock daily prices for ticker {} and date {}", ticker, tradingDate);
-                        continue;
+                    LocalDate tradingDateNow = tradingDateNow();
+                    if (!tradingDateNow.equals(tradingDate)) {
+                        if (tradingDate.plusDays(5).isBefore(tradingDateNow)) {
+                            // more than 5 days passed since last intraDay price
+                            log.warn("Not extracting delisted stock daily prices for ticker {} and date {}", ticker, tradingDate);
+                            continue;
+                        } else {
+                            // less than 5 days passed since last intraDay price
+                            log.warn("Extracting stock daily prices for ticker {} and date {}", ticker, tradingDate);
+                        }
                     }
                     double percentChange = Math.round(node.get("regularMarketChangePercent").asDouble() * 100.0) / 100.0;
                     intraDayPrices.add(new DailyPriceOHLC(ticker, tradingDate, percentChange,
