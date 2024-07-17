@@ -23,12 +23,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static stock.price.analytics.config.TradingDateUtil.previousTradingDate;
+import static stock.price.analytics.config.TradingDateUtil.tradingDateNow;
 
 @Slf4j
 @Service
@@ -50,7 +51,8 @@ public class YahooQuoteService {
     public List<DailyPriceOHLC> dailyPricesImport() {
         int maxTickersPerRequest = 850;
         List<DailyPriceOHLC> dailyImportedPrices = new ArrayList<>();
-        List<DailyPriceOHLC> latestByTicker = dailyPriceOHLCService.findXTBLatestByTickerWithDateAfter(previousTradingDate());
+        LocalDate minTradingDate = tradingDateNow().minusDays(5); // max 5 calendar days in the past for previous intraDay prices to be found
+        List<DailyPriceOHLC> latestByTicker = dailyPriceOHLCService.findXTBLatestByTickerWithDateAfter(minTradingDate);
 
         int start = 0;
         int end = Math.min(maxTickersPerRequest, latestByTicker.size());
