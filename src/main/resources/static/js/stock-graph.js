@@ -185,7 +185,7 @@ function updateOHLCChart(stockData) {
                                 lineWidth: 0.5,
                                 marker: { enabled: false },
                                 tooltip: {
-                                    pointFormat: '<span style="font-size:15px;color:red">{series.name}: {point.y}</span>'
+                                    pointFormat: '<span style="font-size:15px;color:red">{series.name}: {point.y:.2f}</span>'
                                 }
                             },
                             {
@@ -198,7 +198,7 @@ function updateOHLCChart(stockData) {
                                 lineWidth: 0.5,
                                 marker: { enabled: false },
                                 tooltip: {
-                                    pointFormat: '<span style="font-size:15px;color:yellow">{series.name}: {point.y}</span>'
+                                    pointFormat: '<span style="font-size:15px;color:yellow">{series.name}: {point.y:.2f}</span>'
                                 }
                             },
                             {
@@ -211,7 +211,7 @@ function updateOHLCChart(stockData) {
                                 lineWidth: 0.5,
                                 marker: { enabled: false },
                                 tooltip: {
-                                    pointFormat: '<span style="font-size:15px;color:orange">{series.name}: {point.y}</span>'
+                                    pointFormat: '<span style="font-size:15px;color:orange">{series.name}: {point.y:.2f}</span>'
                                 }
                             }
                         ],
