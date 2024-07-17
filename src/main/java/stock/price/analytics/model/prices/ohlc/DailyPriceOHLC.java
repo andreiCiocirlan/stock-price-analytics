@@ -26,10 +26,10 @@ public class DailyPriceOHLC extends AbstractPriceOHLC {
         this.date = date;
     }
 
-    public DailyPriceOHLC(String ticker, @NonNull LocalDate date, double percentChange, CandleOHLC candleOHLC) {
+    public DailyPriceOHLC(String ticker, @NonNull LocalDate date, double performance, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
         this.date = date;
-        this.setPerformance(percentChange);
+        this.setPerformance(performance);
     }
 
     @Override
