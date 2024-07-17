@@ -16,7 +16,7 @@ public class RefreshMaterializedViewsService {
         refreshMaterializedViewsRepository.refreshLatestPrices();
         log.info("refreshed latest prices");
         refreshMaterializedViewsRepository.refreshDailyPerformanceHeatmapPrices();
-        log.info("refreshed heatmap prices");
+        log.info("refreshed daily performance prices");
         refreshMaterializedViewsRepository.refreshWeeklyPerformanceHeatmapPrices();
         log.info("refreshed weekly performance prices");
         refreshMaterializedViewsRepository.refreshMonthlyPerformanceHeatmapPrices();
