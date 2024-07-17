@@ -23,6 +23,13 @@ public class RefreshMaterializedViewsService {
         log.info("refreshed monthly performance prices");
         refreshMaterializedViewsRepository.refreshYearlyPerformanceHeatmapPrices();
         log.info("refreshed yearly performance prices");
+        refreshMaterializedViewsRepository.refreshPrevTwoWeeks();
+        log.info("refreshed prev two weeks prices");
+        refreshMaterializedViewsRepository.refreshPrevTwoMonths();
+        log.info("refreshed prev two months prices");
+        refreshMaterializedViewsRepository.refreshPrevTwoYears();
+        log.info("refreshed prev two years prices");
+
         if (refreshHighLowPrices) {
             refreshMaterializedViewsRepository.refreshHighLow4w();
             log.info("refreshed high low 4w");

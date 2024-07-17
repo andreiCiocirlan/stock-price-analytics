@@ -18,15 +18,9 @@ public interface PriceOHLCRepository extends JpaRepository<AbstractPriceOHLC, Lo
     List<DailyPriceOHLC> findByTickerAndDate(String ticker, LocalDate date);
 
     @Query(value = """
-            SELECT id, ticker, start_date, end_date, high, low, open, close, performance
-            FROM (
-                SELECT id, ticker, start_date, end_date, high, low, open, close, performance,
-                    ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY start_date DESC) AS rn
-                FROM weekly_prices
-                WHERE ticker IN (:tickers)
-            ) AS subquery
-            WHERE rn <= 2
-            ORDER BY ticker, start_date DESC;
+            SELECT *
+            FROM prev_two_weeks
+            WHERE ticker in (:tickers)
             """, nativeQuery = true)
     List<WeeklyPriceOHLC> findPreviousTwoWeeklyPricesForTickers(@Param("tickers") List<String> tickers);
 
@@ -37,15 +31,9 @@ public interface PriceOHLCRepository extends JpaRepository<AbstractPriceOHLC, Lo
     List<WeeklyPriceOHLC> findWeeklyByTickerAndStartDate(String ticker, LocalDate date);
 
     @Query(value = """
-            SELECT id, ticker, start_date, end_date, high, low, open, close, performance
-            FROM (
-                SELECT id, ticker, start_date, end_date, high, low, open, close, performance,
-                    ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY start_date DESC) AS rn
-                FROM monthly_prices
-                WHERE ticker IN (:tickers)
-            ) AS subquery
-            WHERE rn <= 2
-            ORDER BY ticker, start_date DESC;
+            SELECT *
+            FROM prev_two_months
+            WHERE ticker in (:tickers)
             """, nativeQuery = true)
     List<MonthlyPriceOHLC> findPreviousTwoMonthlyPricesForTickers(@Param("tickers") List<String> tickers);
 
@@ -56,15 +44,9 @@ public interface PriceOHLCRepository extends JpaRepository<AbstractPriceOHLC, Lo
     List<MonthlyPriceOHLC> findMonthlyByTickerAndStartDate(String ticker, LocalDate date);
 
     @Query(value = """
-            SELECT id, ticker, start_date, end_date, high, low, open, close, performance
-            FROM (
-                SELECT id, ticker, start_date, end_date, high, low, open, close, performance,
-                    ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY start_date DESC) AS rn
-                FROM yearly_prices
-                WHERE ticker IN (:tickers)
-            ) AS subquery
-            WHERE rn <= 2
-            ORDER BY ticker, start_date DESC;
+            SELECT *
+            FROM prev_two_years
+            WHERE ticker in (:tickers)
             """, nativeQuery = true)
     List<YearlyPriceOHLC> findPreviousTwoYearlyPricesForTickers(@Param("tickers") List<String> tickers);
 
