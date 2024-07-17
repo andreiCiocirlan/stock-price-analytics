@@ -35,17 +35,4 @@ public class TradingDateUtil {
         return LocalDate.now().minusDays(1);
     }
 
-    public static LocalDate previousTradingDate() {
-        LocalDate now = tradingDateNow();
-        return switch (now.getDayOfWeek()) {
-            case MONDAY -> now.with(TemporalAdjusters.previous(DayOfWeek.FRIDAY));
-            case TUESDAY -> now.with(TemporalAdjusters.previous(DayOfWeek.MONDAY));
-            case WEDNESDAY -> now.with(TemporalAdjusters.previous(DayOfWeek.TUESDAY));
-            case THURSDAY -> now.with(TemporalAdjusters.previous(DayOfWeek.WEDNESDAY));
-            case FRIDAY -> now.with(TemporalAdjusters.previous(DayOfWeek.THURSDAY));
-            case SATURDAY -> now.with(TemporalAdjusters.previous(DayOfWeek.FRIDAY));
-            case SUNDAY -> now.with(TemporalAdjusters.previous(DayOfWeek.FRIDAY));
-        };
-    }
-
 }
