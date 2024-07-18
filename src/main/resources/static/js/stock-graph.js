@@ -133,7 +133,7 @@ function updateOHLCChart(stockData) {
                             labels: { style: { color: '#FFFFFF' } }
                         },
                         yAxis: {
-                            crosshair: { width: 1, color: 'gray', dashStyle: 'Dash', label: { enabled: true } },
+                            crosshair: { width: 1, color: 'gray', dashStyle: 'Dash', label: { enabled: true, style: { color: '#FFFFFF' } } },
                             gridLineWidth: 0.2,
                             title: { text: 'Price' },
                             labels: { style: { color: '#FFFFFF'} },
