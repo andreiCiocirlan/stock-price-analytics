@@ -65,7 +65,6 @@ public class YahooQuoteService {
             List<DailyPriceOHLC> dailyPriceOHLCs = yahooFinanceClient.extractDailyPricesFromJSON(pricesJSON);
             List<DailyPriceOHLC> dailyPrices = dailyPriceOHLCService.getDailyImportedPrices(dailyPriceOHLCs, latestByTicker.stream()
                     .collect(Collectors.toMap(DailyPriceOHLC::getTicker, p -> p)));
-            dailyPriceOHLCService.saveDailyPrices(dailyPrices);
             dailyImportedPrices.addAll(dailyPrices);
 
             String fileName = dailyPriceOHLCs.getFirst().getDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_" + fileCounter + ".json";
@@ -77,6 +76,7 @@ public class YahooQuoteService {
             fileCounter++;
         }
 
+        dailyPriceOHLCService.saveDailyPrices(dailyImportedPrices);
         return dailyImportedPrices;
     }
 
