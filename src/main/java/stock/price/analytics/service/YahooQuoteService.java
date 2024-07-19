@@ -72,11 +72,6 @@ public class YahooQuoteService {
             String path = "./yahoo-daily-prices/" + fileName;
             writeToFile(path, pricesJSON);
 
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
             start = end;
             end = Math.min(start + maxTickersPerRequest, latestByTicker.size());
             fileCounter++;
