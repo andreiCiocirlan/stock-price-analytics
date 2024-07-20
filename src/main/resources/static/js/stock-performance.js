@@ -67,7 +67,7 @@ function updateStockPerformanceChart(timeFrame) {
 }
 
 function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, positivePerfFirst) {
-    stockPerformanceChart = Highcharts.chart('container', {
+    stockPerformanceChart = Highcharts.chart('heatmap-container', {
         chart: { type: 'heatmap',backgroundColor: '#171B26' },
         navigation: { buttonOptions: { enabled: false}},
         title: null,
