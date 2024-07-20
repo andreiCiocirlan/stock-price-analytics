@@ -134,46 +134,7 @@ function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, 
                         item.performance,
                         item.ticker
                 ])
-        }],
-        responsive: {
-          rules: [{
-              condition: {
-                  maxWidth: 500 // Applies to mobile devices
-              },
-              chartOptions: {
-                  title: {
-                      style: {
-                          fontSize: '1.5em' // Adjust title font size for small screens
-                      }
-                  },
-                  xAxis: {
-                      labels: {
-                          style: {
-                              fontSize: '0.8em' // Adjust x-axis label font size for small screens
-                          }
-                      }
-                  }
-              }
-          }, {
-              condition: {
-                  minWidth: 501 // Applies to larger screens
-              },
-              chartOptions: {
-                  title: {
-                      style: {
-                          fontSize: '2em' // Adjust title font size for larger screens
-                      }
-                  },
-                  xAxis: {
-                      labels: {
-                          style: {
-                              fontSize: '1em' // Adjust x-axis label font size for larger screens
-                          }
-                      }
-                  }
-              }
-          }]
-        }
+        }]
     });
 }
 
