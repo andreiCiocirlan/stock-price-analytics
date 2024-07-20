@@ -1,14 +1,14 @@
 body, html {
     height: 100%;
     background-color: #171B26;
-    overflow-y: scroll;
+    overflow: hidden;
     font-size: 15px;
     font-weight: bold;
 }
 
 #heatmap-container {
     width: 100%;
-    height: 89vh;
+    height: 87vh;
 }
 
 @media (orientation: landscape) {
