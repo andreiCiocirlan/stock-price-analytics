@@ -60,10 +60,13 @@ public class PriceOHLCService {
 
         List<AbstractPriceOHLC> weeklyPrices = updatePricesAndPerformance(importedDailyPrices, StockTimeframe.WEEKLY, previousTwoWeeklyPricesByTicker);
         priceOHLCRepository.saveAll(weeklyPrices);
+        log.info("imported {} weeklyPrices", weeklyPrices.size());
         List<AbstractPriceOHLC> monthlyPrices = updatePricesAndPerformance(importedDailyPrices, StockTimeframe.MONTHLY, previousTwoMonthlyPricesByTicker);
         priceOHLCRepository.saveAll(monthlyPrices);
+        log.info("imported {} monthlyPrices", monthlyPrices.size());
         List<AbstractPriceOHLC> yearlyPrices = updatePricesAndPerformance(importedDailyPrices, StockTimeframe.YEARLY, previousTwoYearlyPricesByTicker);
         priceOHLCRepository.saveAll(yearlyPrices);
+        log.info("imported {} yearlyPrices", yearlyPrices.size());
     }
 
     private List<AbstractPriceOHLC> updatePricesAndPerformance(List<DailyPriceOHLC> dailyPrices, StockTimeframe timeframe, Map<String, List<AbstractPriceOHLC>> previousTwoWMYPricesByTicker) {
