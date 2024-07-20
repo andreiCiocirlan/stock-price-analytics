@@ -244,6 +244,39 @@ function updateOHLCChart(stockData) {
                                     return { x : 10, y : 0 };
                                 }
                             }
+                        },
+                        responsive: {
+                            rules: [{
+                                condition: {
+                                    maxWidth: 500 // Adjust based on your needs
+                                },
+                                chartOptions: {
+                                    title: {
+                                        style: {
+                                            fontSize: '1.5em' // Adjust title font size for smaller screens
+                                        }
+                                    },
+                                    xAxis: {
+                                        labels: {
+                                            style: {
+                                                fontSize: '0.8em' // Adjust x-axis label font size
+                                            }
+                                        }
+                                    },
+                                    yAxis: {
+                                        labels: {
+                                            style: {
+                                                fontSize: '0.8em' // Adjust y-axis label font size
+                                            }
+                                        }
+                                    },
+                                    dataLabels: {
+                                        style: {
+                                            fontSize: '0.6em' // Adjust data label font size
+                                        }
+                                    }
+                                }
+                            }]
                         }
                    });
                    ohlcContainer.addEventListener('resize', () => {
