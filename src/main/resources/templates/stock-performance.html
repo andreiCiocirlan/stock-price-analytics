@@ -4,67 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stock Performance Heatmap</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/css/styles.css">
 </head>
 <body>
-<div class="time-frame-buttons">
-    <div class="select-item">
-        <label for="numRows">Rows</label>
-        <select id="numRows" onchange="dispatchTimeFrameChangeEvent()">
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="15">15</option>
-            <option value="20" selected>20</option>
-        </select>
-    </div>
-    <div class="select-item">
-        <label for="numCols">Cols</label>
-        <select id="numCols" onchange="dispatchTimeFrameChangeEvent()">
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="15">15</option>
-            <option value="20">20</option>
-            <option value="25" selected>25</option>
-            <option value="30">30</option>
-        </select>
-    </div>
-    <div class="select-item">
-        <label for="cfdMargin">CFD</label>
-        <select id="cfdMargin" onchange="dispatchTimeFrameChangeEvent()">
-            <option value="0" selected>1:1</option>
-            <option value="0.2" selected>5:1</option>
-            <option value="0.25">4:1</option>
-            <option value="0.33">3:1</option>
-            <option value="0.5">2:1</option>
-        </select>
-    </div>
-    <div class="time-frame-label-container">
-        <label for="timeFrameGroup">Timeframe</label>
-        <div id="timeFrameGroup" class="time-frame-button-group">
-            <button onclick="handleTimeFrameButtonClick('DAILY')">Daily</button>
-            <button onclick="handleTimeFrameButtonClick('WEEKLY')">Weekly</button>
-            <button onclick="handleTimeFrameButtonClick('MONTHLY')">Monthly</button>
-            <button onclick="handleTimeFrameButtonClick('YEARLY')">Yearly</button>
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="time-frame-buttons d-flex flex-wrap">
+                <div class="select-item m-2">
+                    <label for="numRows">Rows</label>
+                    <select class="form-control" id="numRows" onchange="dispatchTimeFrameChangeEvent()">
+                        <option value="5">5</option>
+                        <option value="10" selected>10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                    </select>
+                </div>
+                <div class="select-item m-2">
+                    <label for="numCols">Cols</label>
+                    <select class="form-control" id="numCols" onchange="dispatchTimeFrameChangeEvent()">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="25" selected>25</option>
+                        <option value="30">30</option>
+                    </select>
+                </div>
+                <div class="select-item m-2">
+                    <label for="cfdMargin">CFD</label>
+                    <select class="form-control" id="cfdMargin" onchange="dispatchTimeFrameChangeEvent()">
+                        <option value="0" selected>1:1</option>
+                        <option value="0.2" selected>5:1</option>
+                        <option value="0.25">4:1</option>
+                        <option value="0.33">3:1</option>
+                        <option value="0.5">2:1</option>
+                    </select>
+                </div>
+                <div class="time-frame-label-container">
+                    <div id="timeFrameGroup" class="time-frame-button-group">
+                        <button class="btn btn-primary" onclick="handleTimeFrameButtonClick('DAILY')">Daily</button>
+                        <button class="btn btn-primary" onclick="handleTimeFrameButtonClick('WEEKLY')">Weekly</button>
+                        <button class="btn btn-primary" onclick="handleTimeFrameButtonClick('MONTHLY')">Monthly</button>
+                        <button class="btn btn-primary" onclick="handleTimeFrameButtonClick('YEARLY')">Yearly</button>
+                    </div>
+                </div>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <label for="positivePerfFirst">Positive First</label>
+                        <input type="checkbox" id="positivePerfFirst" onchange="dispatchTimeFrameChangeEvent()" checked>
+                    </div>
+                    <div class="checkbox-item">
+                        <label for="xtbOnly">XTB Tickers</label>
+                        <input type="checkbox" id="xtbOnly" onchange="dispatchTimeFrameChangeEvent()" checked>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="checkbox-group">
-        <div class="checkbox-item">
-            <label for="positivePerfFirst">Positive First</label>
-            <input type="checkbox" id="positivePerfFirst" onchange="dispatchTimeFrameChangeEvent()" checked>
-        </div>
-        <div class="checkbox-item">
-            <label for="xtbOnly">XTB Tickers</label>
-            <input type="checkbox" id="xtbOnly" onchange="dispatchTimeFrameChangeEvent()" checked>
+    <div class="row">
+        <div class="col-12">
+            <div id="heatmap-container"></div>
         </div>
     </div>
 </div>
-<div id="heatmap-container"></div>
 <script src="https://code.highcharts.com/stock/highstock.js"></script>
 <script src="https://code.highcharts.com/modules/heatmap.js"></script>
 <script src="https://code.highcharts.com/modules/exporting.js"></script>
 <script src="https://code.highcharts.com/modules/export-data.js"></script>
 <script src="https://code.highcharts.com/stock/highcharts-more.js"></script>
 <script src="https://code.highcharts.com/stock/indicators/indicators.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="../static/js/stock-performance.js"></script>
 <script src="../static/js/stock-graph.js"></script>
 </body>
