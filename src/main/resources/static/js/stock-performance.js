@@ -121,6 +121,9 @@ function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, 
                 events: {
                     click: function() {
                         openStockGraph({ ticker: data[this.index].ticker });
+                    },
+                    touchstart: function() {
+                        openStockGraph({ ticker: data[this.index].ticker });
                     }
                 }
             },
