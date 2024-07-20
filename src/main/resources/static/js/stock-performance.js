@@ -129,7 +129,7 @@ function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, 
             data:
                 data.map((item, index) => [
                         Math.floor(index / numRows),
-                        index % numRows,
+                        (numRows - 1) - (index % numRows),
                         item.performance,
                         item.ticker
                 ])
