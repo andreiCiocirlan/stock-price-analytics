@@ -119,13 +119,6 @@ function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, 
                     return `<span style="font-size: ${fontSize};">${data[this.point.index].ticker}<br>${data[this.point.index].performance}%</span>`;
                 }
             },
-            point: {
-                events: {
-                    click: function() {
-                        openStockGraph({ ticker: data[this.index].ticker });
-                    }
-                }
-            },
             data:
                 data.map((item, index) => [
                         Math.floor(index / numRows),
