@@ -38,6 +38,17 @@ function handleTimeFrameButtonClick(timeFrame) {
     updateStockPerformanceChart(currentTimeFrame);
 }
 
+function updatePricesIntraday() {
+    const url = `/stock-prices/yahoo-prices`;
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+        })
+        .catch(error => console.error(error));
+}
+
 function updateStockPerformanceChart(timeFrame) {
     const urlParams = new URLSearchParams(window.location.search);
     const numRows = document.getElementById('numRows').value || 5;
