@@ -46,8 +46,10 @@ public class IntraDayPricesController {
     @GetMapping("/yahoo-prices")
     public void yahooPricesImport() {
         List<DailyPriceOHLC> dailyImportedPrices = yahooQuoteService.dailyPricesImport();
-        priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
-        refreshMaterializedViewsService.refreshMaterializedViews(false);
+        if (!dailyImportedPrices.isEmpty()) {
+            priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
+            refreshMaterializedViewsService.refreshMaterializedViews(false);
+        }
     }
 
     @GetMapping("/yahoo-prices/from-file")
