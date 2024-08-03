@@ -69,7 +69,7 @@ public class StockHistoricalPricesService {
                         if (tickers != null && Arrays.stream(tickers.split(",")).noneMatch(ticker -> ticker.equals(stockTicker)))
                             return;
                         List<DailyPriceOHLC> dailyPrices = dailyPricesFromFileWithCount(srcFile, prevDaysCount + 1); // +1 to get previous day close
-                        tickerAndPrevDaysPricesImported.put(stockTicker, dailyPrices.stream().filter(dp -> dp.getDate().isAfter(tradingDate)).toList());
+                        tickerAndPrevDaysPricesImported.put(stockTicker, dailyPrices);
                     });
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -77,7 +77,7 @@ public class StockHistoricalPricesService {
 
         tickerAndPrevDaysPricesImported.forEach((_, dailyPricesPrevDays) -> prevDaysHistPrices.addAll(dailyPriceWithPerformance(dailyPricesPrevDays)));
 
-        partitionDataAndSave(prevDaysHistPrices, priceOhlcRepository);
+        partitionDataAndSave(prevDaysHistPrices.stream().filter(dp -> dp.getDate().isAfter(tradingDate)).toList(), priceOhlcRepository);
 
         // insert/update higher timeframe prices
         priceOHLCService.updateHigherTimeframesPricesFor(tradingDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
