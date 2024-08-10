@@ -30,7 +30,7 @@ public class DailyPriceOHLCService {
                 if (latestPrice.getDate().equals(dailyPrice.getDate())) {
                     if (needsUpdate(dailyPrice, latestPrice)) { // update prices
                         log.info("updated ticker {} which has different prices compared to DB {}", ticker, dailyPrice);
-                        BeanUtils.copyProperties(dailyPrice, latestPrice, "id", "date", "open"); // date and opening price don't change
+                        BeanUtils.copyProperties(dailyPrice, latestPrice, "id", "date"); // date won't change (opening price might be adjusted)
                         importedDailyPrices.add(latestPrice);
                     } else {
                         log.info("same daily prices as in DB, not saved for {}", ticker);
