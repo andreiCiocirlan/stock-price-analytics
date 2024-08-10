@@ -42,6 +42,7 @@ public class YahooQuoteService {
     private final DailyPriceOHLCService dailyPriceOHLCService;
     private int RETRY_COUNT_CRUMB = 0;
     private String COOKIE_FC_YAHOO = "";
+    private String CRUMB_COOKIE = "";
 
     public List<DailyPriceOHLC> dailyPricesFromFile(String fileName) {
         return yahooFinanceClient.dailyPricesFromFile(fileName);
@@ -49,7 +50,7 @@ public class YahooQuoteService {
 
     @Transactional
     public List<DailyPriceOHLC> dailyPricesImport() {
-        int maxTickersPerRequest = 850;
+        int maxTickersPerRequest = 1650;
         List<DailyPriceOHLC> dailyImportedPrices = new ArrayList<>();
         LocalDate minTradingDate = tradingDateNow().minusDays(5); // max 5 calendar days in the past for previous intraDay prices to be found
         List<DailyPriceOHLC> latestByTicker = dailyPriceOHLCService.findXTBLatestByTickerWithDateAfter(minTradingDate);
@@ -137,6 +138,9 @@ public class YahooQuoteService {
     }
 
     public String getCrumb() {
+        if (!CRUMB_COOKIE.isBlank()) {
+            return CRUMB_COOKIE;
+        }
         while (RETRY_COUNT_CRUMB < MAX_RETRIES_CRUMB) {
             String crumb = null;
             try (CloseableHttpClient httpClient = createHttpClient()) {
@@ -151,6 +155,7 @@ public class YahooQuoteService {
                     HttpEntity entity = response.getEntity();
                     if (entity != null) {
                         crumb = EntityUtils.toString(entity);
+                        CRUMB_COOKIE = crumb;
                     }
                 } else {
                     RETRY_COUNT_CRUMB++;
@@ -164,7 +169,7 @@ public class YahooQuoteService {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            log.info("crumb: {}", crumb);
+            log.info("crumb: {}", CRUMB_COOKIE);
             return crumb;
         }
         // If we reach this point, all retries have been exhausted
