@@ -17,7 +17,7 @@ public interface DailyPriceOHLCRepository extends JpaRepository<DailyPriceOHLC, 
     long countByDateBetween(LocalDate startDate, LocalDate endDate);
 
     List<DailyPriceOHLC> findByDateBefore(LocalDate date);
-    List<DailyPriceOHLC> findByDateAfter(LocalDate date);
+    List<DailyPriceOHLC> findByDateAfterOrderByDate(LocalDate date);
     List<DailyPriceOHLC> findByDateBetween(LocalDate startDate, LocalDate endDate);
 
     @Query(value = "SELECT * from latest_prices", nativeQuery = true)
