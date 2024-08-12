@@ -204,6 +204,7 @@ public class PriceOHLCService {
             FROM final_result
             ON CONFLICT (ticker, start_date)
                 DO UPDATE SET
+                    open = EXCLUDED.open,
                     high = EXCLUDED.high,
                     low = EXCLUDED.low,
                     close = EXCLUDED.close,
