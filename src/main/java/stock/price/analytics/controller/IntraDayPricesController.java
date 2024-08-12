@@ -14,7 +14,10 @@ import stock.price.analytics.service.PriceOHLCService;
 import stock.price.analytics.service.RefreshMaterializedViewsService;
 import stock.price.analytics.service.YahooQuoteService;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -43,20 +46,36 @@ public class IntraDayPricesController {
     }
 
     @Transactional
-    @GetMapping("/yahoo-prices")
+    @GetMapping("/yahoo-prices/intraday")
     public void yahooPricesImport() {
         List<DailyPriceOHLC> dailyImportedPrices = yahooQuoteService.dailyPricesImport();
         if (!dailyImportedPrices.isEmpty()) {
-            priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
+            priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices, getTradingDate(dailyImportedPrices));
             refreshMaterializedViewsService.refreshMaterializedViews(false);
         }
+    }
+
+    @Transactional
+    @GetMapping("/yahoo-prices/pre-market")
+    public void yahooPreMarketPricesImport() {
+        yahooQuoteService.dailyPricesImport(true);
+    }
+
+    // returns the trading date being imported (highest count, as for some tickers it might import previous days)
+    private LocalDate getTradingDate(List<DailyPriceOHLC> dailyImportedPrices) {
+        return dailyImportedPrices.stream()
+                .collect(Collectors.groupingBy(DailyPriceOHLC::getDate, Collectors.counting()))
+                .entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElseThrow();
     }
 
     @GetMapping("/yahoo-prices/from-file")
     public void yFinanceDailyPricesFrom(@RequestParam("fileName") String fileName) {
         List<DailyPriceOHLC> importedDailyPrices = yahooQuoteService.dailyPricesFromFile(fileName);
         if (!importedDailyPrices.isEmpty()) {
-            priceOHLCService.updatePricesForHigherTimeframes(importedDailyPrices);
+            priceOHLCService.updatePricesForHigherTimeframes(importedDailyPrices, LocalDate.now());
         } else {
             log.info("importedDailyPrices empty");
         }

@@ -48,8 +48,12 @@ public class YahooQuoteService {
         return yahooFinanceClient.dailyPricesFromFile(fileName);
     }
 
-    @Transactional
     public List<DailyPriceOHLC> dailyPricesImport() {
+        return dailyPricesImport(false);
+    }
+
+    @Transactional
+    public List<DailyPriceOHLC> dailyPricesImport(boolean preMarketOnly) {
         int maxTickersPerRequest = 1650;
         List<DailyPriceOHLC> dailyImportedPrices = new ArrayList<>();
         LocalDate minTradingDate = tradingDateNow().minusDays(5); // max 5 calendar days in the past for previous intraDay prices to be found
@@ -63,21 +67,25 @@ public class YahooQuoteService {
             String tickers = partition.stream().map(DailyPriceOHLC::getTicker).collect(Collectors.joining(","));
             String pricesJSON = quotePricesJSON(tickers, getCrumb());
 
-            List<DailyPriceOHLC> dailyPriceOHLCs = yahooFinanceClient.extractDailyPricesFromJSON(pricesJSON);
+            List<DailyPriceOHLC> dailyPriceOHLCs = yahooFinanceClient.extractDailyPricesFromJSON(pricesJSON, preMarketOnly);
             List<DailyPriceOHLC> dailyPrices = dailyPriceOHLCService.getDailyImportedPrices(dailyPriceOHLCs, latestByTicker.stream()
                     .collect(Collectors.toMap(DailyPriceOHLC::getTicker, p -> p)));
             dailyImportedPrices.addAll(dailyPrices);
 
-            String fileName = dailyPriceOHLCs.getFirst().getDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_" + fileCounter + ".json";
-            String path = "./yahoo-daily-prices/" + fileName;
-            writeToFile(path, pricesJSON);
+            if (!preMarketOnly) {
+                String fileName = dailyPriceOHLCs.getFirst().getDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_" + fileCounter + ".json";
+                String path = "./yahoo-daily-prices/" + fileName;
+                writeToFile(path, pricesJSON);
+            }
 
             start = end;
             end = Math.min(start + maxTickersPerRequest, latestByTicker.size());
             fileCounter++;
         }
 
-        dailyPriceOHLCService.saveDailyPrices(dailyImportedPrices);
+        if (!preMarketOnly) { // only save if intraday prices, for pre-market only display
+            dailyPriceOHLCService.saveDailyPrices(dailyImportedPrices);
+        }
         return dailyImportedPrices;
     }
 
