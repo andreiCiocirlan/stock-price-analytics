@@ -1,5 +1,6 @@
 package stock.price.analytics;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -20,6 +21,7 @@ public class Application implements ApplicationRunner {
     }
 
     @Override
+    @Transactional
     public void run(ApplicationArguments args) throws Exception {
         // update ipo/delisted dates at start-up
         stockRepository.updateIpoAndDelistedDates();

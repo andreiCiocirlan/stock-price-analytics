@@ -1,6 +1,7 @@
 package stock.price.analytics.repository.stocks;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import stock.price.analytics.model.stocks.Stock;
@@ -8,6 +9,7 @@ import stock.price.analytics.model.stocks.Stock;
 @Repository
 public interface StockRepository extends JpaRepository<Stock, Long> {
 
+    @Modifying
     @Query(value = """
             UPDATE stocks s
             SET delisted_date = (
