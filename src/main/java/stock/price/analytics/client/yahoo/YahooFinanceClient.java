@@ -30,13 +30,13 @@ public class YahooFinanceClient {
             String jsonFilePath = String.join("", "./yahoo-daily-prices/", fileName, ".json");
             String jsonData = String.join("", readAllLines(Path.of(jsonFilePath)));
 
-            return extractDailyPricesFromJSON(jsonData);
+            return extractDailyPricesFromJSON(jsonData, false);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public List<DailyPriceOHLC> extractDailyPricesFromJSON(String jsonData) {
+    public List<DailyPriceOHLC> extractDailyPricesFromJSON(String jsonData, boolean preMarketPrices) {
         List<DailyPriceOHLC> intraDayPrices = new ArrayList<>();
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode;
@@ -51,9 +51,11 @@ public class YahooFinanceClient {
 
         for (JsonNode node : resultArray) {
             String ticker = node.get("symbol").asText();
-            if (node.has("regularMarketPrice") && node.has("regularMarketDayHigh") &&
+            String marketPrice = preMarketPrices ? "preMarketPrice" : "regularMarketPrice";
+            String marketChangePercent = preMarketPrices ? "preMarketChangePercent" : "regularMarketChangePercent";
+            if (node.has(marketPrice) && node.has("regularMarketDayHigh") &&
                     node.has("regularMarketDayLow") && node.has("regularMarketOpen") &&
-                    node.has("regularMarketChangePercent") && node.has("regularMarketTime")) {
+                    node.has(marketChangePercent) && node.has("regularMarketTime")) {
                 try {
                     LocalDate tradingDate = Instant.ofEpochSecond(node.get("regularMarketTime").asLong()).atZone(ZoneId.systemDefault()).toLocalDate();
                     LocalDate tradingDateNow = tradingDateNow();
@@ -67,10 +69,10 @@ public class YahooFinanceClient {
                             log.warn("Extracting stock daily prices for ticker {} and date {}", ticker, tradingDate);
                         }
                     }
-                    double percentChange = Math.round(node.get("regularMarketChangePercent").asDouble() * 100.0) / 100.0;
+                    double percentChange = Math.round(node.get(marketChangePercent).asDouble() * 100.0) / 100.0;
                     intraDayPrices.add(new DailyPriceOHLC(ticker, tradingDate, percentChange,
                             new CandleOHLC(node.get("regularMarketOpen").asDouble(), node.get("regularMarketDayHigh").asDouble(),
-                                    node.get("regularMarketDayLow").asDouble(), node.get("regularMarketPrice").asDouble())));
+                                    node.get("regularMarketDayLow").asDouble(), node.get(marketPrice).asDouble())));
                 } catch (IllegalArgumentException e) {
                     log.warn("Unable to extract daily prices for ticker {} error: {}", ticker, e.getMessage());
                 }
