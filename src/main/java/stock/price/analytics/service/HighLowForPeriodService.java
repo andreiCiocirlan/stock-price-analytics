@@ -9,7 +9,7 @@ import stock.price.analytics.model.prices.enums.StockPerformanceInterval;
 import stock.price.analytics.model.prices.highlow.HighLow30Days;
 import stock.price.analytics.model.prices.highlow.HighLow52Week;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
-import stock.price.analytics.repository.prices.HighLowRepository;
+import stock.price.analytics.repository.prices.HighLowForPeriodRepository;
 import stock.price.analytics.util.Constants;
 
 import java.io.IOException;
@@ -33,7 +33,7 @@ public class HighLowForPeriodService {
 
     private static final LocalDate START_DATE = of(2022, 6, 1);
     private static final LocalDate END_DATE = of(2025, 6, 1);
-    private final HighLowRepository highLowRepository;
+    private final HighLowForPeriodRepository highLowForPeriodRepository;
 
     @Transactional
     public void saveHighLowPricesForPeriod(StockPerformanceInterval stockPerformanceInterval) {
@@ -59,7 +59,7 @@ public class HighLowForPeriodService {
                     .map(HighLow52Week.class::cast)
                     .toList();
         };
-        partitionDataAndSave(highLowPrices, highLowRepository);
+        partitionDataAndSave(highLowPrices, highLowForPeriodRepository);
     }
 
 }

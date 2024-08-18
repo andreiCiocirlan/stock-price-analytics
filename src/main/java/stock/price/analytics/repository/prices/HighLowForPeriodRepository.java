@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 
 @Repository
-public interface HighLowRepository extends JpaRepository<HighLowForPeriod, Long> {
+public interface HighLowForPeriodRepository extends JpaRepository<HighLowForPeriod, Long> {
 }
