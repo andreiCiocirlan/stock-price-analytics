@@ -9,7 +9,6 @@ import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.service.PriceOHLCService;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RequestMapping("/ohlc")
@@ -27,6 +26,6 @@ public class PricesOHLCController {
 
     @PostMapping("/update-higher-timeframes")
     public void updateHigherTimeframesForDate(@RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date) {
-        priceOHLCService.updateHigherTimeframesPricesFor(date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        priceOHLCService.updateHigherTimeframesPricesFor(date);
     }
 }

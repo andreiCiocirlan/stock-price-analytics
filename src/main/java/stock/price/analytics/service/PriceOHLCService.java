@@ -143,16 +143,16 @@ public class PriceOHLCService {
     }
 
     @Transactional
-    public void updateHigherTimeframesPricesFor(String dateFormatted) {
-        updateHigherTimeframeHistPrices("week", "weekly_prices", dateFormatted);
-        updateHigherTimeframeHistPrices("month", "monthly_prices", dateFormatted);
-        updateHigherTimeframeHistPrices("year", "yearly_prices", dateFormatted);
+    public void updateHigherTimeframesPricesFor(LocalDate date) {
+        String dateStr = date.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        updateHigherTimeframeHistPrices("week", "weekly_prices", dateStr);
+        updateHigherTimeframeHistPrices("month", "monthly_prices", dateStr);
+        updateHigherTimeframeHistPrices("year", "yearly_prices", dateStr);
     }
 
     public void saveHigherTimeframePricesBetween(LocalDate startDate, LocalDate endDate) {
         while (startDate.isBefore(endDate)) {
-            String dateStr = startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-            updateHigherTimeframesPricesFor(dateStr);
+            updateHigherTimeframesPricesFor(startDate);
             startDate = startDate.plusDays(7);
         }
     }

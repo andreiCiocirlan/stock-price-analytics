@@ -19,7 +19,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -80,7 +79,7 @@ public class StockHistoricalPricesService {
         partitionDataAndSave(prevDaysHistPrices.stream().filter(dp -> dp.getDate().isAfter(tradingDate)).toList(), priceOhlcRepository);
 
         // insert/update higher timeframe prices
-        priceOHLCService.updateHigherTimeframesPricesFor(tradingDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        priceOHLCService.updateHigherTimeframesPricesFor(tradingDate);
     }
 
     private List<DailyPriceOHLC> dailyPriceWithPerformance(List<DailyPriceOHLC> dailyPrices) {
