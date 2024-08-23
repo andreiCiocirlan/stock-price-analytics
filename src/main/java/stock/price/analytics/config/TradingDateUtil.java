@@ -35,4 +35,13 @@ public class TradingDateUtil {
         return LocalDate.now().minusDays(1);
     }
 
+    public static LocalDate previousTradingDate(LocalDate date) {
+        if (date.getDayOfWeek().equals(DayOfWeek.SATURDAY) || date.getDayOfWeek().equals(DayOfWeek.SUNDAY)
+                || (date.getDayOfWeek().equals(DayOfWeek.MONDAY))) {
+            return date.with(TemporalAdjusters.previous(DayOfWeek.FRIDAY));
+        }
+
+        return date.minusDays(1);
+    }
+
 }
