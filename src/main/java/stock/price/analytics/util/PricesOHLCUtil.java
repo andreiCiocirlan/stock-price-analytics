@@ -2,6 +2,7 @@ package stock.price.analytics.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import stock.price.analytics.config.TradingDateUtil;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
 
@@ -95,6 +96,24 @@ public class PricesOHLCUtil {
             throw new RuntimeException(e);
         }
         return dailyPricesOHLC;
+    }
+
+    public static List<DailyPriceOHLC> dailyPricesFromFileWithDate(Path srcFile, LocalDate tradingDate) {
+        List<DailyPriceOHLC> dailyPrices = new ArrayList<>();
+        final String ticker = tickerFrom(srcFile);
+
+        List<String> lines;
+        try {
+            lines = readAllLines(srcFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        LocalDate prevDayTradingDate = TradingDateUtil.previousTradingDate(tradingDate);
+        lines.stream()
+                .filter(line -> line.contains(tradingDate.format(DateTimeFormatter.ISO_LOCAL_DATE))
+                        || line.contains(prevDayTradingDate.format(DateTimeFormatter.ISO_LOCAL_DATE)))
+                .parallel().forEachOrdered(line -> addDailyPrices(line, ticker, dailyPrices));
+        return dailyPrices;
     }
 
     public static List<DailyPriceOHLC> dailyPricesFromFileWithCount(Path srcFile, int lastDays) {

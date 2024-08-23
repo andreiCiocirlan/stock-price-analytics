@@ -7,10 +7,12 @@ import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.controller.dto.StockWithPrevCloseDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
+import stock.price.analytics.repository.prices.DailyPriceOHLCRepository;
 import stock.price.analytics.repository.prices.PriceOHLCRepository;
 import stock.price.analytics.util.Constants;
 
@@ -37,6 +39,8 @@ public class StockHistoricalPricesService {
 
     private final PriceOHLCService priceOHLCService;
     private final PriceOHLCRepository priceOhlcRepository;
+    private final DailyPriceOHLCRepository dailyPriceOHLCRepository;
+    private final RefreshMaterializedViewsService refreshMaterializedViewsService;
 
     private static List<? extends AbstractPriceOHLC> pricesOHLCForTimeframe(StockTimeframe stockTimeframe) {
         List<AbstractPriceOHLC> priceOHLCS = new ArrayList<>();
@@ -55,6 +59,34 @@ public class StockHistoricalPricesService {
             case MONTHLY -> priceOHLCS.stream().map(MonthlyPriceOHLC.class::cast).toList();
             case YEARLY -> priceOHLCS.stream().map(YearlyPriceOHLC.class::cast).toList();
         };
+    }
+
+    @Transactional
+    public void savePricesForTradingDate(List<String> tickers, LocalDate tradingDate, LocalDate higherTimeFrameDate) {
+        List<DailyPriceOHLC> prevDaysHistPrices = new ArrayList<>();
+        Map<String, List<DailyPriceOHLC>> tickerAndPrevDaysPricesImported = new HashMap<>();
+        try (Stream<Path> walk = walk(Paths.get(Constants.STOCKS_LOCATION))) {
+            walk.filter(Files::isRegularFile)
+                    .filter(srcFile -> tickers.contains(tickerFrom(srcFile)))
+                    .parallel().forEachOrdered(srcFile -> { // must be forEachOrdered
+                        List<DailyPriceOHLC> dailyPrices = dailyPricesFromFileWithDate(srcFile, tradingDate);
+                        tickerAndPrevDaysPricesImported.put(tickerFrom(srcFile), dailyPrices);
+                    });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        tickerAndPrevDaysPricesImported.forEach((_, dailyPricesPrevDays) -> prevDaysHistPrices.addAll(dailyPriceWithPerformance(dailyPricesPrevDays)));
+        List<DailyPriceOHLC> dailyPricesDB = dailyPriceOHLCRepository.findByDate(tradingDate);
+        Map<String, DailyPriceOHLC> importedPricesMap = prevDaysHistPrices.stream().filter(dp -> dp.getDate().isEqual(tradingDate)).collect(Collectors.toMap(DailyPriceOHLC::getTicker, p -> p));
+        dailyPricesDB.forEach(dp -> BeanUtils.copyProperties(importedPricesMap.get(dp.getTicker()), dp, "id", "date"));
+        partitionDataAndSave(dailyPricesDB, priceOhlcRepository);
+
+        // insert/update higher timeframe prices
+        priceOHLCService.updateHigherTimeframesPricesFor(higherTimeFrameDate);
+
+        // refresh views
+        refreshMaterializedViewsService.refreshAllMaterializedViews();
     }
 
     @Transactional

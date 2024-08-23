@@ -10,8 +10,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.service.StockHistoricalPricesService;
+import stock.price.analytics.util.FileUtils;
 
+import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 
 @Slf4j
 @Controller
@@ -19,6 +23,16 @@ import java.time.LocalDate;
 public class StockHistoricalPricesController {
 
     private final StockHistoricalPricesService stockHistoricalPricesService;
+
+
+    @PostMapping("/prices_for_trading_date")
+    @ResponseStatus(HttpStatus.OK)
+    public void savePricesForTradingDate(@RequestParam(required = false, value = "tickers") String tickers,
+                                         @RequestParam(name = "tradingDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate tradingDate,
+                                         @RequestParam(name = "higherTimeFrameDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate higherTimeFrameDate) throws IOException {
+        List<String> tickerList = tickers != null ? Arrays.stream(tickers.split(",")).toList() : FileUtils.readTickersXTB();
+        stockHistoricalPricesService.savePricesForTradingDate(tickerList, tradingDate, higherTimeFrameDate);
+    }
 
     @PostMapping("/prices_after_trading_date")
     @ResponseStatus(HttpStatus.OK)
