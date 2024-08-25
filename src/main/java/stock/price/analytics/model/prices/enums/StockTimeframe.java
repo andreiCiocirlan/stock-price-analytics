@@ -24,4 +24,13 @@ public enum StockTimeframe {
             case YEARLY -> "yearly_prices";
         };
     }
+
+    public static String toSQLInterval(StockTimeframe timeframe) {
+        return switch (timeframe) {
+            case DAILY -> "DAY";
+            case WEEKLY -> "WEEK";
+            case MONTHLY -> "MONTH";
+            case YEARLY -> "YEAR";
+        };
+    }
 }

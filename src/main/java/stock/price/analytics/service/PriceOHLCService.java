@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static stock.price.analytics.model.prices.enums.StockTimeframe.dbTableOHLCFrom;
+import static stock.price.analytics.model.prices.enums.StockTimeframe.toSQLInterval;
 import static stock.price.analytics.util.StockDateUtils.*;
 
 
@@ -143,21 +145,35 @@ public class PriceOHLCService {
     }
 
     @Transactional
-    public void updateHigherTimeframesPricesFor(LocalDate date) {
+    public void updateAllHigherTimeframesPricesForTickers(LocalDate date, String tickers) {
+        updateHigherTimeframesPricesFor(date, StockTimeframe.WEEKLY, tickers);
+        updateHigherTimeframesPricesFor(date, StockTimeframe.MONTHLY, tickers);
+        updateHigherTimeframesPricesFor(date, StockTimeframe.YEARLY, tickers);
+    }
+
+    @Transactional
+    public void updateHigherTimeframesPricesFor(LocalDate date, StockTimeframe timeframe, String tickers) {
         String dateStr = date.format(DateTimeFormatter.ISO_LOCAL_DATE);
-        updateHigherTimeframeHistPrices("week", "weekly_prices", dateStr);
-        updateHigherTimeframeHistPrices("month", "monthly_prices", dateStr);
-        updateHigherTimeframeHistPrices("year", "yearly_prices", dateStr);
+        updateHigherTimeframeHistPrices(toSQLInterval(timeframe), dbTableOHLCFrom(timeframe), dateStr, tickers);
     }
 
     public void saveHigherTimeframePricesBetween(LocalDate startDate, LocalDate endDate) {
         while (startDate.isBefore(endDate)) {
-            updateHigherTimeframesPricesFor(startDate);
+            updateAllHigherTimeframesPricesForTickers(startDate, null);
             startDate = startDate.plusDays(7);
         }
     }
 
-    private void updateHigherTimeframeHistPrices(String timeframe, String tableName, String dateFormatted) {
+    private void updateHigherTimeframeHistPrices(String timeframe, String tableName, String dateFormatted, String tickers) {
+        int savedOrUpdatedCount = entityManager.createNativeQuery(
+                String.format(queryFrom(tickers, timeframe, tableName, dateFormatted), timeframe, tableName)
+        ).executeUpdate();
+        if (savedOrUpdatedCount != 0) {
+            log.info("saved/updated {} {} rows for date {} and tickers {}", savedOrUpdatedCount, timeframe, dateFormatted, tickers);
+        }
+    }
+
+    private String queryFrom(String tickers, String timeframe, String tableName, String dateFormatted) {
         String query = STR."""
             WITH interval_data AS (
             SELECT
@@ -168,6 +184,16 @@ public class PriceOHLCService {
                 MIN(low) AS low
             FROM daily_prices
             WHERE date BETWEEN '\{dateFormatted}'::date - INTERVAL '2 \{timeframe}' AND '\{dateFormatted}'
+            """;
+
+        if (tickers != null) {
+            query = query.concat(
+                    STR."""
+                    AND ticker in (\{tickers})
+                    """);
+        }
+
+        query = query.concat(STR."""
             GROUP BY ticker, DATE_TRUNC('\{timeframe}', date)
             ),
             last_week AS (
@@ -210,13 +236,8 @@ public class PriceOHLCService {
                     close = EXCLUDED.close,
                     performance = EXCLUDED.performance,
                     end_date = EXCLUDED.end_date
-            """;
+            """);
 
-        int savedOrUpdatedCount = entityManager.createNativeQuery(
-                String.format(query, timeframe, tableName)
-        ).executeUpdate();
-        if (savedOrUpdatedCount != 0) {
-            log.info("saved/updated {} {} rows for date {}", savedOrUpdatedCount, timeframe, dateFormatted);
-        }
+        return query;
     }
 }
