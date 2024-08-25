@@ -7,7 +7,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.controller.dto.CandleOHLCWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 import stock.price.analytics.service.PriceOHLCService;
 
 import java.time.LocalDate;
