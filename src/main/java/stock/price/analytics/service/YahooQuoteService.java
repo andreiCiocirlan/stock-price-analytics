@@ -72,7 +72,7 @@ public class YahooQuoteService {
                     .collect(Collectors.toMap(DailyPriceOHLC::getTicker, p -> p)));
             dailyImportedPrices.addAll(dailyPrices);
 
-            if (!preMarketOnly) {
+            if (!preMarketOnly || dailyPriceOHLCs.isEmpty()) {
                 String fileName = dailyPriceOHLCs.getFirst().getDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_" + fileCounter + ".json";
                 String path = "./yahoo-daily-prices/" + fileName;
                 writeToFile(path, pricesJSON);
@@ -83,7 +83,7 @@ public class YahooQuoteService {
             fileCounter++;
         }
 
-        if (!preMarketOnly) { // only save if intraday prices, for pre-market only display
+        if (!preMarketOnly || dailyImportedPrices.isEmpty()) { // only save if intraday prices, for pre-market only display
             dailyPriceOHLCService.saveDailyPrices(dailyImportedPrices);
         }
         return dailyImportedPrices;
