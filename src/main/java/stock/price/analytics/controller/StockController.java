@@ -2,10 +2,7 @@ package stock.price.analytics.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.stocks.StockRepository;
 import stock.price.analytics.service.StockService;
@@ -24,6 +21,15 @@ public class StockController {
     @ResponseStatus(HttpStatus.OK)
     public void saveStocksInDB() throws IOException {
         stockService.saveStocks();
+    }
+
+    @PostMapping("/save_stock")
+    public void saveStockInDB(@RequestParam(value = "tickers") String tickers,
+                              @RequestParam(value = "cfdMargin") Double cfdMargin,
+                              @RequestParam(value = "shortSell") Boolean shortSell) {
+        double xtb_cfdMargin = cfdMargin != null ? cfdMargin : 0d;
+        boolean xtbStock = cfdMargin != null;
+        stockService.saveStocks(tickers, xtbStock, (Boolean.TRUE.equals(shortSell)), xtb_cfdMargin);
     }
 
     @GetMapping("/stocks")

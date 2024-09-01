@@ -48,6 +48,13 @@ public class Stock {
         this.xtbStock = xtbStock;
     }
 
+    public Stock(String ticker, boolean xtbStock, boolean shortSell, double cfdMargin) {
+        this.ticker = ticker;
+        this.xtbStock = xtbStock;
+        this.shortSell = shortSell;
+        this.cfdMargin = cfdMargin;
+    }
+
     public Stock(String ticker, LocalDate ipoDate, boolean xtbStock) {
         this.ticker = ticker;
         this.ipoDate = ipoDate;

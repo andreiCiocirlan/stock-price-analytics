@@ -51,4 +51,11 @@ public class StockService {
         stockRepository.saveAll(stocks);
     }
 
+    @Transactional
+    public void saveStocks(String tickers, boolean xtbStock, boolean shortSell, double cfdMargin) {
+        for (String ticker : tickers.split(",")) {
+            stockRepository.save(new Stock(ticker, xtbStock, shortSell, cfdMargin));
+        }
+    }
+
 }
