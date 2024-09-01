@@ -1,0 +1,5 @@
+
+access pg:psql:
+	- heroku pg:psql --app stock-price-analytics
+
+heroku run sql script : heroku pg:psql DATABASE_URL < "D:\stocks-data\historical_prices\dump\stocks.sql"
