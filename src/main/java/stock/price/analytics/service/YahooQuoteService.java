@@ -58,6 +58,7 @@ public class YahooQuoteService {
         List<DailyPriceOHLC> dailyImportedPrices = new ArrayList<>();
         LocalDate minTradingDate = tradingDateNow().minusDays(5); // max 5 calendar days in the past for previous intraDay prices to be found
         List<DailyPriceOHLC> latestByTicker = dailyPriceOHLCService.findXTBLatestByTickerWithDateAfter(minTradingDate);
+        List<String> tickersImported = new ArrayList<>(latestByTicker.stream().map(DailyPriceOHLC::getTicker).toList());
 
         int start = 0;
         int end = Math.min(maxTickersPerRequest, latestByTicker.size());
@@ -71,6 +72,9 @@ public class YahooQuoteService {
             List<DailyPriceOHLC> dailyPrices = dailyPriceOHLCService.getDailyImportedPrices(dailyPriceOHLCs, latestByTicker.stream()
                     .collect(Collectors.toMap(DailyPriceOHLC::getTicker, p -> p)));
             dailyImportedPrices.addAll(dailyPrices);
+
+            // keep track of which tickers were imported
+            tickersImported.removeAll(dailyPrices.stream().map(DailyPriceOHLC::getTicker).toList());
 
             if (!preMarketOnly || dailyPriceOHLCs.isEmpty()) {
                 String fileName = dailyPriceOHLCs.getFirst().getDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_" + fileCounter + ".json";
@@ -86,6 +90,11 @@ public class YahooQuoteService {
         if (!preMarketOnly || dailyImportedPrices.isEmpty()) { // only save if intraday prices, for pre-market only display
             dailyPriceOHLCService.saveDailyPrices(dailyImportedPrices);
         }
+
+        if (!tickersImported.isEmpty()) {
+            log.warn("Did not import tickers {}", tickersImported);
+        }
+
         return dailyImportedPrices;
     }
 
