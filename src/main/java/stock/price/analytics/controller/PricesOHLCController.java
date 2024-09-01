@@ -12,6 +12,8 @@ import stock.price.analytics.service.PriceOHLCService;
 import java.time.LocalDate;
 import java.util.List;
 
+import static stock.price.analytics.util.Constants.TIMEFRAME_PATTERN;
+
 @RequestMapping("/ohlc")
 @RestController
 @Slf4j
@@ -19,7 +21,6 @@ import java.util.List;
 public class PricesOHLCController {
 
     private final PriceOHLCService priceOHLCService;
-    private static final String TIMEFRAME_PATTERN = "^(DAILY|WEEKLY|MONTHLY|YEARLY)$";
 
     @GetMapping("/prices")
     public List<CandleOHLCWithDateDTO> dailyOHLC(@RequestParam("ticker") String ticker, @RequestParam("timeFrame") String timeFrame) {
