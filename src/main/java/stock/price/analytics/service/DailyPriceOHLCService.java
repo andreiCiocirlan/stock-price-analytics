@@ -33,7 +33,7 @@ public class DailyPriceOHLCService {
                         BeanUtils.copyProperties(dailyPrice, latestPrice, "id", "date"); // date won't change (opening price might be adjusted)
                         importedDailyPrices.add(latestPrice);
                     } else {
-                        log.info("same daily prices as in DB, not saved for {}", ticker);
+                        log.warn("same daily prices as in DB, not saved for {}", ticker);
                     }
                 } else { // insert new daily prices
                     importedDailyPrices.add(dailyPrice);
