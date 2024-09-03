@@ -92,7 +92,7 @@ public class YahooQuoteService {
         }
 
         if (!tickersImported.isEmpty()) {
-            log.warn("Did not import tickers {}", tickersImported);
+            log.warn("Did not import {} tickers  {}", tickersImported.size(), tickersImported);
         }
 
         return dailyImportedPrices;
