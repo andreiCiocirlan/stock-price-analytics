@@ -13,30 +13,30 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "high_low30d")
-public class HighLow30Days extends HighLowForPeriod {
+@Table(name = "high_low4w")
+public class HighLow4w extends HighLowForPeriod {
 
-    @Column(name = "low30d")
-    private double low30day;
-    @Column(name = "high30d")
-    private double high30day;
+    @Column(name = "low")
+    private double low4w;
+    @Column(name = "high")
+    private double high4w;
 
-    public HighLow30Days(String ticker, LocalDate startDate, LocalDate endDate, double weeklyClose) {
+    public HighLow4w(String ticker, LocalDate startDate, LocalDate endDate, double weeklyClose) {
         super(ticker, weeklyClose, startDate, endDate);
     }
 
     @Override
     public void setLow(double low) {
-        setLow30day(low);
+        setLow4w(low);
     }
 
     @Override
     public void setHigh(double high) {
-        setHigh30day(high);
+        setHigh4w(high);
     }
 
     @Override
     public String toString() {
-        return STR."HighLow30Days { \{super.toString()}, low30day=\{low30day}, high30day=\{high30day}} ";
+        return STR."HighLow4W { \{super.toString()}, low4w=\{low4w}, high4w=\{high4w}} ";
     }
 }

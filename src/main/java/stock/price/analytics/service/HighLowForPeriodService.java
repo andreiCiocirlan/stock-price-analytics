@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.model.prices.PriceEntity;
 import stock.price.analytics.model.prices.enums.StockPerformanceInterval;
-import stock.price.analytics.model.prices.highlow.HighLow30Days;
+import stock.price.analytics.model.prices.highlow.HighLow4w;
 import stock.price.analytics.model.prices.highlow.HighLow52Week;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.repository.prices.HighLowForPeriodRepository;
@@ -53,7 +53,7 @@ public class HighLowForPeriodService {
 
         List<? extends PriceEntity> highLowPrices = switch (stockPerformanceInterval) {
             case STOCK_PERF_INTERVAL_30D -> highLowForPeriod.stream()
-                    .map(HighLow30Days.class::cast)
+                    .map(HighLow4w.class::cast)
                     .toList();
             case STOCK_PERF_INTERVAL_52W -> highLowForPeriod.stream()
                     .map(HighLow52Week.class::cast)

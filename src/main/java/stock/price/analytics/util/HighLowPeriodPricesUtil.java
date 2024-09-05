@@ -2,7 +2,7 @@ package stock.price.analytics.util;
 
 import stock.price.analytics.model.prices.enums.StockPerformanceInterval;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.model.prices.highlow.HighLow30Days;
+import stock.price.analytics.model.prices.highlow.HighLow4w;
 import stock.price.analytics.model.prices.highlow.HighLow52Week;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
@@ -44,7 +44,7 @@ public class HighLowPeriodPricesUtil extends PricesOHLCUtil {
             if (StockPerformanceInterval.STOCK_PERF_INTERVAL_52W.equals(stockPerformanceInterval)) {
                 highLowForPeriod = new HighLow52Week(ticker, wp.getStartDate(), week_end, fridayClose);
             } else {
-                highLowForPeriod = new HighLow30Days(ticker, wp.getStartDate(), week_end, fridayClose);
+                highLowForPeriod = new HighLow4w(ticker, wp.getStartDate(), week_end, fridayClose);
             }
 
             highLowForPeriod.setHigh(dailyPrices.stream()

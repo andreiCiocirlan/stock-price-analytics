@@ -16,10 +16,10 @@ import java.time.LocalDate;
 @Table(name = "high_low52w")
 public class HighLow52Week extends HighLowForPeriod {
 
-    @Column(name = "low52w")
-    private double low52week;
-    @Column(name = "high52w")
-    private double high52week;
+    @Column(name = "low")
+    private double low52w;
+    @Column(name = "high")
+    private double high52w;
 
     public HighLow52Week(String ticker, LocalDate startDate, LocalDate endDate, double weeklyClose) {
         super(ticker, weeklyClose, startDate, endDate);
@@ -27,16 +27,16 @@ public class HighLow52Week extends HighLowForPeriod {
 
     @Override
     public void setLow(double low) {
-        setLow52week(low);
+        setLow52w(low);
     }
 
     @Override
     public void setHigh(double high) {
-        setHigh52week(high);
+        setHigh52w(high);
     }
 
     @Override
     public String toString() {
-        return STR."HighLow52Weeks { \{super.toString()}, low52week=\{low52week}, high52week=\{high52week}} ";
+        return STR."HighLow52W { \{super.toString()}, low52w=\{low52w}, high52w=\{high52w}} ";
     }
 }
