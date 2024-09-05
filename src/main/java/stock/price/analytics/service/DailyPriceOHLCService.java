@@ -23,6 +23,7 @@ public class DailyPriceOHLCService {
     @Transactional
     public List<DailyPriceOHLC> getDailyImportedPrices(List<DailyPriceOHLC> dailyPrices, Map<String, DailyPriceOHLC> latestPricesByTicker) {
         List<DailyPriceOHLC> importedDailyPrices = new ArrayList<>();
+        List<String> sameDailyPrices = new ArrayList<>();
         for (DailyPriceOHLC dailyPrice : dailyPrices) {
             String ticker = dailyPrice.getTicker();
             if (latestPricesByTicker.containsKey(ticker)) {
@@ -33,7 +34,7 @@ public class DailyPriceOHLCService {
                         BeanUtils.copyProperties(dailyPrice, latestPrice, "id", "date"); // date won't change (opening price might be adjusted)
                         importedDailyPrices.add(latestPrice);
                     } else {
-                        log.warn("same daily prices as in DB, not saved for {}", ticker);
+                        sameDailyPrices.add(ticker);
                     }
                 } else { // insert new daily prices
                     importedDailyPrices.add(dailyPrice);
@@ -42,6 +43,9 @@ public class DailyPriceOHLCService {
                 log.info("new stock daily price: {}", dailyPrice);
                 importedDailyPrices.add(dailyPrice);
             }
+        }
+        if (!sameDailyPrices.isEmpty()) {
+            log.warn("same daily prices as in DB, not saved for {}", sameDailyPrices);
         }
         return importedDailyPrices;
     }
