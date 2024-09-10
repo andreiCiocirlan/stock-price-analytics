@@ -75,16 +75,8 @@ public class IntraDayPricesController {
     }
 
     @GetMapping("/yahoo-prices/from-file")
-    public void yFinanceDailyPricesFrom(@RequestParam("fileName") String fileName) {
-        List<DailyPriceOHLC> importedDailyPrices = yahooQuoteService.dailyPricesFromFile(fileName);
-        if (!importedDailyPrices.isEmpty()) {
-            priceOHLCService.updatePricesForHigherTimeframes(importedDailyPrices, LocalDate.now());
-            highLowForPeriodService.updateHighLow(importedDailyPrices.stream().map(DailyPriceOHLC::getTicker).toList(), getTradingDate(importedDailyPrices));
-        } else {
-            log.info("importedDailyPrices empty");
-        }
-        log.info("imported {}", importedDailyPrices.size());
-
+    public List<DailyPriceOHLC> yFinanceDailyPricesFrom(@RequestParam("fileName") String fileName) {
+        return yahooQuoteService.dailyPricesFromFile(fileName);
     }
 
 }
