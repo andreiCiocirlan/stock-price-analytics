@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import stock.price.analytics.client.finnhub.FinnhubClient;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 import stock.price.analytics.repository.prices.PriceOHLCRepository;
+import stock.price.analytics.service.HighLowForPeriodService;
 import stock.price.analytics.service.PriceOHLCService;
 import stock.price.analytics.service.RefreshMaterializedViewsService;
 import stock.price.analytics.service.YahooQuoteService;
@@ -30,6 +31,7 @@ public class IntraDayPricesController {
     private final FinnhubClient finnhubClient;
     private final PriceOHLCRepository priceOHLCRepository;
     private final PriceOHLCService priceOHLCService;
+    private final HighLowForPeriodService highLowForPeriodService;
     private final RefreshMaterializedViewsService refreshMaterializedViewsService;
 
     @GetMapping("/finnhub")
@@ -51,6 +53,7 @@ public class IntraDayPricesController {
         List<DailyPriceOHLC> dailyImportedPrices = yahooQuoteService.dailyPricesImport();
         if (!dailyImportedPrices.isEmpty()) {
             priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices, getTradingDate(dailyImportedPrices));
+            highLowForPeriodService.updateHighLow(dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList(), getTradingDate(dailyImportedPrices));
             refreshMaterializedViewsService.refreshMaterializedViews(false);
         }
     }
@@ -76,6 +79,7 @@ public class IntraDayPricesController {
         List<DailyPriceOHLC> importedDailyPrices = yahooQuoteService.dailyPricesFromFile(fileName);
         if (!importedDailyPrices.isEmpty()) {
             priceOHLCService.updatePricesForHigherTimeframes(importedDailyPrices, LocalDate.now());
+            highLowForPeriodService.updateHighLow(importedDailyPrices.stream().map(DailyPriceOHLC::getTicker).toList(), getTradingDate(importedDailyPrices));
         } else {
             log.info("importedDailyPrices empty");
         }

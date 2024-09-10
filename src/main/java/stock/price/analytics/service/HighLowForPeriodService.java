@@ -1,5 +1,7 @@
 package stock.price.analytics.service;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +19,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.nio.file.Files.walk;
@@ -33,6 +37,9 @@ public class HighLowForPeriodService {
 
     private static final LocalDate START_DATE = of(2022, 6, 1);
     private static final LocalDate END_DATE = of(2025, 6, 1);
+
+    @PersistenceContext
+    private final EntityManager entityManager;
     private final HighLowForPeriodRepository highLowForPeriodRepository;
 
     @Transactional
@@ -62,4 +69,58 @@ public class HighLowForPeriodService {
         partitionDataAndSave(highLowPrices, highLowForPeriodRepository);
     }
 
+    @Transactional
+    public void updateHighLow(List<String> tickerList, LocalDate tradingDate) {
+        String tickers = tickerList.stream().map(ticker -> STR."'\{ticker}'").collect(Collectors.joining(", "));
+        String tradingDateFormatted = tradingDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
+
+        updateHighLowForPeriod(StockPerformanceInterval.STOCK_PERF_INTERVAL_30D, tickers, tradingDateFormatted);
+        updateHighLowForPeriod(StockPerformanceInterval.STOCK_PERF_INTERVAL_52W, tickers, tradingDateFormatted);
+    }
+
+    public void updateHighLowForPeriod(StockPerformanceInterval period, String tickers, String tradingDate) {
+        String interval = StockPerformanceInterval.STOCK_PERF_INTERVAL_30D == period ? "4 weeks" : "52 weeks";
+        String tableName = StockPerformanceInterval.STOCK_PERF_INTERVAL_30D == period ? "high_low4w" : "high_low52w";
+
+        updateHighLowPricesForInterval(tradingDate, tableName, interval, tickers);
+    }
+
+    private void updateHighLowPricesForInterval(String date, String tableName, String interval, String tickers) {
+        String query = queryHighLowPricesForInterval(date, tableName, interval, tickers);
+        int savedOrUpdatedCount = entityManager.createNativeQuery(query).executeUpdate();
+        if (savedOrUpdatedCount != 0) {
+            log.warn("saved/updated {} {} rows for date {}", savedOrUpdatedCount, interval, date);
+        }
+    }
+
+    private String queryHighLowPricesForInterval(String date, String tableName, String interval, String tickers) {
+        return STR."""
+                INSERT INTO \{tableName} (id, high, low, weekly_close, start_date, end_date, ticker)
+                SELECT
+                    nextval('sequence_high_low') AS id,
+                	max(wp.high),
+                	min(wp.low),
+                	current_week.close,
+                    date_trunc('week', '\{date}'::date)::date  AS start_date,
+                    (date_trunc('week', '\{date}'::date)  + interval '4 days')::date AS end_date,
+                	wp.ticker
+                FROM weekly_prices wp
+                LEFT JOIN (
+                    SELECT ticker, close
+                    FROM weekly_prices
+                    WHERE start_date >= date_trunc('week', '\{date}'::date)
+                        AND start_date < date_trunc('week', '\{date}'::date) + INTERVAL '1 week'
+                ) current_week ON wp.ticker = current_week.ticker
+                WHERE
+                	wp.ticker in (\{tickers}) and
+                	wp.start_date >= (date_trunc('week', '\{date}'::date) - INTERVAL '\{interval}')
+                GROUP BY wp.ticker, current_week.close
+                ORDER BY wp.ticker
+                ON CONFLICT (ticker, start_date)
+                DO UPDATE SET
+                	high = EXCLUDED.high,
+                	low = EXCLUDED.low,
+                	weekly_close = EXCLUDED.weekly_close;
+                """;
+    }
 }
