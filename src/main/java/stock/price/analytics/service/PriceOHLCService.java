@@ -6,7 +6,6 @@ import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.controller.dto.CandleOHLCWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
@@ -154,13 +153,6 @@ public class PriceOHLCService {
     public void updateHigherTimeframesPricesFor(LocalDate date, List<StockTimeframe> timeframes, String tickers) {
         for (StockTimeframe timeframe : timeframes) {
             updateHigherTimeframeHistPrices(toSQLInterval(timeframe), dbTableOHLCFrom(timeframe), date, tickers);
-        }
-    }
-
-    public void saveHigherTimeframePricesBetween(LocalDate startDate, LocalDate endDate) {
-        while (startDate.isBefore(endDate)) {
-            updateAllHigherTimeframesPricesForTickers(startDate, Strings.EMPTY);
-            startDate = startDate.plusDays(7);
         }
     }
 
