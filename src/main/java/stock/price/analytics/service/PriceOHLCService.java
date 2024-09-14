@@ -223,8 +223,6 @@ public class PriceOHLCService {
                     dp_o.open,
                     dp_c.close,
                     CASE
-                        --WHEN (dp_o.date >= DATE_TRUNC('\{timeframe}', CURRENT_DATE)) THEN
-                        --           ROUND((100.0 * (dp_c.close - dp_o.open) / dp_o.open)::numeric, 2)
                         WHEN (LAG(dp_c.close, 1) OVER (PARTITION BY dp_o.ticker ORDER BY start_date) IS NULL) THEN
                             CASE
                                 WHEN (dp_o.open <> 0) THEN ROUND((100.0 * (dp_c.close - dp_o.open) / dp_o.open)::numeric, 2)
@@ -240,7 +238,7 @@ public class PriceOHLCService {
             final_result AS (
                 SELECT *
                 FROM last_week
-                    WHERE end_date BETWEEN DATE_TRUNC('week', '\{dateFormatted}'::date) AND '\{dateFormatted}' -- 'week' to capture EOY/EOM where 31st on Mon/Tue/Wed/Thu
+                    WHERE start_date >= DATE_TRUNC('\{timeframe}', '\{dateFormatted}'::date)
             )
             INSERT INTO \{tableName} (ticker, start_date, end_date, high, low, open, close, performance)
             SELECT ticker, start_date, end_date, high, low, open, close, performance
