@@ -51,11 +51,11 @@ public class StockSplitAdjustPricesService {
         return pricesToUpdate;
     }
 
-    private void updatePrices(AbstractPriceOHLC dailyPriceOHLC, double priceMultiplier) {
-        dailyPriceOHLC.setOpen(Math.round((priceMultiplier * dailyPriceOHLC.getOpen()) * 100.0) / 100.0);
-        dailyPriceOHLC.setHigh(Math.round((priceMultiplier * dailyPriceOHLC.getHigh()) * 100.0) / 100.0);
-        dailyPriceOHLC.setLow(Math.round((priceMultiplier * dailyPriceOHLC.getLow()) * 100.0) / 100.0);
-        dailyPriceOHLC.setClose(Math.round((priceMultiplier * dailyPriceOHLC.getClose()) * 100.0) / 100.0);
+    private void updatePrices(AbstractPriceOHLC priceOHLC, double priceMultiplier) {
+        priceOHLC.setOpen(Math.round((priceMultiplier * priceOHLC.getOpen()) * 100.0) / 100.0);
+        priceOHLC.setHigh(Math.round((priceMultiplier * priceOHLC.getHigh()) * 100.0) / 100.0);
+        priceOHLC.setLow(Math.round((priceMultiplier * priceOHLC.getLow()) * 100.0) / 100.0);
+        priceOHLC.setClose(Math.round((priceMultiplier * priceOHLC.getClose()) * 100.0) / 100.0);
     }
 
     private void updatePrices(AbstractPriceOHLC dailyPriceOHLC, String ohlc, double priceMultiplier) {
