@@ -61,7 +61,7 @@ public enum StockTimeframe {
     }
 
     /**
-     * @param timeframeLetters
+     * @param timeframeLetters any of WMY
      * @return corresponding stock timeframes from WMY -> [WEEKLY, MONTHLY, YEARLY]
      */
     public static List<StockTimeframe> valuesFromLetters(String timeframeLetters) {
