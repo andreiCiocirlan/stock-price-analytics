@@ -31,7 +31,7 @@ public class StockSplitAdjustPricesController {
                            @RequestParam("stockSplitDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate stockSplitDate,
                            @RequestParam("priceMultiplier") double priceMultiplier) {
         stockSplitAdjustPricesService.adjustPricesFor(ticker, stockSplitDate, priceMultiplier);
-        priceOHLCService.updateHigherTimeframesForStockSplitDate(ticker, stockSplitDate);
+        priceOHLCService.updateAllHigherTimeframesPricesForTickers(stockSplitDate, STR."'\{ticker}'");
     }
 
     @PostMapping("/adjust-prices-for-date")

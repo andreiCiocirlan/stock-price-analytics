@@ -1,8 +1,15 @@
 package stock.price.analytics.model.prices.enums;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
+import static java.time.temporal.TemporalAdjusters.lastDayOfYear;
+import static stock.price.analytics.config.TradingDateUtil.tradingDateNow;
 
 public enum StockTimeframe {
 
@@ -35,6 +42,17 @@ public enum StockTimeframe {
             case WEEKLY -> "WEEK";
             case MONTHLY -> "MONTH";
             case YEARLY -> "YEAR";
+        };
+    }
+
+    public static LocalDate htfDateFrom(LocalDate date, StockTimeframe timeframe) {
+        LocalDate tradingDateNow = tradingDateNow();
+
+        return switch (timeframe) {
+            case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
+            case WEEKLY -> tradingDateNow.isBefore(date.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY))) ? tradingDateNow : date.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
+            case MONTHLY -> tradingDateNow.isBefore(date.with(lastDayOfMonth())) ? tradingDateNow : date.with(lastDayOfMonth());
+            case YEARLY -> tradingDateNow.isBefore(date.with(lastDayOfYear())) ? tradingDateNow : date.with(lastDayOfYear());
         };
     }
 

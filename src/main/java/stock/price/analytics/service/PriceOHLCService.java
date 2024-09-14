@@ -12,20 +12,14 @@ import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.repository.prices.PriceOHLCRepository;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
-import static java.time.temporal.TemporalAdjusters.lastDayOfYear;
-import static stock.price.analytics.config.TradingDateUtil.tradingDateNow;
-import static stock.price.analytics.model.prices.enums.StockTimeframe.dbTableOHLCFrom;
-import static stock.price.analytics.model.prices.enums.StockTimeframe.toSQLInterval;
+import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
 import static stock.price.analytics.util.StockDateUtils.*;
 
 
@@ -157,27 +151,8 @@ public class PriceOHLCService {
     @Transactional
     public void updateHigherTimeframesPricesFor(LocalDate date, List<StockTimeframe> timeframes, String tickers) {
         for (StockTimeframe timeframe : timeframes) {
-            updateHigherTimeframeHistPrices(toSQLInterval(timeframe), dbTableOHLCFrom(timeframe), date, tickers);
+            updateHigherTimeframeHistPrices(toSQLInterval(timeframe), dbTableOHLCFrom(timeframe), htfDateFrom(date, timeframe), tickers);
         }
-    }
-
-    public void updateHigherTimeframePricesFor(LocalDate date, StockTimeframe timeframe, String tickers) {
-        updateHigherTimeframeHistPrices(toSQLInterval(timeframe), dbTableOHLCFrom(timeframe), date, tickers);
-    }
-
-    @Transactional
-    public void updateHigherTimeframesForStockSplitDate(String ticker, LocalDate stockSplitDate) {
-        LocalDate lastDayOfWeekFromSplitDate = stockSplitDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
-        LocalDate lastDayOfMonthFromSplitDate = stockSplitDate.with(lastDayOfMonth());
-        LocalDate lastDayOfYearFromSplitDate = stockSplitDate.with(lastDayOfYear());
-        LocalDate tradingDateNow = tradingDateNow();
-        LocalDate weeklyDate = tradingDateNow.isBefore(lastDayOfWeekFromSplitDate) ? tradingDateNow : lastDayOfWeekFromSplitDate;
-        LocalDate monthlyDate = tradingDateNow.isBefore(lastDayOfMonthFromSplitDate) ? tradingDateNow : lastDayOfMonthFromSplitDate;
-        LocalDate yearlyDate = tradingDateNow.isBefore(lastDayOfYearFromSplitDate) ? tradingDateNow : lastDayOfYearFromSplitDate;
-        ticker = STR."'\{ticker}'";
-        updateHigherTimeframePricesFor(weeklyDate, StockTimeframe.WEEKLY, ticker);
-        updateHigherTimeframePricesFor(monthlyDate, StockTimeframe.MONTHLY, ticker);
-        updateHigherTimeframePricesFor(yearlyDate, StockTimeframe.YEARLY, ticker);
     }
 
     private void updateHigherTimeframeHistPrices(String timeframe, String tableName, LocalDate date, String tickers) {
