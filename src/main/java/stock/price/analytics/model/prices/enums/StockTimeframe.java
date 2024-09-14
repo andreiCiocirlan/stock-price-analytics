@@ -1,5 +1,9 @@
 package stock.price.analytics.model.prices.enums;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 public enum StockTimeframe {
 
     DAILY,
@@ -32,5 +36,26 @@ public enum StockTimeframe {
             case MONTHLY -> "MONTH";
             case YEARLY -> "YEAR";
         };
+    }
+
+    public static List<StockTimeframe> higherTimeframes() {
+        return List.of(WEEKLY, MONTHLY, YEARLY);
+    }
+
+    /**
+     * @param timeframeLetters
+     * @return corresponding stock timeframes from WMY -> [WEEKLY, MONTHLY, YEARLY]
+     */
+    public static List<StockTimeframe> valuesFromLetters(String timeframeLetters) {
+        Set<StockTimeframe> timeframes = new HashSet<>();
+
+        timeframeLetters = timeframeLetters.toUpperCase(); // sanitize for dwmy
+        for (StockTimeframe timeframe : StockTimeframe.values()) {
+            if (timeframeLetters.contains(timeframe.name().substring(0, 1))) {
+                timeframes.add(timeframe);
+            }
+        }
+
+        return timeframes.stream().toList();
     }
 }

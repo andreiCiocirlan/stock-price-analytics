@@ -6,6 +6,7 @@ import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.controller.dto.CandleOHLCWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
@@ -146,25 +147,25 @@ public class PriceOHLCService {
 
     @Transactional
     public void updateAllHigherTimeframesPricesForTickers(LocalDate date, String tickers) {
-        updateHigherTimeframesPricesFor(date, StockTimeframe.WEEKLY, tickers);
-        updateHigherTimeframesPricesFor(date, StockTimeframe.MONTHLY, tickers);
-        updateHigherTimeframesPricesFor(date, StockTimeframe.YEARLY, tickers);
+        updateHigherTimeframesPricesFor(date, StockTimeframe.higherTimeframes(), tickers);
     }
 
     @Transactional
-    public void updateHigherTimeframesPricesFor(LocalDate date, StockTimeframe timeframe, String tickers) {
-        String dateStr = date.format(DateTimeFormatter.ISO_LOCAL_DATE);
-        updateHigherTimeframeHistPrices(toSQLInterval(timeframe), dbTableOHLCFrom(timeframe), dateStr, tickers);
+    public void updateHigherTimeframesPricesFor(LocalDate date, List<StockTimeframe> timeframes, String tickers) {
+        for (StockTimeframe timeframe : timeframes) {
+            updateHigherTimeframeHistPrices(toSQLInterval(timeframe), dbTableOHLCFrom(timeframe), date, tickers);
+        }
     }
 
     public void saveHigherTimeframePricesBetween(LocalDate startDate, LocalDate endDate) {
         while (startDate.isBefore(endDate)) {
-            updateAllHigherTimeframesPricesForTickers(startDate, null);
+            updateAllHigherTimeframesPricesForTickers(startDate, Strings.EMPTY);
             startDate = startDate.plusDays(7);
         }
     }
 
-    private void updateHigherTimeframeHistPrices(String timeframe, String tableName, String dateFormatted, String tickers) {
+    private void updateHigherTimeframeHistPrices(String timeframe, String tableName, LocalDate date, String tickers) {
+        String dateFormatted = date.format(DateTimeFormatter.ISO_LOCAL_DATE);
         int savedOrUpdatedCount = entityManager.createNativeQuery(
                 String.format(queryFrom(tickers, timeframe, tableName, dateFormatted), timeframe, tableName)
         ).executeUpdate();
@@ -186,7 +187,7 @@ public class PriceOHLCService {
             WHERE date BETWEEN '\{dateFormatted}'::date - INTERVAL '2 \{timeframe}' AND '\{dateFormatted}'
             """;
 
-        if (tickers != null) {
+        if (tickers.isEmpty()) {
             query = query.concat(
                     STR."""
                     AND ticker in (\{tickers})

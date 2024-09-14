@@ -10,9 +10,10 @@ import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.service.PriceOHLCService;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 
-import static stock.price.analytics.util.Constants.TIMEFRAME_PATTERN;
+import static stock.price.analytics.util.Constants.HIGHER_TIMEFRAMES_PATTERN;
 
 @RequestMapping("/ohlc")
 @RestController
@@ -29,14 +30,11 @@ public class PricesOHLCController {
 
     @PostMapping("/update-higher-timeframes")
     public void updateHigherTimeframesForDate(@RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
-                                              @RequestParam(required = false, name = "timeFrame") @Pattern(regexp = TIMEFRAME_PATTERN, message = "Invalid timeframe") String timeFrame,
+                                              @RequestParam(required = false, name = "timeFrames") @Pattern(regexp = HIGHER_TIMEFRAMES_PATTERN, message = "Invalid timeframe") String timeFrames,
                                               @RequestParam(required = false, value = "tickers") String tickers) {
         String tickersQueryParam = tickers != null ? STR."'\{tickers.replace(",", "','")}'" : null;
-        if (timeFrame != null) {
-            priceOHLCService.updateHigherTimeframesPricesFor(date, StockTimeframe.valueOf(timeFrame.toUpperCase()), tickersQueryParam);
-        } else {
-            priceOHLCService.updateAllHigherTimeframesPricesForTickers(date, tickersQueryParam);
-        }
-
+        List<StockTimeframe> timeframes = timeFrames != null ?
+                StockTimeframe.valuesFromLetters(timeFrames.toUpperCase()) : Arrays.stream(StockTimeframe.values()).toList();
+        priceOHLCService.updateHigherTimeframesPricesFor(date, timeframes, tickersQueryParam);
     }
 }
