@@ -83,9 +83,8 @@ public class StockHistoricalPricesService {
         partitionDataAndSave(dailyPricesDB, priceOhlcRepository);
 
         // insert/update higher timeframe prices
-        priceOHLCService.updateAllHigherTimeframesPricesForTickers(higherTimeFrameDate, tickers.stream()
-                                                                                        .map(ticker -> STR."'\{ticker}'")
-                                                                                        .collect(Collectors.joining(", ")));
+        String tickersQuery = tickers.stream().map(ticker -> STR."'\{ticker}'").collect(Collectors.joining(", "));
+        priceOHLCService.updateAllHigherTimeframesPricesForTickers(higherTimeFrameDate, tickersQuery);
 
         // refresh views
         refreshMaterializedViewsService.refreshAllMaterializedViews();
