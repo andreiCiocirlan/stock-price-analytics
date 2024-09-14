@@ -167,13 +167,15 @@ public class PriceOHLCService {
 
     @Transactional
     public void updateHigherTimeframesForStockSplitDate(String ticker, LocalDate stockSplitDate) {
+        LocalDate lastDayOfWeekFromSplitDate = stockSplitDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
         LocalDate lastDayOfMonthFromSplitDate = stockSplitDate.with(lastDayOfMonth());
         LocalDate lastDayOfYearFromSplitDate = stockSplitDate.with(lastDayOfYear());
         LocalDate tradingDateNow = tradingDateNow();
+        LocalDate weeklyDate = tradingDateNow.isBefore(lastDayOfWeekFromSplitDate) ? tradingDateNow : lastDayOfWeekFromSplitDate;
         LocalDate monthlyDate = tradingDateNow.isBefore(lastDayOfMonthFromSplitDate) ? tradingDateNow : lastDayOfMonthFromSplitDate;
         LocalDate yearlyDate = tradingDateNow.isBefore(lastDayOfYearFromSplitDate) ? tradingDateNow : lastDayOfYearFromSplitDate;
         ticker = STR."'\{ticker}'";
-        updateHigherTimeframePricesFor(stockSplitDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY)), StockTimeframe.WEEKLY, ticker);
+        updateHigherTimeframePricesFor(weeklyDate, StockTimeframe.WEEKLY, ticker);
         updateHigherTimeframePricesFor(monthlyDate, StockTimeframe.MONTHLY, ticker);
         updateHigherTimeframePricesFor(yearlyDate, StockTimeframe.YEARLY, ticker);
     }
