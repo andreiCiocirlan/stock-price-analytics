@@ -49,7 +49,7 @@ public class PriceOHLCService {
         return priceOHLCs;
     }
 
-    public void updatePricesForHigherTimeframes(List<DailyPriceOHLC> importedDailyPrices, LocalDate tradingDate) {
+    public void updatePricesForHigherTimeframes(List<DailyPriceOHLC> importedDailyPrices) {
         List<String> tickers = importedDailyPrices.stream().map(DailyPriceOHLC::getTicker).toList();
         List<WeeklyPriceOHLC> previousTwoWeeklyPrices = priceOHLCRepository.findPreviousTwoWeeklyPricesForTickers(tickers);
         List<MonthlyPriceOHLC> previousTwoMonthlyPrices = priceOHLCRepository.findPreviousTwoMonthlyPricesForTickers(tickers);

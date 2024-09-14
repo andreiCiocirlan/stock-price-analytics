@@ -52,7 +52,7 @@ public class IntraDayPricesController {
     public void yahooPricesImport() {
         List<DailyPriceOHLC> dailyImportedPrices = yahooQuoteService.dailyPricesImport();
         if (!dailyImportedPrices.isEmpty()) {
-            priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices, getTradingDate(dailyImportedPrices));
+            priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
             highLowForPeriodService.updateHighLow(dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList(), getTradingDate(dailyImportedPrices));
             refreshMaterializedViewsService.refreshMaterializedViews(false);
         }
