@@ -187,7 +187,7 @@ public class PriceOHLCService {
             WHERE date BETWEEN '\{dateFormatted}'::date - INTERVAL '2 \{timeframe}' AND '\{dateFormatted}'
             """;
 
-        if (tickers.isEmpty()) {
+        if (!tickers.isEmpty()) {
             query = query.concat(
                     STR."""
                     AND ticker in (\{tickers})
