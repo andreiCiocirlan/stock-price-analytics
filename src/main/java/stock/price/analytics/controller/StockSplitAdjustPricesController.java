@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.AbstractPriceOHLC;
+import stock.price.analytics.service.PriceOHLCService;
 import stock.price.analytics.service.StockSplitAdjustPricesService;
 
 import java.time.LocalDate;
@@ -20,15 +21,17 @@ import java.util.List;
 @Validated
 @RequiredArgsConstructor
 @RequestMapping("/stock-split")
-class StockSplitAdjustPricesController {
+public class StockSplitAdjustPricesController {
 
     private final StockSplitAdjustPricesService stockSplitAdjustPricesService;
+    private final PriceOHLCService priceOHLCService;
 
     @PostMapping("/adjust-prices")
     void splitAdjustPrices(@RequestParam("ticker") String ticker,
                            @RequestParam("stockSplitDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate stockSplitDate,
                            @RequestParam("priceMultiplier") double priceMultiplier) {
         stockSplitAdjustPricesService.adjustPricesFor(ticker, stockSplitDate, priceMultiplier);
+        priceOHLCService.updateHigherTimeframesForStockSplitDate(ticker, stockSplitDate);
     }
 
     @PostMapping("/adjust-prices-for-date")
@@ -39,6 +42,5 @@ class StockSplitAdjustPricesController {
                                               @RequestParam("ohlc") @Valid @Pattern(regexp = "^[OHLCohlc]{1,4}$", message = "Invalid OHLC") String ohlc) {
         return stockSplitAdjustPricesService.adjustPricesForDateAndTimeframe(ticker, date, priceMultiplier, timeframe, ohlc);
     }
-
 
 }
