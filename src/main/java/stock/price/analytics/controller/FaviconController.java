@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-class FaviconController {
+public class FaviconController {
  
     @GetMapping("favicon.ico")
     @ResponseBody
