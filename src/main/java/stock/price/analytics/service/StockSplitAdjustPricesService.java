@@ -21,7 +21,7 @@ public class StockSplitAdjustPricesService {
     private final PriceOHLCRepository priceOHLCRepository;
 
     public void adjustPricesFor(String ticker, LocalDate stockSplitDate, double priceMultiplier) {
-        List<DailyPriceOHLC> dailyPricesToUpdate = priceOHLCRepository.findByTickerAndDateLessThanEqual(ticker, stockSplitDate);
+        List<DailyPriceOHLC> dailyPricesToUpdate = priceOHLCRepository.findByTickerAndDateLessThan(ticker, stockSplitDate);
         List<WeeklyPriceOHLC> weeklyPricesToUpdate = priceOHLCRepository.findWeeklyByTickerAndStartDateBefore(ticker, stockSplitDate.with(previousOrSame(DayOfWeek.MONDAY)));
         List<MonthlyPriceOHLC> monthlyPricesToUpdate = priceOHLCRepository.findMonthlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfMonth()));
         List<YearlyPriceOHLC> yearlyPricesToUpdate = priceOHLCRepository.findYearlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfYear()));
