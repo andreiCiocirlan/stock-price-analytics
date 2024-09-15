@@ -113,7 +113,7 @@ public class HighLowForPeriodService {
                 ) current_week ON wp.ticker = current_week.ticker
                 WHERE
                 	wp.ticker in (\{tickers}) and
-                	wp.start_date between (date_trunc('week', '\{date}'::date) - INTERVAL '\{interval}') and '\{date}'::date
+                	wp.start_date between (date_trunc('week', '\{date}'::date) - INTERVAL '\{interval}') and date_trunc('week', '\{date}'::date)
                 GROUP BY wp.ticker, current_week.close
                 ORDER BY wp.ticker
                 ON CONFLICT (ticker, start_date)
