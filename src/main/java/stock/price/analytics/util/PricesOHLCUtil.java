@@ -2,7 +2,6 @@ package stock.price.analytics.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import stock.price.analytics.config.TradingDateUtil;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
 

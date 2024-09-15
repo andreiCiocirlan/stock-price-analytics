@@ -9,7 +9,7 @@ import java.util.Set;
 
 import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 import static java.time.temporal.TemporalAdjusters.lastDayOfYear;
-import static stock.price.analytics.config.TradingDateUtil.tradingDateNow;
+import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 public enum StockTimeframe {
 

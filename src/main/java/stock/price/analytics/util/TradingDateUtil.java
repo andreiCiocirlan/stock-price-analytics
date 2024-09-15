@@ -1,4 +1,4 @@
-package stock.price.analytics.config;
+package stock.price.analytics.util;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;

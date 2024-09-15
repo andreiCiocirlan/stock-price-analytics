@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.nio.file.Files.readAllLines;
-import static stock.price.analytics.config.TradingDateUtil.tradingDateNow;
+import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 @Slf4j
 @Component
