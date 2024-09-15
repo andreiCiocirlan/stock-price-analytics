@@ -87,7 +87,7 @@ public class StockHistoricalPricesService {
         priceOHLCService.updateAllHigherTimeframesPricesForTickers(higherTimeFrameDate, tickersQuery);
 
         // refresh views
-        refreshMaterializedViewsService.refreshAllMaterializedViews();
+        refreshMaterializedViewsService.refreshMaterializedViews();
     }
 
     @Transactional

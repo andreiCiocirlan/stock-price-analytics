@@ -53,7 +53,7 @@ public class IntraDayPricesController {
         if (!dailyImportedPrices.isEmpty()) {
             priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
             highLowForPeriodService.updateHighLow(dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList(), tradingDateImported(dailyImportedPrices));
-            refreshMaterializedViewsService.refreshMaterializedViews(false);
+            refreshMaterializedViewsService.refreshMaterializedViews();
         }
     }
 

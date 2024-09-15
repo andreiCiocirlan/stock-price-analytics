@@ -12,26 +12,9 @@ public class RefreshMaterializedViewsService {
 
     private final RefreshMaterializedViewsRepository refreshMaterializedViewsRepository;
 
-    public void refreshAllMaterializedViews() {
-        refreshHighLowPrices();
+    public void refreshMaterializedViews() {
         refreshLatestAndPerformanceHeatmapPrices();
         refreshPreviousHighTimeframePrices();
-    }
-
-    public void refreshMaterializedViews(boolean refreshHighLowPrices) {
-        if (refreshHighLowPrices) {
-            refreshHighLowPrices();
-        } else {
-            refreshLatestAndPerformanceHeatmapPrices();
-            refreshPreviousHighTimeframePrices();
-        }
-    }
-
-    private void refreshHighLowPrices() {
-        refreshMaterializedViewsRepository.refreshHighLow4w();
-        log.info("refreshed high low 4w");
-        refreshMaterializedViewsRepository.refreshHighLow52w();
-        log.info("refreshed high low 52w");
     }
 
     private void refreshLatestAndPerformanceHeatmapPrices() {
