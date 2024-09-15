@@ -70,22 +70,22 @@ public class HighLowForPeriodService {
     }
 
     @Transactional
-    public void updateHighLow(List<String> tickerList, LocalDate tradingDate) {
+    public void saveOrUpdateHighLow_4w_52w(List<String> tickerList, LocalDate tradingDate) {
         String tickers = tickerList.stream().map(ticker -> STR."'\{ticker}'").collect(Collectors.joining(", "));
         String tradingDateFormatted = tradingDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
 
-        updateHighLowForPeriod(StockPerformanceInterval.STOCK_PERF_INTERVAL_30D, tickers, tradingDateFormatted);
-        updateHighLowForPeriod(StockPerformanceInterval.STOCK_PERF_INTERVAL_52W, tickers, tradingDateFormatted);
+        saveOrUpdateHighLowForPeriod(StockPerformanceInterval.STOCK_PERF_INTERVAL_30D, tickers, tradingDateFormatted);
+        saveOrUpdateHighLowForPeriod(StockPerformanceInterval.STOCK_PERF_INTERVAL_52W, tickers, tradingDateFormatted);
     }
 
-    public void updateHighLowForPeriod(StockPerformanceInterval period, String tickers, String tradingDate) {
+    public void saveOrUpdateHighLowForPeriod(StockPerformanceInterval period, String tickers, String tradingDate) {
         String interval = StockPerformanceInterval.STOCK_PERF_INTERVAL_30D == period ? "4 weeks" : "52 weeks";
         String tableName = StockPerformanceInterval.STOCK_PERF_INTERVAL_30D == period ? "high_low4w" : "high_low52w";
 
-        updateHighLowPricesForInterval(tradingDate, tableName, interval, tickers);
+        saveOrUpdateHighLowPricesForInterval(tradingDate, tableName, interval, tickers);
     }
 
-    private void updateHighLowPricesForInterval(String date, String tableName, String interval, String tickers) {
+    private void saveOrUpdateHighLowPricesForInterval(String date, String tableName, String interval, String tickers) {
         String query = queryHighLowPricesForInterval(date, tableName, interval, tickers);
         int savedOrUpdatedCount = entityManager.createNativeQuery(query).executeUpdate();
         if (savedOrUpdatedCount != 0) {
