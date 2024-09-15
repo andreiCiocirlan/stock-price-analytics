@@ -29,7 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static stock.price.analytics.config.TradingDateUtil.tradingDateNow;
+import static stock.price.analytics.util.TradingDateUtil.tradingDateImported;
+import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 @Slf4j
 @Service
@@ -77,7 +78,7 @@ public class YahooQuoteService {
             tickersImported.removeAll(dailyPrices.stream().map(DailyPriceOHLC::getTicker).toList());
 
             if (!preMarketOnly || dailyPriceOHLCs.isEmpty()) {
-                String fileName = dailyPriceOHLCs.getFirst().getDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_" + fileCounter + ".json";
+                String fileName = tradingDateImported(dailyPriceOHLCs).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_" + fileCounter + ".json";
                 String path = "./yahoo-daily-prices/" + fileName;
                 writeToFile(path, pricesJSON);
             }

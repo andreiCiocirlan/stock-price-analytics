@@ -1,10 +1,15 @@
 package stock.price.analytics.util;
 
+import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class TradingDateUtil {
 
@@ -44,4 +49,13 @@ public class TradingDateUtil {
         return date.minusDays(1);
     }
 
+    // returns the trading date being imported (highest count, as for some tickers it might import previous days)
+    public static LocalDate tradingDateImported(List<DailyPriceOHLC> dailyImportedPrices) {
+        return dailyImportedPrices.stream()
+                .collect(Collectors.groupingBy(DailyPriceOHLC::getDate, Collectors.counting()))
+                .entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElseThrow();
+    }
 }

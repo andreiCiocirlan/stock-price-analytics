@@ -15,10 +15,9 @@ import stock.price.analytics.service.PriceOHLCService;
 import stock.price.analytics.service.RefreshMaterializedViewsService;
 import stock.price.analytics.service.YahooQuoteService;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+
+import static stock.price.analytics.util.TradingDateUtil.tradingDateImported;
 
 
 @Slf4j
@@ -53,7 +52,7 @@ public class IntraDayPricesController {
         List<DailyPriceOHLC> dailyImportedPrices = yahooQuoteService.dailyPricesImport();
         if (!dailyImportedPrices.isEmpty()) {
             priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
-            highLowForPeriodService.updateHighLow(dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList(), getTradingDate(dailyImportedPrices));
+            highLowForPeriodService.updateHighLow(dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList(), tradingDateImported(dailyImportedPrices));
             refreshMaterializedViewsService.refreshMaterializedViews(false);
         }
     }
@@ -62,16 +61,6 @@ public class IntraDayPricesController {
     @GetMapping("/yahoo-prices/pre-market")
     public void yahooPreMarketPricesImport() {
         yahooQuoteService.dailyPricesImport(true);
-    }
-
-    // returns the trading date being imported (highest count, as for some tickers it might import previous days)
-    private LocalDate getTradingDate(List<DailyPriceOHLC> dailyImportedPrices) {
-        return dailyImportedPrices.stream()
-                .collect(Collectors.groupingBy(DailyPriceOHLC::getDate, Collectors.counting()))
-                .entrySet().stream()
-                .max(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
-                .orElseThrow();
     }
 
     @GetMapping("/yahoo-prices/from-file")
