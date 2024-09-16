@@ -52,7 +52,13 @@ public class DailyPriceOHLC extends AbstractPriceOHLC {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DailyPriceOHLC that = (DailyPriceOHLC) o;
-        return Objects.equals(date, that.date);
+
+        return Objects.equals(getTicker(), that.getTicker()) &&
+                Objects.equals(date, that.date) &&
+                Double.compare(getOpen(), that.getOpen()) == 0 &&
+                Double.compare(getHigh(), that.getHigh()) == 0 &&
+                Double.compare(getLow(), that.getLow()) == 0 &&
+                Double.compare(getClose(), that.getClose()) == 0;
     }
 
     @Override
