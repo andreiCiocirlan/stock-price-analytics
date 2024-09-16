@@ -45,7 +45,7 @@ public class DailyPriceOHLCService {
             }
         }
         if (!sameDailyPrices.isEmpty()) {
-            log.warn("same daily prices as in DB, not saved for {}", sameDailyPrices);
+            log.warn("same {} daily prices as in DB, not saved for {}", sameDailyPrices.size(), sameDailyPrices);
         }
         return importedDailyPrices;
     }
