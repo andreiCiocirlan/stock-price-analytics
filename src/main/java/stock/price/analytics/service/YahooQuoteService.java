@@ -70,14 +70,14 @@ public class YahooQuoteService {
             String pricesJSON = quotePricesJSON(tickers, getCrumb());
 
             List<DailyPriceOHLC> dailyPriceOHLCs = yahooFinanceClient.extractDailyPricesFromJSON(pricesJSON, preMarketOnly);
-            List<DailyPriceOHLC> dailyPrices = dailyPriceOHLCService.getDailyImportedPrices(dailyPriceOHLCs, latestByTicker.stream()
+            List<DailyPriceOHLC> dailyPricesImported = dailyPriceOHLCService.getDailyImportedPrices(dailyPriceOHLCs, latestByTicker.stream()
                     .collect(Collectors.toMap(DailyPriceOHLC::getTicker, p -> p)));
-            dailyImportedPrices.addAll(dailyPrices);
+            dailyImportedPrices.addAll(dailyPricesImported);
 
             // keep track of which tickers were imported
-            tickersImported.removeAll(dailyPrices.stream().map(DailyPriceOHLC::getTicker).toList());
+            tickersImported.removeAll(dailyPricesImported.stream().map(DailyPriceOHLC::getTicker).toList());
 
-            if (!preMarketOnly || dailyPriceOHLCs.isEmpty()) {
+            if (!preMarketOnly && !dailyPricesImported.isEmpty()) {
                 String fileName = tradingDateImported(dailyPriceOHLCs).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_" + fileCounter + ".json";
                 String path = "./yahoo-daily-prices/" + fileName;
                 writeToFile(path, pricesJSON);
