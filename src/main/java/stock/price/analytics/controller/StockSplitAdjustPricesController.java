@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.AbstractPriceOHLC;
+import stock.price.analytics.service.HighLowForPeriodService;
 import stock.price.analytics.service.PriceOHLCService;
 import stock.price.analytics.service.StockSplitAdjustPricesService;
 
@@ -25,6 +26,7 @@ public class StockSplitAdjustPricesController {
 
     private final StockSplitAdjustPricesService stockSplitAdjustPricesService;
     private final PriceOHLCService priceOHLCService;
+    private final HighLowForPeriodService highLowForPeriodService;
 
     @PostMapping("/adjust-prices")
     void splitAdjustPrices(@RequestParam("ticker") String ticker,
@@ -32,6 +34,7 @@ public class StockSplitAdjustPricesController {
                            @RequestParam("priceMultiplier") double priceMultiplier) {
         stockSplitAdjustPricesService.adjustPricesFor(ticker, stockSplitDate, priceMultiplier);
         priceOHLCService.updateAllHigherTimeframesPricesForTickers(stockSplitDate, STR."'\{ticker}'");
+        highLowForPeriodService.saveOrUpdateHighLow_4w_52w(List.of(ticker), stockSplitDate, true);
     }
 
     @PostMapping("/adjust-prices-for-date")

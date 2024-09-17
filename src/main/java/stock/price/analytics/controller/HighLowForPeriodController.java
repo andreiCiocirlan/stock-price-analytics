@@ -36,7 +36,7 @@ public class HighLowForPeriodController {
     public void saveHighLow_4w_52wForTickerAndDate(@RequestParam("ticker") String ticker,
                                                        @RequestParam(name = "tradingDate")
                                                             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate tradingDate) {
-        highLowForPeriodService.saveOrUpdateHighLow_4w_52w(List.of(ticker), tradingDate);
+        highLowForPeriodService.saveOrUpdateHighLow_4w_52w(List.of(ticker), tradingDate, false);
     }
 
 }
