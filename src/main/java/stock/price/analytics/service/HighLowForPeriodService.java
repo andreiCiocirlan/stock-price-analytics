@@ -79,7 +79,7 @@ public class HighLowForPeriodService {
     }
 
     public void saveOrUpdateHighLowForPeriod(StockPerformanceInterval period, String tickers, String tradingDate) {
-        String interval = StockPerformanceInterval.STOCK_PERF_INTERVAL_30D == period ? "4 weeks" : "52 weeks";
+        String interval = StockPerformanceInterval.STOCK_PERF_INTERVAL_30D == period ? "4" : "52";
         String tableName = StockPerformanceInterval.STOCK_PERF_INTERVAL_30D == period ? "high_low4w" : "high_low52w";
 
         saveOrUpdateHighLowPricesForInterval(tradingDate, tableName, interval, tickers);
@@ -95,32 +95,36 @@ public class HighLowForPeriodService {
 
     private String queryHighLowPricesForInterval(String date, String tableName, String interval, String tickers) {
         return STR."""
-                INSERT INTO \{tableName} (id, high, low, weekly_close, start_date, end_date, ticker)
+                WITH weekly_dates AS (
+                	SELECT DATE_TRUNC('week', '\{date}'::date) AS start_date
+                ),
+                cumulative_prices AS (
+                    SELECT
+                        wp.ticker,
+                        DATE_TRUNC('week', wp.start_date) AS start_date,
+                        MAX(wp.high) OVER (PARTITION BY wp.ticker ORDER BY DATE_TRUNC('week', wp.start_date) ROWS BETWEEN \{interval} PRECEDING AND CURRENT ROW) AS cumulative_high,
+                        MIN(wp.low) OVER (PARTITION BY wp.ticker ORDER BY DATE_TRUNC('week', wp.start_date) ROWS BETWEEN \{interval} PRECEDING AND CURRENT ROW) AS cumulative_low
+                    FROM weekly_prices wp
+                	WHERE
+                		wp.start_date >= DATE_TRUNC('week', '\{date}'::date) - INTERVAL '\{interval} week' -- important criteria to shrink query input!
+                		and ticker in (\{tickers})
+                )
+                INSERT INTO \{tableName} (id, high, low, start_date, end_date, ticker)
                 SELECT
-                    nextval('sequence_high_low') AS id,
-                	max(wp.high),
-                	min(wp.low),
-                	current_week.close,
-                    date_trunc('week', '\{date}'::date)::date  AS start_date,
-                    (date_trunc('week', '\{date}'::date)  + interval '4 days')::date AS end_date,
-                	wp.ticker
-                FROM weekly_prices wp
-                LEFT JOIN (
-                    SELECT ticker, close
-                    FROM weekly_prices
-                    WHERE start_date >= date_trunc('week', '\{date}'::date)
-                        AND start_date < date_trunc('week', '\{date}'::date) + INTERVAL '1 week'
-                ) current_week ON wp.ticker = current_week.ticker
-                WHERE
-                	wp.ticker in (\{tickers}) and
-                	wp.start_date between (date_trunc('week', '\{date}'::date) - INTERVAL '\{interval}') and date_trunc('week', '\{date}'::date)
-                GROUP BY wp.ticker, current_week.close
-                ORDER BY wp.ticker
+                	nextval('sequence_high_low') AS id,
+                	MAX(cp.cumulative_high) AS high,
+                    MIN(cp.cumulative_low) AS low,
+                    date_trunc('week', wd.start_date::date)::date  AS start_date,
+                    (date_trunc('week', wd.start_date::date)  + interval '4 days')::date AS end_date,
+                    cp.ticker
+                FROM weekly_dates wd
+                JOIN cumulative_prices cp ON cp.start_date = wd.start_date
+                GROUP BY wd.start_date, cp.ticker
+                ORDER BY cp.ticker, wd.start_date DESC
                 ON CONFLICT (ticker, start_date)
                 DO UPDATE SET
                 	high = EXCLUDED.high,
-                	low = EXCLUDED.low,
-                	weekly_close = EXCLUDED.weekly_close;
+                	low = EXCLUDED.low;
                 """;
     }
 }
