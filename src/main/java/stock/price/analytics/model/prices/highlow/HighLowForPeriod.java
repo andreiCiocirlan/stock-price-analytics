@@ -24,9 +24,6 @@ public abstract class HighLowForPeriod implements PriceEntity {
     @Column(name = "ticker")
     private String ticker;
 
-    @Column(name = "weekly_close")
-    private double weeklyClose;
-
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "end_date")
     private LocalDate endDate;
@@ -35,9 +32,8 @@ public abstract class HighLowForPeriod implements PriceEntity {
     @Column(name = "start_date")
     private LocalDate startDate;
 
-    public HighLowForPeriod(String ticker, double weeklyClose, LocalDate startDate, LocalDate endDate) {
+    public HighLowForPeriod(String ticker, LocalDate startDate, LocalDate endDate) {
         this.ticker = ticker;
-        this.weeklyClose = weeklyClose;
         this.startDate = startDate;
         this.endDate = endDate;
     }
@@ -47,6 +43,6 @@ public abstract class HighLowForPeriod implements PriceEntity {
 
     @Override
     public String toString() {
-        return STR."ticker=\{ticker}, weeklyClose=\{weeklyClose}, startDate=\{startDate}, endDate=\{endDate}";
+        return STR."ticker=\{ticker}, startDate=\{startDate}, endDate=\{endDate}";
     }
 }

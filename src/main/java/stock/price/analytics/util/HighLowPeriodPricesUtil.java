@@ -32,7 +32,6 @@ public class HighLowPeriodPricesUtil extends PricesOHLCUtil {
     private static List<HighLowForPeriod> getHighLowForPeriod(List<WeeklyPriceOHLC> weeklyHistoricalPrices, List<DailyPriceOHLC> dailyPrices, StockPerformanceInterval stockPerformanceInterval) {
         List<HighLowForPeriod> highLowsForPeriod = new ArrayList<>();
         for (WeeklyPriceOHLC wp : weeklyHistoricalPrices) {
-            double fridayClose = wp.getClose();
             String ticker = wp.getTicker();
             LocalDate week_end = wp.getEndDate(); // Friday
             LocalDate startDate; // going back in time for the past X days/weeks etc.
@@ -42,9 +41,9 @@ public class HighLowPeriodPricesUtil extends PricesOHLCUtil {
 
             HighLowForPeriod highLowForPeriod;
             if (StockPerformanceInterval.STOCK_PERF_INTERVAL_52W.equals(stockPerformanceInterval)) {
-                highLowForPeriod = new HighLow52Week(ticker, wp.getStartDate(), week_end, fridayClose);
+                highLowForPeriod = new HighLow52Week(ticker, wp.getStartDate(), week_end);
             } else {
-                highLowForPeriod = new HighLow4w(ticker, wp.getStartDate(), week_end, fridayClose);
+                highLowForPeriod = new HighLow4w(ticker, wp.getStartDate(), week_end);
             }
 
             highLowForPeriod.setHigh(dailyPrices.stream()

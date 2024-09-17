@@ -21,8 +21,8 @@ public class HighLow52Week extends HighLowForPeriod {
     @Column(name = "high")
     private double high52w;
 
-    public HighLow52Week(String ticker, LocalDate startDate, LocalDate endDate, double weeklyClose) {
-        super(ticker, weeklyClose, startDate, endDate);
+    public HighLow52Week(String ticker, LocalDate startDate, LocalDate endDate) {
+        super(ticker, startDate, endDate);
     }
 
     @Override
