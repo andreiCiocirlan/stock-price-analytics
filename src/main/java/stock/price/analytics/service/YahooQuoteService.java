@@ -55,7 +55,7 @@ public class YahooQuoteService {
 
     @Transactional
     public List<DailyPriceOHLC> dailyPricesImport(boolean preMarketOnly) {
-        int maxTickersPerRequest = 1650;
+        int maxTickersPerRequest = 1700;
         List<DailyPriceOHLC> dailyImportedPrices = new ArrayList<>();
         LocalDate minTradingDate = tradingDateNow().minusDays(5); // max 5 calendar days in the past for previous intraDay prices to be found
         List<DailyPriceOHLC> latestByTicker = dailyPriceOHLCService.findXTBLatestByTickerWithDateAfter(minTradingDate);
