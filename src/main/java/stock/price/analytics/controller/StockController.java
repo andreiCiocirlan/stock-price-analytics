@@ -26,10 +26,10 @@ public class StockController {
     @PostMapping("/save_stock")
     public void saveStockInDB(@RequestParam(value = "tickers") String tickers,
                               @RequestParam(value = "cfdMargin") Double cfdMargin,
+                              @RequestParam(value = "xtbStock") Boolean xtbStock,
                               @RequestParam(value = "shortSell") Boolean shortSell) {
         double xtb_cfdMargin = cfdMargin != null ? cfdMargin : 0d;
-        boolean xtbStock = cfdMargin != null;
-        stockService.saveStocks(tickers, xtbStock, (Boolean.TRUE.equals(shortSell)), xtb_cfdMargin);
+        stockService.saveStocks(tickers, Boolean.TRUE.equals(xtbStock), Boolean.TRUE.equals(shortSell), xtb_cfdMargin);
     }
 
     @GetMapping("/stocks")
