@@ -1,33 +1,36 @@
 package stock.price.analytics.model.prices.highlow;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.time.LocalDate;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @Table(name = "highest_lowest_prices")
-public class HighestLowestPrices {
+public class HighestLowestPrices extends HighLowForPeriod {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequence_highest_lowest")
-    @SequenceGenerator(name = "seqGen_highest_lowest", sequenceName = "seq_highest_lowest")
-    @Column(name = "id", nullable = false)
-    private Long id;
-
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Column(name = "start_date")
-    private LocalDate start_date;   // marking the week for which highest/lowest prices are calculated for
-    @Column(name = "ticker")
-    private String ticker;
     @Column(name = "low")
-    private double low;
+    private double lowest;
     @Column(name = "high")
-    private double high;
+    private double highest;
+
+    @Override
+    public void setLow(double low) {
+        setLowest(low);
+    }
+
+    @Override
+    public void setHigh(double high) {
+        setHighest(high);
+    }
+
+    @Override
+    public String toString() {
+        return STR."HighestLowest { \{super.toString()}, lowest=\{lowest}, highest=\{highest}} ";
+    }
 }

@@ -28,6 +28,7 @@ import java.util.stream.Stream;
 
 import static java.nio.file.Files.walk;
 import static java.time.LocalDate.of;
+import static stock.price.analytics.model.prices.enums.HighLowPeriod.*;
 import static stock.price.analytics.util.HighLowPeriodPricesUtil.highLowFromFileForPeriod;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 
@@ -71,83 +72,57 @@ public class HighLowForPeriodService {
     }
 
     @Transactional
-    public void saveOrUpdateHighLow_4w_52w(List<String> tickerList, LocalDate tradingDate, boolean allHistoricalPrices) {
+    public void saveCurrentWeekHighLowPrices(List<String> tickerList, LocalDate tradingDate) {
+        saveHighLowPrices(tickerList, tradingDate, false);
+    }
+
+    @Transactional
+    public void saveAllHistoricalHighLowPrices(List<String> tickerList, LocalDate tradingDate) {
+        saveHighLowPrices(tickerList, tradingDate, true);
+    }
+
+    private void saveHighLowPrices(List<String> tickerList, LocalDate tradingDate, boolean allHistoricalPrices) {
         String tickers = tickerList.stream().map(ticker -> STR."'\{ticker}'").collect(Collectors.joining(", "));
         String tradingDateFormatted = tradingDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
 
-        saveOrUpdateHighLowForPeriod(HighLowPeriod.HIGH_LOW_4W, tickers, tradingDateFormatted, allHistoricalPrices);
-        saveOrUpdateHighLowForPeriod(HighLowPeriod.HIGH_LOW_52W, tickers, tradingDateFormatted, allHistoricalPrices);
-    }
-
-    private void saveOrUpdateHighLowForPeriod(HighLowPeriod period, String tickers, String tradingDate, boolean allHistoricalPrices) {
-        String interval = HighLowPeriod.HIGH_LOW_4W == period ? "4" : "52";
-        String tableName = HighLowPeriod.HIGH_LOW_4W == period ? "high_low4w" : "high_low52w";
-
-        String query = allHistoricalPrices ? queryHighLowPricesAllHistoricalDataForInterval(tradingDate, tableName, interval, tickers) :
-                queryHighLowPricesForInterval(tradingDate, tableName, interval, tickers);
-        int savedOrUpdatedCount = entityManager.createNativeQuery(query).executeUpdate();
-        if (savedOrUpdatedCount != 0) {
-            log.warn("saved/updated {} {} rows for date {}", savedOrUpdatedCount, interval, tradingDate);
+        for (HighLowPeriod highLowPeriod : HighLowPeriod.values()) {
+            String query = queryHighLowPricesFor(highLowPeriod, tradingDateFormatted, tickers, allHistoricalPrices);
+            int savedOrUpdatedCount = entityManager.createNativeQuery(query).executeUpdate();
+            if (savedOrUpdatedCount != 0) {
+                log.warn("saved/updated {} rows for HighLow {} weeks and date {}", savedOrUpdatedCount, intervalFrom(highLowPeriod), tradingDateFormatted);
+            }
         }
     }
 
-    private String queryHighLowPricesForInterval(String date, String tableName, String interval, String tickers) {
+    private String queryHighLowPricesFor(HighLowPeriod period, String date, String tickers, boolean allHistoricalPrices) {
+        String interval = intervalFrom(period);
+        String sequenceName = sequenceNameFrom(period);
+        String tableName = tableNameFrom(period);
+        String cumulativeWhereClause = allHistoricalPrices ? "1=1" : whereClauseFrom(period, date);
+        String allTimeHistoricalInterval = allHistoricalPrices ? "- (GENERATE_SERIES(0, 3500) * INTERVAL '1 week')" : "";
+
         return STR."""
                 WITH weekly_dates AS (
-                	SELECT DATE_TRUNC('week', '\{date}'::date) AS start_date
+                	SELECT DATE_TRUNC('week', '\{date}'::date) \{allTimeHistoricalInterval} AS start_date
                 ),
                 cumulative_prices AS (
                     SELECT
                         wp.ticker,
                         DATE_TRUNC('week', wp.start_date) AS start_date,
-                        MAX(wp.high) OVER (PARTITION BY wp.ticker ORDER BY DATE_TRUNC('week', wp.start_date) ROWS BETWEEN \{interval} PRECEDING AND CURRENT ROW) AS cumulative_high,
-                        MIN(wp.low) OVER (PARTITION BY wp.ticker ORDER BY DATE_TRUNC('week', wp.start_date) ROWS BETWEEN \{interval} PRECEDING AND CURRENT ROW) AS cumulative_low
+                        MAX(wp.high) OVER (PARTITION BY wp.ticker ORDER BY wp.start_date ROWS BETWEEN \{interval} PRECEDING AND CURRENT ROW) AS cumulative_high,
+                        MIN(wp.low) OVER (PARTITION BY wp.ticker ORDER BY wp.start_date ROWS BETWEEN \{interval} PRECEDING AND CURRENT ROW) AS cumulative_low
                     FROM weekly_prices wp
                 	WHERE
-                		wp.start_date >= DATE_TRUNC('week', '\{date}'::date) - INTERVAL '\{interval} week' -- important criteria to shrink query input!
-                		and ticker in (\{tickers})
+                		\{cumulativeWhereClause} and wp.ticker in (\{tickers})
                 )
                 INSERT INTO \{tableName} (id, high, low, start_date, end_date, ticker)
                 SELECT
-                	nextval('sequence_high_low') AS id,
+                	nextval('\{sequenceName}') AS id,
                 	MAX(cp.cumulative_high) AS high,
                     MIN(cp.cumulative_low) AS low,
                     date_trunc('week', wd.start_date::date)::date  AS start_date,
                     (date_trunc('week', wd.start_date::date)  + interval '4 days')::date AS end_date,
-                    cp.ticker
-                FROM weekly_dates wd
-                JOIN cumulative_prices cp ON cp.start_date = wd.start_date
-                GROUP BY wd.start_date, cp.ticker
-                ORDER BY cp.ticker, wd.start_date DESC
-                ON CONFLICT (ticker, start_date)
-                DO UPDATE SET
-                	high = EXCLUDED.high,
-                	low = EXCLUDED.low;
-                """;
-    }
-
-    private String queryHighLowPricesAllHistoricalDataForInterval(String date, String tableName, String interval, String tickers) {
-        return STR."""
-                WITH weekly_dates AS (
-                	SELECT DATE_TRUNC('week', '\{date}'::date) - (GENERATE_SERIES(0, 3500) * INTERVAL '1 week') AS start_date
-                ),
-                cumulative_prices AS (
-                    SELECT
-                        wp.ticker,
-                        DATE_TRUNC('week', wp.start_date) AS start_date,
-                        MAX(wp.high) OVER (PARTITION BY wp.ticker ORDER BY DATE_TRUNC('week', wp.start_date) ROWS BETWEEN \{interval} PRECEDING AND CURRENT ROW) AS cumulative_high,
-                        MIN(wp.low) OVER (PARTITION BY wp.ticker ORDER BY DATE_TRUNC('week', wp.start_date) ROWS BETWEEN \{interval} PRECEDING AND CURRENT ROW) AS cumulative_low
-                    FROM weekly_prices wp
-                	WHERE ticker in (\{tickers})
-                )
-                INSERT INTO \{tableName} (id, high, low, start_date, end_date, ticker)
-                SELECT
-                	nextval('sequence_high_low') AS id,
-                	MAX(cp.cumulative_high) AS high,
-                    MIN(cp.cumulative_low) AS low,
-                    date_trunc('week', wd.start_date::date)::date  AS start_date,
-                    (date_trunc('week', wd.start_date::date)  + interval '4 days')::date AS end_date,
-                    cp.ticker
+                    cp.ticker AS ticker
                 FROM weekly_dates wd
                 JOIN cumulative_prices cp ON cp.start_date = wd.start_date
                 GROUP BY wd.start_date, cp.ticker

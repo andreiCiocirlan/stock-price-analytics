@@ -34,7 +34,7 @@ public class StockSplitAdjustPricesController {
                            @RequestParam("priceMultiplier") double priceMultiplier) {
         stockSplitAdjustPricesService.adjustPricesFor(ticker, stockSplitDate, priceMultiplier);
         priceOHLCService.updateAllHigherTimeframesPricesForTickers(stockSplitDate, STR."'\{ticker}'");
-        highLowForPeriodService.saveOrUpdateHighLow_4w_52w(List.of(ticker), stockSplitDate, true);
+        highLowForPeriodService.saveAllHistoricalHighLowPrices(List.of(ticker), stockSplitDate);
     }
 
     @PostMapping("/adjust-prices-for-date")
