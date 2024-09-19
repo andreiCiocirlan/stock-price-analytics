@@ -101,6 +101,9 @@ public class HighLowForPeriodService {
         String cumulativeWhereClause = allHistoricalPrices ? "1=1" : whereClauseFrom(period, date);
         String allTimeHistoricalInterval = allHistoricalPrices ? "- (GENERATE_SERIES(0, 3500) * INTERVAL '1 week')" : "";
 
+        if (HIGH_LOW_ALL_TIME == period && !allHistoricalPrices)
+            return queryHighestLowestPricesCurrentWeek(date, tickers, sequenceName);
+
         return STR."""
                 WITH weekly_dates AS (
                 	SELECT DATE_TRUNC('week', '\{date}'::date) \{allTimeHistoricalInterval} AS start_date
@@ -131,6 +134,39 @@ public class HighLowForPeriodService {
                 DO UPDATE SET
                 	high = EXCLUDED.high,
                 	low = EXCLUDED.low;
+                """;
+    }
+
+    private String queryHighestLowestPricesCurrentWeek(String date, String tickers, String sequenceName) {
+        return STR."""
+                WITH hl_data AS (
+                    SELECT
+                        hlp.ticker,
+                        MAX(hlp.high) AS highest,
+                        MIN(hlp.low) AS lowest
+                    FROM highest_lowest_prices hlp
+                    WHERE
+                        hlp.start_date BETWEEN (DATE_TRUNC('week', '\{date}'::date) - INTERVAL '1 week')
+                        AND DATE_TRUNC('week', '\{date}'::date)
+                        AND hlp.ticker IN (\{tickers})
+                    GROUP BY hlp.ticker
+                )
+                INSERT INTO public.highest_lowest_prices (id, high, low, start_date, end_date, ticker)
+                SELECT
+                	nextval('\{sequenceName}') AS id,
+                    GREATEST(wp.high, hl.highest),
+                    LEAST(wp.low, hl.lowest),
+                    DATE_TRUNC('week', wp.start_date)::date,
+                    (DATE_TRUNC('week', wp.start_date) + INTERVAL '4 days')::date,
+                    wp.ticker
+                FROM weekly_prices wp
+                LEFT JOIN hl_data hl ON hl.ticker = wp.ticker
+                WHERE wp.ticker IN (\{tickers})
+                AND DATE_TRUNC('week', wp.start_date) = DATE_TRUNC('week', '\{date}'::date)
+                ON CONFLICT (ticker, start_date)
+                DO UPDATE SET
+                	high = EXCLUDED.high,
+                	low = EXCLUDED.low
                 """;
     }
 }
