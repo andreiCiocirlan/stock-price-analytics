@@ -34,12 +34,12 @@ public class DailyPriceOHLC extends AbstractPriceOHLC {
 
     @Override
     public LocalDate getStartDate() {
-        return LocalDate.now();
+        return date;
     }
 
     @Override
     public LocalDate getEndDate() {
-        return LocalDate.now();
+        return date;
     }
 
     @Override
