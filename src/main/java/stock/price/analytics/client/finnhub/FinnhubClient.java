@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 import static stock.price.analytics.util.Constants.FINNHUB_BASE_URL;
+import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 @Slf4j
 @Component
