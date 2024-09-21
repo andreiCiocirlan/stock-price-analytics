@@ -30,6 +30,7 @@ import static java.nio.file.Files.walk;
 import static java.time.LocalDate.of;
 import static stock.price.analytics.model.prices.enums.HighLowPeriod.*;
 import static stock.price.analytics.util.HighLowPeriodPricesUtil.highLowFromFileForPeriod;
+import static stock.price.analytics.util.LoggingUtil.logElapsedTime;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 
 @Slf4j
@@ -73,12 +74,12 @@ public class HighLowForPeriodService {
 
     @Transactional
     public void saveCurrentWeekHighLowPrices(List<String> tickerList, LocalDate tradingDate) {
-        saveHighLowPrices(tickerList, tradingDate, false);
+        logElapsedTime(() -> saveHighLowPrices(tickerList, tradingDate, false), "saved current week HighLow prices");
     }
 
     @Transactional
     public void saveAllHistoricalHighLowPrices(List<String> tickerList, LocalDate tradingDate) {
-        saveHighLowPrices(tickerList, tradingDate, true);
+        logElapsedTime(() -> saveHighLowPrices(tickerList, tradingDate, true), "saved ALL Historical HighLow prices");
     }
 
     private void saveHighLowPrices(List<String> tickerList, LocalDate tradingDate, boolean allHistoricalPrices) {
