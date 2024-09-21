@@ -16,7 +16,7 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
               SELECT MAX(dp.date)
               FROM daily_prices dp
               WHERE dp.ticker = s.ticker
-              HAVING MAX(dp.date) < CURRENT_DATE - INTERVAL '20 day'
+              HAVING MAX(dp.date) < CURRENT_DATE - INTERVAL '10 day'
             ), ipo_date = (
               SELECT MIN(dp.date)
               FROM daily_prices dp
