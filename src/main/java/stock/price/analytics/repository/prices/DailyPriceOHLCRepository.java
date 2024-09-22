@@ -31,7 +31,7 @@ public interface DailyPriceOHLCRepository extends JpaRepository<DailyPriceOHLC, 
     List<DailyPriceOHLC> findAllLatestByTickerWithDateAfter(LocalDate date); // ALL tickers
 
     @Query(value ="""
-            select lp.* from latest_prices lp
+            select lp.* from latest_prices_view lp
             join stocks s on s.ticker = lp.ticker and s.xtb_stock = true
             where lp.date >= :date
     """, nativeQuery = true)
