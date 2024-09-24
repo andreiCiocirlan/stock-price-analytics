@@ -15,8 +15,8 @@ public class RefreshMaterializedViewsService {
     private final RefreshMaterializedViewsRepository refreshMaterializedViewsRepository;
 
     public void refreshMaterializedViews() {
-        refreshLatestAndPerformanceHeatmapPrices();
         refreshPreviousHighTimeframePrices();
+        refreshLatestAndPerformanceHeatmapPrices();
     }
 
     private void refreshLatestAndPerformanceHeatmapPrices() {
