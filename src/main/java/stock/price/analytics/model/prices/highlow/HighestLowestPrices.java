@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "highest_lowest_prices")
+@Table(name = "highest_lowest")
 public class HighestLowestPrices extends HighLowForPeriod {
 
     @Column(name = "low")

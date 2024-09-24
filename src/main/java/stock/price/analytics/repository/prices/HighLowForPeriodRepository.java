@@ -15,10 +15,10 @@ public interface HighLowForPeriodRepository extends JpaRepository<HighLowForPeri
                 lowest = hlp.low
             FROM (
                 SELECT ticker, high, low
-                FROM highest_lowest_prices
+                FROM highest_lowest
                 WHERE (ticker, start_date) IN (
                     SELECT ticker, MAX(start_date)
-                    FROM highest_lowest_prices
+                    FROM highest_lowest
                     GROUP BY ticker
                 )
             ) hlp

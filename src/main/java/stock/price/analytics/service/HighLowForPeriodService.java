@@ -145,14 +145,14 @@ public class HighLowForPeriodService {
                         hlp.ticker,
                         MAX(hlp.high) AS highest,
                         MIN(hlp.low) AS lowest
-                    FROM highest_lowest_prices hlp
+                    FROM highest_lowest hlp
                     WHERE
                         hlp.start_date BETWEEN (DATE_TRUNC('week', '\{date}'::date) - INTERVAL '1 week')
                         AND DATE_TRUNC('week', '\{date}'::date)
                         AND hlp.ticker IN (\{tickers})
                     GROUP BY hlp.ticker
                 )
-                INSERT INTO public.highest_lowest_prices (id, high, low, start_date, end_date, ticker)
+                INSERT INTO public.highest_lowest (id, high, low, start_date, end_date, ticker)
                 SELECT
                 	nextval('\{sequenceName}') AS id,
                     GREATEST(wp.high, hl.highest),

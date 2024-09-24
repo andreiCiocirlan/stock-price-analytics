@@ -18,7 +18,7 @@ public enum HighLowPeriod {
         return switch (period) {
             case HIGH_LOW_4W -> "high_low4w";
             case HIGH_LOW_52W -> "high_low52w";
-            case HIGH_LOW_ALL_TIME -> "highest_lowest_prices";
+            case HIGH_LOW_ALL_TIME -> "highest_lowest";
         };
     }
 
