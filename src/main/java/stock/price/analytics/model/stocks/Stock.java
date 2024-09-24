@@ -41,6 +41,24 @@ public class Stock {
     @Column(name = "delisted_date")
     private LocalDate delistedDate; // date stock was added (IPO)
 
+    @Column(name = "high4w")
+    private double high4w; // high 4w
+
+    @Column(name = "low4w")
+    private double low4w; // low 4w
+
+    @Column(name = "high52w")
+    private double high52w; // high 52w
+
+    @Column(name = "low52w")
+    private double low52w; // low 52w
+
+    @Column(name = "highest")
+    private double highest; // highest price All-Time
+
+    @Column(name = "lowest")
+    private double lowest; // lowest price All-Time
+
     public Stock(String ticker, LocalDate ipoDate, LocalDate delistedDate, boolean xtbStock) {
         this.ticker = ticker;
         this.ipoDate = ipoDate;
