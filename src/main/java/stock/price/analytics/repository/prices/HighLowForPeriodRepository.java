@@ -26,7 +26,7 @@ public interface HighLowForPeriodRepository extends JpaRepository<HighLowForPeri
             """, nativeQuery = true)
     void updateHighestLowest();
 
-    @Query("""
+    @Query(value = """
             UPDATE stocks s
             SET
                 high52w = h52w.high52w,
@@ -41,10 +41,10 @@ public interface HighLowForPeriodRepository extends JpaRepository<HighLowForPeri
                 )
             ) h52w
             WHERE s.ticker = h52w.ticker;
-            """)
+            """, nativeQuery = true)
     void updateHighLow52w();
 
-    @Query("""
+    @Query(value = """
             UPDATE stocks s
             SET
                 high4w = h4w.high4w,
@@ -59,7 +59,7 @@ public interface HighLowForPeriodRepository extends JpaRepository<HighLowForPeri
                 )
             ) h4w
             WHERE s.ticker = h4w.ticker;
-            """)
+            """, nativeQuery = true)
     void updateHighLow4w();
 
 }
