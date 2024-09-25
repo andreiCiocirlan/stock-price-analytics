@@ -58,4 +58,8 @@ public class StockService {
         }
     }
 
+    public List<Stock> stocksByTickerIn(List<String> tickers) {
+        return stockRepository.findByTickerIn(tickers);
+    }
+
 }
