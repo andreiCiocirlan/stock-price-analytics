@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import stock.price.analytics.model.stocks.Stock;
 
+import java.util.List;
+
 @Repository
 public interface StockRepository extends JpaRepository<Stock, Long> {
 
@@ -24,4 +26,6 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
             )
             """, nativeQuery = true)
     void updateIpoAndDelistedDates();
+
+    List<Stock> findByTickerIn(List<String> ticker);
 }
