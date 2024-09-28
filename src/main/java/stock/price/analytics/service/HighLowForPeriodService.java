@@ -148,7 +148,7 @@ public class HighLowForPeriodService {
                     FROM highest_lowest hlp
                     WHERE
                         hlp.start_date BETWEEN (DATE_TRUNC('week', '\{date}'::date) - INTERVAL '1 week')
-                        AND DATE_TRUNC('week', '\{date}'::date)
+                        AND '\{date}'::date
                         AND hlp.ticker IN (\{tickers})
                     GROUP BY hlp.ticker
                 )
@@ -160,7 +160,7 @@ public class HighLowForPeriodService {
                     DATE_TRUNC('week', wp.start_date)::date,
                     (DATE_TRUNC('week', wp.start_date) + INTERVAL '4 days')::date,
                     wp.ticker
-                FROM weekly_prices wp
+                FROM weekly_prices_performance_view wp
                 LEFT JOIN hl_data hl ON hl.ticker = wp.ticker
                 WHERE wp.ticker IN (\{tickers})
                 AND DATE_TRUNC('week', wp.start_date) = DATE_TRUNC('week', '\{date}'::date)
