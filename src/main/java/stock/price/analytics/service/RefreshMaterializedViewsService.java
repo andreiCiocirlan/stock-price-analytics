@@ -29,6 +29,7 @@ public class RefreshMaterializedViewsService {
 
     private void refreshPreviousHighTimeframePrices() {
         logElapsedTime(refreshMaterializedViewsRepository::refreshPrevTwoWeeks, "refreshed prev two weeks prices");
+        logElapsedTime(refreshMaterializedViewsRepository::refreshPrev52Weeks, "refreshed prev 52 weeks prices");
         logElapsedTime(refreshMaterializedViewsRepository::refreshPrevTwoMonths, "refreshed prev two months prices");
         logElapsedTime(refreshMaterializedViewsRepository::refreshPrevTwoYears, "refreshed prev two years prices");
     }
