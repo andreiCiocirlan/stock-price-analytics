@@ -2,16 +2,20 @@ package stock.price.analytics.model.prices.trailing;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 import stock.price.analytics.model.prices.ohlc.CandleOHLC;
 import stock.price.analytics.model.prices.ohlc.WeeklyPriceOHLC;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
 @Table(name = "prev_52w")
 public class Previous52WPrices {
 
@@ -61,10 +65,20 @@ public class Previous52WPrices {
     public static Previous52WPrices newFrom(WeeklyPriceOHLC weeklyPrice) {
         return new Previous52WPrices(
                 weeklyPrice.getTicker(),
-                weeklyPrice.getStartDate(),
-                weeklyPrice.getEndDate(),
+                weeklyPrice.getStartDate().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)),
+                weeklyPrice.getEndDate().with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY)),
                 weeklyPrice.getPerformance(),
                 new CandleOHLC(weeklyPrice.getOpen(), weeklyPrice.getHigh(), weeklyPrice.getLow(), weeklyPrice.getClose()));
+    }
+
+    public void updateFrom(WeeklyPriceOHLC weeklyPrice) {
+        this.setOpen(weeklyPrice.getOpen());
+        this.setHigh(weeklyPrice.getHigh());
+        this.setLow(weeklyPrice.getLow());
+        this.setClose(weeklyPrice.getClose());
+        this.setPerformance(weeklyPrice.getPerformance());
+        this.setStartDate(weeklyPrice.getStartDate().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)));
+        this.setEndDate(weeklyPrice.getEndDate().with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY)));
     }
 
     @Override
