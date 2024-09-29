@@ -21,11 +21,11 @@ public interface DailyPriceOHLCRepository extends JpaRepository<DailyPriceOHLC, 
     List<DailyPriceOHLC> findByDateAfterOrderByDate(LocalDate date);
     List<DailyPriceOHLC> findByDateBetween(LocalDate startDate, LocalDate endDate);
 
-    @Query(value = "SELECT * from latest_prices", nativeQuery = true)
+    @Query(value = "SELECT * from latest_prices_view", nativeQuery = true)
     List<DailyPriceOHLC> findLatestByTicker();
 
     @Query(value ="""
-            select lp.* from latest_prices lp
+            select lp.* from latest_prices_view lp
             where lp.date >= :date
     """, nativeQuery = true)
     List<DailyPriceOHLC> findAllLatestByTickerWithDateAfter(LocalDate date); // ALL tickers
