@@ -19,6 +19,10 @@ public class RefreshMaterializedViewsService {
         refreshLatestAndPerformanceHeatmapPrices();
     }
 
+    public void refreshLatestHighLowView() {
+        logElapsedTime(refreshMaterializedViewsRepository::refreshLatestHighLow, "refreshed latest highs lows for tickers");
+    }
+
     private void refreshLatestAndPerformanceHeatmapPrices() {
         logElapsedTime(refreshMaterializedViewsRepository::refreshLatestPrices, "refreshed latest prices");
         logElapsedTime(refreshMaterializedViewsRepository::refreshDailyPerformanceHeatmapPrices, "refreshed daily performance prices");
