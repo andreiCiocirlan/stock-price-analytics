@@ -72,22 +72,28 @@ public class HighLowForPeriodService {
         partitionDataAndSave(highLowPrices, highLowForPeriodRepository);
     }
 
-    @Transactional
-    public void saveCurrentWeekHighLowPrices(List<String> tickerList, LocalDate tradingDate) {
-        logElapsedTime(() -> saveHighLowPrices(tickerList, tradingDate, false), "saved current week HighLow prices");
+    public void saveCurrentWeekHighLowPricesSingleTicker(String ticker, LocalDate tradingDate) {
+        saveCurrentWeekHighLowPrices(List.of(ticker), tradingDate);
     }
 
-    @Transactional
-    public void saveAllHistoricalHighLowPrices(List<String> tickerList, LocalDate tradingDate) {
-        logElapsedTime(() -> saveHighLowPrices(tickerList, tradingDate, true), "saved ALL Historical HighLow prices");
+    public void saveCurrentWeekHighLowPrices(List<String> tickers, LocalDate tradingDate) {
+        logElapsedTime(() -> saveHighLowPrices(tickers, tradingDate, false), "saved current week HighLow prices");
     }
 
-    private void saveHighLowPrices(List<String> tickerList, LocalDate tradingDate, boolean allHistoricalPrices) {
-        String tickers = tickerList.stream().map(ticker -> STR."'\{ticker}'").collect(Collectors.joining(", "));
-        String tradingDateFormatted = tradingDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
+    public void saveAllHistoricalHighLowPrices(List<String> tickers, LocalDate tradingDate) {
+        logElapsedTime(() -> saveHighLowPrices(tickers, tradingDate, true), "saved ALL historical HighLow prices");
+    }
 
-        for (HighLowPeriod highLowPeriod : HighLowPeriod.values()) {
-            String query = queryHighLowPricesFor(highLowPeriod, tradingDateFormatted, tickers, allHistoricalPrices);
+    public void saveAllHistoricalHighLowPricesSingleTicker(String ticker, LocalDate tradingDate) {
+        saveAllHistoricalHighLowPrices(List.of(ticker), tradingDate);
+    }
+
+    private void saveHighLowPrices(List<String> tickers, LocalDate tradingDate, boolean allHistoricalPrices) {
+        for (HighLowPeriod highLowPeriod : values()) {
+            String tickersFormatted = tickers.stream().map(ticker -> STR."'\{ticker}'").collect(Collectors.joining(", "));
+            String tradingDateFormatted = tradingDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
+
+            String query = queryHighLowPricesFor(highLowPeriod, tradingDateFormatted, tickersFormatted, allHistoricalPrices);
             int savedOrUpdatedCount = entityManager.createNativeQuery(query).executeUpdate();
             if (savedOrUpdatedCount != 0) {
                 log.warn("saved/updated {} rows for {} and date {}", savedOrUpdatedCount, tableNameFrom(highLowPeriod), tradingDateFormatted);

@@ -10,10 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import stock.price.analytics.client.finnhub.FinnhubClient;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 import stock.price.analytics.repository.prices.PriceOHLCRepository;
-import stock.price.analytics.service.HighLowForPeriodService;
-import stock.price.analytics.service.PriceOHLCService;
-import stock.price.analytics.service.RefreshMaterializedViewsService;
-import stock.price.analytics.service.YahooQuoteService;
+import stock.price.analytics.service.*;
 
 import java.util.List;
 
@@ -32,6 +29,7 @@ public class IntraDayPricesController {
     private final PriceOHLCService priceOHLCService;
     private final HighLowForPeriodService highLowForPeriodService;
     private final RefreshMaterializedViewsService refreshMaterializedViewsService;
+    private final StockService stockService;
 
     @GetMapping("/finnhub")
     public DailyPriceOHLC intraDayPrices(@RequestParam("ticker") String ticker) {
@@ -52,8 +50,16 @@ public class IntraDayPricesController {
         List<DailyPriceOHLC> dailyImportedPrices = yahooQuoteService.dailyPricesImport();
         if (!dailyImportedPrices.isEmpty()) {
             priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
-            highLowForPeriodService.saveCurrentWeekHighLowPrices(dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList(), tradingDateImported(dailyImportedPrices));
+            stockService.updateStocksDate(dailyImportedPrices);
+            // daily performance view based on stock last_updated (keep this order)
             refreshMaterializedViewsService.refreshMaterializedViews();
+
+            // high/low price update based on weekly perf view (refreshed before)
+            highLowForPeriodService.saveCurrentWeekHighLowPrices(dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList(),
+                    tradingDateImported(dailyImportedPrices));
+            refreshMaterializedViewsService.refreshLatestHighLowView();
+            // latest high low materialized view refreshed -> update stocks also
+            stockService.updateStocksHighLow();
         }
     }
 
@@ -63,9 +69,24 @@ public class IntraDayPricesController {
         yahooQuoteService.dailyPricesImport(true);
     }
 
+    @Transactional
     @GetMapping("/yahoo-prices/from-file")
-    public List<DailyPriceOHLC> yFinanceDailyPricesFrom(@RequestParam("fileName") String fileName) {
-        return yahooQuoteService.dailyPricesFromFile(fileName);
+    public List<DailyPriceOHLC> yahooPricesImportFromFile(@RequestParam("fileName") String fileName) {
+        List<DailyPriceOHLC> dailyImportedPrices = yahooQuoteService.dailyPricesFromFile(fileName);
+        if (!dailyImportedPrices.isEmpty()) {
+            priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
+            stockService.updateStocksDate(dailyImportedPrices);
+            // daily performance view based on stock last_updated (keep this order)
+            refreshMaterializedViewsService.refreshMaterializedViews();
+
+            // high/low price update based on weekly perf view (refreshed before)
+            highLowForPeriodService.saveCurrentWeekHighLowPrices(dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList(),
+                    tradingDateImported(dailyImportedPrices));
+            refreshMaterializedViewsService.refreshLatestHighLowView();
+            // latest high low materialized view refreshed -> update stocks also
+            stockService.updateStocksHighLow();
+        }
+        return dailyImportedPrices;
     }
 
 }

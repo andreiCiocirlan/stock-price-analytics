@@ -1,5 +1,6 @@
 package stock.price.analytics.controller;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -11,7 +12,6 @@ import stock.price.analytics.model.prices.enums.StockPerformanceInterval;
 import stock.price.analytics.service.HighLowForPeriodService;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,10 +33,11 @@ public class HighLowForPeriodController {
 
     @PostMapping("/save-hl-4w-52w-ticker")
     @ResponseStatus(HttpStatus.OK)
+    @Transactional
     public void saveHighLow_4w_52wForTickerAndDate(@RequestParam("ticker") String ticker,
                                                        @RequestParam(name = "tradingDate")
                                                             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate tradingDate) {
-        highLowForPeriodService.saveCurrentWeekHighLowPrices(List.of(ticker), tradingDate);
+        highLowForPeriodService.saveCurrentWeekHighLowPricesSingleTicker(ticker, tradingDate);
     }
 
 }

@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static java.nio.file.Files.walk;
+import static stock.price.analytics.util.LoggingUtil.logElapsedTime;
 import static stock.price.analytics.util.PricesOHLCUtil.tickerFrom;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateImported;
 
@@ -62,17 +63,19 @@ public class StockService {
 
     @Transactional
     public void updateStocksDate(List<DailyPriceOHLC> dailyImportedPrices) {
-        LocalDate tradingDate = tradingDateImported(dailyImportedPrices);
-        List<String> tickers = dailyImportedPrices.stream()
-                .filter(dailyPriceOHLC -> dailyPriceOHLC.getDate().equals(tradingDate)) // make sure only today prices are filtered
-                .map(DailyPriceOHLC::getTicker)
-                .toList();
-        stockRepository.updateStocksLastUpdated(tradingDate, tickers);
+        logElapsedTime(() -> {
+            LocalDate tradingDate = tradingDateImported(dailyImportedPrices);
+            List<String> tickers = dailyImportedPrices.stream()
+                    .filter(dailyPriceOHLC -> dailyPriceOHLC.getDate().equals(tradingDate)) // make sure only today prices are filtered
+                    .map(DailyPriceOHLC::getTicker)
+                    .toList();
+            stockRepository.updateStocksLastUpdated(tradingDate, tickers);
+        }, "updated stocks date");
     }
 
     @Transactional
     public void updateStocksHighLow() {
-        stockRepository.updateStocksHighLow();
+        logElapsedTime(stockRepository::updateStocksHighLow, "updated stocks high low 4w, 52w, all-time");
     }
 
 }

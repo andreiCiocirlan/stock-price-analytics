@@ -1,5 +1,6 @@
 package stock.price.analytics.controller;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -29,12 +30,13 @@ public class StockSplitAdjustPricesController {
     private final HighLowForPeriodService highLowForPeriodService;
 
     @PostMapping("/adjust-prices")
+    @Transactional
     void splitAdjustPrices(@RequestParam("ticker") String ticker,
                            @RequestParam("stockSplitDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate stockSplitDate,
                            @RequestParam("priceMultiplier") double priceMultiplier) {
         stockSplitAdjustPricesService.adjustPricesFor(ticker, stockSplitDate, priceMultiplier);
         priceOHLCService.updateAllHigherTimeframesPricesForTickers(stockSplitDate, STR."'\{ticker}'");
-        highLowForPeriodService.saveAllHistoricalHighLowPrices(List.of(ticker), stockSplitDate);
+        highLowForPeriodService.saveAllHistoricalHighLowPricesSingleTicker(ticker, stockSplitDate);
     }
 
     @PostMapping("/adjust-prices-for-date")
