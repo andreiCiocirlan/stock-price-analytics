@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+/*
 
 @Repository
 public interface Previous52WPricesRepository extends JpaRepository<Previous52WPrices, Long> {
@@ -30,3 +31,5 @@ public interface Previous52WPricesRepository extends JpaRepository<Previous52WPr
     List<Previous52WPrices> prev52WeeksOrderedByStartDateDescForTickers(List<String> tickers);
 
 }
+
+*/

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+/*
 
 @Slf4j
 @Service
@@ -22,17 +23,17 @@ public class Previous52WPricesService {
 
     private final Previous52WPricesRepository previous52WeekPricesRepository;
 
-    /**
-        old code being called:
 
-        List<WeeklyPriceOHLC> weeklyPricesUpdated = priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
+//        old code being called:
+//
+//        List<WeeklyPriceOHLC> weeklyPricesUpdated = priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
+//
+//        Map<String, List<Previous52WPrices>> previous52wByTicker = previous52WPricesService.updatePrevious52wPrices(weeklyPricesUpdated);
+//        Map<HighLowPeriod, List<String>> stockHighLowUpdateMap = stockService.updateStocksHighLow(previous52wByTicker);
+//
+//        refreshMaterializedViewsService.refreshMaterializedViews(); // refresh mviews first (high/low price update based on mview)
+//        highLowForPeriodService.saveCurrentWeekHighLowPrices(stockHighLowUpdateMap, tradingDateImported(dailyImportedPrices));
 
-        Map<String, List<Previous52WPrices>> previous52wByTicker = previous52WPricesService.updatePrevious52wPrices(weeklyPricesUpdated);
-        Map<HighLowPeriod, List<String>> stockHighLowUpdateMap = stockService.updateStocksHighLow(previous52wByTicker);
-
-        refreshMaterializedViewsService.refreshMaterializedViews(); // refresh mviews first (high/low price update based on mview)
-        highLowForPeriodService.saveCurrentWeekHighLowPrices(stockHighLowUpdateMap, tradingDateImported(dailyImportedPrices));
-    */
 
     public Map<String, List<Previous52WPrices>> updatePrevious52wPrices(List<WeeklyPriceOHLC> weeklyPricesImported) {
         List<String> tickers = weeklyPricesImported.stream().map(WeeklyPriceOHLC::getTicker).toList();
@@ -76,9 +77,7 @@ public class Previous52WPricesService {
         return previous52WeekPricesRepository.prev52WeeksOrderedByStartDateDescForTickers(tickers);
     }
 
-    /**
-     * Run once after weekly_prices populated (afterward update with incoming data)
-     */
+    // Run once after weekly_prices populated (afterward update with incoming data)
     public void insertPrev52w() {
         String query = queryInsertPrev52w();
         int insertCount = entityManager.createNativeQuery(query).executeUpdate();
@@ -105,3 +104,5 @@ public class Previous52WPricesService {
     }
 
 }
+
+*/

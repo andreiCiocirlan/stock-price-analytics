@@ -1,8 +1,15 @@
 package stock.price.analytics.old_code.prev52w;
+/*
+
+import stock.price.analytics.model.prices.enums.HighLowPeriod;
+import stock.price.analytics.model.stocks.Stock;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class StockServiceOld {
 
-    /**
+
 
      in stockrepository
      List<Stock> findByXtbStockTrueAndDelistedDateNullAndTickerIn(Set<String> tickers);
@@ -108,5 +115,6 @@ public class StockServiceOld {
                 ));
     }
 
-     */
+
 }
+     */

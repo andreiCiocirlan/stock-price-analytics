@@ -11,6 +11,7 @@ import stock.price.analytics.model.prices.ohlc.WeeklyPriceOHLC;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
+/*
 
 @Getter
 @Setter
@@ -87,3 +88,6 @@ public class Previous52WPrices {
     }
 
 }
+
+
+*/
