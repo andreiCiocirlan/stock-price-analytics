@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.stocks.StockRepository;
 import stock.price.analytics.util.Constants;
@@ -22,6 +23,7 @@ import java.util.stream.Stream;
 
 import static java.nio.file.Files.walk;
 import static stock.price.analytics.util.PricesOHLCUtil.tickerFrom;
+import static stock.price.analytics.util.TradingDateUtil.tradingDateImported;
 
 @Slf4j
 @Service
@@ -58,8 +60,19 @@ public class StockService {
         }
     }
 
-    public List<Stock> stocksByTickerIn(List<String> tickers) {
-        return stockRepository.findByTickerIn(tickers);
+    @Transactional
+    public void updateStocksDate(List<DailyPriceOHLC> dailyImportedPrices) {
+        LocalDate tradingDate = tradingDateImported(dailyImportedPrices);
+        List<String> tickers = dailyImportedPrices.stream()
+                .filter(dailyPriceOHLC -> dailyPriceOHLC.getDate().equals(tradingDate)) // make sure only today prices are filtered
+                .map(DailyPriceOHLC::getTicker)
+                .toList();
+        stockRepository.updateStocksLastUpdated(tradingDate, tickers);
+    }
+
+    @Transactional
+    public void updateStocksHighLow() {
+        stockRepository.updateStocksHighLow();
     }
 
 }

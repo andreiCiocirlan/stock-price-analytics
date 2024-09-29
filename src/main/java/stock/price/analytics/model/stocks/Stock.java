@@ -59,6 +59,10 @@ public class Stock {
     @Column(name = "lowest")
     private double lowest; // lowest price All-Time
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Column(name = "last_updated")
+    private LocalDate lastUpdated; // used as fast-fetch max(date) per ticker
+
     public Stock(String ticker, LocalDate ipoDate, LocalDate delistedDate, boolean xtbStock) {
         this.ticker = ticker;
         this.ipoDate = ipoDate;
