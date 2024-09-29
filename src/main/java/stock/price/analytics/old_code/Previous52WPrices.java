@@ -1,4 +1,4 @@
-package stock.price.analytics.model.prices.trailing;
+package stock.price.analytics.old_code;
 
 import jakarta.persistence.*;
 import lombok.Getter;
