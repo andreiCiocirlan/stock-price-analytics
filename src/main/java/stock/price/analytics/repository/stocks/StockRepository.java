@@ -12,6 +12,7 @@ import java.util.List;
 public interface StockRepository extends JpaRepository<Stock, Long> {
 
 
+    @Modifying
     @Query(value = """
             UPDATE stocks s
             SET
@@ -30,6 +31,7 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
             """, nativeQuery = true)
     void updateHighestLowest();
 
+    @Modifying
     @Query(value = """
             UPDATE stocks s
             SET
@@ -48,6 +50,7 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
             """, nativeQuery = true)
     void updateHighLow52w();
 
+    @Modifying
     @Query(value = """
             UPDATE stocks s
             SET
