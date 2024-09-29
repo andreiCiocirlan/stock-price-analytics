@@ -90,7 +90,7 @@ public class HighLowForPeriodService {
             String query = queryHighLowPricesFor(highLowPeriod, tradingDateFormatted, tickers, allHistoricalPrices);
             int savedOrUpdatedCount = entityManager.createNativeQuery(query).executeUpdate();
             if (savedOrUpdatedCount != 0) {
-                log.warn("saved/updated {} rows for HighLow {} weeks and date {}", savedOrUpdatedCount, intervalFrom(highLowPeriod), tradingDateFormatted);
+                log.warn("saved/updated {} rows for {} and date {}", savedOrUpdatedCount, tableNameFrom(highLowPeriod), tradingDateFormatted);
             }
         }
     }
