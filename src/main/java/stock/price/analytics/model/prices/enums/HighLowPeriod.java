@@ -6,10 +6,10 @@ public enum HighLowPeriod {
     HIGH_LOW_52W,
     HIGH_LOW_ALL_TIME;
 
-    public static String intervalFrom(HighLowPeriod period) {
+    public static String intervalPrecedingFrom(HighLowPeriod period) {
         return switch (period) {
-            case HIGH_LOW_4W -> "4";
-            case HIGH_LOW_52W -> "52";
+            case HIGH_LOW_4W -> "3"; // between 3 preceding and current row -> means previous 4-week period
+            case HIGH_LOW_52W -> "51"; // between 51 preceding and current row -> means previous 52-week period
             case HIGH_LOW_ALL_TIME -> "UNBOUNDED";
         };
     }
@@ -24,8 +24,8 @@ public enum HighLowPeriod {
 
     public static String whereClauseFrom(HighLowPeriod period, String date) {
         return switch (period) {
-            case HIGH_LOW_4W -> STR."wp.start_date >= DATE_TRUNC('week', '\{date}'::date) - INTERVAL '4 week'";
-            case HIGH_LOW_52W -> STR."wp.start_date >= DATE_TRUNC('week', '\{date}'::date) - INTERVAL '52 week'";
+            case HIGH_LOW_4W -> STR."wp.start_date > DATE_TRUNC('week', '\{date}'::date) - INTERVAL '4 week'";
+            case HIGH_LOW_52W -> STR."wp.start_date > DATE_TRUNC('week', '\{date}'::date) - INTERVAL '52 week'";
             case HIGH_LOW_ALL_TIME -> "1=1";
         };
     }

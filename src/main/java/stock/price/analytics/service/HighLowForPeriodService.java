@@ -96,7 +96,7 @@ public class HighLowForPeriodService {
     }
 
     private String queryHighLowPricesFor(HighLowPeriod period, String date, String tickers, boolean allHistoricalPrices) {
-        String interval = intervalFrom(period);
+        String interval = intervalPrecedingFrom(period);
         String sequenceName = sequenceNameFrom(period);
         String tableName = tableNameFrom(period);
         String cumulativeWhereClause = allHistoricalPrices ? "1=1" : whereClauseFrom(period, date);
