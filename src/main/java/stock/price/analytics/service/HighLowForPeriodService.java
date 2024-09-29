@@ -122,15 +122,13 @@ public class HighLowForPeriodService {
                 INSERT INTO \{tableName} (id, high, low, start_date, end_date, ticker)
                 SELECT
                 	nextval('\{sequenceName}') AS id,
-                	MAX(cp.cumulative_high) AS high,
-                    MIN(cp.cumulative_low) AS low,
+                	cp.cumulative_high AS high,
+                    cp.cumulative_low AS low,
                     date_trunc('week', wd.start_date::date)::date  AS start_date,
                     (date_trunc('week', wd.start_date::date)  + interval '4 days')::date AS end_date,
                     cp.ticker AS ticker
                 FROM weekly_dates wd
                 JOIN cumulative_prices cp ON cp.start_date = wd.start_date
-                GROUP BY wd.start_date, cp.ticker
-                ORDER BY cp.ticker, wd.start_date DESC
                 ON CONFLICT (ticker, start_date)
                 DO UPDATE SET
                 	high = EXCLUDED.high,
