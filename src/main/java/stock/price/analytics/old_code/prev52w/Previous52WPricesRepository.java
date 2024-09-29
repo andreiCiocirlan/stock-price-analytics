@@ -1,4 +1,4 @@
-package stock.price.analytics.old_code;
+package stock.price.analytics.old_code.prev52w;
 
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;

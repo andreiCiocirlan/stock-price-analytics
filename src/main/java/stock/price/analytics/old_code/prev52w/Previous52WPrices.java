@@ -1,4 +1,4 @@
-package stock.price.analytics.old_code;
+package stock.price.analytics.old_code.prev52w;
 
 import jakarta.persistence.*;
 import lombok.Getter;
