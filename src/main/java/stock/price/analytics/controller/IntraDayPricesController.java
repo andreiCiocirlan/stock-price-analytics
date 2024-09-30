@@ -12,6 +12,7 @@ import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 import stock.price.analytics.repository.prices.PriceOHLCRepository;
 import stock.price.analytics.service.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static stock.price.analytics.util.TradingDateUtil.tradingDateImported;
@@ -55,11 +56,10 @@ public class IntraDayPricesController {
             refreshMaterializedViewsService.refreshMaterializedViews();
 
             // high/low price update based on weekly perf view (refreshed before)
-            highLowForPeriodService.saveCurrentWeekHighLowPrices(dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList(),
-                    tradingDateImported(dailyImportedPrices));
-            refreshMaterializedViewsService.refreshLatestHighLowView();
-            // latest high low materialized view refreshed -> update stocks also
-            stockService.updateStocksHighLow();
+            LocalDate tradingDate = tradingDateImported(dailyImportedPrices);
+            List<String> tickers = dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList();
+            highLowForPeriodService.saveCurrentWeekHighLowPrices(tickers, tradingDate);
+            stockService.updateStocksHighLow(tradingDate);
         }
     }
 
@@ -80,11 +80,10 @@ public class IntraDayPricesController {
             refreshMaterializedViewsService.refreshMaterializedViews();
 
             // high/low price update based on weekly perf view (refreshed before)
-            highLowForPeriodService.saveCurrentWeekHighLowPrices(dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList(),
-                    tradingDateImported(dailyImportedPrices));
-            refreshMaterializedViewsService.refreshLatestHighLowView();
-            // latest high low materialized view refreshed -> update stocks also
-            stockService.updateStocksHighLow();
+            LocalDate tradingDate = tradingDateImported(dailyImportedPrices);
+            List<String> tickers = dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList();
+            highLowForPeriodService.saveCurrentWeekHighLowPrices(tickers, tradingDate);
+            stockService.updateStocksHighLow(tradingDate);
         }
         return dailyImportedPrices;
     }

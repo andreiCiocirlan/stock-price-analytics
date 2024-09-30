@@ -101,18 +101,68 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
 
     @Modifying
     @Query(value = """
-            UPDATE stocks s
-            SET
-                high4w = l.high4w,
-                high52w = l.high52w,
-                highest = l.highest,
-                low4w = l.low4w,
-                low52w = l.low52w,
-                lowest = l.lowest
-            FROM latest_high_low l
-            WHERE s.ticker = l.ticker;
+            WITH hl_prices AS (
+            			SELECT
+            				hl52.ticker,
+            				hl52.high AS high52w_high,
+            				hl52.low AS low52w_low,
+            				NULL::double precision AS high4w_high,
+            				NULL::double precision AS low4w_low,
+            				NULL::double precision AS highest_high,
+            				NULL::double precision AS lowest_low
+            			FROM high_low52w hl52
+            			WHERE start_date = CAST(:tradingDate AS DATE)
+            
+            			UNION ALL
+            
+            			SELECT
+            				hl4.ticker,
+            				NULL::double precision AS high52w_high,
+            				NULL::double precision AS low52w_low,
+            				hl4.high AS high4w_high,
+            				hl4.low AS low4w_low,
+            				NULL::double precision AS highest_high,
+            				NULL::double precision AS lowest_low
+            			FROM high_low4w hl4
+            			WHERE start_date = CAST(:tradingDate AS DATE)
+            
+            			UNION ALL
+            
+            			SELECT
+            				hl.ticker,
+            				NULL::double precision AS high52w_high,
+            				NULL::double precision AS low52w_low,
+            				NULL::double precision AS high4w_high,
+            				NULL::double precision AS low4w_low,
+            				hl.high AS highest_high,
+            				hl.low AS lowest_low
+            			FROM highest_lowest hl
+            			WHERE start_date = CAST(:tradingDate AS DATE)
+            		),
+            		merged_result as (
+            			SELECT
+            				ticker,
+            				MAX(highest_high) AS highest,
+            				MAX(high52w_high) AS high52w,
+            				MAX(high4w_high) AS high4w,
+            				MIN(lowest_low) AS lowest,
+            				MIN(low52w_low) AS low52w,
+            				MIN(low4w_low) AS low4w
+            			FROM hl_prices
+            			GROUP BY ticker
+            		)
+                    UPDATE stocks s
+            		SET
+            			high4w = l.high4w,
+            			high52w = l.high52w,
+            			highest = l.highest,
+            			low4w = l.low4w,
+            			low52w = l.low52w,
+            			lowest = l.lowest
+            		FROM merged_result l
+            		WHERE s.ticker = l.ticker;
             """, nativeQuery = true)
-    void updateStocksHighLow();
+    void updateStocksHighLow(LocalDate tradingDate);
 
     @Modifying
     @Query(value = """

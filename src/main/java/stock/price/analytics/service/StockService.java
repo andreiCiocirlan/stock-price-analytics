@@ -74,8 +74,8 @@ public class StockService {
     }
 
     @Transactional
-    public void updateStocksHighLow() {
-        logElapsedTime(stockRepository::updateStocksHighLow, "updated stocks high low 4w, 52w, all-time");
+    public void updateStocksHighLow(LocalDate tradingDate) {
+        logElapsedTime(() -> stockRepository.updateStocksHighLow(tradingDate), "updated stocks high low 4w, 52w, all-time");
     }
 
 }
