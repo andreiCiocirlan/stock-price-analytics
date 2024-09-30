@@ -19,8 +19,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -91,26 +93,35 @@ public class HighLowForPeriodService {
     private void saveHighLowPrices(List<String> tickers, LocalDate tradingDate, boolean allHistoricalPrices) {
         for (HighLowPeriod highLowPeriod : values()) {
             String tickersFormatted = tickers.stream().map(ticker -> STR."'\{ticker}'").collect(Collectors.joining(", "));
-            String tradingDateFormatted = tradingDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
 
-            String query = queryHighLowPricesFor(highLowPeriod, tradingDateFormatted, tickersFormatted, allHistoricalPrices);
+            String query = queryHighLowPricesFor(highLowPeriod, tradingDate, tickersFormatted, allHistoricalPrices);
             int savedOrUpdatedCount = entityManager.createNativeQuery(query).executeUpdate();
             if (savedOrUpdatedCount != 0) {
-                log.warn("saved/updated {} rows for {} and date {}", savedOrUpdatedCount, tableNameFrom(highLowPeriod), tradingDateFormatted);
+                log.warn("saved/updated {} rows for {} and date {}", savedOrUpdatedCount, tableNameFrom(highLowPeriod), tradingDate);
             }
         }
     }
 
-    private String queryHighLowPricesFor(HighLowPeriod period, String date, String tickers, boolean allHistoricalPrices) {
-        String interval = intervalPrecedingFrom(period);
+    private String queryHighLowPricesFor(HighLowPeriod period, LocalDate tradingDate, String tickers, boolean allHistoricalPrices) {
+        String date = tradingDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
         String sequenceName = sequenceNameFrom(period);
         String tableName = tableNameFrom(period);
+        String interval = intervalPrecedingFrom(period);
+
+        if (!allHistoricalPrices) {
+            if (HIGH_LOW_ALL_TIME == period) {
+                return queryHighestLowestPricesCurrentWeek(date, tickers, sequenceName);
+            }
+            if (HIGH_LOW_52W == period || HIGH_LOW_4W == period) {
+                // monday to prevent using date_trunc which is overhead for the query
+                String monday = tradingDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).format(DateTimeFormatter.ISO_LOCAL_DATE);
+                return queryHighLow52wOr4wPricesCurrentWeek(tableName, interval, monday, tickers, sequenceName);
+            }
+        }
         String cumulativeWhereClause = allHistoricalPrices ? "1=1" : whereClauseFrom(period, date);
         String allTimeHistoricalInterval = allHistoricalPrices ? "- (GENERATE_SERIES(0, 3500) * INTERVAL '1 week')" : "";
 
-        if (HIGH_LOW_ALL_TIME == period && !allHistoricalPrices)
-            return queryHighestLowestPricesCurrentWeek(date, tickers, sequenceName);
-
+        // entire historical prices update
         return STR."""
                 WITH weekly_dates AS (
                 	SELECT DATE_TRUNC('week', '\{date}'::date) \{allTimeHistoricalInterval} AS start_date
@@ -135,6 +146,35 @@ public class HighLowForPeriodService {
                     cp.ticker AS ticker
                 FROM weekly_dates wd
                 JOIN cumulative_prices cp ON cp.start_date = wd.start_date
+                ON CONFLICT (ticker, start_date)
+                DO UPDATE SET
+                	high = EXCLUDED.high,
+                	low = EXCLUDED.low;
+                """;
+    }
+
+    private String queryHighLow52wOr4wPricesCurrentWeek(String tableName, String interval, String date, String tickers, String sequenceName) {
+        return STR."""
+                WITH hl_for_period AS (
+                	SELECT
+                		wp.ticker,
+                		MAX(wp.high) as high,
+                		MIN(wp.low) as low
+                	FROM weekly_prices wp
+                	WHERE wp.start_date >= '\{date}'::date - INTERVAL '\{interval} week'
+                	    and ticker not in (select ticker from stocks where delisted_date is not null)
+                	    and ticker in (\{tickers})
+                	group by wp.ticker
+                )
+                INSERT INTO \{tableName} (id, high, low, start_date, end_date, ticker)
+                SELECT
+                	nextval('\{sequenceName}') AS id,
+                	hlp.high,
+                    hlp.low,
+                    date_trunc('week', '\{date}'::date)::date  AS start_date,
+                    (date_trunc('week', '\{date}'::date)  + interval '4 days')::date AS end_date,
+                    hlp.ticker
+                FROM hl_for_period hlp
                 ON CONFLICT (ticker, start_date)
                 DO UPDATE SET
                 	high = EXCLUDED.high,
