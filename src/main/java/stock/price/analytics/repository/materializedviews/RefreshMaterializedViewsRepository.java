@@ -50,8 +50,4 @@ public interface RefreshMaterializedViewsRepository extends JpaRepository<Abstra
     @Query(value = "REFRESH MATERIALIZED VIEW prev_two_years", nativeQuery = true)
     void refreshPrevTwoYears();
 
-    @Modifying
-    @Transactional
-    @Query(value = "REFRESH MATERIALIZED VIEW latest_high_low", nativeQuery = true)
-    void refreshLatestHighLow();
 }
