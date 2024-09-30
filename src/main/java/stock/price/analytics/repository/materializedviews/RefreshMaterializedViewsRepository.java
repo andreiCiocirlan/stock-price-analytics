@@ -1,6 +1,5 @@
 package stock.price.analytics.repository.materializedviews;
 
-import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -11,42 +10,34 @@ import stock.price.analytics.model.prices.ohlc.AbstractPriceOHLC;
 public interface RefreshMaterializedViewsRepository extends JpaRepository<AbstractPriceOHLC, Long> {
 
     @Modifying
-    @Transactional
     @Query(value = "REFRESH MATERIALIZED VIEW daily_prices_performance_view", nativeQuery = true)
     void refreshDailyPerformanceHeatmapPrices();
 
     @Modifying
-    @Transactional
     @Query(value = "REFRESH MATERIALIZED VIEW weekly_prices_performance_view", nativeQuery = true)
     void refreshWeeklyPerformanceHeatmapPrices();
 
     @Modifying
-    @Transactional
     @Query(value = "REFRESH MATERIALIZED VIEW monthly_prices_performance_view", nativeQuery = true)
     void refreshMonthlyPerformanceHeatmapPrices();
 
     @Modifying
-    @Transactional
     @Query(value = "REFRESH MATERIALIZED VIEW yearly_prices_performance_view", nativeQuery = true)
     void refreshYearlyPerformanceHeatmapPrices();
 
     @Modifying
-    @Transactional
     @Query(value = "REFRESH MATERIALIZED VIEW latest_prices_view", nativeQuery = true)
     void refreshLatestPrices();
 
     @Modifying
-    @Transactional
     @Query(value = "REFRESH MATERIALIZED VIEW prev_two_weeks", nativeQuery = true)
     void refreshPrevTwoWeeks();
 
     @Modifying
-    @Transactional
     @Query(value = "REFRESH MATERIALIZED VIEW prev_two_months", nativeQuery = true)
     void refreshPrevTwoMonths();
 
     @Modifying
-    @Transactional
     @Query(value = "REFRESH MATERIALIZED VIEW prev_two_years", nativeQuery = true)
     void refreshPrevTwoYears();
 

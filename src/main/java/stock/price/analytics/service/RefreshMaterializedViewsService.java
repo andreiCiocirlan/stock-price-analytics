@@ -14,6 +14,7 @@ public class RefreshMaterializedViewsService {
 
     private final RefreshMaterializedViewsRepository refreshMaterializedViewsRepository;
 
+    @Transactional
     public void refreshMaterializedViews() {
         refreshPreviousHighTimeframePrices();
         refreshLatestAndPerformanceHeatmapPrices();
