@@ -1,5 +1,6 @@
 package stock.price.analytics.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class RefreshMaterializedViewsService {
     }
 
     private void refreshPreviousHighTimeframePrices() {
-        logElapsedTime(refreshMaterializedViewsRepository::refreshPrevTwoWeeks, "refreshed prev two weeks prices");
+        logElapsedTime(refreshMaterializedViewsRepository::refreshPrevThreeWeeks, "refreshed prev three weeks prices");
         logElapsedTime(refreshMaterializedViewsRepository::refreshPrevTwoMonths, "refreshed prev two months prices");
         logElapsedTime(refreshMaterializedViewsRepository::refreshPrevTwoYears, "refreshed prev two years prices");
     }
