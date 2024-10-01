@@ -19,8 +19,10 @@ public interface PriceOHLCRepository extends JpaRepository<AbstractPriceOHLC, Lo
 
     @Query(value = """
                 SELECT *
-                FROM prev_three_weeks
-                WHERE ticker in (:tickers)
+                FROM weekly_prices
+                WHERE start_date BETWEEN (DATE_TRUNC('week', CURRENT_DATE) - INTERVAL '2 week') AND CURRENT_DATE
+                AND ticker in (:tickers)
+                ORDER BY ticker, start_date DESC
             """, nativeQuery = true)
     List<WeeklyPriceOHLC> findPreviousThreeWeeksPricesForTickers(@Param("tickers") List<String> tickers);
 
@@ -31,11 +33,13 @@ public interface PriceOHLCRepository extends JpaRepository<AbstractPriceOHLC, Lo
     List<WeeklyPriceOHLC> findWeeklyByTickerAndStartDate(String ticker, LocalDate date);
 
     @Query(value = """
-            SELECT *
-            FROM prev_two_months
-            WHERE ticker in (:tickers)
+                SELECT *
+                FROM monthly_prices
+                WHERE start_date BETWEEN (DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '2 week') AND CURRENT_DATE
+                AND ticker in (:tickers)
+                ORDER BY ticker, start_date DESC
             """, nativeQuery = true)
-    List<MonthlyPriceOHLC> findPreviousTwoMonthlyPricesForTickers(@Param("tickers") List<String> tickers);
+    List<MonthlyPriceOHLC> findPreviousThreeMonthlyPricesForTickers(@Param("tickers") List<String> tickers);
 
     @Query("SELECT m FROM MonthlyPriceOHLC m WHERE m.ticker = :ticker AND m.startDate < :date")
     List<MonthlyPriceOHLC> findMonthlyByTickerAndStartDateBefore(String ticker, LocalDate date);
@@ -44,11 +48,13 @@ public interface PriceOHLCRepository extends JpaRepository<AbstractPriceOHLC, Lo
     List<MonthlyPriceOHLC> findMonthlyByTickerAndStartDate(String ticker, LocalDate date);
 
     @Query(value = """
-            SELECT *
-            FROM prev_two_years
-            WHERE ticker in (:tickers)
+                SELECT *
+                FROM yearly_prices
+                WHERE start_date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '2 week') AND CURRENT_DATE
+                AND ticker in (:tickers)
+                ORDER BY ticker, start_date DESC
             """, nativeQuery = true)
-    List<YearlyPriceOHLC> findPreviousTwoYearlyPricesForTickers(@Param("tickers") List<String> tickers);
+    List<YearlyPriceOHLC> findPreviousThreeYearlyPricesForTickers(@Param("tickers") List<String> tickers);
 
     @Query("SELECT y FROM YearlyPriceOHLC y WHERE y.ticker = :ticker AND y.startDate < :date")
     List<YearlyPriceOHLC> findYearlyByTickerAndStartDateBefore(String ticker, LocalDate date);

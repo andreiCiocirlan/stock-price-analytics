@@ -57,8 +57,8 @@ public class PriceOHLCService {
 
         // Fetch previous prices for each timeframe
         List<WeeklyPriceOHLC> previousTwoWeeklyPrices = getPreviousTwoWeeklyPrices(tickers);
-        List<MonthlyPriceOHLC> previousTwoMonthlyPrices = priceOHLCRepository.findPreviousTwoMonthlyPricesForTickers(tickers);
-        List<YearlyPriceOHLC> previousTwoYearlyPrices = priceOHLCRepository.findPreviousTwoYearlyPricesForTickers(tickers);
+        List<MonthlyPriceOHLC> previousTwoMonthlyPrices = getPreviousTwoMonthlyPrices(tickers);
+        List<YearlyPriceOHLC> previousTwoYearlyPrices = getPreviousTwoYearlyPrices(tickers);
 
         // Update prices for each timeframe
         updateAndSavePrices(importedDailyPrices, WEEKLY, previousTwoWeeklyPrices);
@@ -74,6 +74,25 @@ public class PriceOHLCService {
                 .flatMap(prices -> prices.stream().limit(2))
                 .toList();
     }
+
+    private List<MonthlyPriceOHLC> getPreviousTwoMonthlyPrices(List<String> tickers) {
+        return priceOHLCRepository.findPreviousThreeMonthlyPricesForTickers(tickers)
+                .stream()
+                .collect(Collectors.groupingBy(MonthlyPriceOHLC::getTicker))
+                .values().stream()
+                .flatMap(prices -> prices.stream().limit(2))
+                .toList();
+    }
+
+    private List<YearlyPriceOHLC> getPreviousTwoYearlyPrices(List<String> tickers) {
+        return priceOHLCRepository.findPreviousThreeYearlyPricesForTickers(tickers)
+                .stream()
+                .collect(Collectors.groupingBy(YearlyPriceOHLC::getTicker))
+                .values().stream()
+                .flatMap(prices -> prices.stream().limit(2))
+                .toList();
+    }
+
 
     private void updateAndSavePrices(List<DailyPriceOHLC> importedDailyPrices,
                                                                    StockTimeframe timeframe,

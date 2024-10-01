@@ -17,7 +17,6 @@ public class RefreshMaterializedViewsService {
 
     @Transactional
     public void refreshMaterializedViews() {
-        refreshPreviousHighTimeframePrices();
         refreshLatestAndPerformanceHeatmapPrices();
     }
 
@@ -27,12 +26,6 @@ public class RefreshMaterializedViewsService {
         logElapsedTime(refreshMaterializedViewsRepository::refreshWeeklyPerformanceHeatmapPrices, "refreshed weekly performance prices");
         logElapsedTime(refreshMaterializedViewsRepository::refreshMonthlyPerformanceHeatmapPrices, "refreshed monthly performance prices");
         logElapsedTime(refreshMaterializedViewsRepository::refreshYearlyPerformanceHeatmapPrices, "refreshed yearly performance prices");
-    }
-
-    private void refreshPreviousHighTimeframePrices() {
-        logElapsedTime(refreshMaterializedViewsRepository::refreshPrevThreeWeeks, "refreshed prev three weeks prices");
-        logElapsedTime(refreshMaterializedViewsRepository::refreshPrevTwoMonths, "refreshed prev two months prices");
-        logElapsedTime(refreshMaterializedViewsRepository::refreshPrevTwoYears, "refreshed prev two years prices");
     }
 
 }
