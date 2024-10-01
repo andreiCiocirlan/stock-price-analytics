@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 
 @Entity
 @Table(name = "weekly_prices")
@@ -27,13 +29,13 @@ public class WeeklyPriceOHLC extends AbstractPriceOHLC {
 
     public WeeklyPriceOHLC(String ticker, LocalDate startDate, LocalDate endDate, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
-        this.startDate = startDate;
+        this.startDate = startDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         this.endDate = endDate;
     }
 
     public WeeklyPriceOHLC(String ticker, LocalDate startDate, LocalDate endDate, double performance, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
-        this.startDate = startDate;
+        this.startDate = startDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         this.endDate = endDate;
         this.setPerformance(performance);
     }

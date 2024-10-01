@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 
 @Entity
 @Table(name = "monthly_prices")
@@ -27,7 +28,7 @@ public class MonthlyPriceOHLC extends AbstractPriceOHLC {
 
     public MonthlyPriceOHLC(String ticker, LocalDate startDate, LocalDate endDate, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
-        this.startDate = startDate;
+        this.startDate = startDate.with(TemporalAdjusters.firstDayOfMonth());
         this.endDate = endDate;
     }
 
