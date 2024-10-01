@@ -111,7 +111,7 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
             				NULL::double precision AS highest_high,
             				NULL::double precision AS lowest_low
             			FROM high_low52w hl52
-            			WHERE start_date = CAST(:tradingDate AS DATE)
+            			WHERE start_date = DATE_TRUNC('week', CAST(:tradingDate AS DATE))
             
             			UNION ALL
             
@@ -124,7 +124,7 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
             				NULL::double precision AS highest_high,
             				NULL::double precision AS lowest_low
             			FROM high_low4w hl4
-            			WHERE start_date = CAST(:tradingDate AS DATE)
+            			WHERE start_date = DATE_TRUNC('week', CAST(:tradingDate AS DATE))
             
             			UNION ALL
             
@@ -137,7 +137,7 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
             				hl.high AS highest_high,
             				hl.low AS lowest_low
             			FROM highest_lowest hl
-            			WHERE start_date = CAST(:tradingDate AS DATE)
+            			WHERE start_date = DATE_TRUNC('week', CAST(:tradingDate AS DATE))
             		),
             		merged_result as (
             			SELECT
