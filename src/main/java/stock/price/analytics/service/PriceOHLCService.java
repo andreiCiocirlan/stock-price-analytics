@@ -35,8 +35,8 @@ public class PriceOHLCService {
     private final PriceOHLCRepository priceOHLCRepository;
 
     public List<CandleOHLCWithDateDTO> findOHLCFor(String ticker, StockTimeframe timeframe) {
-        String tableNameOHLC = StockTimeframe.dbTableOHLCFrom(timeframe);
-        String orderByIdField = timeframe == StockTimeframe.DAILY ? "date" : "start_date";
+        String tableNameOHLC = dbTableOHLCFrom(timeframe);
+        String orderByIdField = timeframe == DAILY ? "date" : "start_date";
         String queryStr = STR."SELECT \{orderByIdField}, open, high, low, close FROM \{tableNameOHLC} WHERE ticker = :ticker ORDER BY \{orderByIdField} ASC";
 
         Query nativeQuery = entityManager.createNativeQuery(queryStr, CandleOHLCWithDateDTO.class);
@@ -61,9 +61,9 @@ public class PriceOHLCService {
         List<YearlyPriceOHLC> previousTwoYearlyPrices = priceOHLCRepository.findPreviousTwoYearlyPricesForTickers(tickers);
 
         // Update prices for each timeframe
-        updateAndSavePrices(importedDailyPrices, StockTimeframe.WEEKLY, previousTwoWeeklyPrices);
-        updateAndSavePrices(importedDailyPrices, StockTimeframe.MONTHLY, previousTwoMonthlyPrices);
-        updateAndSavePrices(importedDailyPrices, StockTimeframe.YEARLY, previousTwoYearlyPrices);
+        updateAndSavePrices(importedDailyPrices, WEEKLY, previousTwoWeeklyPrices);
+        updateAndSavePrices(importedDailyPrices, MONTHLY, previousTwoMonthlyPrices);
+        updateAndSavePrices(importedDailyPrices, YEARLY, previousTwoYearlyPrices);
     }
 
     private List<WeeklyPriceOHLC> getPreviousTwoWeeklyPrices(List<String> tickers) {
@@ -112,7 +112,8 @@ public class PriceOHLCService {
         } else {
             result = switch (timeframe) {
                 case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
-                case WEEKLY, MONTHLY, YEARLY -> updateOrCreateWMYPrice(previousTwoWMY, dailyPrice, latestEndDateWMY, timeframe);
+                case WEEKLY, MONTHLY, YEARLY ->
+                        updateOrCreateWMYPrice(previousTwoWMY, dailyPrice, latestEndDateWMY, timeframe);
             };
         }
         return result;
@@ -162,7 +163,7 @@ public class PriceOHLCService {
 
     @Transactional
     public void updateAllHigherTimeframesPricesForTickers(LocalDate date, String tickers) {
-        updateHigherTimeframesPricesFor(date, StockTimeframe.higherTimeframes(), tickers);
+        updateHigherTimeframesPricesFor(date, higherTimeframes(), tickers);
     }
 
     @Transactional
