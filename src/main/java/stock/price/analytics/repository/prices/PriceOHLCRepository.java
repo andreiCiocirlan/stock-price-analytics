@@ -35,7 +35,7 @@ public interface PriceOHLCRepository extends JpaRepository<AbstractPriceOHLC, Lo
     @Query(value = """
                 SELECT *
                 FROM monthly_prices
-                WHERE start_date BETWEEN (DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '2 week') AND CURRENT_DATE
+                WHERE start_date BETWEEN (DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '2 month') AND CURRENT_DATE
                 AND ticker in (:tickers)
                 ORDER BY ticker, start_date DESC
             """, nativeQuery = true)
@@ -50,7 +50,7 @@ public interface PriceOHLCRepository extends JpaRepository<AbstractPriceOHLC, Lo
     @Query(value = """
                 SELECT *
                 FROM yearly_prices
-                WHERE start_date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '2 week') AND CURRENT_DATE
+                WHERE start_date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '2 year') AND CURRENT_DATE
                 AND ticker in (:tickers)
                 ORDER BY ticker, start_date DESC
             """, nativeQuery = true)
