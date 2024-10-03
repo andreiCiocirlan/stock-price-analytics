@@ -46,7 +46,11 @@ public class YahooQuoteService {
     private String CRUMB_COOKIE = "";
 
     public List<DailyPriceOHLC> dailyPricesFromFile(String fileName) {
-        return yahooFinanceClient.dailyPricesFromFile(fileName);
+        List<DailyPriceOHLC> dailyPriceOHLCs = yahooFinanceClient.dailyPricesFromFile(fileName);
+        LocalDate minTradingDate = tradingDateNow().minusDays(5); // max 5 calendar days in the past for previous intraDay prices to be found
+        List<DailyPriceOHLC> latestByTicker = dailyPriceOHLCService.findXTBLatestByTickerWithDateAfter(minTradingDate);
+        return dailyPriceOHLCService.getDailyImportedPrices(dailyPriceOHLCs, latestByTicker.stream()
+                .collect(Collectors.toMap(DailyPriceOHLC::getTicker, p -> p)));
     }
 
     public List<DailyPriceOHLC> dailyPricesImport() {
