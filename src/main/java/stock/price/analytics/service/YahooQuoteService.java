@@ -41,6 +41,7 @@ public class YahooQuoteService {
     private static final int MAX_RETRIES_CRUMB = 5;
     private final YahooFinanceClient yahooFinanceClient;
     private final DailyPriceOHLCService dailyPriceOHLCService;
+    private final PriceOHLCService priceOHLCService;
     private int RETRY_COUNT_CRUMB = 0;
     private String COOKIE_FC_YAHOO = "";
     private String CRUMB_COOKIE = "";
@@ -93,7 +94,7 @@ public class YahooQuoteService {
         }
 
         if (!preMarketOnly || dailyImportedPrices.isEmpty()) { // only save if intraday prices, for pre-market only display
-            dailyPriceOHLCService.saveDailyPrices(dailyImportedPrices);
+            priceOHLCService.savePrices(dailyImportedPrices);
         }
 
         if (!tickersImported.isEmpty()) {

@@ -28,7 +28,6 @@ public class IntraDayPricesController {
     private final FinnhubClient finnhubClient;
     private final PriceOHLCRepository priceOHLCRepository;
     private final PriceOHLCService priceOHLCService;
-    private final DailyPriceOHLCService dailyPriceOHLCService;
     private final HighLowForPeriodService highLowForPeriodService;
     private final RefreshMaterializedViewsService refreshMaterializedViewsService;
     private final StockService stockService;
@@ -75,7 +74,7 @@ public class IntraDayPricesController {
     public List<DailyPriceOHLC> yahooPricesImportFromFile(@RequestParam("fileName") String fileName) {
         List<DailyPriceOHLC> dailyImportedPrices = yahooQuoteService.dailyPricesFromFile(fileName);
         if (!dailyImportedPrices.isEmpty()) {
-            dailyPriceOHLCService.saveDailyPrices(dailyImportedPrices);
+            priceOHLCService.savePrices(dailyImportedPrices);
             priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
             stockService.updateStocksDate(dailyImportedPrices);
             // daily performance view based on stock last_updated (keep this order)

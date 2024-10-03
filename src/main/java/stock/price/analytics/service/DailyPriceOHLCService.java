@@ -64,8 +64,4 @@ public class DailyPriceOHLCService {
                 || dailyPrice.getPerformance() != latestPrice.getPerformance();
     }
 
-    public void saveDailyPrices(List<DailyPriceOHLC> dailyImportedPrices) {
-        dailyPriceOHLCRepository.saveAll(dailyImportedPrices);
-    }
-
 }

@@ -267,4 +267,9 @@ public class PriceOHLCService {
 
         return query;
     }
+
+    @Transactional
+    public void savePrices(List<? extends AbstractPriceOHLC> prices) {
+        priceOHLCRepository.saveAll(prices);
+    }
 }
