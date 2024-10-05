@@ -10,14 +10,17 @@ import stock.price.analytics.service.StockService;
 import java.io.IOException;
 import java.util.List;
 
+import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
+
 @RestController
+@RequestMapping("/stocks")
 @RequiredArgsConstructor
 public class StockController {
 
     private final StockService stockService;
     private final StockRepository stockRepository;
 
-    @PostMapping("/save_stocks")
+    @PostMapping("/save_all")
     @ResponseStatus(HttpStatus.OK)
     public void saveStocksInDB() throws IOException {
         stockService.saveStocks();
@@ -32,10 +35,16 @@ public class StockController {
         stockService.saveStocks(tickers, Boolean.TRUE.equals(xtbStock), Boolean.TRUE.equals(shortSell), xtb_cfdMargin);
     }
 
-    @GetMapping("/stocks")
+    @GetMapping("/")
     @ResponseStatus(HttpStatus.OK)
     public List<Stock> getStocks() {
         return stockRepository.findAll();
     }
+
+    @PutMapping("/update-high-low")
+    public void updateStocksHighLow() {
+        stockService.updateStocksHighLow(tradingDateNow());
+    }
+
 
 }
