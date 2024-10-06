@@ -102,8 +102,6 @@ public class PriceOHLCService {
 
         List<AbstractPriceOHLC> updatedPrices = updatePricesAndPerformance(importedDailyPrices, timeframe, previousPricesByTicker);
         priceOHLCRepository.saveAll(updatedPrices);
-
-        log.info("updated {} {} prices", updatedPrices.size(), timeframe.name().toLowerCase());
     }
 
     private List<AbstractPriceOHLC> updatePricesAndPerformance(List<DailyPriceOHLC> dailyPrices, StockTimeframe timeframe, Map<String, List<AbstractPriceOHLC>> previousTwoWMYPricesByTicker) {
