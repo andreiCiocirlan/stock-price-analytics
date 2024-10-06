@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.repository.materializedviews.RefreshMaterializedViewsRepository;
 
-import static stock.price.analytics.util.LoggingUtil.logElapsedTime;
+import static stock.price.analytics.util.LoggingUtil.logTime;
 
 @Slf4j
 @Service
@@ -21,11 +21,11 @@ public class RefreshMaterializedViewsService {
     }
 
     private void refreshLatestAndPerformanceHeatmapPrices() {
-        logElapsedTime(refreshMaterializedViewsRepository::refreshLatestPrices, "refreshed latest prices");
-        logElapsedTime(refreshMaterializedViewsRepository::refreshDailyPerformanceHeatmapPrices, "refreshed daily performance prices");
-        logElapsedTime(refreshMaterializedViewsRepository::refreshWeeklyPerformanceHeatmapPrices, "refreshed weekly performance prices");
-        logElapsedTime(refreshMaterializedViewsRepository::refreshMonthlyPerformanceHeatmapPrices, "refreshed monthly performance prices");
-        logElapsedTime(refreshMaterializedViewsRepository::refreshYearlyPerformanceHeatmapPrices, "refreshed yearly performance prices");
+        logTime(refreshMaterializedViewsRepository::refreshLatestPrices, "refreshed latest prices");
+        logTime(refreshMaterializedViewsRepository::refreshDailyPerformanceHeatmapPrices, "refreshed daily performance prices");
+        logTime(refreshMaterializedViewsRepository::refreshWeeklyPerformanceHeatmapPrices, "refreshed weekly performance prices");
+        logTime(refreshMaterializedViewsRepository::refreshMonthlyPerformanceHeatmapPrices, "refreshed monthly performance prices");
+        logTime(refreshMaterializedViewsRepository::refreshYearlyPerformanceHeatmapPrices, "refreshed yearly performance prices");
     }
 
 }

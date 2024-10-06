@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
-import static stock.price.analytics.util.LoggingUtil.logElapsedTime;
+import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.StockDateUtils.*;
 
 
@@ -49,7 +49,7 @@ public class PriceOHLCService {
     }
 
     public void updatePricesForHigherTimeframes(List<DailyPriceOHLC> importedDailyPrices) {
-        logElapsedTime(() -> updateHTF(importedDailyPrices), "updated prices for higher timeframes");
+        logTime(() -> updateHTF(importedDailyPrices), "updated prices for higher timeframes");
     }
 
     private void updateHTF(List<DailyPriceOHLC> importedDailyPrices) {
