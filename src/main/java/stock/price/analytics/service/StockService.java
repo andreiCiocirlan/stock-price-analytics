@@ -75,7 +75,8 @@ public class StockService {
 
     @Transactional
     public void updateStocksHighLow(LocalDate tradingDate) {
-        logTime(() -> stockRepository.updateStocksHighLow(tradingDate), "updated stocks high low 4w, 52w, all-time");
+        logTime(() -> stockRepository.updateStocksHighLow(tradingDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))),
+                "updated stocks high low 4w, 52w, all-time");
     }
 
 }
