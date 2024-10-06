@@ -92,14 +92,15 @@ public class HighLowForPeriodService {
 
     private void saveHighLowPrices(List<String> tickers, LocalDate tradingDate, boolean allHistoricalPrices) {
         for (HighLowPeriod highLowPeriod : values()) {
-            String tickersFormatted = tickers.stream().map(ticker -> STR."'\{ticker}'").collect(Collectors.joining(", "));
-
-            String query = queryHighLowPricesFor(highLowPeriod, tradingDate, tickersFormatted, allHistoricalPrices);
-            int savedOrUpdatedCount = entityManager.createNativeQuery(query).executeUpdate();
-            if (savedOrUpdatedCount != 0) {
-                log.warn("saved/updated {} rows for {} and date {}", savedOrUpdatedCount, tableNameFrom(highLowPeriod), tradingDate);
-            }
+            String msg = String.format("saved %d %s rows for %s", tickers.size(), tableNameFrom(highLowPeriod), tradingDate);
+            logTime(() -> executeQueryHLPricesForPeriod(tickers, tradingDate, allHistoricalPrices, highLowPeriod), msg);
         }
+    }
+
+    private void executeQueryHLPricesForPeriod(List<String> tickers, LocalDate tradingDate, boolean allHistoricalPrices, HighLowPeriod highLowPeriod) {
+        String tickersFormatted = tickers.stream().map(ticker -> STR."'\{ticker}'").collect(Collectors.joining(", "));
+        String query = queryHighLowPricesFor(highLowPeriod, tradingDate, tickersFormatted, allHistoricalPrices);
+        entityManager.createNativeQuery(query).executeUpdate();
     }
 
     private String queryHighLowPricesFor(HighLowPeriod period, LocalDate tradingDate, String tickers, boolean allHistoricalPrices) {
