@@ -15,6 +15,7 @@ import stock.price.analytics.service.*;
 import java.time.LocalDate;
 import java.util.List;
 
+import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateImported;
 
 
@@ -48,7 +49,7 @@ public class IntraDayPricesController {
     @Transactional
     @GetMapping("/yahoo-prices/intraday")
     public void yahooPricesImport() {
-        List<DailyPriceOHLC> dailyImportedPrices = yahooQuoteService.dailyPricesImport();
+        List<DailyPriceOHLC> dailyImportedPrices = logTimeAndReturn(yahooQuoteService::dailyPricesImport, "imported daily prices");
         if (!dailyImportedPrices.isEmpty()) {
             priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
             stockService.updateStocksDate(dailyImportedPrices);
@@ -71,7 +72,7 @@ public class IntraDayPricesController {
     @Transactional
     @GetMapping("/yahoo-prices/from-file")
     public List<DailyPriceOHLC> yahooPricesImportFromFile(@RequestParam("fileName") String fileName) {
-        List<DailyPriceOHLC> dailyImportedPrices = yahooQuoteService.dailyPricesFromFile(fileName);
+        List<DailyPriceOHLC> dailyImportedPrices = logTimeAndReturn(() -> yahooQuoteService.dailyPricesFromFile(fileName), "imported daily prices");
         if (!dailyImportedPrices.isEmpty()) {
             priceOHLCService.savePrices(dailyImportedPrices);
             priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
