@@ -42,6 +42,18 @@
                         <option value="0.5">2:1</option>
                     </select>
                 </div>
+                <div class="select-item m-2">
+                    <label for="priceMilestone">Milestone</label>
+                    <select class="form-control" id="priceMilestone" onchange="dispatchTimeFrameChangeEvent()">
+                        <option value="NONE">NONE</option>
+                        <option value="NEW_4W_HIGH">NEW_4W_HIGH</option>
+                        <option value="NEW_52W_HIGH">NEW_52W_HIGH</option>
+                        <option value="NEW_ALL_TIME_HIGH">NEW_ALL_TIME_HIGH</option>
+                        <option value="NEW_4W_LOW">NEW_4W_LOW</option>
+                        <option value="NEW_52W_LOW">NEW_52W_LOW</option>
+                        <option value="NEW_ALL_TIME_LOW">NEW_ALL_TIME_LOW</option>
+                    </select>
+                </div>
                 <div class="time-frame-label-container">
                     <div id="timeFrameGroup" class="time-frame-button-group">
                         <button class="btn btn-primary" onclick="handleTimeFrameButtonClick('DAILY')">Daily</button>

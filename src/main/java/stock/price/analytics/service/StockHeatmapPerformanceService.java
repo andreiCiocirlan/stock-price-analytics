@@ -10,6 +10,7 @@ import stock.price.analytics.controller.dto.StockPerformanceDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.prices.enums.StockTimeframe.dbTablePerfHeatmapFrom;
 
@@ -21,8 +22,8 @@ public class StockHeatmapPerformanceService {
     @PersistenceContext
     private final EntityManager entityManager;
 
-    public List<StockPerformanceDTO> stockPerformanceForDateAndTimeframeAndFilters(StockTimeframe timeFrame, Boolean xtb, Boolean positivePerfFirst, Integer limit, Double cfdMargin) {
-        String queryStr = queryFrom(timeFrame, positivePerfFirst, limit, xtb, cfdMargin);
+    public List<StockPerformanceDTO> stockPerformanceForDateAndTimeframeAndFilters(StockTimeframe timeFrame, Boolean xtb, Boolean positivePerfFirst, Integer limit, Double cfdMargin, List<String> tickers) {
+        String queryStr = queryFrom(timeFrame, positivePerfFirst, limit, xtb, cfdMargin, tickers);
 
         Query nativeQuery = entityManager.createNativeQuery(queryStr, StockPerformanceDTO.class);
 
@@ -32,7 +33,7 @@ public class StockHeatmapPerformanceService {
         return priceOHLCs;
     }
 
-    private static String queryFrom(StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, Boolean xtb, Double cfdMargin) {
+    private static String queryFrom(StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, Boolean xtb, Double cfdMargin, List<String> tickers) {
         String dbTable = dbTablePerfHeatmapFrom(timeFrame);
         String query = STR."""
             SELECT p.ticker, p.performance FROM \{dbTable} p JOIN Stocks s ON s.ticker = p.ticker
@@ -43,6 +44,13 @@ public class StockHeatmapPerformanceService {
             query += STR."""
                 WHERE (COALESCE(\{cfdMargin}, -1) = -1 OR s.cfd_margin = \{cfdMargin})
                 """; // only XTB tickers use cfdMargin field
+        }
+
+        if (!tickers.isEmpty()) {
+            String tickersFormatted = tickers.stream().map(ticker -> STR."'\{ticker}'").collect(Collectors.joining(", "));
+            query +=  STR."""
+             AND p.ticker in (\{tickersFormatted})
+             """;
         }
 
         // default negative performance first (ascending by performance)

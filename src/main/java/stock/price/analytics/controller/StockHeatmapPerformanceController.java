@@ -8,9 +8,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import stock.price.analytics.controller.dto.StockPerformanceDTO;
+import stock.price.analytics.model.prices.enums.PriceMilestone;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
+import stock.price.analytics.service.PriceMilestoneService;
 import stock.price.analytics.service.StockHeatmapPerformanceService;
 
+import java.util.Collections;
 import java.util.List;
 
 @Controller
@@ -19,6 +22,7 @@ import java.util.List;
 public class StockHeatmapPerformanceController {
 
     private final StockHeatmapPerformanceService stockHeatmapPerformanceService;
+    private final PriceMilestoneService priceMilestoneService;
 
     @GetMapping("/stock-performance")
     @ResponseBody
@@ -32,14 +36,23 @@ public class StockHeatmapPerformanceController {
                                                          @RequestParam(required = false, value = "xtb") Boolean xtb,
                                                          @RequestParam(required = false, value = "positivePerfFirst") Boolean positivePerfFirst,
                                                          @RequestParam(required = false, value = "limit") Integer limit,
-                                                         @RequestParam(required = false, value = "cfdMargin") Double cfdMargin) {
+                                                         @RequestParam(required = false, value = "cfdMargin") Double cfdMargin,
+                                                         @RequestParam(required = false, value = "priceMilestone") String priceMilestone) {
         StockTimeframe stockTimeframe = ("undefined".equals(timeFrame)) ? StockTimeframe.MONTHLY : StockTimeframe.valueOf(timeFrame);
+        List<String> tickers = Collections.emptyList();
+        if (priceMilestone != null && PriceMilestone.NONE != PriceMilestone.valueOf(priceMilestone)) {
+            tickers = priceMilestoneService.findTickersForMilestone(PriceMilestone.valueOf(priceMilestone), cfdMargin);
+            if (tickers.isEmpty()) {
+                return Collections.emptyList();
+            }
+        }
         return stockHeatmapPerformanceService.stockPerformanceForDateAndTimeframeAndFilters(
                 stockTimeframe,
                 xtb,
                 positivePerfFirst,
                 limit,
-                cfdMargin
+                cfdMargin,
+                tickers
         );
     }
 

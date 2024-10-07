@@ -56,6 +56,7 @@ function updateStockPerformanceChart(timeFrame) {
     const positivePerfFirst = document.getElementById('positivePerfFirst').checked || false;
     const xtb = document.getElementById('xtbOnly').checked;
     const cfdMargin = document.getElementById('cfdMargin');
+    const priceMilestone = document.getElementById('priceMilestone');
 
     if (timeFrame == undefined) {
         timeFrame = 'WEEKLY';
@@ -64,6 +65,9 @@ function updateStockPerformanceChart(timeFrame) {
     url = `/stock-performance-json?timeFrame=${timeFrame}&positivePerfFirst=${positivePerfFirst}&limit=${limit}`;
     if (cfdMargin) {
         url += '&cfdMargin=' + cfdMargin.value;
+    }
+    if (priceMilestone) {
+        url += '&priceMilestone=' + priceMilestone.value;
     }
     if (xtb) {
         url += '&xtb=true';
