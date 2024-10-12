@@ -33,14 +33,13 @@ public class PriceMilestoneService {
         String whereClause = PriceMilestone.whereClauseFrom(priceMilestone);
         String currentMondayFormatted = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
                 .format(DateTimeFormatter.ISO_LOCAL_DATE);
-        String previousMondayFormatted = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-                .minusDays(7).format(DateTimeFormatter.ISO_LOCAL_DATE);
+        String joinDateFormatted = PriceMilestone.joinDateFrom(priceMilestone);
 
         return STR."""
                 SELECT wp.ticker
                 FROM weekly_prices wp
-                JOIN \{highLowTable} hl_prev ON hl_prev.ticker = wp.ticker
-                    AND hl_prev.start_date = '\{previousMondayFormatted}'
+                JOIN \{highLowTable} hl ON hl.ticker = wp.ticker
+                    AND hl.start_date = '\{joinDateFormatted}'
                 JOIN stocks s ON s.ticker = wp.ticker
                 WHERE
                 	wp.start_date = '\{currentMondayFormatted}'
