@@ -18,8 +18,8 @@ public enum StockTimeframe {
     MONTHLY,
     YEARLY;
 
-    public static String dbTablePerfHeatmapFrom(StockTimeframe timeframe) {
-        return switch (timeframe) {
+    public String dbTablePerfHeatmap() {
+        return switch (this) {
             case DAILY -> "daily_prices_performance_view";
             case WEEKLY -> "weekly_prices_performance_view";
             case MONTHLY -> "monthly_prices_performance_view";
@@ -27,8 +27,8 @@ public enum StockTimeframe {
         };
     }
 
-    public static String dbTableOHLCFrom(StockTimeframe timeframe) {
-        return switch (timeframe) {
+    public String dbTableOHLC() {
+        return switch (this) {
             case DAILY -> "daily_prices";
             case WEEKLY -> "weekly_prices";
             case MONTHLY -> "monthly_prices";
@@ -36,8 +36,8 @@ public enum StockTimeframe {
         };
     }
 
-    public static String toSQLInterval(StockTimeframe timeframe) {
-        return switch (timeframe) {
+    public String toSQLInterval() {
+        return switch (this) {
             case DAILY -> "DAY";
             case WEEKLY -> "WEEK";
             case MONTHLY -> "MONTH";
@@ -45,10 +45,10 @@ public enum StockTimeframe {
         };
     }
 
-    public static LocalDate htfDateFrom(LocalDate date, StockTimeframe timeframe) {
+    public LocalDate htfDateFrom(LocalDate date) {
         LocalDate tradingDateNow = tradingDateNow();
 
-        return switch (timeframe) {
+        return switch (this) {
             case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
             case WEEKLY -> tradingDateNow.isBefore(date.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY))) ? tradingDateNow : date.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
             case MONTHLY -> tradingDateNow.isBefore(date.with(lastDayOfMonth())) ? tradingDateNow : date.with(lastDayOfMonth());

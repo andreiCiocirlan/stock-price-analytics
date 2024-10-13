@@ -35,7 +35,7 @@ public class PriceOHLCService {
     private final PriceOHLCRepository priceOHLCRepository;
 
     public List<CandleOHLCWithDateDTO> findOHLCFor(String ticker, StockTimeframe timeframe) {
-        String tableNameOHLC = dbTableOHLCFrom(timeframe);
+        String tableNameOHLC = timeframe.dbTableOHLC();
         String orderByIdField = timeframe == DAILY ? "date" : "start_date";
         String queryStr = STR."SELECT \{orderByIdField}, open, high, low, close FROM \{tableNameOHLC} WHERE ticker = :ticker ORDER BY \{orderByIdField} ASC";
 
@@ -186,7 +186,7 @@ public class PriceOHLCService {
     @Transactional
     public void updateHigherTimeframesPricesFor(LocalDate date, List<StockTimeframe> timeframes, String tickers) {
         for (StockTimeframe timeframe : timeframes) {
-            updateHigherTimeframeHistPrices(toSQLInterval(timeframe), dbTableOHLCFrom(timeframe), htfDateFrom(date, timeframe), tickers);
+            updateHigherTimeframeHistPrices(timeframe.toSQLInterval(), timeframe.dbTableOHLC(), timeframe.htfDateFrom(date), tickers);
         }
     }
 

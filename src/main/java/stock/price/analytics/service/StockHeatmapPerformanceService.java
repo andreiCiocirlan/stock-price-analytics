@@ -12,8 +12,6 @@ import stock.price.analytics.model.prices.enums.StockTimeframe;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static stock.price.analytics.model.prices.enums.StockTimeframe.dbTablePerfHeatmapFrom;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -34,7 +32,7 @@ public class StockHeatmapPerformanceService {
     }
 
     private static String queryFrom(StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, Boolean xtb, Double cfdMargin, List<String> tickers) {
-        String dbTable = dbTablePerfHeatmapFrom(timeFrame);
+        String dbTable = timeFrame.dbTablePerfHeatmap();
         String query = STR."""
             SELECT p.ticker, p.performance FROM \{dbTable} p JOIN Stocks s ON s.ticker = p.ticker
             """;
