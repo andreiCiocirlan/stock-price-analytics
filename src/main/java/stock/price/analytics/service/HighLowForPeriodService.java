@@ -92,7 +92,7 @@ public class HighLowForPeriodService {
 
     private void saveHighLowPrices(List<String> tickers, LocalDate tradingDate, boolean allHistoricalPrices) {
         for (HighLowPeriod highLowPeriod : values()) {
-            String msg = String.format("saved %d %s rows for %s", tickers.size(), tableNameFrom(highLowPeriod), tradingDate);
+            String msg = String.format("saved %d %s rows for %s", tickers.size(), highLowPeriod.tableName(), tradingDate);
             logTime(() -> executeQueryHLPricesForPeriod(tickers, tradingDate, allHistoricalPrices, highLowPeriod), msg);
         }
     }
@@ -105,9 +105,9 @@ public class HighLowForPeriodService {
 
     private String queryHighLowPricesFor(HighLowPeriod period, LocalDate tradingDate, String tickers, boolean allHistoricalPrices) {
         String date = tradingDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
-        String sequenceName = sequenceNameFrom(period);
-        String tableName = tableNameFrom(period);
-        String interval = intervalPrecedingFrom(period);
+        String sequenceName = period.sequenceName();
+        String tableName = period.tableName();
+        String interval = period.intervalPreceding();
 
         if (!allHistoricalPrices) {
             if (HIGH_LOW_ALL_TIME == period) {
@@ -119,7 +119,7 @@ public class HighLowForPeriodService {
                 return queryHighLow52wOr4wPricesCurrentWeek(tableName, interval, monday, tickers, sequenceName);
             }
         }
-        String cumulativeWhereClause = allHistoricalPrices ? "1=1" : whereClauseFrom(period, date);
+        String cumulativeWhereClause = allHistoricalPrices ? "1=1" : period.whereClause(date);
         String allTimeHistoricalInterval = allHistoricalPrices ? "- (GENERATE_SERIES(0, 3500) * INTERVAL '1 week')" : "";
 
         // entire historical prices update
