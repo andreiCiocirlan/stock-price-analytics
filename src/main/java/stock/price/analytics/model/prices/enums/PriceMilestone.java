@@ -20,7 +20,7 @@ public enum PriceMilestone {
     LOW_ALL_TIME_95,
     NONE;
 
-    public String tableNameFrom() {
+    public String tableName() {
         return switch (this) {
             case NEW_52W_HIGH, NEW_52W_LOW, HIGH_52W_95, LOW_52W_95 -> "high_low52w";
             case NEW_4W_HIGH, NEW_4W_LOW, HIGH_4W_95, LOW_4W_95 -> "high_low4w";
@@ -29,7 +29,7 @@ public enum PriceMilestone {
         };
     }
 
-    public String whereClauseFrom() {
+    public String whereClause() {
         return switch (this) {
             case NEW_52W_HIGH, NEW_ALL_TIME_HIGH, NEW_4W_HIGH -> "wp.high > hl.high";
             case NEW_52W_LOW, NEW_4W_LOW, NEW_ALL_TIME_LOW -> "wp.low < hl.low";
@@ -39,7 +39,7 @@ public enum PriceMilestone {
         };
     }
 
-    public String joinDateFrom() {
+    public String joinDate() {
         return switch (this) {
             case NEW_52W_HIGH, NEW_ALL_TIME_HIGH, NEW_4W_HIGH, NEW_52W_LOW, NEW_4W_LOW, NEW_ALL_TIME_LOW ->
                     LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))

@@ -29,11 +29,11 @@ public class PriceMilestoneService {
     }
 
     private String queryPriceMilestone(PriceMilestone priceMilestone, double cfdMargin) {
-        String highLowTable = priceMilestone.tableNameFrom();
-        String whereClause = priceMilestone.whereClauseFrom();
+        String highLowTable = priceMilestone.tableName();
+        String whereClause = priceMilestone.whereClause();
         String currentMondayFormatted = LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
                 .format(DateTimeFormatter.ISO_LOCAL_DATE);
-        String joinDateFormatted = priceMilestone.joinDateFrom();
+        String joinDateFormatted = priceMilestone.joinDate();
 
         return STR."""
                 SELECT wp.ticker
