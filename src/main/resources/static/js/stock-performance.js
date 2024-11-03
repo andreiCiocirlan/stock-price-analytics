@@ -137,7 +137,7 @@ function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, 
             point: {
                 events: {
                     click: function() {
-                        openStockGraph({ ticker: data[this.index].ticker });
+                        updateOHLCChart({ ticker: data[this.index].ticker });
                     }
                 }
             },

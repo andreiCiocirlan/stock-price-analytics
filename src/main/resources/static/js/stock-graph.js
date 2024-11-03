@@ -99,161 +99,154 @@ function updateOHLCChart(stockData) {
     fetch(URL)
         .then(response => response.json())
         .then(priceData => {
-            // Render the OHLC chart in the new window
-            if (ohlcContainer) {
-                // If the chart container exists, create or update the chart
-                if (chart) {
-                    chart.update({
-                        title: {
-                            text: `${stockData.ticker}`
-                        },
-                        series: [{
-                            name: stockData.ticker,
+            if (chart) {
+                chart.update({
+                    title: {
+                        text: `${stockData.ticker}`
+                    },
+                    series: [{
+                        name: stockData.ticker,
+                        data: priceData.map(item => [
+                            new Date(item.date).getTime(),
+                            item.open,
+                            item.high,
+                            item.low,
+                            item.close
+                        ])
+                    }]
+                });
+            } else {
+               // If the chart doesn't exist, create a new one
+               chart = Highcharts.stockChart('ohlc-container', {
+                    chart: {
+                        type: 'candlestick',
+                        backgroundColor: '#171B26'
+                    },
+                    title: { text: `${stockData.ticker}`, style: { color: '#FFFFFF' } },
+                    navigation: { buttonOptions: { enabled: false}}, // remove corner button tooltip
+                    xAxis: {
+                        crosshair: { width: 1, color: 'gray', dashStyle: 'Dash' },
+                        type: 'datetime',
+                        labels: { style: { color: '#FFFFFF' } }
+                    },
+                    yAxis: {
+                        crosshair: { width: 1, color: 'gray', dashStyle: 'Dash', label: { enabled: true, style: { color: '#FFFFFF' } } },
+                        gridLineWidth: 0.2,
+                        title: { text: 'Price' },
+                        labels: { style: { color: '#FFFFFF'} },
+                        opposite: true, // Position the y-axis on the right side
+                        offset: 30 // Position the y-axis on the right side
+                    },
+                    legend: {
+                        itemStyle: { color: '#FFFFFF', bold: true }
+                    },
+                    plotOptions: {
+                        candlestick: {
+                            color: '#E53935', // Red color for negative change
+                            upColor: '#00B34D', // Green color for positive change
+                            lineColor: '#E53935', // Red color for negative wicks
+                            upLineColor: '#00B34D', // Green color for positive wicks
+                            minPointLength: 8, // Minimum height of the candlestick
+                            pointPadding: 0.15, // Padding between candlesticks
+                            groupPadding: 0.02 // Padding between groups of candlesticks
+                        }
+                    },
+                    rangeSelector: rangeSelect,
+                    series: [
+                        {
+                            id: 'main-series',
+                            name: 'Stock Data',
+                            type: 'candlestick',
                             data: priceData.map(item => [
                                 new Date(item.date).getTime(),
                                 item.open,
                                 item.high,
                                 item.low,
                                 item.close
-                            ])
-                        }]
-                    });
-                } else {
-                   // If the chart doesn't exist, create a new one
-                   chart = Highcharts.stockChart(ohlcContainer, {
-                        chart: {
-                            type: 'candlestick',
-                            backgroundColor: '#171B26'
-                        },
-                        title: { text: `${stockData.ticker}`, style: { color: '#FFFFFF' } },
-                        navigation: { buttonOptions: { enabled: false}}, // remove corner button tooltip
-                        xAxis: {
-                            crosshair: { width: 1, color: 'gray', dashStyle: 'Dash' },
-                            type: 'datetime',
-                            labels: { style: { color: '#FFFFFF' } }
-                        },
-                        yAxis: {
-                            crosshair: { width: 1, color: 'gray', dashStyle: 'Dash', label: { enabled: true, style: { color: '#FFFFFF' } } },
-                            gridLineWidth: 0.2,
-                            title: { text: 'Price' },
-                            labels: { style: { color: '#FFFFFF'} },
-                            opposite: true, // Position the y-axis on the right side
-                            offset: 30 // Position the y-axis on the right side
-                        },
-                        legend: {
-                            itemStyle: { color: '#FFFFFF', bold: true }
-                        },
-                        plotOptions: {
-                            candlestick: {
-                                color: '#E53935', // Red color for negative change
-                                upColor: '#00B34D', // Green color for positive change
-                                lineColor: '#E53935', // Red color for negative wicks
-                                upLineColor: '#00B34D', // Green color for positive wicks
-                                minPointLength: 8, // Minimum height of the candlestick
-                                pointPadding: 0.15, // Padding between candlesticks
-                                groupPadding: 0.02 // Padding between groups of candlesticks
+                            ]),
+                            tooltip: {
+                                 pointFormat:
+                                        '<span style="font-size:15px;color:white">' +
+                                              'O<span style="color:{point.color}">{point.open:.2f}</span> ' +
+                                              'H<span style="color:{point.color}">{point.high:.2f}</span> ' +
+                                              'L<span style="color:{point.color}">{point.low:.2f}</span> ' +
+                                              'C<span style="color:{point.color}">{point.close:.2f}</span></span>'
                             }
                         },
-                        rangeSelector: rangeSelect,
-                        series: [
-                            {
-                                id: 'main-series',
-                                name: 'Stock Data',
-                                type: 'candlestick',
-                                data: priceData.map(item => [
-                                    new Date(item.date).getTime(),
-                                    item.open,
-                                    item.high,
-                                    item.low,
-                                    item.close
-                                ]),
-                                tooltip: {
-                                     pointFormat:
-                                            '<span style="font-size:15px;color:white">' +
-                                                  'O<span style="color:{point.color}">{point.open:.2f}</span> ' +
-                                                  'H<span style="color:{point.color}">{point.high:.2f}</span> ' +
-                                                  'L<span style="color:{point.color}">{point.low:.2f}</span> ' +
-                                                  'C<span style="color:{point.color}">{point.close:.2f}</span></span>'
-                                }
-                            },
-                            {
-                                type: 'sma',
-                                id: 'sma-200',
-                                name: '200SMA',
-                                color: 'red',
-                                linkedTo: 'main-series',
-                                params: { period: 200 },
-                                lineWidth: 0.5,
-                                marker: { enabled: false },
-                                tooltip: {
-                                    pointFormat: '<span style="font-size:15px;color:red">{series.name}: {point.y:.2f}</span>'
-                                }
-                            },
-                            {
-                                type: 'sma',
-                                id: 'sma-21',
-                                name: '21SMA',
-                                color: 'yellow',
-                                linkedTo: 'main-series',
-                                params: { period: 21 },
-                                lineWidth: 0.5,
-                                marker: { enabled: false },
-                                tooltip: {
-                                    pointFormat: '<span style="font-size:15px;color:yellow">{series.name}: {point.y:.2f}</span>'
-                                }
-                            },
-                            {
-                                type: 'sma',
-                                id: 'sma-100',
-                                name: '100SMA',
-                                color: 'orange',
-                                linkedTo: 'main-series',
-                                params: { period: 100 },
-                                lineWidth: 0.5,
-                                marker: { enabled: false },
-                                tooltip: {
-                                    pointFormat: '<span style="font-size:15px;color:orange">{series.name}: {point.y:.2f}</span>'
-                                }
+                        {
+                            type: 'sma',
+                            id: 'sma-200',
+                            name: '200SMA',
+                            color: 'red',
+                            linkedTo: 'main-series',
+                            params: { period: 200 },
+                            lineWidth: 0.5,
+                            marker: { enabled: false },
+                            tooltip: {
+                                pointFormat: '<span style="font-size:15px;color:red">{series.name}: {point.y:.2f}</span>'
                             }
-                        ],
-                        tooltip: {
-                            enabled: true,
-                            shared: true,
-                            useHTML: true,
-                            style: {
-                                fontSize: '12px',
-                                color: '#FFFFFF',
-                                backgroundColor: 'transparent'
-                            },
-                            backgroundColor: 'rgba(0, 0, 0, 0.05)',
-                            borderColor: 'transparent',
-                            borderWidth: 0,
-                            shadow: false,
-                            split: true,
-                            xDateFormat: '%d %b \'%y',
-                            positioner: function(labelWidth, labelHeight, point) {
-                                const chart = this.chart;
-                                let x, y;
-
-                                if (point.isHeader) {
-                                    return {
-                                        x: point.plotX + this.chart.plotLeft - labelWidth / 2,
-                                        y: this.chart.chartHeight - labelHeight
-                                    };
-                                } else {
-                                    return { x : 10, y : 0 };
-                                }
+                        },
+                        {
+                            type: 'sma',
+                            id: 'sma-21',
+                            name: '21SMA',
+                            color: 'yellow',
+                            linkedTo: 'main-series',
+                            params: { period: 21 },
+                            lineWidth: 0.5,
+                            marker: { enabled: false },
+                            tooltip: {
+                                pointFormat: '<span style="font-size:15px;color:yellow">{series.name}: {point.y:.2f}</span>'
+                            }
+                        },
+                        {
+                            type: 'sma',
+                            id: 'sma-100',
+                            name: '100SMA',
+                            color: 'orange',
+                            linkedTo: 'main-series',
+                            params: { period: 100 },
+                            lineWidth: 0.5,
+                            marker: { enabled: false },
+                            tooltip: {
+                                pointFormat: '<span style="font-size:15px;color:orange">{series.name}: {point.y:.2f}</span>'
                             }
                         }
-                   });
-                   ohlcContainer.addEventListener('resize', () => {
-                       if (!isResizing) {
-                           chart.reflow();
-                       }
-                   });
-               }
-           } else {
-               console.error('ohlcContainer is not defined');
+                    ],
+                    tooltip: {
+                        enabled: true,
+                        shared: true,
+                        useHTML: true,
+                        style: {
+                            fontSize: '12px',
+                            color: '#FFFFFF',
+                            backgroundColor: 'transparent'
+                        },
+                        backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                        borderColor: 'transparent',
+                        borderWidth: 0,
+                        shadow: false,
+                        split: true,
+                        xDateFormat: '%d %b \'%y',
+                        positioner: function(labelWidth, labelHeight, point) {
+                            const chart = this.chart;
+                            let x, y;
+                            if (point.isHeader) {
+                                return {
+                                    x: point.plotX + this.chart.plotLeft - labelWidth / 2,
+                                    y: this.chart.chartHeight - labelHeight
+                                };
+                            } else {
+                                return { x : 10, y : 0 };
+                            }
+                        }
+                    }
+               });
+               ohlcContainer.addEventListener('resize', () => {
+                   if (!isResizing) {
+                       chart.reflow();
+                   }
+               });
            }
        })
        .catch(error => console.error(error));
