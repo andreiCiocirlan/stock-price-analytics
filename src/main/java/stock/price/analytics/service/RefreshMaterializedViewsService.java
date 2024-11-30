@@ -18,6 +18,7 @@ public class RefreshMaterializedViewsService {
     @Transactional
     public void refreshMaterializedViews() {
         refreshLatestAndPerformanceHeatmapPrices();
+        refreshDailyJSONPrices();
     }
 
     private void refreshLatestAndPerformanceHeatmapPrices() {
@@ -27,5 +28,10 @@ public class RefreshMaterializedViewsService {
         logTime(refreshMaterializedViewsRepository::refreshMonthlyPerformanceHeatmapPrices, "refreshed monthly performance prices");
         logTime(refreshMaterializedViewsRepository::refreshYearlyPerformanceHeatmapPrices, "refreshed yearly performance prices");
     }
+
+    private void refreshDailyJSONPrices() {
+        logTime(refreshMaterializedViewsRepository::refreshDailyJSONPricesPrices, "refreshed daily prices json");
+    }
+
 
 }
