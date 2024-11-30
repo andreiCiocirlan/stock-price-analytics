@@ -29,7 +29,7 @@ public class RefreshMaterializedViewsService {
         logTime(refreshMaterializedViewsRepository::refreshYearlyPerformanceHeatmapPrices, "refreshed yearly performance prices");
     }
 
-    private void refreshDailyJSONPrices() {
+    public void refreshDailyJSONPrices() {
         logTime(refreshMaterializedViewsRepository::refreshDailyJSONPricesPrices, "refreshed daily prices json");
     }
 

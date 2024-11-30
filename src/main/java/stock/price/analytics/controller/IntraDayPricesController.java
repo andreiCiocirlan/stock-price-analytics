@@ -3,10 +3,7 @@ package stock.price.analytics.controller;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.client.finnhub.FinnhubClient;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 import stock.price.analytics.repository.prices.PriceOHLCRepository;
@@ -32,6 +29,7 @@ public class IntraDayPricesController {
     private final HighLowForPeriodService highLowForPeriodService;
     private final RefreshMaterializedViewsService refreshMaterializedViewsService;
     private final StockService stockService;
+    private final DailyPricesJSONService dailyPricesJSONService;
 
     @GetMapping("/finnhub")
     public DailyPriceOHLC intraDayPrices(@RequestParam("ticker") String ticker) {
@@ -86,6 +84,12 @@ public class IntraDayPricesController {
             highLowForPeriodService.saveCurrentWeekHighLowPrices(tickers, tradingDate);
         }
         return dailyImportedPrices;
+    }
+
+    @Transactional
+    @PostMapping("/yahoo-prices/save-json-from-file")
+    public void saveDailyPricesJSONFrom(@RequestParam("fileName") String fileName) {
+        dailyPricesJSONService.saveDailyPricesJSONFrom(fileName);
     }
 
 }

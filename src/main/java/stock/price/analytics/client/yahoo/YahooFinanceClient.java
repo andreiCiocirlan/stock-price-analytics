@@ -3,11 +3,17 @@ package stock.price.analytics.client.yahoo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import stock.price.analytics.model.prices.json.DailyPricesJSON;
+import stock.price.analytics.model.prices.json.Response;
+import stock.price.analytics.model.prices.json.UnixTimestampToLocalDateDeserializer;
 import stock.price.analytics.model.prices.ohlc.CandleOHLC;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
+import stock.price.analytics.service.DailyPricesJSONService;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -25,6 +31,8 @@ import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 @RequiredArgsConstructor
 public class YahooFinanceClient {
 
+    public final DailyPricesJSONService dailyPricesJSONService;
+
     public List<DailyPriceOHLC> dailyPricesFromFile(String fileName) {
         try {
             String jsonFilePath = String.join("", "./yahoo-daily-prices/", fileName, ".json");
@@ -37,6 +45,41 @@ public class YahooFinanceClient {
     }
 
     public List<DailyPriceOHLC> extractDailyPricesFromJSON(String jsonData, boolean preMarketPrices) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<DailyPricesJSON> dailyPricesJSONList = new ArrayList<>();
+        try {
+            objectMapper.registerModule(new JavaTimeModule());
+            SimpleModule module = new SimpleModule();
+            module.addDeserializer(LocalDate.class, new UnixTimestampToLocalDateDeserializer());
+            objectMapper.registerModule(module);
+            Response response = objectMapper.readValue(jsonData, Response.class);
+            List<DailyPricesJSON> dailyPricesJSON = response.getQuoteResponse().getResult();
+
+            dailyPricesJSONList.addAll(dailyPricesJSONService.extractDailyJSONPricesAndSave(dailyPricesJSON));
+        } catch (JsonProcessingException ex) {
+            throw new RuntimeException(ex);
+        }
+
+        return dailyPricesOHLCFrom(dailyPricesJSONList, preMarketPrices);
+    }
+
+    public List<DailyPriceOHLC> dailyPricesOHLCFrom(List<DailyPricesJSON> dailyPricesJSON, boolean preMarketPrices) {
+        List<DailyPriceOHLC> dailyOLHCPrices = new ArrayList<>();
+        for (DailyPricesJSON dailyPriceJson : dailyPricesJSON) {
+            String ticker = dailyPriceJson.getSymbol();
+            double open = dailyPriceJson.getRegularMarketOpen();
+            double high = dailyPriceJson.getRegularMarketDayHigh();
+            double low = dailyPriceJson.getRegularMarketDayLow();
+            double close = preMarketPrices ? dailyPriceJson.getPreMarketPrice() : dailyPriceJson.getRegularMarketPrice();
+            double percentChange = Math.round(dailyPriceJson.getRegularMarketChangePercent() * 100.0) / 100.0;
+
+            DailyPriceOHLC dailyPrice = new DailyPriceOHLC(ticker, dailyPriceJson.getDate(), percentChange, new CandleOHLC(open, high, low, close));
+            dailyOLHCPrices.add(dailyPrice);
+        }
+        return dailyOLHCPrices;
+    }
+
+    public List<DailyPriceOHLC> extractDailyPricesFromJSON_old(String jsonData, boolean preMarketPrices) {
         List<DailyPriceOHLC> intraDayPrices = new ArrayList<>();
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode;
