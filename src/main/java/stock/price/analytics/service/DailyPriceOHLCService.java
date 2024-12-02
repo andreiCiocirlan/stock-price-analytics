@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static stock.price.analytics.util.Constants.MAX_TICKER_COUNT_PRINT;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -45,7 +47,10 @@ public class DailyPriceOHLCService {
             }
         }
         if (!sameDailyPrices.isEmpty()) {
-            log.warn("same {} daily prices as in DB, not saved for {}", sameDailyPrices.size(), sameDailyPrices);
+            log.warn("same {} daily prices as in DB", sameDailyPrices.size());
+            if (sameDailyPrices.size() <= MAX_TICKER_COUNT_PRINT) {
+                log.warn("{}", sameDailyPrices);
+            }
         }
         return importedDailyPrices;
     }

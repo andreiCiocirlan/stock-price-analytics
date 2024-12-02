@@ -19,6 +19,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.nio.file.Files.readAllLines;
+import static stock.price.analytics.util.Constants.MAX_TICKER_COUNT_PRINT;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
@@ -71,7 +72,10 @@ public class DailyPricesJSONService {
         }
 
         if (!sameDailyPrices.isEmpty()) {
-            log.warn("same {} daily prices as in DB, not saved for {}", sameDailyPrices.size(), sameDailyPrices);
+            log.warn("same {} daily prices as in DB", sameDailyPrices.size());
+            if (sameDailyPrices.size() <= MAX_TICKER_COUNT_PRINT) {
+                log.warn("{}", sameDailyPrices);
+            }
         }
         dailyPricesJSONRepository.saveAll(dailyJSONPrices);
 
@@ -127,8 +131,10 @@ public class DailyPricesJSONService {
         }
 
         if (!sameDailyPrices.isEmpty()) {
-            log.warn("same {} daily prices as in DB, not saved for {}", sameDailyPrices.size(), sameDailyPrices);
-        }
+            log.warn("same {} daily prices as in DB", sameDailyPrices.size());
+            if (sameDailyPrices.size() <= MAX_TICKER_COUNT_PRINT) {
+                log.warn("{}", sameDailyPrices);
+            }        }
         return dailyJSONPrices;
     }
 

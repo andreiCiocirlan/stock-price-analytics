@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static stock.price.analytics.util.Constants.MAX_TICKER_COUNT_PRINT;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateImported;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
@@ -98,7 +99,10 @@ public class YahooQuoteService {
         }
 
         if (!tickersImported.isEmpty()) {
-            log.warn("Did not import {} tickers  {}", tickersImported.size(), tickersImported);
+            log.warn("Did not import {} tickers", tickersImported.size());
+            if (tickersImported.size() <= MAX_TICKER_COUNT_PRINT) {
+                log.warn("{}", tickersImported);
+            }
         }
 
         return dailyImportedPrices;
