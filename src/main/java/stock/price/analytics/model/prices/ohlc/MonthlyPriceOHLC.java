@@ -34,7 +34,7 @@ public class MonthlyPriceOHLC extends AbstractPriceOHLC {
 
     public MonthlyPriceOHLC(String ticker, LocalDate startDate, LocalDate endDate, double performance, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
-        this.startDate = startDate;
+        this.startDate = startDate.with(TemporalAdjusters.firstDayOfMonth());
         this.endDate = endDate;
         this.setPerformance(performance);
     }
