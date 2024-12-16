@@ -251,7 +251,7 @@ public class PriceOHLCService {
                     WHERE start_date >= DATE_TRUNC('\{timeframe}', '\{dateFormatted}'::date)
             )
             INSERT INTO \{tableName} (ticker, start_date, end_date, high, low, open, close, performance)
-            SELECT ticker, start_date, end_date, high, low, open, close, performance
+            SELECT ticker, DATE_TRUNC('\{timeframe}', start_date), end_date, high, low, open, close, performance
             FROM final_result
             ON CONFLICT (ticker, start_date)
                 DO UPDATE SET
