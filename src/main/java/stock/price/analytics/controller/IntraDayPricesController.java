@@ -48,7 +48,7 @@ public class IntraDayPricesController {
     @GetMapping("/yahoo-prices/intraday")
     public void yahooPricesImport() {
         List<DailyPriceOHLC> dailyImportedPrices = logTimeAndReturn(yahooQuoteService::dailyPricesImport, "imported daily prices");
-        if (!dailyImportedPrices.isEmpty()) {
+        if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
             priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
             stockService.updateStocksDate(dailyImportedPrices);
             // daily performance view based on stock last_updated (keep this order)
@@ -71,7 +71,7 @@ public class IntraDayPricesController {
     @GetMapping("/yahoo-prices/from-file")
     public List<DailyPriceOHLC> yahooPricesImportFromFile(@RequestParam("fileName") String fileName) {
         List<DailyPriceOHLC> dailyImportedPrices = logTimeAndReturn(() -> yahooQuoteService.dailyPricesFromFile(fileName), "imported daily prices");
-        if (!dailyImportedPrices.isEmpty()) {
+        if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
             priceOHLCService.savePrices(dailyImportedPrices);
             priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
             stockService.updateStocksDate(dailyImportedPrices);
