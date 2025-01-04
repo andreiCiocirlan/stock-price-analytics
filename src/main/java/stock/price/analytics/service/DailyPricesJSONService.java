@@ -33,7 +33,7 @@ public class DailyPricesJSONService {
     private final RefreshMaterializedViewsService refreshMaterializedViewsService;
 
     public List<DailyPricesJSON> findByDateBetween(LocalDate from, LocalDate to) {
-       return dailyPricesJSONRepository.findByDateBetween(from, to);
+        return dailyPricesJSONRepository.findByDateBetween(from, to);
     }
 
     public List<DailyPricesJSON> extractDailyJSONPricesAndSave(List<DailyPricesJSON> dailyPricesJSON) {
@@ -84,7 +84,7 @@ public class DailyPricesJSONService {
 
     public List<DailyPricesJSON> dailyPricesJSONFromFile(String fileName) {
         try {
-            String jsonFilePath = String.join("", "./yahoo-daily-prices/", fileName, ".json");
+            String jsonFilePath = String.join("", "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/", fileName, ".json");
             String jsonData = String.join("", readAllLines(Path.of(jsonFilePath)));
 
             return extractAllDailyPricesJSONFrom(jsonData);
@@ -134,7 +134,8 @@ public class DailyPricesJSONService {
             log.warn("same {} daily prices as in DB", sameDailyPrices.size());
             if (sameDailyPrices.size() <= MAX_TICKER_COUNT_PRINT) {
                 log.warn("{}", sameDailyPrices);
-            }        }
+            }
+        }
         return dailyJSONPrices;
     }
 
