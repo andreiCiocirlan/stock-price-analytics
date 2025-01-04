@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import stock.price.analytics.cache.HigherTimeframePricesCache;
 import stock.price.analytics.controller.dto.CandleOHLCWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
@@ -14,9 +15,7 @@ import stock.price.analytics.repository.prices.PriceOHLCRepository;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
@@ -33,6 +32,7 @@ public class PriceOHLCService {
     private final EntityManager entityManager;
 
     private final PriceOHLCRepository priceOHLCRepository;
+    private final HigherTimeframePricesCache higherTimeframePricesCache;
 
     public List<CandleOHLCWithDateDTO> findOHLCFor(String ticker, StockTimeframe timeframe) {
         String tableNameOHLC = timeframe.dbTableOHLC();
@@ -53,7 +53,7 @@ public class PriceOHLCService {
     }
 
     private void updateHTF(List<DailyPriceOHLC> importedDailyPrices) {
-        List<String> tickers = importedDailyPrices.stream().map(DailyPriceOHLC::getTicker).toList();
+        List<String> tickers = new ArrayList<>(importedDailyPrices.stream().map(DailyPriceOHLC::getTicker).toList());
 
         // Fetch previous prices for each timeframe
         List<WeeklyPriceOHLC> previousTwoWeeklyPrices = getPreviousTwoWeeklyPrices(tickers);
@@ -67,29 +67,71 @@ public class PriceOHLCService {
     }
 
     private List<WeeklyPriceOHLC> getPreviousTwoWeeklyPrices(List<String> tickers) {
-        return priceOHLCRepository.findPreviousThreeWeeksPricesForTickers(tickers)
+        Set<String> cacheTickers = higherTimeframePricesCache.weeklyPricesTickers();
+        List<WeeklyPriceOHLC> previousWeeklyPrices;
+        if (cacheTickers.isEmpty()) {
+            log.info("Fetching PreviousTwoWeeklyPrices from database for tickers: {}", tickers);
+            previousWeeklyPrices = priceOHLCRepository.findPreviousThreeWeeksPricesForTickers(tickers);
+            higherTimeframePricesCache.addWeeklyPrices(previousWeeklyPrices);
+        } else if (cacheTickers.containsAll(tickers)) {
+            previousWeeklyPrices = higherTimeframePricesCache.weeklyPricesFor(tickers);
+        } else { // partial match
+            tickers.removeAll(cacheTickers);
+            previousWeeklyPrices = priceOHLCRepository.findPreviousThreeWeeksPricesForTickers(tickers);
+            higherTimeframePricesCache.addWeeklyPrices(previousWeeklyPrices);
+        }
+
+        return previousWeeklyPrices
                 .stream()
                 .collect(Collectors.groupingBy(WeeklyPriceOHLC::getTicker))
                 .values().stream()
-                .flatMap(prices -> prices.stream().limit(2))
+                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(WeeklyPriceOHLC::getStartDate).reversed()).limit(2))
                 .toList();
     }
 
     private List<MonthlyPriceOHLC> getPreviousTwoMonthlyPrices(List<String> tickers) {
-        return priceOHLCRepository.findPreviousThreeMonthlyPricesForTickers(tickers)
+        Set<String> cacheTickers = higherTimeframePricesCache.monthlyPricesTickers();
+        List<MonthlyPriceOHLC> previousMonthlyPrices;
+        if (cacheTickers.isEmpty()) {
+            log.info("Fetching PreviousTwoMonthlyPrices from database for tickers: {}", tickers);
+            previousMonthlyPrices = priceOHLCRepository.findPreviousThreeMonthlyPricesForTickers(tickers);
+            higherTimeframePricesCache.addMonthlyPrices(previousMonthlyPrices);
+        } else if (cacheTickers.containsAll(tickers)) {
+            previousMonthlyPrices = higherTimeframePricesCache.monthlyPricesFor(tickers);
+        } else { // partial match
+            tickers.removeAll(cacheTickers);
+            previousMonthlyPrices = priceOHLCRepository.findPreviousThreeMonthlyPricesForTickers(tickers);
+            higherTimeframePricesCache.addMonthlyPrices(previousMonthlyPrices);
+        }
+
+        return previousMonthlyPrices
                 .stream()
                 .collect(Collectors.groupingBy(MonthlyPriceOHLC::getTicker))
                 .values().stream()
-                .flatMap(prices -> prices.stream().limit(2))
+                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(MonthlyPriceOHLC::getStartDate).reversed()).limit(2))
                 .toList();
     }
 
     private List<YearlyPriceOHLC> getPreviousTwoYearlyPrices(List<String> tickers) {
-        return priceOHLCRepository.findPreviousThreeYearlyPricesForTickers(tickers)
+        Set<String> cacheTickers = higherTimeframePricesCache.yearlyPricesTickers();
+        List<YearlyPriceOHLC> previousYearlyPrices;
+        if (cacheTickers.isEmpty()) {
+            log.info("Fetching PreviousTwoYearlyPrices from database for tickers: {}", tickers);
+            previousYearlyPrices = priceOHLCRepository.findPreviousThreeYearlyPricesForTickers(tickers);
+            higherTimeframePricesCache.addYearlyPrices(previousYearlyPrices);
+        } else if (cacheTickers.containsAll(tickers)) {
+            previousYearlyPrices = higherTimeframePricesCache.yearlyPricesFor(tickers);
+        } else { // partial match
+            tickers.removeAll(cacheTickers);
+            previousYearlyPrices = priceOHLCRepository.findPreviousThreeYearlyPricesForTickers(tickers);
+            higherTimeframePricesCache.addYearlyPrices(previousYearlyPrices);
+        }
+
+        return previousYearlyPrices
                 .stream()
                 .collect(Collectors.groupingBy(YearlyPriceOHLC::getTicker))
                 .values().stream()
-                .flatMap(prices -> prices.stream().limit(2))
+                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(YearlyPriceOHLC::getStartDate).reversed()).limit(2))
                 .toList();
     }
 
