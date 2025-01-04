@@ -35,7 +35,7 @@ public class YahooFinanceClient {
 
     public List<DailyPriceOHLC> dailyPricesFromFile(String fileName) {
         try {
-            String jsonFilePath = String.join("", "./yahoo-daily-prices/", fileName, ".json");
+            String jsonFilePath = String.join("", "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/", fileName, ".json");
             String jsonData = String.join("", readAllLines(Path.of(jsonFilePath)));
 
             return extractDailyPricesFromJSON(jsonData, false);
