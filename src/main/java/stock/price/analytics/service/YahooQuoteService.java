@@ -85,7 +85,7 @@ public class YahooQuoteService {
 
             if (!preMarketOnly && !dailyPricesImported.isEmpty()) {
                 String fileName = tradingDateImported(dailyPriceOHLCs).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_" + fileCounter + ".json";
-                String path = "./yahoo-daily-prices/" + fileName;
+                String path = "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/" + fileName;
                 writeToFile(path, pricesJSON);
             }
 
