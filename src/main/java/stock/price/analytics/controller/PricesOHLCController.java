@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.controller.dto.CandleOHLCWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.service.PriceOHLCService;
+import stock.price.analytics.service.QuarterlyPriceService;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -22,6 +23,7 @@ import static stock.price.analytics.util.Constants.HIGHER_TIMEFRAMES_PATTERN;
 public class PricesOHLCController {
 
     private final PriceOHLCService priceOHLCService;
+    private final QuarterlyPriceService quarterlyPriceService;
 
     @GetMapping("/prices")
     public List<CandleOHLCWithDateDTO> dailyOHLC(@RequestParam("ticker") String ticker, @RequestParam("timeFrame") String timeFrame) {
@@ -36,5 +38,10 @@ public class PricesOHLCController {
         List<StockTimeframe> timeframes = timeFrames != null ?
                 StockTimeframe.valuesFromLetters(timeFrames.toUpperCase()) : Arrays.stream(StockTimeframe.values()).toList();
         priceOHLCService.updateHigherTimeframesPricesFor(date, timeframes, tickersQueryParam);
+    }
+
+    @PostMapping("/save-quarterly-prices")
+    public void saveAllQuarterlyPrices() {
+        quarterlyPriceService.saveAllQuarterlyPrices();
     }
 }

@@ -19,6 +19,13 @@ public interface PriceOHLCRepository extends JpaRepository<AbstractPriceOHLC, Lo
 
     @Query(value = """
                 SELECT *
+                FROM monthly_prices
+                ORDER BY start_date desc
+            """, nativeQuery = true)
+    List<MonthlyPriceOHLC> findAllMonthlyPrices();
+
+    @Query(value = """
+                SELECT *
                 FROM weekly_prices
                 WHERE start_date BETWEEN (DATE_TRUNC('week', CURRENT_DATE) - INTERVAL '2 week') AND CURRENT_DATE
                 AND ticker in (:tickers)
