@@ -70,7 +70,7 @@ public class PriceOHLCService {
         Set<String> cacheTickers = higherTimeframePricesCache.weeklyPricesTickers();
         List<WeeklyPriceOHLC> previousWeeklyPrices;
         if (cacheTickers.isEmpty()) {
-            log.info("Fetching PreviousTwoWeeklyPrices from database for tickers: {}", tickers);
+            log.info("Fetching PreviousTwoWeeklyPrices from database for {} tickers", tickers.size());
             previousWeeklyPrices = priceOHLCRepository.findPreviousThreeWeeksPricesForTickers(tickers);
             higherTimeframePricesCache.addWeeklyPrices(previousWeeklyPrices);
         } else if (cacheTickers.containsAll(tickers)) {
@@ -93,7 +93,7 @@ public class PriceOHLCService {
         Set<String> cacheTickers = higherTimeframePricesCache.monthlyPricesTickers();
         List<MonthlyPriceOHLC> previousMonthlyPrices;
         if (cacheTickers.isEmpty()) {
-            log.info("Fetching PreviousTwoMonthlyPrices from database for tickers: {}", tickers);
+            log.info("Fetching PreviousTwoMonthlyPrices from database for {} tickers", tickers.size());
             previousMonthlyPrices = priceOHLCRepository.findPreviousThreeMonthlyPricesForTickers(tickers);
             higherTimeframePricesCache.addMonthlyPrices(previousMonthlyPrices);
         } else if (cacheTickers.containsAll(tickers)) {
@@ -116,7 +116,7 @@ public class PriceOHLCService {
         Set<String> cacheTickers = higherTimeframePricesCache.yearlyPricesTickers();
         List<YearlyPriceOHLC> previousYearlyPrices;
         if (cacheTickers.isEmpty()) {
-            log.info("Fetching PreviousTwoYearlyPrices from database for tickers: {}", tickers);
+            log.info("Fetching PreviousTwoYearlyPrices from database for {} tickers", tickers.size());
             previousYearlyPrices = priceOHLCRepository.findPreviousThreeYearlyPricesForTickers(tickers);
             higherTimeframePricesCache.addYearlyPrices(previousYearlyPrices);
         } else if (cacheTickers.containsAll(tickers)) {
