@@ -75,10 +75,14 @@ public class PriceOHLCService {
             higherTimeframePricesCache.addWeeklyPrices(previousWeeklyPrices);
         } else if (cacheTickers.containsAll(tickers)) {
             previousWeeklyPrices = higherTimeframePricesCache.weeklyPricesFor(tickers);
+            log.info("full match : previousWeeklyPrices {}", previousWeeklyPrices.size());
         } else { // partial match
             tickers.removeAll(cacheTickers);
             previousWeeklyPrices = priceOHLCRepository.findPreviousThreeWeeksPricesForTickers(tickers);
             higherTimeframePricesCache.addWeeklyPrices(previousWeeklyPrices);
+            log.info("previousWeeklyPrices partial match for {} tickers", tickers.size());
+            cacheTickers.addAll(tickers);
+            previousWeeklyPrices = higherTimeframePricesCache.weeklyPricesFor(cacheTickers.stream().toList());
         }
 
         return previousWeeklyPrices
@@ -102,6 +106,9 @@ public class PriceOHLCService {
             tickers.removeAll(cacheTickers);
             previousMonthlyPrices = priceOHLCRepository.findPreviousThreeMonthlyPricesForTickers(tickers);
             higherTimeframePricesCache.addMonthlyPrices(previousMonthlyPrices);
+            log.info("previousMonthlyPrices partial match for {} tickers", tickers.size());
+            cacheTickers.addAll(tickers);
+            previousMonthlyPrices = higherTimeframePricesCache.monthlyPricesFor(cacheTickers.stream().toList());
         }
 
         return previousMonthlyPrices
@@ -125,6 +132,9 @@ public class PriceOHLCService {
             tickers.removeAll(cacheTickers);
             previousYearlyPrices = priceOHLCRepository.findPreviousThreeYearlyPricesForTickers(tickers);
             higherTimeframePricesCache.addYearlyPrices(previousYearlyPrices);
+            log.info("previousYearlyPrices partial match for {} tickers", tickers.size());
+            cacheTickers.addAll(tickers);
+            previousYearlyPrices = higherTimeframePricesCache.yearlyPricesFor(cacheTickers.stream().toList());
         }
 
         return previousYearlyPrices
