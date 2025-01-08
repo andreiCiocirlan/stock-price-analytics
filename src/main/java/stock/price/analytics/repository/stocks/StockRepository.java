@@ -176,4 +176,6 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
             WHERE s.ticker = subquery.ticker;
             """, nativeQuery = true)
     void saveStockUpdatedDate(); // only for new stocks with history
+
+    List<Stock> findByXtbStockTrueAndDelistedDateIsNull();
 }
