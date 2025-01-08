@@ -1,6 +1,7 @@
 package stock.price.analytics.model.prices.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.Objects;
 @Entity
 @NoArgsConstructor
 @Table(name = "daily_prices_json")
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class DailyPricesJSON implements PriceEntity {
 
 	@Id
