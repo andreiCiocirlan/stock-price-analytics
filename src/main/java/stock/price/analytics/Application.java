@@ -2,17 +2,22 @@ package stock.price.analytics;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import stock.price.analytics.repository.stocks.StockRepository;
+import stock.price.analytics.service.HigherTimeframePricesCacheService;
+import stock.price.analytics.util.LoggingUtil;
 
 @RequiredArgsConstructor
 @SpringBootApplication
+@Slf4j
 public class Application implements ApplicationRunner {
 
     private final StockRepository stockRepository;
+    private final HigherTimeframePricesCacheService higherTimeframePricesCacheService;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -21,7 +26,7 @@ public class Application implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) throws Exception {
-        // update ipo/delisted dates at start-up
-        stockRepository.updateIpoAndDelistedDates();
+        LoggingUtil.logTime(stockRepository::updateIpoAndDelistedDates, "updated ipo/delisted dates at start-up");
+        LoggingUtil.logTime(higherTimeframePricesCacheService::populateHigherTimeframePricesCache, "initialized higher-timeframe prices cache");
     }
 }
