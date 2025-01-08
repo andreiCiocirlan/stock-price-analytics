@@ -31,7 +31,7 @@ public interface PriceOHLCRepository extends JpaRepository<AbstractPriceOHLC, Lo
                 AND ticker in (:tickers)
                 ORDER BY ticker, start_date DESC
             """, nativeQuery = true)
-    List<WeeklyPriceOHLC> findPreviousThreeWeeksPricesForTickers(@Param("tickers") List<String> tickers);
+    List<WeeklyPriceOHLC> findPreviousThreeWeeklyPricesForTickers(@Param("tickers") List<String> tickers);
 
     @Query("SELECT w FROM WeeklyPriceOHLC w WHERE w.ticker = :ticker AND w.startDate < :date")
     List<WeeklyPriceOHLC> findWeeklyByTickerAndStartDateBefore(String ticker, LocalDate date);

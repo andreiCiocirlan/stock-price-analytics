@@ -71,14 +71,14 @@ public class PriceOHLCService {
         List<WeeklyPriceOHLC> previousWeeklyPrices;
         if (cacheTickers.isEmpty()) {
             log.info("Fetching PreviousTwoWeeklyPrices from database for {} tickers", tickers.size());
-            previousWeeklyPrices = priceOHLCRepository.findPreviousThreeWeeksPricesForTickers(tickers);
+            previousWeeklyPrices = priceOHLCRepository.findPreviousThreeWeeklyPricesForTickers(tickers);
             higherTimeframePricesCache.addWeeklyPrices(previousWeeklyPrices);
         } else if (cacheTickers.containsAll(tickers)) {
             previousWeeklyPrices = higherTimeframePricesCache.weeklyPricesFor(tickers);
             log.info("previousWeeklyPrices full match for tickers");
         } else { // partial match
             tickers.removeAll(cacheTickers);
-            previousWeeklyPrices = priceOHLCRepository.findPreviousThreeWeeksPricesForTickers(tickers);
+            previousWeeklyPrices = priceOHLCRepository.findPreviousThreeWeeklyPricesForTickers(tickers);
             higherTimeframePricesCache.addWeeklyPrices(previousWeeklyPrices);
             log.info("previousWeeklyPrices partial match for {} tickers", tickers.size());
             cacheTickers.addAll(tickers);
