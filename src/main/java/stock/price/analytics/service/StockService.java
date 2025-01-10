@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import stock.price.analytics.cache.StocksCache;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.stocks.StockRepository;
@@ -32,6 +33,7 @@ import static stock.price.analytics.util.TradingDateUtil.tradingDateImported;
 public class StockService {
 
     private final StockRepository stockRepository;
+    private final StocksCache stocksCache;
 
     @Transactional
     public void saveStocks() throws IOException {
@@ -69,7 +71,15 @@ public class StockService {
                     .filter(dailyPriceOHLC -> dailyPriceOHLC.getDate().equals(tradingDate)) // make sure only today prices are filtered
                     .map(DailyPriceOHLC::getTicker)
                     .toList();
-            stockRepository.updateStocksLastUpdated(tradingDate, tickers);
+
+            List<String> tickersCached = stocksCache.tickers();
+            if (tickersCached.equals(tickers)) {
+                List<Stock> stocksCached = stocksCache.stocksFor(tickers);
+                stocksCached.forEach(s -> s.setLastUpdated(tradingDate));
+                stockRepository.saveAll(stocksCached);
+            } else { // new stock imported that moment -> revert to regular sql update
+                stockRepository.updateStocksLastUpdated(tradingDate, tickers);
+            }
         }, "updated stocks date");
     }
 
@@ -79,4 +89,7 @@ public class StockService {
                 "updated stocks high low 4w, 52w, all-time");
     }
 
+    public void initStocksCache() {
+        stocksCache.addStocks(stockRepository.findByXtbStockTrueAndDelistedDateIsNull());
+    }
 }
