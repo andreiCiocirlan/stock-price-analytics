@@ -1,5 +1,6 @@
 package stock.price.analytics.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -23,6 +26,7 @@ public class QuarterlyPriceService {
 
     private final PriceOHLCRepository priceOHLCRepository;
 
+    @Transactional
     public void saveAllQuarterlyPrices() {
         List<MonthlyPriceOHLC> monthlyPrices = priceOHLCRepository.findAllMonthlyPrices();
 
@@ -47,8 +51,8 @@ public class QuarterlyPriceService {
                 )
         );
 
-        priceOHLCRepository.saveAll(quarterlyPrices);
-        log.info("saved {} quarterly prices", quarterlyPrices.size());
+        partitionDataAndSave(quarterlyPrices, priceOHLCRepository);
+        priceOHLCRepository.quarterlyPricesUpdatePerformance();
     }
 
     private QuarterlyPriceOHLC quarterlyPricesFrom(List<MonthlyPriceOHLC> monthlyPrices) {
