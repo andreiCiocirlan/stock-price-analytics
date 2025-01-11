@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
 import static stock.price.analytics.util.LoggingUtil.logTime;
+import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 import static stock.price.analytics.util.StockDateUtils.*;
 
 
@@ -155,7 +156,7 @@ public class PriceOHLCService {
                 .collect(Collectors.groupingBy(AbstractPriceOHLC::getTicker, Collectors.mapping(p -> (AbstractPriceOHLC) p, Collectors.toList())));
 
         List<AbstractPriceOHLC> updatedPrices = updatePricesAndPerformance(importedDailyPrices, timeframe, previousPricesByTicker);
-        priceOHLCRepository.saveAll(updatedPrices);
+        partitionDataAndSave(updatedPrices, priceOHLCRepository);
     }
 
     private List<AbstractPriceOHLC> updatePricesAndPerformance(List<DailyPriceOHLC> dailyPrices, StockTimeframe timeframe, Map<String, List<AbstractPriceOHLC>> previousTwoWMYPricesByTicker) {
