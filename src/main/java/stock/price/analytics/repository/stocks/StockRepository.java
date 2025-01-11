@@ -178,4 +178,7 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
     void saveStockUpdatedDate(); // only for new stocks with history
 
     List<Stock> findByXtbStockTrueAndDelistedDateIsNull();
+
+    @Query("SELECT MAX(s.lastUpdated) FROM Stock s")
+    LocalDate findLastUpdate();
 }
