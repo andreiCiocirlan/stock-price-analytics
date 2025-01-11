@@ -19,11 +19,13 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static java.nio.file.Files.walk;
 import static stock.price.analytics.util.LoggingUtil.logTime;
+import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 import static stock.price.analytics.util.PricesOHLCUtil.tickerFrom;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateImported;
 
@@ -73,10 +75,10 @@ public class StockService {
                     .toList();
 
             List<String> tickersCached = stocksCache.tickers();
-            if (tickersCached.equals(tickers)) {
+            if (new HashSet<>(tickersCached).containsAll(tickers)) {
                 List<Stock> stocksCached = stocksCache.stocksFor(tickers);
                 stocksCached.forEach(s -> s.setLastUpdated(tradingDate));
-                stockRepository.saveAll(stocksCached);
+                partitionDataAndSave(stocksCached, stockRepository);
             } else { // new stock imported that moment -> revert to regular sql update
                 stockRepository.updateStocksLastUpdated(tradingDate, tickers);
             }

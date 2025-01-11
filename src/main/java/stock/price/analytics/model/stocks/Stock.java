@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
+import stock.price.analytics.model.prices.PriceEntity;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -14,7 +15,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Entity
 @Table(name = "stocks")
-public class Stock {
+public class Stock implements PriceEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "stocks_gen")
     @SequenceGenerator(name = "stocks_gen", sequenceName = "stocks_seq")
