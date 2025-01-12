@@ -8,6 +8,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import stock.price.analytics.repository.stocks.StockRepository;
+import stock.price.analytics.service.HighLowPricesCacheService;
 import stock.price.analytics.service.HigherTimeframePricesCacheService;
 import stock.price.analytics.service.StockService;
 import stock.price.analytics.util.LoggingUtil;
@@ -20,6 +21,7 @@ public class Application implements ApplicationRunner {
     private final StockRepository stockRepository;
     private final StockService stockService;
     private final HigherTimeframePricesCacheService higherTimeframePricesCacheService;
+    private final HighLowPricesCacheService highLowPricesCacheService;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -31,5 +33,6 @@ public class Application implements ApplicationRunner {
         LoggingUtil.logTime(stockRepository::updateIpoAndDelistedDates, "updated ipo/delisted dates at start-up");
         LoggingUtil.logTime(higherTimeframePricesCacheService::populateHigherTimeframePricesCache, "initialized higher-timeframe prices cache");
         LoggingUtil.logTime(stockService::initStocksCache, "initialized xtb stocks cache");
+        LoggingUtil.logTime(highLowPricesCacheService::initHighLowPricesCache, "initialized high low prices cache");
     }
 }

@@ -57,7 +57,7 @@ public class IntraDayPricesController {
             // high/low price update based on weekly perf view (refreshed before)
             LocalDate tradingDate = tradingDateImported(dailyImportedPrices);
             List<String> tickers = dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList();
-            highLowForPeriodService.saveCurrentWeekHighLowPrices(tickers, tradingDate);
+            highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices, tickers);
         }
     }
 
@@ -81,7 +81,7 @@ public class IntraDayPricesController {
             // high/low price update based on weekly perf view (refreshed before)
             LocalDate tradingDate = tradingDateImported(dailyImportedPrices);
             List<String> tickers = dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList();
-            highLowForPeriodService.saveCurrentWeekHighLowPrices(tickers, tradingDate);
+            highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices, tickers);
         }
         return dailyImportedPrices;
     }

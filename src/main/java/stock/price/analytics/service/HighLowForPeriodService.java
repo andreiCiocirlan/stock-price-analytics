@@ -6,12 +6,14 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import stock.price.analytics.cache.HighLowPricesCache;
 import stock.price.analytics.model.prices.PriceEntity;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.enums.StockPerformanceInterval;
 import stock.price.analytics.model.prices.highlow.HighLow4w;
 import stock.price.analytics.model.prices.highlow.HighLow52Week;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
+import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 import stock.price.analytics.repository.prices.HighLowForPeriodRepository;
 import stock.price.analytics.util.Constants;
 
@@ -46,6 +48,7 @@ public class HighLowForPeriodService {
     @PersistenceContext
     private final EntityManager entityManager;
     private final HighLowForPeriodRepository highLowForPeriodRepository;
+    private final HighLowPricesCache highLowPricesCache;
 
     @Transactional
     public void saveHighLowPricesForPeriod(StockPerformanceInterval stockPerformanceInterval) {
@@ -72,6 +75,19 @@ public class HighLowForPeriodService {
                     .toList();
         };
         partitionDataAndSave(highLowPrices, highLowForPeriodRepository);
+    }
+
+    public void saveCurrentWeekHighLowPricesFrom(List<DailyPriceOHLC> dailyPricesImported, List<String> tickers) {
+        logTime(() -> {
+            for (HighLowPeriod highLowPeriod : values()) {
+                List<? extends HighLowForPeriod> hlPrices = highLowPricesCache.highLowPricesFor(dailyPricesImported, tickers, highLowPeriod);
+                if (!hlPrices.isEmpty()) {
+                    log.info("found new {} prices {}", highLowPeriod, hlPrices.stream().map(HighLowForPeriod::getTicker));
+                    highLowPricesCache.addHighLowPrices(hlPrices, highLowPeriod);
+                    partitionDataAndSave(hlPrices, highLowForPeriodRepository);
+                }
+            }
+        }, "saved current week HighLow prices");
     }
 
     public void saveCurrentWeekHighLowPricesSingleTicker(String ticker, LocalDate tradingDate) {
