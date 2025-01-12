@@ -40,6 +40,8 @@ public abstract class HighLowForPeriod implements PriceEntity {
 
     public abstract void setLow(double low);
     public abstract void setHigh(double high);
+    public abstract double getHigh();
+    public abstract double getLow();
 
     @Override
     public String toString() {

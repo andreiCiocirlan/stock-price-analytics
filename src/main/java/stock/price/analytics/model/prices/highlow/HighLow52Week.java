@@ -36,6 +36,16 @@ public class HighLow52Week extends HighLowForPeriod {
     }
 
     @Override
+    public double getHigh() {
+        return high52w;
+    }
+
+    @Override
+    public double getLow() {
+        return low52w;
+    }
+
+    @Override
     public String toString() {
         return STR."HighLow52W { \{super.toString()}, low52w=\{low52w}, high52w=\{high52w}} ";
     }

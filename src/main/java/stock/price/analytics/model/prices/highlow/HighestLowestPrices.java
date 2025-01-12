@@ -30,6 +30,16 @@ public class HighestLowestPrices extends HighLowForPeriod {
     }
 
     @Override
+    public double getHigh() {
+        return highest;
+    }
+
+    @Override
+    public double getLow() {
+        return lowest;
+    }
+
+    @Override
     public String toString() {
         return STR."HighestLowest { \{super.toString()}, lowest=\{lowest}, highest=\{highest}} ";
     }

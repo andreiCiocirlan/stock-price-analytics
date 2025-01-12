@@ -36,6 +36,16 @@ public class HighLow4w extends HighLowForPeriod {
     }
 
     @Override
+    public double getHigh() {
+        return high4w;
+    }
+
+    @Override
+    public double getLow() {
+        return low4w;
+    }
+
+    @Override
     public String toString() {
         return STR."HighLow4W { \{super.toString()}, low4w=\{low4w}, high4w=\{high4w}} ";
     }
