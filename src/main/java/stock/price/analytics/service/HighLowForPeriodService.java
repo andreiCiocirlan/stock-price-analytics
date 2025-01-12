@@ -82,7 +82,7 @@ public class HighLowForPeriodService {
             for (HighLowPeriod highLowPeriod : values()) {
                 List<? extends HighLowForPeriod> hlPrices = highLowPricesCache.highLowPricesFor(dailyPricesImported, tickers, highLowPeriod);
                 if (!hlPrices.isEmpty()) {
-                    log.info("found new {} prices {}", highLowPeriod, hlPrices.stream().map(HighLowForPeriod::getTicker));
+                    log.info("found new {} prices {}", highLowPeriod, hlPrices.stream().map(HighLowForPeriod::getTicker).toList());
                     highLowPricesCache.addHighLowPrices(hlPrices, highLowPeriod);
                     partitionDataAndSave(hlPrices, highLowForPeriodRepository);
                 }
