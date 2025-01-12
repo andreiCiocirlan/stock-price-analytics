@@ -19,6 +19,14 @@ import static stock.price.analytics.util.Constants.NR_THREADS;
 public class PartitionAndSavePriceEntityUtil {
 
     public static <T, R extends PriceEntity> void partitionDataAndSave(List<T> entities, JpaRepository<R, Long> repository) {
+        partitionDataAndSave(entities, repository, true);
+    }
+
+    public static <T, R extends PriceEntity> void partitionDataAndSaveNoLogging(List<T> entities, JpaRepository<R, Long> repository) {
+        partitionDataAndSave(entities, repository, false);
+    }
+
+    public static <T, R extends PriceEntity> void partitionDataAndSave(List<T> entities, JpaRepository<R, Long> repository, boolean logging) {
         if (entities.isEmpty()) {
             log.info("entities isEmpty");
             return;
@@ -28,7 +36,9 @@ public class PartitionAndSavePriceEntityUtil {
             partitions.add(entities.subList(i, Math.min(i + 250, entities.size())));
         }
         save(partitions, repository);
-        log.info("Saved {} rows of type: {} ", entities.size(), entities.getFirst().getClass().getName());
+        if (logging) {
+            log.info("Saved {} rows of type: {} ", entities.size(), entities.getFirst().getClass().getName());
+        }
     }
 
     private static <T, R extends PriceEntity> void save(List<List<T>> partitions, JpaRepository<R, Long> repository) {
