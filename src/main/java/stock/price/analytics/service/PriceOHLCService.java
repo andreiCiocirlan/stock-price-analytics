@@ -76,7 +76,6 @@ public class PriceOHLCService {
             higherTimeframePricesCache.addWeeklyPrices(previousWeeklyPrices);
         } else if (cacheTickers.containsAll(tickers)) {
             previousWeeklyPrices = higherTimeframePricesCache.weeklyPricesFor(tickers);
-            log.info("previousWeeklyPrices full match for tickers");
         } else { // partial match
             tickers.removeAll(cacheTickers);
             previousWeeklyPrices = priceOHLCRepository.findPreviousThreeWeeklyPricesForTickers(tickers);
@@ -103,7 +102,6 @@ public class PriceOHLCService {
             higherTimeframePricesCache.addMonthlyPrices(previousMonthlyPrices);
         } else if (cacheTickers.containsAll(tickers)) {
             previousMonthlyPrices = higherTimeframePricesCache.monthlyPricesFor(tickers);
-            log.info("previousMonthlyPrices full match for tickers");
         } else { // partial match
             tickers.removeAll(cacheTickers);
             previousMonthlyPrices = priceOHLCRepository.findPreviousThreeMonthlyPricesForTickers(tickers);
@@ -130,7 +128,6 @@ public class PriceOHLCService {
             higherTimeframePricesCache.addYearlyPrices(previousYearlyPrices);
         } else if (cacheTickers.containsAll(tickers)) {
             previousYearlyPrices = higherTimeframePricesCache.yearlyPricesFor(tickers);
-            log.info("previousYearlyPrices full match for tickers");
         } else { // partial match
             tickers.removeAll(cacheTickers);
             previousYearlyPrices = priceOHLCRepository.findPreviousThreeYearlyPricesForTickers(tickers);
