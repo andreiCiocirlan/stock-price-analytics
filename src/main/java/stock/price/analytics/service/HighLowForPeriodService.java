@@ -36,6 +36,7 @@ import static stock.price.analytics.model.prices.enums.HighLowPeriod.*;
 import static stock.price.analytics.util.HighLowPeriodPricesUtil.highLowFromFileForPeriod;
 import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
+import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveNoLogging;
 
 @Slf4j
 @Service
@@ -84,7 +85,7 @@ public class HighLowForPeriodService {
                 if (!hlPrices.isEmpty()) {
                     log.info("found new {} prices {}", highLowPeriod, hlPrices.stream().map(HighLowForPeriod::getTicker).toList());
                     highLowPricesCache.addHighLowPrices(hlPrices, highLowPeriod);
-                    partitionDataAndSave(hlPrices, highLowForPeriodRepository);
+                    partitionDataAndSaveNoLogging(hlPrices, highLowForPeriodRepository);
                 }
             }
         }, "saved current week HighLow prices");
