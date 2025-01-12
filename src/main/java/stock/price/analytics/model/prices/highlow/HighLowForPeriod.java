@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 import stock.price.analytics.model.prices.PriceEntity;
+import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 
 import java.time.LocalDate;
 
@@ -36,6 +37,21 @@ public abstract class HighLowForPeriod implements PriceEntity {
         this.ticker = ticker;
         this.startDate = startDate;
         this.endDate = endDate;
+    }
+
+    public boolean newHighLow(DailyPriceOHLC dailyPriceImported) {
+        boolean newHighLowFound = false;
+
+        if (dailyPriceImported.getHigh() >= this.getHigh()) {
+            this.setHigh(dailyPriceImported.getHigh());
+            newHighLowFound = true;
+        }
+        if (dailyPriceImported.getLow() <= this.getLow()) {
+            this.setLow(dailyPriceImported.getLow());
+            newHighLowFound = true;
+        }
+
+        return newHighLowFound;
     }
 
     public abstract void setLow(double low);

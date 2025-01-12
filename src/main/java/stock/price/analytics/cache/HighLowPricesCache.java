@@ -1,0 +1,67 @@
+package stock.price.analytics.cache;
+
+import org.springframework.stereotype.Component;
+import stock.price.analytics.model.prices.enums.HighLowPeriod;
+import stock.price.analytics.model.prices.highlow.HighLow4w;
+import stock.price.analytics.model.prices.highlow.HighLow52Week;
+import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
+import stock.price.analytics.model.prices.highlow.HighestLowestPrices;
+import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
+
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Component
+public class HighLowPricesCache {
+
+    private final Map<String, HighLow4w> highLow4wMap = new HashMap<>();
+    private final Map<String, HighLow52Week> highLow52wMap = new HashMap<>();
+    private final Map<String, HighestLowestPrices> highestLowestMap = new HashMap<>();
+
+    public void addHighLowPrices(List<? extends HighLowForPeriod> hlPrices, HighLowPeriod highLowPeriod) {
+        switch (highLowPeriod) {
+            case HIGH_LOW_4W -> hlPrices.forEach(hlPrice -> highLow4wMap.merge(
+                    createKey(hlPrice.getTicker(), hlPrice.getStartDate()),
+                    (HighLow4w) hlPrice,
+                    (_, newPrice) -> newPrice
+            ));
+            case HIGH_LOW_52W -> hlPrices.forEach(hlPrice ->
+                    highLow52wMap.merge(
+                            createKey(hlPrice.getTicker(), hlPrice.getStartDate()),
+                            (HighLow52Week) hlPrice,
+                            (_, newPrice) -> newPrice
+                    )
+            );
+            case HIGH_LOW_ALL_TIME -> hlPrices.forEach(hlPrice ->
+                    highestLowestMap.merge(
+                            createKey(hlPrice.getTicker(), hlPrice.getStartDate()),
+                            (HighestLowestPrices) hlPrice,
+                            (_, newPrice) -> newPrice
+                    )
+            );
+        }
+    }
+
+    public List<? extends HighLowForPeriod> highLowPricesFor(List<DailyPriceOHLC> dailyPricesImported, List<String> tickers, HighLowPeriod highLowPeriod) {
+        Map<String, DailyPriceOHLC> dailyPricesImportedMap = dailyPricesImported.stream().collect(Collectors.toMap(DailyPriceOHLC::getTicker, p -> p));
+        Map<String, ? extends HighLowForPeriod> highLowPrices = switch (highLowPeriod) {
+            case HIGH_LOW_4W -> highLow4wMap;
+            case HIGH_LOW_52W -> highLow52wMap;
+            case HIGH_LOW_ALL_TIME -> highestLowestMap;
+        };
+        return tickers.stream()
+                .flatMap(ticker -> highLowPrices.entrySet().stream()
+                                .filter(entry -> entry.getKey().startsWith(ticker + "_"))
+                                .map(Map.Entry::getValue)
+                                .filter(hlp -> hlp.newHighLow(dailyPricesImportedMap.get(ticker))) // the method also assigns new high/low price not just return true/false
+                ).collect(Collectors.toList());
+    }
+
+    private String createKey(String ticker, LocalDate startDate) {
+        return ticker + "_" + startDate;
+    }
+
+}

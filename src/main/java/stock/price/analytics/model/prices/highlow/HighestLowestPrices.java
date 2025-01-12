@@ -6,6 +6,11 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.beans.BeanUtils;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 
 @Entity
 @Getter
@@ -18,6 +23,15 @@ public class HighestLowestPrices extends HighLowForPeriod {
     private double lowest;
     @Column(name = "high")
     private double highest;
+
+
+    public HighestLowestPrices copyWith(LocalDate startDate) {
+        HighestLowestPrices copy = new HighestLowestPrices();
+        BeanUtils.copyProperties(this, copy, "id", "startDate", "endDate");
+        copy.setStartDate(startDate);
+        copy.setEndDate(startDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY)));
+        return copy;
+    }
 
     @Override
     public void setLow(double low) {
