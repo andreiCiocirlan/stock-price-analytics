@@ -1,5 +1,6 @@
 package stock.price.analytics.cache;
 
+import lombok.Getter;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.highlow.HighLow4w;
@@ -8,6 +9,7 @@ import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.highlow.HighestLowestPrices;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +21,8 @@ public class HighLowPricesCache {
     private final Map<String, HighLow4w> highLow4wMap = new HashMap<>();
     private final Map<String, HighLow52Week> highLow52wMap = new HashMap<>();
     private final Map<String, HighestLowestPrices> highestLowestMap = new HashMap<>();
+    @Getter
+    private final List<HighLowForPeriod> newHighLowPrices = new ArrayList<>();
 
     public void addHighLowPrices(List<? extends HighLowForPeriod> hlPrices, HighLowPeriod highLowPeriod) {
         switch (highLowPeriod) {
@@ -51,20 +55,19 @@ public class HighLowPricesCache {
             case HIGH_LOW_52W -> highLow52wMap;
             case HIGH_LOW_ALL_TIME -> highestLowestMap;
         };
-        return tickers.stream()
+        List<? extends HighLowForPeriod> updatedHighLowPrices = tickers.stream()
                 .flatMap(ticker -> highLowPrices.entrySet().stream()
-                                .filter(entry -> entry.getKey().equals(ticker))
-                                .map(Map.Entry::getValue)
-                                .filter(hlp -> hlp.newHighLow(dailyPricesImportedMap.get(ticker))) // the method also assigns new high/low price not just return true/false
+                        .filter(entry -> entry.getKey().equals(ticker))
+                        .map(Map.Entry::getValue)
+                        .filter(hlp -> hlp.newHighLow(dailyPricesImportedMap.get(ticker))) // the method also assigns new high/low price not just return true/false
                 ).collect(Collectors.toList());
+
+        newHighLowPrices.addAll(updatedHighLowPrices); // used for stocks update high-low prices
+        return updatedHighLowPrices;
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends HighLowForPeriod> Map<String, T> highLowMapFor(HighLowPeriod highLowPeriod) {
-        return switch (highLowPeriod) {
-            case HIGH_LOW_4W -> (Map<String, T>) highLow4wMap; // Assuming highLow4wMap is of type Map<String, HighLow4w>
-            case HIGH_LOW_52W -> (Map<String, T>) highLow52wMap; // Assuming highLow52wMap is of type Map<String, HighLow52w>
-            case HIGH_LOW_ALL_TIME -> (Map<String, T>) highestLowestMap; // Assuming highestLowestMap is of type Map<String, HighestLowest>
-        };
+    // clean slate for next import
+    public void clearNewHighLowPrices() {
+        newHighLowPrices.clear();
     }
 }

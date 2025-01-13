@@ -6,10 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.HighLowPricesCache;
 import stock.price.analytics.cache.StocksCache;
-import stock.price.analytics.model.prices.enums.HighLowPeriod;
-import stock.price.analytics.model.prices.highlow.HighLow4w;
-import stock.price.analytics.model.prices.highlow.HighLow52Week;
-import stock.price.analytics.model.prices.highlow.HighestLowestPrices;
+import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.stocks.StockRepository;
@@ -23,16 +20,13 @@ import java.nio.file.Paths;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.nio.file.Files.walk;
 import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
-import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveNoLogging;
 import static stock.price.analytics.util.PricesOHLCUtil.tickerFrom;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateImported;
 
@@ -99,17 +93,23 @@ public class StockService {
                 "updated stocks high low 4w, 52w, all-time");
     }
 
-    public void updateStocksHighLowFromHighLowCache(List<String> tickers) {
+    public void updateStocksHighLowFromHighLowCache() {
         Map<String, Stock> stocksMap = stocksCache.stocksMap();
-        Map<String, HighLow4w> highLow4wMap = highLowPricesCache.highLowMapFor(HighLowPeriod.HIGH_LOW_4W);
-        Map<String, HighLow52Week> highLow52wMap = highLowPricesCache.highLowMapFor(HighLowPeriod.HIGH_LOW_52W);
-        Map<String, HighestLowestPrices> highestLowestMap = highLowPricesCache.highLowMapFor(HighLowPeriod.HIGH_LOW_ALL_TIME);
-        for (String ticker : tickers) {
-            Stock stock = stocksMap.get(ticker);
-            highLow4wMap.get(ticker);
-            stock.updateFrom(highLow4wMap.get(ticker), highLow52wMap.get(ticker), highestLowestMap.get(ticker));
+        List<HighLowForPeriod> newHighLowPrices = highLowPricesCache.getNewHighLowPrices();
+        Set<Stock> updatedStocks = newHighLowPrices.stream()
+                .map(HighLowForPeriod::getTicker)
+                .filter(stocksMap::containsKey)
+                .map(stocksMap::get)
+                .collect(Collectors.toSet());
+        if (!updatedStocks.isEmpty()) {
+            for (HighLowForPeriod newHighLowPrice : newHighLowPrices) {
+                String ticker = newHighLowPrice.getTicker();
+                Stock stock = stocksMap.get(ticker);
+                stock.updateFrom(newHighLowPrice);
+            }
+            partitionDataAndSave(updatedStocks.stream().toList(), stockRepository);
+            highLowPricesCache.clearNewHighLowPrices(); // clear new high low prices for next import
         }
-        partitionDataAndSaveNoLogging(stocksMap.values().stream().toList(), stockRepository);
     }
 
     public void initStocksCache() {

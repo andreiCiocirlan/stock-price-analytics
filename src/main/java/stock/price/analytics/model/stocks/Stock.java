@@ -8,6 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import stock.price.analytics.model.prices.PriceEntity;
 import stock.price.analytics.model.prices.highlow.HighLow4w;
 import stock.price.analytics.model.prices.highlow.HighLow52Week;
+import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.highlow.HighestLowestPrices;
 
 import java.time.LocalDate;
@@ -92,13 +93,28 @@ public class Stock implements PriceEntity {
         this.ipoDate = ipoDate;
     }
 
-    public void updateFrom(HighLow4w highLow4w, HighLow52Week highLow52Week, HighestLowestPrices highestLowestPrices) {
-        this.setLow52w(highLow52Week.getLow52w());
-        this.setHigh52w(highLow52Week.getHigh52w());
-        this.setLow4w(highLow4w.getLow4w());
-        this.setHigh4w(highLow4w.getHigh4w());
+    public void updateFrom(HighLowForPeriod highLowForPeriod) {
+        switch (highLowForPeriod) {
+            case HighLow4w highLow4w -> updateFromHighLow4w(highLow4w);
+            case HighLow52Week highLow52Week -> updateFromHighLow52Week(highLow52Week);
+            case HighestLowestPrices highestLowestPrices -> updateFromHighestLowestPrices(highestLowestPrices);
+            default -> throw new IllegalArgumentException("Unknown type: " + highLowForPeriod.getClass().getSimpleName());
+        }
+    }
+
+    private void updateFromHighestLowestPrices(HighestLowestPrices highestLowestPrices) {
         this.setLowest(highestLowestPrices.getLowest());
         this.setHighest(highestLowestPrices.getHighest());
+    }
+
+    private void updateFromHighLow52Week(HighLow52Week highLow52Week) {
+        this.setLow52w(highLow52Week.getLow52w());
+        this.setHigh52w(highLow52Week.getHigh52w());
+    }
+
+    private void updateFromHighLow4w(HighLow4w highLow4w) {
+        this.setLow4w(highLow4w.getLow4w());
+        this.setHigh4w(highLow4w.getHigh4w());
     }
 
     @Override
