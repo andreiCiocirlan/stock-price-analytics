@@ -12,6 +12,7 @@ import stock.price.analytics.service.*;
 import java.time.LocalDate;
 import java.util.List;
 
+import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateImported;
 
@@ -58,6 +59,7 @@ public class IntraDayPricesController {
             LocalDate tradingDate = tradingDateImported(dailyImportedPrices);
             List<String> tickers = dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList();
             highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices, tickers);
+            logTime(() -> stockService.updateStocksHighLowFromHighLowCache(tickers), "updated stocks high low 4w, 52w, all-time");
         }
     }
 
@@ -82,6 +84,7 @@ public class IntraDayPricesController {
             LocalDate tradingDate = tradingDateImported(dailyImportedPrices);
             List<String> tickers = dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList();
             highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices, tickers);
+            logTime(() -> stockService.updateStocksHighLowFromHighLowCache(tickers), "updated stocks high low 4w, 52w, all-time");
         }
         return dailyImportedPrices;
     }

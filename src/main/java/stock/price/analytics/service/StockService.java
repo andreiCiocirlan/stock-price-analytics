@@ -4,7 +4,12 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import stock.price.analytics.cache.HighLowPricesCache;
 import stock.price.analytics.cache.StocksCache;
+import stock.price.analytics.model.prices.enums.HighLowPeriod;
+import stock.price.analytics.model.prices.highlow.HighLow4w;
+import stock.price.analytics.model.prices.highlow.HighLow52Week;
+import stock.price.analytics.model.prices.highlow.HighestLowestPrices;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.stocks.StockRepository;
@@ -21,11 +26,13 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static java.nio.file.Files.walk;
 import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
+import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveNoLogging;
 import static stock.price.analytics.util.PricesOHLCUtil.tickerFrom;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateImported;
 
@@ -36,6 +43,7 @@ public class StockService {
 
     private final StockRepository stockRepository;
     private final StocksCache stocksCache;
+    private final HighLowPricesCache highLowPricesCache;
 
     @Transactional
     public void saveStocks() throws IOException {
@@ -89,6 +97,19 @@ public class StockService {
     public void updateStocksHighLow(LocalDate tradingDate) {
         logTime(() -> stockRepository.updateStocksHighLow(tradingDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))),
                 "updated stocks high low 4w, 52w, all-time");
+    }
+
+    public void updateStocksHighLowFromHighLowCache(List<String> tickers) {
+        Map<String, Stock> stocksMap = stocksCache.stocksMap();
+        Map<String, HighLow4w> highLow4wMap = highLowPricesCache.highLowMapFor(HighLowPeriod.HIGH_LOW_4W);
+        Map<String, HighLow52Week> highLow52wMap = highLowPricesCache.highLowMapFor(HighLowPeriod.HIGH_LOW_52W);
+        Map<String, HighestLowestPrices> highestLowestMap = highLowPricesCache.highLowMapFor(HighLowPeriod.HIGH_LOW_ALL_TIME);
+        for (String ticker : tickers) {
+            Stock stock = stocksMap.get(ticker);
+            highLow4wMap.get(ticker);
+            stock.updateFrom(highLow4wMap.get(ticker), highLow52wMap.get(ticker), highestLowestMap.get(ticker));
+        }
+        partitionDataAndSaveNoLogging(stocksMap.values().stream().toList(), stockRepository);
     }
 
     public void initStocksCache() {

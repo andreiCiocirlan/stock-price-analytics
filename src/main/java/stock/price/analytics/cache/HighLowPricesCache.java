@@ -44,7 +44,7 @@ public class HighLowPricesCache {
         }
     }
 
-    public List<? extends HighLowForPeriod> highLowPricesFor(List<DailyPriceOHLC> dailyPricesImported, List<String> tickers, HighLowPeriod highLowPeriod) {
+    public List<? extends HighLowForPeriod> updateHighLowPricesCacheFrom(List<DailyPriceOHLC> dailyPricesImported, List<String> tickers, HighLowPeriod highLowPeriod) {
         Map<String, DailyPriceOHLC> dailyPricesImportedMap = dailyPricesImported.stream().collect(Collectors.toMap(DailyPriceOHLC::getTicker, p -> p));
         Map<String, ? extends HighLowForPeriod> highLowPrices = switch (highLowPeriod) {
             case HIGH_LOW_4W -> highLow4wMap;
@@ -59,4 +59,12 @@ public class HighLowPricesCache {
                 ).collect(Collectors.toList());
     }
 
+    @SuppressWarnings("unchecked")
+    public <T extends HighLowForPeriod> Map<String, T> highLowMapFor(HighLowPeriod highLowPeriod) {
+        return switch (highLowPeriod) {
+            case HIGH_LOW_4W -> (Map<String, T>) highLow4wMap; // Assuming highLow4wMap is of type Map<String, HighLow4w>
+            case HIGH_LOW_52W -> (Map<String, T>) highLow52wMap; // Assuming highLow52wMap is of type Map<String, HighLow52w>
+            case HIGH_LOW_ALL_TIME -> (Map<String, T>) highestLowestMap; // Assuming highestLowestMap is of type Map<String, HighestLowest>
+        };
+    }
 }

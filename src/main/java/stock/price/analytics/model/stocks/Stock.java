@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 import stock.price.analytics.model.prices.PriceEntity;
+import stock.price.analytics.model.prices.highlow.HighLow4w;
+import stock.price.analytics.model.prices.highlow.HighLow52Week;
+import stock.price.analytics.model.prices.highlow.HighestLowestPrices;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -87,6 +90,15 @@ public class Stock implements PriceEntity {
     public Stock(String ticker, LocalDate ipoDate) {
         this.ticker = ticker;
         this.ipoDate = ipoDate;
+    }
+
+    public void updateFrom(HighLow4w highLow4w, HighLow52Week highLow52Week, HighestLowestPrices highestLowestPrices) {
+        this.setLow52w(highLow52Week.getLow52w());
+        this.setHigh52w(highLow52Week.getHigh52w());
+        this.setLow4w(highLow4w.getLow4w());
+        this.setHigh4w(highLow4w.getHigh4w());
+        this.setLowest(highestLowestPrices.getLowest());
+        this.setHighest(highestLowestPrices.getHighest());
     }
 
     @Override
