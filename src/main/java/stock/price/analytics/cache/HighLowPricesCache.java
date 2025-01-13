@@ -8,7 +8,6 @@ import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.highlow.HighestLowestPrices;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,20 +23,20 @@ public class HighLowPricesCache {
     public void addHighLowPrices(List<? extends HighLowForPeriod> hlPrices, HighLowPeriod highLowPeriod) {
         switch (highLowPeriod) {
             case HIGH_LOW_4W -> hlPrices.forEach(hlPrice -> highLow4wMap.merge(
-                    createKey(hlPrice.getTicker(), hlPrice.getStartDate()),
+                    hlPrice.getTicker(),
                     (HighLow4w) hlPrice,
                     (_, newPrice) -> newPrice
             ));
             case HIGH_LOW_52W -> hlPrices.forEach(hlPrice ->
                     highLow52wMap.merge(
-                            createKey(hlPrice.getTicker(), hlPrice.getStartDate()),
+                            hlPrice.getTicker(),
                             (HighLow52Week) hlPrice,
                             (_, newPrice) -> newPrice
                     )
             );
             case HIGH_LOW_ALL_TIME -> hlPrices.forEach(hlPrice ->
                     highestLowestMap.merge(
-                            createKey(hlPrice.getTicker(), hlPrice.getStartDate()),
+                            hlPrice.getTicker(),
                             (HighestLowestPrices) hlPrice,
                             (_, newPrice) -> newPrice
                     )
@@ -54,14 +53,10 @@ public class HighLowPricesCache {
         };
         return tickers.stream()
                 .flatMap(ticker -> highLowPrices.entrySet().stream()
-                                .filter(entry -> entry.getKey().startsWith(ticker + "_"))
+                                .filter(entry -> entry.getKey().equals(ticker))
                                 .map(Map.Entry::getValue)
                                 .filter(hlp -> hlp.newHighLow(dailyPricesImportedMap.get(ticker))) // the method also assigns new high/low price not just return true/false
                 ).collect(Collectors.toList());
-    }
-
-    private String createKey(String ticker, LocalDate startDate) {
-        return ticker + "_" + startDate;
     }
 
 }
