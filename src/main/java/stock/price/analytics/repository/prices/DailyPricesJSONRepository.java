@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import stock.price.analytics.model.prices.json.DailyPricesJSON;
+import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,5 +15,8 @@ public interface DailyPricesJSONRepository extends JpaRepository<DailyPricesJSON
 
     @Query(value = "SELECT * from daily_prices_json_view where date between :from and :to", nativeQuery = true)
     List<DailyPricesJSON> findByDateBetween(@Param("from") LocalDate from, @Param("to") LocalDate to);
+
+    @Query(value = "select max(date) from daily_prices_json_view", nativeQuery = true)
+    LocalDate findLastImportedDate();
 
 }
