@@ -29,4 +29,7 @@ public class StocksCache {
                 .collect(Collectors.toList());
     }
 
+    public Map<String, Stock> stocksMap() {
+        return stocksMap;
+    }
 }
