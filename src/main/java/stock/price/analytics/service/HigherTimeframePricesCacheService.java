@@ -19,9 +19,10 @@ public class HigherTimeframePricesCacheService {
 
     public void populateHigherTimeframePricesCache() {
         List<Stock> xtbStocks = stockRepository.findByXtbStockTrueAndDelistedDateIsNull();
-        higherTimeframePricesCache.addWeeklyPrices(priceOHLCRepository.findPreviousThreeWeeklyPricesForTickers(xtbStocks.stream().map(Stock::getTicker).toList()));
-        higherTimeframePricesCache.addMonthlyPrices(priceOHLCRepository.findPreviousThreeMonthlyPricesForTickers(xtbStocks.stream().map(Stock::getTicker).toList()));
-        higherTimeframePricesCache.addYearlyPrices(priceOHLCRepository.findPreviousThreeYearlyPricesForTickers(xtbStocks.stream().map(Stock::getTicker).toList()));
+        List<String> tickers = xtbStocks.stream().map(Stock::getTicker).toList();
+        higherTimeframePricesCache.addWeeklyPrices(priceOHLCRepository.findPreviousThreeWeeklyPricesForTickers(tickers));
+        higherTimeframePricesCache.addMonthlyPrices(priceOHLCRepository.findPreviousThreeMonthlyPricesForTickers(tickers));
+        higherTimeframePricesCache.addYearlyPrices(priceOHLCRepository.findPreviousThreeYearlyPricesForTickers(tickers));
     }
 
 }
