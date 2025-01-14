@@ -54,6 +54,7 @@ public class HighLowPricesCacheService {
             if (highLowPeriod == HighLowPeriod.HIGH_LOW_ALL_TIME) { // for all-time highs/lows simply copy the existing row on Mondays
                 List<HighestLowestPrices> highestLowestPrices = new ArrayList<>();
                 highLowForPeriodRepository.highestLowestPrices(startDate).forEach(hlp -> highestLowestPrices.add(hlp.copyWith(newWeekStartDate)));
+                partitionDataAndSave(highestLowestPrices, highLowForPeriodRepository);
                 highLowPricesCache.addHighLowPrices(highestLowestPrices, highLowPeriod);
             } else { // for 4w, 52w need sql select for the period (for all-time it would simply be a copy)
                 int weekCount = switch (highLowPeriod) {
@@ -65,6 +66,7 @@ public class HighLowPricesCacheService {
                         .stream()
                         .map(dto -> convertToHighLowForPeriod(dto, newWeekStartDate, newWeekEndDate, highLowPeriod))
                         .toList();
+                partitionDataAndSave(highLowForPeriods, highLowForPeriodRepository);
                 highLowPricesCache.addHighLowPrices(highLowForPeriods, highLowPeriod);
             }
         } else {
