@@ -6,6 +6,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import stock.price.analytics.model.prices.enums.HighLowPeriod;
 
 import java.time.LocalDate;
 
@@ -43,6 +44,11 @@ public class HighLow52Week extends HighLowForPeriod {
     @Override
     public double getLow() {
         return low52w;
+    }
+
+    @Override
+    public HighLowPeriod getHighLowPeriod() {
+        return HighLowPeriod.HIGH_LOW_52W;
     }
 
     @Override

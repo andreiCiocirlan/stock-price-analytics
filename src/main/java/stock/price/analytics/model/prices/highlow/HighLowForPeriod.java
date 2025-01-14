@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 import stock.price.analytics.model.prices.PriceEntity;
+import stock.price.analytics.model.prices.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 
 import java.time.DayOfWeek;
@@ -62,6 +63,7 @@ public abstract class HighLowForPeriod implements PriceEntity {
     public abstract void setHigh(double high);
     public abstract double getHigh();
     public abstract double getLow();
+    public abstract HighLowPeriod getHighLowPeriod();
 
     @Override
     public String toString() {

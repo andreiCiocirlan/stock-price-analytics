@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.BeanUtils;
+import stock.price.analytics.model.prices.enums.HighLowPeriod;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -51,6 +52,11 @@ public class HighestLowestPrices extends HighLowForPeriod {
     @Override
     public double getLow() {
         return lowest;
+    }
+
+    @Override
+    public HighLowPeriod getHighLowPeriod() {
+        return HighLowPeriod.HIGH_LOW_ALL_TIME;
     }
 
     @Override
