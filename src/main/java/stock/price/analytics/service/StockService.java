@@ -107,7 +107,9 @@ public class StockService {
                 Stock stock = stocksMap.get(ticker);
                 stock.updateFrom(newHighLowPrice);
             }
-            partitionDataAndSave(updatedStocks.stream().toList(), stockRepository);
+            List<Stock> stocks = updatedStocks.stream().toList();
+            partitionDataAndSave(stocks, stockRepository);
+            stocksCache.addStocks(stocks);
             highLowPricesCache.clearNewHighLowPrices(); // clear new high low prices for next import
         }
     }
