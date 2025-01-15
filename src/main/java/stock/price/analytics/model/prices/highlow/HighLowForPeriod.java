@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import stock.price.analytics.model.prices.PriceEntity;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
@@ -13,6 +14,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 
+@Slf4j
 @MappedSuperclass
 @NoArgsConstructor
 @Setter
@@ -50,10 +52,14 @@ public abstract class HighLowForPeriod implements PriceEntity {
         if (dailyPriceImported.getHigh() > this.getHigh()) {
             this.setHigh(dailyPriceImported.getHigh());
             newHighLowFound = true;
+        } else if (dailyPriceImported.getClose() == this.getHigh()) {
+            log.info("Equal {} high for {}: {}", getHighLowPeriod(), dailyPriceImported.getTicker(), dailyPriceImported.getClose());
         }
         if (dailyPriceImported.getLow() < this.getLow()) {
             this.setLow(dailyPriceImported.getLow());
             newHighLowFound = true;
+        } else if (dailyPriceImported.getClose() == this.getLow()) {
+            log.info("Equal {} low for {}: {}", getHighLowPeriod(), dailyPriceImported.getTicker(), dailyPriceImported.getClose());
         }
 
         return newHighLowFound;
