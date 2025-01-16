@@ -1,6 +1,5 @@
 package stock.price.analytics.cache;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.model.prices.ohlc.MonthlyPriceOHLC;
 import stock.price.analytics.model.prices.ohlc.WeeklyPriceOHLC;
@@ -10,7 +9,6 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Component
 public class HigherTimeframePricesCache {
 
