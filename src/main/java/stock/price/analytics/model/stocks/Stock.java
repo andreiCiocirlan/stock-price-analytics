@@ -10,6 +10,7 @@ import stock.price.analytics.model.prices.highlow.HighLow4w;
 import stock.price.analytics.model.prices.highlow.HighLow52Week;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.highlow.HighestLowestPrices;
+import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -45,6 +46,18 @@ public class Stock implements PriceEntity {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "delisted_date")
     private LocalDate delistedDate; // date stock was added (IPO)
+
+    // real-time prices
+    @Column(name = "open")
+    private Double open; // Daily Opening Price
+    @Column(name = "high")
+    private Double high; // Daily High
+    @Column(name = "low")
+    private Double low; // Daily Low
+    @Column(name = "close")
+    private Double close; // Daily Close (real-time price)
+    @Column(name = "d_performance")
+    private Double dPerformance; // Daily Performance (real-time price)
 
     @Column(name = "high4w")
     private double high4w; // high 4w
@@ -110,6 +123,15 @@ public class Stock implements PriceEntity {
     private void updateFromHighLow52Week(HighLow52Week highLow52Week) {
         this.setLow52w(highLow52Week.getLow52w());
         this.setHigh52w(highLow52Week.getHigh52w());
+    }
+
+    public void updateFromDailyPrice(DailyPriceOHLC dailyPrice) {
+        this.setOpen(dailyPrice.getOpen());
+        this.setHigh(dailyPrice.getHigh());
+        this.setLow(dailyPrice.getLow());
+        this.setClose(dailyPrice.getClose());
+        this.setDPerformance(dailyPrice.getPerformance());
+        this.setLastUpdated(dailyPrice.getDate());
     }
 
     private void updateFromHighLow4w(HighLow4w highLow4w) {
