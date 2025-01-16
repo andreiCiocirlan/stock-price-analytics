@@ -31,7 +31,7 @@ public class Application implements ApplicationRunner {
     @Transactional
     public void run(ApplicationArguments args) throws Exception {
         LoggingUtil.logTime(stockRepository::updateIpoAndDelistedDates, "updated ipo/delisted dates at start-up");
-        LoggingUtil.logTime(higherTimeframePricesCacheService::populateHigherTimeframePricesCache, "initialized higher-timeframe prices cache");
+        LoggingUtil.logTime(higherTimeframePricesCacheService::initHigherTimeframePricesCache, "initialized higher-timeframe prices cache");
         LoggingUtil.logTime(stockService::initStocksCache, "initialized xtb stocks cache");
         LoggingUtil.logTime(highLowPricesCacheService::initHighLowPricesCache, "initialized high low prices cache");
     }

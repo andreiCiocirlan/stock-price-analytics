@@ -17,7 +17,7 @@ public class HigherTimeframePricesCacheService {
     private final StockRepository stockRepository;
     private final PriceOHLCRepository priceOHLCRepository;
 
-    public void populateHigherTimeframePricesCache() {
+    public void initHigherTimeframePricesCache() {
         List<Stock> xtbStocks = stockRepository.findByXtbStockTrueAndDelistedDateIsNull();
         List<String> tickers = xtbStocks.stream().map(Stock::getTicker).toList();
         higherTimeframePricesCache.addWeeklyPrices(priceOHLCRepository.findPreviousThreeWeeklyPricesForTickers(tickers));
