@@ -42,6 +42,21 @@ public class DailyPriceOHLC extends AbstractPriceOHLC {
         return date;
     }
 
+    // used for real-time import and update (create new daily price if dates do not match, update otherwise)
+    public DailyPriceOHLC updateFrom(DailyPriceOHLC newPrice, LocalDate date) {
+        if (getDate().equals(date)) {
+            // Update properties of the existing object
+            setOpen(newPrice.getOpen());
+            setHigh(newPrice.getHigh());
+            setLow(newPrice.getLow());
+            setClose(newPrice.getClose());
+            setPerformance(newPrice.getPerformance());
+            return this;
+        } else { // first import of the day
+            return newPrice;
+        }
+    }
+
     @Override
     public String toString() {
         return STR."Daily_OHLC {  date=\{date} \{super.toString()}";
