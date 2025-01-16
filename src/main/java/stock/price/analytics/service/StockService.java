@@ -28,7 +28,6 @@ import static java.nio.file.Files.walk;
 import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 import static stock.price.analytics.util.PricesOHLCUtil.tickerFrom;
-import static stock.price.analytics.util.TradingDateUtil.tradingDateImported;
 
 @Slf4j
 @Service
@@ -68,29 +67,22 @@ public class StockService {
     }
 
     @Transactional
-    public void updateStocksDate(List<DailyPriceOHLC> dailyImportedPrices) {
-        logTime(() -> {
-            LocalDate tradingDate = tradingDateImported(dailyImportedPrices);
-            List<String> tickers = dailyImportedPrices.stream()
-                    .filter(dailyPriceOHLC -> dailyPriceOHLC.getDate().equals(tradingDate)) // make sure only today prices are filtered
-                    .map(DailyPriceOHLC::getTicker)
-                    .toList();
-
-            List<String> tickersCached = stocksCache.tickers();
-            if (new HashSet<>(tickersCached).containsAll(tickers)) {
-                List<Stock> stocksCached = stocksCache.stocksFor(tickers);
-                stocksCached.forEach(s -> s.setLastUpdated(tradingDate));
-                partitionDataAndSave(stocksCached, stockRepository);
-            } else { // new stock imported that moment -> revert to regular sql update
-                stockRepository.updateStocksLastUpdated(tradingDate, tickers);
-            }
-        }, "updated stocks date");
-    }
-
-    @Transactional
     public void updateStocksHighLow(LocalDate tradingDate) {
         logTime(() -> stockRepository.updateStocksHighLow(tradingDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))),
                 "updated stocks high low 4w, 52w, all-time");
+    }
+
+    public void updateStocksOHLCFromDailyImportedPrices(List<DailyPriceOHLC> dailyImportedPrices) {
+        Map<String, Stock> stocksMap = stocksCache.stocksMap();
+        List<Stock> stocksUpdated = new ArrayList<>();
+        for (DailyPriceOHLC dailyImportedPrice : dailyImportedPrices) {
+            String ticker = dailyImportedPrice.getTicker();
+            Stock stock = stocksMap.containsKey(ticker) ? stocksMap.get(ticker) : new Stock(ticker, LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.FRIDAY)), true);
+            stock.updateFromDailyPrice(dailyImportedPrice);
+            stocksUpdated.add(stock);
+        }
+        partitionDataAndSave(stocksUpdated, stockRepository);
+        stocksCache.addStocks(stocksUpdated);
     }
 
     public void updateStocksHighLowFromHighLowCache() {
