@@ -38,7 +38,7 @@ public class DailyPriceOHLCService {
                     } else {
                         sameDailyPrices.add(ticker);
                     }
-                } else { // insert new daily prices
+                } else if (dailyPrice.getDate().isAfter(latestPrice.getDate())) { // only add if the import date is after latest date from DB
                     importedDailyPrices.add(dailyPrice);
                 }
             } else {
