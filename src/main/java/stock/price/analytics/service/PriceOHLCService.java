@@ -51,10 +51,6 @@ public class PriceOHLCService {
         return priceOHLCs;
     }
 
-    public void addDailyPricesInCache(List<DailyPriceOHLC> dailyPriceOHLCs) {
-        dailyPricesCache.addDailyPrices(dailyPriceOHLCs);
-    }
-
     public void updatePricesForHigherTimeframes(List<DailyPriceOHLC> importedDailyPrices) {
         logTime(() -> updateHTF(importedDailyPrices), "updated prices for higher timeframes");
     }
