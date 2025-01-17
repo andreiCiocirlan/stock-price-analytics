@@ -14,12 +14,10 @@ public class DailyPricesCache {
     private final Map<String, DailyPriceOHLC> dailyPricesByTicker = new HashMap<>();
 
     public void addDailyPrices(List<DailyPriceOHLC> dailyPrices) {
-        dailyPrices.forEach(price -> {
-            this.dailyPricesByTicker.merge(
-                    price.getTicker(),
-                    price,
-                    DailyPriceOHLC::updateFrom);
-        });
+        dailyPrices.forEach(price -> this.dailyPricesByTicker.merge(
+                price.getTicker(),
+                price,
+                DailyPriceOHLC::updateFrom));
     }
 
     public List<DailyPriceOHLC> dailyPricesFor(List<String> tickers) {
