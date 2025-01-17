@@ -52,7 +52,7 @@ public class DailyPriceOHLC extends AbstractPriceOHLC {
             setClose(newPrice.getClose());
             setPerformance(newPrice.getPerformance());
             return this;
-        } else if (getDate().isAfter(newPrice.getDate())) { // newPrice must be newer compared to DB existing price (first daily import)
+        } else if (newPrice.getDate().isAfter(getDate())) { // newPrice must be newer compared to DB existing price (first daily import)
             return newPrice;
         }
         return this; // sometimes DB price is newer, default to existing price
