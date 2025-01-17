@@ -18,7 +18,7 @@ public class DailyPricesCache {
             this.dailyPricesByTicker.merge(
                     price.getTicker(),
                     price,
-                    (existingPrice, newPrice) -> existingPrice.updateFrom(newPrice, price.getDate()));
+                    DailyPriceOHLC::updateFrom);
         });
     }
 
