@@ -50,7 +50,7 @@ public class YahooQuoteService {
     public List<DailyPriceOHLC> dailyPricesFromFile(String fileName) {
         List<DailyPriceOHLC> dailyPriceOHLCs = yahooFinanceClient.dailyPricesFromFile(fileName);
         LocalDate minTradingDate = tradingDateNow().minusDays(5); // max 5 calendar days in the past for previous intraDay prices to be found
-        List<DailyPriceOHLC> latestByTicker = dailyPriceOHLCService.findXTBLatestByTickerWithDateAfter(minTradingDate);
+        List<DailyPriceOHLC> latestByTicker = dailyPriceOHLCService.findXTBLatestDailyPricesWithDateAfter(minTradingDate);
         return dailyPriceOHLCService.getDailyImportedPrices(dailyPriceOHLCs, latestByTicker.stream()
                 .collect(Collectors.toMap(DailyPriceOHLC::getTicker, p -> p)));
     }
@@ -64,7 +64,7 @@ public class YahooQuoteService {
         int maxTickersPerRequest = 1700;
         List<DailyPriceOHLC> dailyImportedPrices = new ArrayList<>();
         LocalDate minTradingDate = tradingDateNow().minusDays(5); // max 5 calendar days in the past for previous intraDay prices to be found
-        List<DailyPriceOHLC> latestByTicker = dailyPriceOHLCService.findXTBLatestByTickerWithDateAfter(minTradingDate);
+        List<DailyPriceOHLC> latestByTicker = dailyPriceOHLCService.findXTBLatestDailyPricesWithDateAfter(minTradingDate);
         List<String> tickersImported = new ArrayList<>(latestByTicker.stream().map(DailyPriceOHLC::getTicker).toList());
 
         int start = 0;
