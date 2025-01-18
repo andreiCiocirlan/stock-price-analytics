@@ -49,6 +49,6 @@ public interface DailyPriceOHLCRepository extends JpaRepository<DailyPriceOHLC, 
             FROM daily_prices dp
             JOIN latest_prices lp ON dp.ticker = lp.ticker AND dp.date = lp.max_date
             """, nativeQuery = true)
-    List<DailyPriceOHLC> findXTBLatestDailyPricesImported();
+    List<DailyPriceOHLC> findLatestDailyPrices();
 
 }

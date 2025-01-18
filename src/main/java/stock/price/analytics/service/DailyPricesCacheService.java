@@ -13,7 +13,7 @@ public class DailyPricesCacheService {
     private final DailyPriceOHLCRepository dailyPriceOHLCRepository;
 
     public void initDailyPricesCache() {
-        dailyPricesCache.addDailyPrices(dailyPriceOHLCRepository.findXTBLatestDailyPricesImported());
+        dailyPricesCache.addDailyPrices(dailyPriceOHLCRepository.findLatestDailyPrices());
     }
 
 }
