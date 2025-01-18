@@ -79,6 +79,6 @@ public class DailyPriceOHLC extends AbstractPriceOHLC {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(date);
+        return Objects.hash(getTicker(), date, getOpen(), getHigh(), getLow(), getClose());
     }
 }
