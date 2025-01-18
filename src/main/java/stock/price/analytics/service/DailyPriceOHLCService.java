@@ -57,8 +57,8 @@ public class DailyPriceOHLCService {
         return importedDailyPrices;
     }
 
-    public void addDailyPricesInCache(List<DailyPriceOHLC> dailyPriceOHLCs) {
-        dailyPricesCache.addDailyPrices(dailyPriceOHLCs);
+    public List<DailyPriceOHLC> addDailyPricesInCacheAndReturn(List<DailyPriceOHLC> dailyPriceOHLCs) {
+        return dailyPricesCache.addDailyPricesInCacheAndReturn(dailyPriceOHLCs);
     }
 
     public List<DailyPriceOHLC> findAllLatestByTickerWithDateAfter(LocalDate date) {
