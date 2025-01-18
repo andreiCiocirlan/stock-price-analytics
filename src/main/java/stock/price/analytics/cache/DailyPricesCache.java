@@ -14,7 +14,7 @@ public class DailyPricesCache {
     private final Map<String, DailyPriceOHLC> dailyPricesByTicker = new HashMap<>();
 
     public void addDailyPrices(List<DailyPriceOHLC> dailyPrices) {
-        dailyPrices.forEach(price -> this.dailyPricesByTicker.merge(
+        dailyPrices.forEach(price -> dailyPricesByTicker.merge(
                 price.getTicker(),
                 price,
                 DailyPriceOHLC::updateFrom));
