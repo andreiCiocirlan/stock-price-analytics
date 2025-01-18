@@ -64,12 +64,9 @@ public class DailyPriceOHLC extends AbstractPriceOHLC {
     }
 
     public boolean differentPrices(DailyPriceOHLC that) {
-        return Objects.equals(getTicker(), that.getTicker()) &&
-                Objects.equals(date, that.date) &&
-                Double.compare(getOpen(), that.getOpen()) == 0 &&
-                Double.compare(getHigh(), that.getHigh()) == 0 &&
-                Double.compare(getLow(), that.getLow()) == 0 &&
-                Double.compare(getClose(), that.getClose()) == 0;
+        return that.getClose() != this.getClose() || that.getOpen() != this.getOpen()
+                || that.getHigh() != this.getHigh() || that.getLow() != this.getLow()
+                || that.getPerformance() != this.getPerformance();
     }
 
     @Override
