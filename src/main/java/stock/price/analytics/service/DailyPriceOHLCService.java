@@ -65,8 +65,8 @@ public class DailyPriceOHLCService {
         return dailyPriceOHLCRepository.findAllLatestByTickerWithDateAfter(date);
     }
 
-    public List<DailyPriceOHLC> findXTBLatestByTickerWithDateAfter(LocalDate date) {
-        return dailyPriceOHLCRepository.findXTBLatestByTickerWithDateAfter(date);
+    public List<DailyPriceOHLC> findXTBLatestDailyPricesWithDateAfter(LocalDate date) {
+        return dailyPriceOHLCRepository.findXTBLatestDailyPricesWithDateAfter(date);
     }
 
     private static boolean needsUpdate(DailyPriceOHLC dailyPrice, DailyPriceOHLC latestPrice) {
