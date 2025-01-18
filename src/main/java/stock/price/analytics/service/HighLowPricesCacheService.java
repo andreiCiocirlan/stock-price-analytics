@@ -13,6 +13,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
@@ -78,6 +79,10 @@ public class HighLowPricesCacheService {
             };
             highLowPricesCache.addHighLowPrices(highLowPrices, highLowPeriod);
         }
+    }
+
+    public List<String> getNewHighLowsForHLPeriod(HighLowPeriod highLowPeriod) {
+        return new ArrayList<>(highLowPricesCache.getDailyNewHighLowsByHLPeriod().getOrDefault(highLowPeriod, Collections.emptySet()));
     }
 
 }

@@ -2,22 +2,24 @@ package stock.price.analytics.controller;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import stock.price.analytics.model.prices.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.enums.StockPerformanceInterval;
 import stock.price.analytics.service.HighLowForPeriodService;
+import stock.price.analytics.service.HighLowPricesCacheService;
 
 import java.time.LocalDate;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class HighLowForPeriodController {
 
     private final HighLowForPeriodService highLowForPeriodService;
+    private final HighLowPricesCacheService highLowPricesCacheService;
 
     @PostMapping("/save-52w-high-low")
     @ResponseStatus(HttpStatus.OK)
@@ -38,6 +40,14 @@ public class HighLowForPeriodController {
                                                        @RequestParam(name = "tradingDate")
                                                             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate tradingDate) {
         highLowForPeriodService.saveCurrentWeekHighLowPricesSingleTicker(ticker, tradingDate);
+    }
+
+    @GetMapping("/daily-new-high-lows-for-hl-period")
+    @ResponseStatus(HttpStatus.OK)
+    public void newDailyHighLowsForHLPeriod() {
+        for (HighLowPeriod highLowPeriod : HighLowPeriod.values()) {
+            log.info("New {} : {}", highLowPeriod, highLowPricesCacheService.getNewHighLowsForHLPeriod(highLowPeriod));
+        }
     }
 
 }

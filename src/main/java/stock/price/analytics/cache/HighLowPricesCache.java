@@ -9,10 +9,7 @@ import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.highlow.HighestLowestPrices;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -23,6 +20,8 @@ public class HighLowPricesCache {
     private final Map<String, HighestLowestPrices> highestLowestMap = new HashMap<>();
     @Getter
     private final List<HighLowForPeriod> newHighLowPrices = new ArrayList<>();
+    @Getter
+    private final Map<HighLowPeriod, Set<String>> dailyNewHighLowsByHLPeriod = new HashMap<>();
 
     public void addHighLowPrices(List<? extends HighLowForPeriod> hlPrices, HighLowPeriod highLowPeriod) {
         switch (highLowPeriod) {
@@ -63,6 +62,12 @@ public class HighLowPricesCache {
                 ).collect(Collectors.toList());
 
         newHighLowPrices.addAll(updatedHighLowPrices); // used for stocks update high-low prices
+
+        // add new highs and lows for 4w, 52w, all-time into cache (to be printed on-demand)
+        for (HighLowForPeriod newHighLowPrice : newHighLowPrices) {
+            dailyNewHighLowsByHLPeriod.computeIfAbsent(newHighLowPrice.getHighLowPeriod(), _ -> new HashSet<>()).add(newHighLowPrice.getTicker());
+        }
+
         return updatedHighLowPrices;
     }
 
