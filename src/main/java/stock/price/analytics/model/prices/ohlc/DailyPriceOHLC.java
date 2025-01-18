@@ -63,6 +63,15 @@ public class DailyPriceOHLC extends AbstractPriceOHLC {
         return STR."Daily_OHLC {  date=\{date} \{super.toString()}";
     }
 
+    public boolean differentPrices(DailyPriceOHLC that) {
+        return Objects.equals(getTicker(), that.getTicker()) &&
+                Objects.equals(date, that.date) &&
+                Double.compare(getOpen(), that.getOpen()) == 0 &&
+                Double.compare(getHigh(), that.getHigh()) == 0 &&
+                Double.compare(getLow(), that.getLow()) == 0 &&
+                Double.compare(getClose(), that.getClose()) == 0;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
