@@ -75,7 +75,7 @@ public class StockService {
                 "updated stocks high low 4w, 52w, all-time");
     }
 
-    public void updateStocksOHLCFromDailyImportedPrices(List<DailyPriceOHLC> dailyImportedPrices) {
+    public void updateStocksOHLCFrom(List<DailyPriceOHLC> dailyImportedPrices) {
         Map<String, Stock> stocksMap = stocksCache.stocksMap();
         List<Stock> stocksUpdated = new ArrayList<>();
         for (DailyPriceOHLC dailyImportedPrice : dailyImportedPrices) {

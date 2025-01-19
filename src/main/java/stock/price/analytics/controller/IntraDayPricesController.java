@@ -51,7 +51,7 @@ public class IntraDayPricesController {
         List<DailyPriceOHLC> dailyImportedPrices = logTimeAndReturn(yahooQuoteService::dailyPricesImport, "imported daily prices");
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
             priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
-            logTime(() -> stockService.updateStocksOHLCFromDailyImportedPrices(dailyImportedPrices), "updated stocks OHLC, last_updated, and performance from daily imported prices ");
+            logTime(() -> stockService.updateStocksOHLCFrom(dailyImportedPrices), "updated stocks OHLC, last_updated, and performance from daily imported prices ");
             // daily performance view based on stock last_updated (keep this order)
             refreshMaterializedViewsService.refreshMaterializedViews();
 
@@ -76,7 +76,7 @@ public class IntraDayPricesController {
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
             priceOHLCService.savePrices(dailyImportedPrices);
             priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
-            logTime(() -> stockService.updateStocksOHLCFromDailyImportedPrices(dailyImportedPrices), "updated stocks OHLC, last_updated, and performance from daily imported prices ");
+            logTime(() -> stockService.updateStocksOHLCFrom(dailyImportedPrices), "updated stocks OHLC, last_updated, and performance from daily imported prices ");
             // daily performance view based on stock last_updated (keep this order)
             refreshMaterializedViewsService.refreshMaterializedViews();
 
