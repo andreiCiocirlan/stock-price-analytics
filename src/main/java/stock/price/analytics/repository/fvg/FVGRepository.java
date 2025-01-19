@@ -34,7 +34,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                     CASE
                         WHEN low1 > high3 THEN 'Bearish'
                         WHEN high1 < low3 THEN 'Bullish'
-                    END AS fvg_type
+                    END AS type
                 FROM fvg_candidates
                 WHERE (low1 > high3 OR high1 < low3)
             )
@@ -43,15 +43,15 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
             	'YEAR' as timeframe,
             	fvg.ticker as ticker,
             	fvg.date2 as date,
-                fvg.fvg_type,
+                fvg.type,
                 CASE
                     WHEN low1 > high3 THEN low1
                     WHEN high1 < low3 THEN high1
-                END AS fvg_low,
+                END AS low,
                 CASE
                     WHEN low1 > high3 THEN high3
                     WHEN high1 < low3 THEN low3
-                END AS fvg_high
+                END AS high
             FROM identified_fvgs fvg
             WHERE
                 NOT EXISTS (
@@ -59,8 +59,8 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                     FROM price_data next_wmy
                     WHERE next_wmy.wmy_date > fvg.date3 AND next_wmy.ticker = fvg.ticker
                       AND (
-                          (fvg.fvg_type = 'Bullish' AND next_wmy.low < fvg.high1)
-                          OR (fvg.fvg_type = 'Bearish' AND next_wmy.high > fvg.low1)
+                          (fvg.type = 'Bullish' AND next_wmy.low < fvg.high1)
+                          OR (fvg.type = 'Bearish' AND next_wmy.high > fvg.low1)
                       )
                 )
             order by ticker, fvg.date2 desc;
@@ -91,7 +91,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                     CASE
                         WHEN low1 > high3 THEN 'Bearish'
                         WHEN high1 < low3 THEN 'Bullish'
-                    END AS fvg_type
+                    END AS type
                 FROM fvg_candidates
                 WHERE (low1 > high3 OR high1 < low3)
             )
@@ -100,15 +100,15 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
             	'QUARTER' as timeframe,
             	fvg.ticker as ticker,
             	fvg.date2 as date,
-                fvg.fvg_type,
+                fvg.type,
                 CASE
                     WHEN low1 > high3 THEN low1
                     WHEN high1 < low3 THEN high1
-                END AS fvg_low,
+                END AS low,
                 CASE
                     WHEN low1 > high3 THEN high3
                     WHEN high1 < low3 THEN low3
-                END AS fvg_high
+                END AS high
             FROM identified_fvgs fvg
             WHERE
                 NOT EXISTS (
@@ -116,8 +116,8 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                     FROM price_data next_wmy
                     WHERE next_wmy.wmy_date > fvg.date3 AND next_wmy.ticker = fvg.ticker
                       AND (
-                          (fvg.fvg_type = 'Bullish' AND next_wmy.low < fvg.high1)
-                          OR (fvg.fvg_type = 'Bearish' AND next_wmy.high > fvg.low1)
+                          (fvg.type = 'Bullish' AND next_wmy.low < fvg.high1)
+                          OR (fvg.type = 'Bearish' AND next_wmy.high > fvg.low1)
                       )
                 )
             order by ticker, fvg.date2 desc;
@@ -148,7 +148,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                     CASE
                         WHEN low1 > high3 THEN 'Bearish'
                         WHEN high1 < low3 THEN 'Bullish'
-                    END AS fvg_type
+                    END AS type
                 FROM fvg_candidates
                 WHERE (low1 > high3 OR high1 < low3)
             )
@@ -157,15 +157,15 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                 'MONTH' as timeframe,
             	fvg.ticker as ticker,
             	fvg.date2 as date,
-                fvg.fvg_type,
+                fvg.type,
                 CASE
                     WHEN low1 > high3 THEN low1
                     WHEN high1 < low3 THEN high1
-                END AS fvg_low,
+                END AS low,
                 CASE
                     WHEN low1 > high3 THEN high3
                     WHEN high1 < low3 THEN low3
-                END AS fvg_high
+                END AS high
             FROM identified_fvgs fvg
             WHERE
                 NOT EXISTS (
@@ -173,8 +173,8 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                     FROM price_data next_wmy
                     WHERE next_wmy.wmy_date > fvg.date3 AND next_wmy.ticker = fvg.ticker
                       AND (
-                          (fvg.fvg_type = 'Bullish' AND next_wmy.low < fvg.high1)
-                          OR (fvg.fvg_type = 'Bearish' AND next_wmy.high > fvg.low1)
+                          (fvg.type = 'Bullish' AND next_wmy.low < fvg.high1)
+                          OR (fvg.type = 'Bearish' AND next_wmy.high > fvg.low1)
                       )
                 )
             order by ticker, fvg.date2 desc;
@@ -205,7 +205,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                     CASE
                         WHEN low1 > high3 THEN 'Bearish'
                         WHEN high1 < low3 THEN 'Bullish'
-                    END AS fvg_type
+                    END AS type
                 FROM fvg_candidates
                 WHERE (low1 > high3 OR high1 < low3)
             )
@@ -214,15 +214,15 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
             	'WEEK' as timeframe,
             	fvg.ticker as ticker,
             	fvg.date2 as date,
-                fvg.fvg_type,
+                fvg.type,
                 CASE
                     WHEN low1 > high3 THEN low1
                     WHEN high1 < low3 THEN high1
-                END AS fvg_low,
+                END AS low,
                 CASE
                     WHEN low1 > high3 THEN high3
                     WHEN high1 < low3 THEN low3
-                END AS fvg_high
+                END AS high
             FROM identified_fvgs fvg
             WHERE
                 NOT EXISTS (
@@ -230,8 +230,8 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                     FROM price_data next_wmy
                     WHERE next_wmy.wmy_date > fvg.date3 AND next_wmy.ticker = fvg.ticker
                       AND (
-                          (fvg.fvg_type = 'Bullish' AND next_wmy.low < fvg.high1)
-                          OR (fvg.fvg_type = 'Bearish' AND next_wmy.high > fvg.low1)
+                          (fvg.type = 'Bullish' AND next_wmy.low < fvg.high1)
+                          OR (fvg.type = 'Bearish' AND next_wmy.high > fvg.low1)
                       )
                 )
             order by ticker, fvg.date2 desc;
@@ -263,7 +263,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                     CASE
                         WHEN low1 > high3 THEN 'Bearish'
                         WHEN high1 < low3 THEN 'Bullish'
-                    END AS fvg_type
+                    END AS type
                 FROM fvg_candidates
                 WHERE (low1 > high3 OR high1 < low3)
             )
@@ -272,15 +272,15 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
             	'DAY' as timeframe,
             	fvg.ticker as ticker,
             	fvg.date2 as date,
-                fvg.fvg_type,
+                fvg.type,
                 CASE
                     WHEN low1 > high3 THEN low1
                     WHEN high1 < low3 THEN high1
-                END AS fvg_low,
+                END AS low,
                 CASE
                     WHEN low1 > high3 THEN high3
                     WHEN high1 < low3 THEN low3
-                END AS fvg_high
+                END AS high
             FROM identified_fvgs fvg
             WHERE
                 NOT EXISTS (
@@ -288,8 +288,8 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                     FROM price_data next_wmy
                     WHERE next_wmy.wmy_date > fvg.date3 AND next_wmy.ticker = fvg.ticker
                       AND (
-                          (fvg.fvg_type = 'Bullish' AND next_wmy.low < fvg.high1)
-                          OR (fvg.fvg_type = 'Bearish' AND next_wmy.high > fvg.low1)
+                          (fvg.type = 'Bullish' AND next_wmy.low < fvg.high1)
+                          OR (fvg.type = 'Bearish' AND next_wmy.high > fvg.low1)
                       )
                 )
             order by ticker, fvg.date2 desc;

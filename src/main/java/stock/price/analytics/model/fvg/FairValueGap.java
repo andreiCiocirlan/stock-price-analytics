@@ -28,26 +28,26 @@ public class FairValueGap implements PriceEntity {
     @Column(name = "date")
     private LocalDate date;
 
-    @Column(name = "fvg_type")
-    private String fvgType;
+    @Column(name = "type")
+    private String type;
 
-    @Column(name = "fvg_low")
-    private double fvgLow;
+    @Column(name = "low")
+    private double low;
 
-    @Column(name = "fvg_high")
-    private double fvgHigh;
+    @Column(name = "high")
+    private double high;
 
-    public FairValueGap(String ticker, String timeframe, LocalDate date, String fvgType, double fvgLow, double fvgHigh) {
+    public FairValueGap(String ticker, String timeframe, LocalDate date, String type, double low, double high) {
         this.timeframe = timeframe;
-        this.fvgType = fvgType;
+        this.type = type;
         this.ticker = ticker;
-        this.fvgLow = fvgLow;
-        this.fvgHigh = fvgHigh;
+        this.low = low;
+        this.high = high;
         this.date = date;
     }
 
     @Override
     public String toString() {
-        return STR."FairValueGap{fvgHigh=\{fvgHigh}, date=\{date}, fvgLow=\{fvgLow}, ticker='\{ticker}', fvgType='\{fvgType}', timeframe='\{timeframe}'}";
+        return STR."FairValueGap{high=\{high}, date=\{date}, low=\{low}, ticker='\{ticker}', type='\{type}', timeframe='\{timeframe}'}";
     }
 }
