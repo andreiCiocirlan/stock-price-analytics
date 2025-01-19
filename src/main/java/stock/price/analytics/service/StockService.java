@@ -80,7 +80,7 @@ public class StockService {
         List<Stock> stocksUpdated = new ArrayList<>();
         for (DailyPriceOHLC dailyImportedPrice : dailyImportedPrices) {
             String ticker = dailyImportedPrice.getTicker();
-            Stock stock = stocksMap.containsKey(ticker) ? stocksMap.get(ticker) : new Stock(ticker, LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.FRIDAY)), true);
+            Stock stock = stocksMap.containsKey(ticker) ? stocksMap.get(ticker) : new Stock(ticker, dailyImportedPrice.getDate(), true);
             stock.updateFromDailyPrice(dailyImportedPrice);
             stocksUpdated.add(stock);
         }
