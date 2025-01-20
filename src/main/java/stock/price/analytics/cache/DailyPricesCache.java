@@ -42,6 +42,10 @@ public class DailyPricesCache {
         }
     }
 
+    public List<DailyPriceOHLC> dailyPrices() {
+        return new ArrayList<>(dailyPricesByTicker.values());
+    }
+
     public List<DailyPriceOHLC> dailyPricesFor(List<String> tickers) {
         return tickers.stream()
                 .flatMap(ticker ->

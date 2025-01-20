@@ -56,6 +56,10 @@ public class DailyPriceOHLCService {
         return importedDailyPrices;
     }
 
+    public List<DailyPriceOHLC> dailyPricesCache() {
+        return dailyPricesCacheService.dailyPricesCache();
+    }
+
     public List<DailyPriceOHLC> addDailyPricesInCacheAndReturn(List<DailyPriceOHLC> dailyPriceOHLCs) {
         return dailyPricesCacheService.addDailyPricesInCacheAndReturn(dailyPriceOHLCs);
     }

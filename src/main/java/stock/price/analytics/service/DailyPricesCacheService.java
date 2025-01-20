@@ -22,4 +22,8 @@ public class DailyPricesCacheService {
     public List<DailyPriceOHLC> addDailyPricesInCacheAndReturn(List<DailyPriceOHLC> dailyPriceOHLCs) {
         return dailyPricesCache.addDailyPricesInCacheAndReturn(dailyPriceOHLCs);
     }
+
+    public List<DailyPriceOHLC> dailyPricesCache() {
+        return dailyPricesCache.dailyPrices();
+    }
 }
