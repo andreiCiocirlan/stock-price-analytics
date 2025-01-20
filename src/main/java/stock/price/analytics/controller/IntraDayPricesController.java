@@ -9,12 +9,10 @@ import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 import stock.price.analytics.repository.prices.PriceOHLCRepository;
 import stock.price.analytics.service.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
-import static stock.price.analytics.util.TradingDateUtil.tradingDateImported;
 
 
 @Slf4j
