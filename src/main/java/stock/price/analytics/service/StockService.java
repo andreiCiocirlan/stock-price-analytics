@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.StocksCache;
-import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
+import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.stocks.StockRepository;
 import stock.price.analytics.util.Constants;
@@ -71,15 +71,30 @@ public class StockService {
                 "updated stocks high low 4w, 52w, all-time");
     }
 
-    public void updateStocksOHLCFrom(List<DailyPriceOHLC> dailyImportedPrices) {
+    public void updateStocksOHLCFrom(List<DailyPriceOHLC> dailyImportedPrices, List<AbstractPriceOHLC> htfPrices) {
         Map<String, Stock> stocksMap = stocksCache.stocksMap();
         List<Stock> stocksUpdated = new ArrayList<>();
+        // update from daily prices
         for (DailyPriceOHLC dailyImportedPrice : dailyImportedPrices) {
             String ticker = dailyImportedPrice.getTicker();
             Stock stock = stocksMap.containsKey(ticker) ? stocksMap.get(ticker) : new Stock(ticker, dailyImportedPrice.getDate(), true);
             stock.updateFromDailyPrice(dailyImportedPrice);
             stocksUpdated.add(stock);
         }
+
+        // update from higher timeframe prices
+        for (AbstractPriceOHLC wmyPrice : htfPrices) {
+            String ticker = wmyPrice.getTicker();
+            Stock stock = stocksMap.containsKey(ticker) ? stocksMap.get(ticker) : new Stock(ticker, wmyPrice.getStartDate(), true);
+            switch (wmyPrice.getTimeframe()) {
+                case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
+                case WEEKLY -> stock.updateFromWeeklyPrice((WeeklyPriceOHLC) wmyPrice);
+                case MONTHLY -> stock.updateFromMonthlyPrice((MonthlyPriceOHLC) wmyPrice);
+                case YEARLY -> stock.updateFromYearlyPrice((YearlyPriceOHLC) wmyPrice);
+            }
+            stocksUpdated.add(stock);
+        }
+
         partitionDataAndSave(stocksUpdated, stockRepository);
         stocksCache.addStocks(stocksUpdated);
     }

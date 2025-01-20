@@ -19,7 +19,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
-import static stock.price.analytics.util.LoggingUtil.logTime;
+import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveNoLogging;
 import static stock.price.analytics.util.StockDateUtils.*;
 
@@ -49,11 +49,11 @@ public class PriceOHLCService {
         return priceOHLCs;
     }
 
-    public void updatePricesForHigherTimeframes(List<DailyPriceOHLC> importedDailyPrices) {
-        logTime(() -> updateHTF(importedDailyPrices), "updated prices for higher timeframes");
+    public List<AbstractPriceOHLC> updatePricesForHigherTimeframes(List<DailyPriceOHLC> importedDailyPrices) {
+        return logTimeAndReturn(() -> updateHTF(importedDailyPrices), "updated prices for higher timeframes");
     }
 
-    private void updateHTF(List<DailyPriceOHLC> importedDailyPrices) {
+    private List<AbstractPriceOHLC> updateHTF(List<DailyPriceOHLC> importedDailyPrices) {
         List<String> tickers = new ArrayList<>(importedDailyPrices.stream().map(DailyPriceOHLC::getTicker).toList());
 
         // Fetch previous prices for each timeframe
@@ -61,10 +61,13 @@ public class PriceOHLCService {
         List<MonthlyPriceOHLC> previousTwoMonthlyPrices = getPreviousTwoMonthlyPrices(tickers);
         List<YearlyPriceOHLC> previousTwoYearlyPrices = getPreviousTwoYearlyPrices(tickers);
 
-        // Update prices for each timeframe
-        updateAndSavePrices(importedDailyPrices, WEEKLY, previousTwoWeeklyPrices);
-        updateAndSavePrices(importedDailyPrices, MONTHLY, previousTwoMonthlyPrices);
-        updateAndSavePrices(importedDailyPrices, YEARLY, previousTwoYearlyPrices);
+        // Update prices for each timeframe and return (used for stocks cache update)
+        List<AbstractPriceOHLC> htfPricesUpdated = new ArrayList<>();
+        htfPricesUpdated.addAll(updateAndSavePrices(importedDailyPrices, WEEKLY, previousTwoWeeklyPrices));
+        htfPricesUpdated.addAll(updateAndSavePrices(importedDailyPrices, MONTHLY, previousTwoMonthlyPrices));
+        htfPricesUpdated.addAll(updateAndSavePrices(importedDailyPrices, YEARLY, previousTwoYearlyPrices));
+
+        return htfPricesUpdated;
     }
 
     private List<WeeklyPriceOHLC> getPreviousTwoWeeklyPrices(List<String> tickers) {
@@ -146,14 +149,15 @@ public class PriceOHLCService {
     }
 
 
-    private void updateAndSavePrices(List<DailyPriceOHLC> importedDailyPrices,
-                                                                   StockTimeframe timeframe,
-                                                                   List<? extends AbstractPriceOHLC> previousPrices) {
+    private List<AbstractPriceOHLC> updateAndSavePrices(List<DailyPriceOHLC> importedDailyPrices,
+                                                        StockTimeframe timeframe,
+                                                        List<? extends AbstractPriceOHLC> previousPrices) {
         Map<String, List<AbstractPriceOHLC>> previousPricesByTicker = previousPrices.stream()
                 .collect(Collectors.groupingBy(AbstractPriceOHLC::getTicker, Collectors.mapping(p -> (AbstractPriceOHLC) p, Collectors.toList())));
 
         List<AbstractPriceOHLC> updatedPrices = updatePricesAndPerformance(importedDailyPrices, timeframe, previousPricesByTicker);
         partitionDataAndSaveNoLogging(updatedPrices, priceOHLCRepository);
+        return updatedPrices;
     }
 
     private List<AbstractPriceOHLC> updatePricesAndPerformance(List<DailyPriceOHLC> dailyPrices, StockTimeframe timeframe, Map<String, List<AbstractPriceOHLC>> previousTwoWMYPricesByTicker) {

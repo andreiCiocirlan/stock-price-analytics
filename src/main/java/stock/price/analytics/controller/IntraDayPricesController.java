@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.client.finnhub.FinnhubClient;
+import stock.price.analytics.model.prices.ohlc.AbstractPriceOHLC;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 import stock.price.analytics.repository.prices.PriceOHLCRepository;
 import stock.price.analytics.service.*;
@@ -48,8 +49,8 @@ public class IntraDayPricesController {
     public void yahooPricesImport() {
         List<DailyPriceOHLC> dailyImportedPrices = logTimeAndReturn(yahooQuoteService::dailyPricesImport, "imported daily prices");
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
-            priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
-            logTime(() -> stockService.updateStocksOHLCFrom(dailyImportedPrices), "updated stocks OHLC, last_updated, and performance from daily imported prices ");
+            List<AbstractPriceOHLC> htfPricesUpdated = priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
+            logTime(() -> stockService.updateStocksOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks OHLC, last_updated, performance from DAILY, WEEKLY, MONTHLY, YEARLY imported prices ");
             // daily performance view based on stock last_updated (keep this order)
             refreshMaterializedViewsService.refreshMaterializedViews();
 
@@ -72,8 +73,8 @@ public class IntraDayPricesController {
         List<DailyPriceOHLC> dailyImportedPrices = logTimeAndReturn(() -> yahooQuoteService.dailyPricesFromFile(fileName), "imported daily prices");
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
             priceOHLCService.savePrices(dailyImportedPrices);
-            priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
-            logTime(() -> stockService.updateStocksOHLCFrom(dailyImportedPrices), "updated stocks OHLC, last_updated, and performance from daily imported prices ");
+            List<AbstractPriceOHLC> htfPricesUpdated = priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
+            logTime(() -> stockService.updateStocksOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks OHLC, last_updated, performance from DAILY, WEEKLY, MONTHLY, YEARLY imported prices ");
             // daily performance view based on stock last_updated (keep this order)
             refreshMaterializedViewsService.refreshMaterializedViews();
 
