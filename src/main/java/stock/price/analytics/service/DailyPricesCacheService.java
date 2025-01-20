@@ -3,7 +3,10 @@ package stock.price.analytics.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.DailyPricesCache;
+import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 import stock.price.analytics.repository.prices.DailyPriceOHLCRepository;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -16,4 +19,7 @@ public class DailyPricesCacheService {
         dailyPricesCache.addDailyPrices(dailyPriceOHLCRepository.findLatestDailyPrices());
     }
 
+    public List<DailyPriceOHLC> addDailyPricesInCacheAndReturn(List<DailyPriceOHLC> dailyPriceOHLCs) {
+        return dailyPricesCache.addDailyPricesInCacheAndReturn(dailyPriceOHLCs);
+    }
 }
