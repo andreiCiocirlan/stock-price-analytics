@@ -61,10 +61,6 @@ public class DailyPriceOHLCService {
         return dailyPricesCache.addDailyPricesInCacheAndReturn(dailyPriceOHLCs);
     }
 
-    public List<DailyPriceOHLC> findAllLatestByTickerWithDateAfter(LocalDate date) {
-        return dailyPriceOHLCRepository.findAllLatestByTickerWithDateAfter(date);
-    }
-
     public List<DailyPriceOHLC> findXTBLatestDailyPricesWithDateAfter(LocalDate date) {
         return dailyPriceOHLCRepository.findXTBLatestDailyPricesWithDateAfter(date);
     }
