@@ -26,6 +26,7 @@ public class RefreshMaterializedViewsService {
         logTime(refreshMaterializedViewsRepository::refreshDailyPerformanceHeatmapPrices, "refreshed daily performance prices");
         logTime(refreshMaterializedViewsRepository::refreshWeeklyPerformanceHeatmapPrices, "refreshed weekly performance prices");
         logTime(refreshMaterializedViewsRepository::refreshMonthlyPerformanceHeatmapPrices, "refreshed monthly performance prices");
+        logTime(refreshMaterializedViewsRepository::refreshQuarterlyPerformanceHeatmapPrices, "refreshed quarterly performance prices");
         logTime(refreshMaterializedViewsRepository::refreshYearlyPerformanceHeatmapPrices, "refreshed yearly performance prices");
     }
 
