@@ -10,10 +10,7 @@ import stock.price.analytics.model.prices.highlow.HighLow4w;
 import stock.price.analytics.model.prices.highlow.HighLow52Week;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.highlow.HighestLowestPrices;
-import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
-import stock.price.analytics.model.prices.ohlc.MonthlyPriceOHLC;
-import stock.price.analytics.model.prices.ohlc.WeeklyPriceOHLC;
-import stock.price.analytics.model.prices.ohlc.YearlyPriceOHLC;
+import stock.price.analytics.model.prices.ohlc.*;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -85,6 +82,18 @@ public class Stock implements PriceEntity {
     private Double monthlyClose; // Monthly Close (real-time price)
     @Column(name = "m_performance")
     private Double monthlyPerformance; // Monthly Performance
+
+    // quarterly prices
+    @Column(name = "q_open")
+    private Double quarterlyOpen; // Quarterly Opening Price
+    @Column(name = "q_high")
+    private Double quarterlyHigh; // Quarterly High
+    @Column(name = "q_low")
+    private Double quarterlyLow; // Quarterly Low
+    @Column(name = "q_close")
+    private Double quarterlyClose; // Quarterly Close (real-time price)
+    @Column(name = "q_performance")
+    private Double quarterlyPerformance; // Quarterly Performance
 
     // yearly prices
     @Column(name = "y_open")
@@ -187,6 +196,14 @@ public class Stock implements PriceEntity {
         this.setMonthlyLow(monthlyPrice.getLow());
         this.setMonthlyClose(monthlyPrice.getClose());
         this.setMonthlyPerformance(monthlyPrice.getPerformance());
+    }
+
+    public void updateFromQuarterlyPrice(QuarterlyPriceOHLC quarterlyPrice) {
+        this.setQuarterlyOpen(quarterlyPrice.getOpen());
+        this.setQuarterlyHigh(quarterlyPrice.getHigh());
+        this.setQuarterlyLow(quarterlyPrice.getLow());
+        this.setQuarterlyClose(quarterlyPrice.getClose());
+        this.setQuarterlyPerformance(quarterlyPrice.getPerformance());
     }
 
     public void updateFromYearlyPrice(YearlyPriceOHLC yearlyPrice) {
