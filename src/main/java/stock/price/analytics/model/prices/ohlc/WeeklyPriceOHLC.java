@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
+import stock.price.analytics.model.prices.enums.StockTimeframe;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -47,6 +48,11 @@ public class WeeklyPriceOHLC extends AbstractPriceOHLC {
                 dailyPrices.getDate(),
                 performanceFrom(dailyPrices, previousClose),
                 new CandleOHLC(dailyPrices.getOpen(), dailyPrices.getHigh(), dailyPrices.getLow(), dailyPrices.getClose()));
+    }
+
+    @Override
+    public StockTimeframe getTimeframe() {
+        return StockTimeframe.WEEKLY;
     }
 
     @Override

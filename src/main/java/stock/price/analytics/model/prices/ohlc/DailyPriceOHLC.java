@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.springframework.format.annotation.DateTimeFormat;
+import stock.price.analytics.model.prices.enums.StockTimeframe;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -40,6 +41,11 @@ public class DailyPriceOHLC extends AbstractPriceOHLC {
     @Override
     public LocalDate getEndDate() {
         return date;
+    }
+
+    @Override
+    public StockTimeframe getTimeframe() {
+        return StockTimeframe.DAILY;
     }
 
     // used for real-time import and update (create new daily price if dates do not match, update otherwise)

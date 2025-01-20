@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import stock.price.analytics.model.prices.PriceEntity;
+import stock.price.analytics.model.prices.enums.StockTimeframe;
 
 import java.time.LocalDate;
 
@@ -49,6 +50,7 @@ public abstract class AbstractPriceOHLC implements PriceEntity {
 
     public abstract LocalDate getStartDate();
     public abstract LocalDate getEndDate();
+    public abstract StockTimeframe getTimeframe();
 
     public AbstractPriceOHLC convertFrom(DailyPriceOHLC dailyPrice, Double previousClose) {
         this.setClose(dailyPrice.getClose());

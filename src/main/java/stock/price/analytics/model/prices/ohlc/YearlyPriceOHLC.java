@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
+import stock.price.analytics.model.prices.enums.StockTimeframe;
 
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
@@ -46,6 +47,11 @@ public class YearlyPriceOHLC extends AbstractPriceOHLC {
                 dailyPrices.getDate(),
                 performanceFrom(dailyPrices, previousClose),
                 new CandleOHLC(dailyPrices.getOpen(), dailyPrices.getHigh(), dailyPrices.getLow(), dailyPrices.getClose()));
+    }
+
+    @Override
+    public StockTimeframe getTimeframe() {
+        return StockTimeframe.YEARLY;
     }
 
     @Override
