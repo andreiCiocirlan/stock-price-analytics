@@ -18,9 +18,7 @@ import java.nio.file.Paths;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static java.nio.file.Files.walk;
@@ -73,11 +71,11 @@ public class StockService {
 
     public void updateStocksOHLCFrom(List<DailyPriceOHLC> dailyImportedPrices, List<AbstractPriceOHLC> htfPrices) {
         Map<String, Stock> stocksMap = stocksCache.stocksMap();
-        List<Stock> stocksUpdated = new ArrayList<>();
+        Set<Stock> stocksUpdated = new HashSet<>();
         // update from daily prices
         for (DailyPriceOHLC dailyImportedPrice : dailyImportedPrices) {
             String ticker = dailyImportedPrice.getTicker();
-            Stock stock = stocksMap.containsKey(ticker) ? stocksMap.get(ticker) : new Stock(ticker, dailyImportedPrice.getDate(), true);
+            Stock stock = stocksMap.getOrDefault(ticker, new Stock(ticker, dailyImportedPrice.getDate(), true));
             stock.updateFromDailyPrice(dailyImportedPrice);
             stocksUpdated.add(stock);
         }
@@ -85,7 +83,7 @@ public class StockService {
         // update from higher timeframe prices
         for (AbstractPriceOHLC wmyPrice : htfPrices) {
             String ticker = wmyPrice.getTicker();
-            Stock stock = stocksMap.containsKey(ticker) ? stocksMap.get(ticker) : new Stock(ticker, wmyPrice.getStartDate(), true);
+            Stock stock = stocksMap.getOrDefault(ticker, new Stock(ticker, wmyPrice.getStartDate(), true));
             switch (wmyPrice.getTimeframe()) {
                 case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
                 case WEEKLY -> stock.updateFromWeeklyPrice((WeeklyPriceOHLC) wmyPrice);
@@ -95,8 +93,9 @@ public class StockService {
             stocksUpdated.add(stock);
         }
 
-        partitionDataAndSave(stocksUpdated, stockRepository);
-        stocksCache.addStocks(stocksUpdated);
+        List<Stock> stocks = new ArrayList<>(stocksUpdated);
+        partitionDataAndSave(stocks, stockRepository);
+        stocksCache.addStocks(stocks);
     }
 
     public void updateStocksHighLowFromHighLowCache() {
