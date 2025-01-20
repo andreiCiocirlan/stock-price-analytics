@@ -3,6 +3,7 @@ package stock.price.analytics.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.model.fvg.FairValueGap;
+import stock.price.analytics.model.prices.enums.FvgTimeframe;
 import stock.price.analytics.repository.fvg.FVGRepository;
 
 import java.util.List;
@@ -15,14 +16,13 @@ public class FairValueGapService {
 
     private final FVGRepository fvgRepository;
 
-    public void findAndSaveFVGsFor(String timeframe) {
+    public void findAndSaveFVGsFor(FvgTimeframe timeframe) {
         List<FairValueGap> entities = switch (timeframe) {
-            case "DAILY" -> fvgRepository.findDailyFVGs();
-            case "WEEKLY" -> fvgRepository.findWeeklyFVGs();
-            case "MONTHLY" -> fvgRepository.findMonthlyFVGs();
-            case "QUARTERLY" -> fvgRepository.findQuarterlyFVGs();
-            case "YEARLY" -> fvgRepository.findYearlyFVGs();
-            default -> throw new IllegalStateException("Unexpected value: " + timeframe);
+            case DAY -> fvgRepository.findDailyFVGs();
+            case WEEK -> fvgRepository.findWeeklyFVGs();
+            case MONTH -> fvgRepository.findMonthlyFVGs();
+            case QUARTER -> fvgRepository.findQuarterlyFVGs();
+            case YEAR -> fvgRepository.findYearlyFVGs();
         };
         partitionDataAndSave(entities, fvgRepository);
     }
