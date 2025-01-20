@@ -56,7 +56,6 @@ public class IntraDayPricesController {
             refreshMaterializedViewsService.refreshMaterializedViews();
 
             // high/low price update based on weekly perf view (refreshed before)
-            LocalDate tradingDate = tradingDateImported(dailyImportedPrices);
             List<String> tickers = dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList();
             highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices, tickers);
             logTime(stockService::updateStocksHighLowFromHighLowCache, "updated stocks high low 4w, 52w, all-time");
@@ -81,7 +80,6 @@ public class IntraDayPricesController {
             refreshMaterializedViewsService.refreshMaterializedViews();
 
             // high/low price update based on weekly perf view (refreshed before)
-            LocalDate tradingDate = tradingDateImported(dailyImportedPrices);
             List<String> tickers = dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList();
             highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices, tickers);
             logTime(stockService::updateStocksHighLowFromHighLowCache, "updated stocks high low 4w, 52w, all-time");
