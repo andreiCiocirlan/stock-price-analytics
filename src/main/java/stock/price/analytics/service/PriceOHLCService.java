@@ -7,7 +7,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import stock.price.analytics.cache.DailyPricesCache;
 import stock.price.analytics.cache.HigherTimeframePricesCache;
 import stock.price.analytics.controller.dto.CandleOHLCWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
@@ -35,7 +34,6 @@ public class PriceOHLCService {
 
     private final PriceOHLCRepository priceOHLCRepository;
     private final HigherTimeframePricesCache higherTimeframePricesCache;
-    private final DailyPricesCache dailyPricesCache;
 
     public List<CandleOHLCWithDateDTO> findOHLCFor(String ticker, StockTimeframe timeframe) {
         String tableNameOHLC = timeframe.dbTableOHLC();
