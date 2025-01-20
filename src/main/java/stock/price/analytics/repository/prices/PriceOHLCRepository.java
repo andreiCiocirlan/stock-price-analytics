@@ -80,6 +80,15 @@ public interface PriceOHLCRepository extends JpaRepository<AbstractPriceOHLC, Lo
 
     @Query(value = """
                 SELECT *
+                FROM quarterly_prices
+                WHERE start_date BETWEEN (DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6 month') AND CURRENT_DATE
+                AND ticker in (:tickers)
+                ORDER BY ticker, start_date DESC
+            """, nativeQuery = true)
+    List<QuarterlyPriceOHLC> findPreviousThreeQuarterlyPricesForTickers(List<String> tickers);
+
+    @Query(value = """
+                SELECT *
                 FROM yearly_prices
                 WHERE start_date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '2 year') AND CURRENT_DATE
                 AND ticker in (:tickers)

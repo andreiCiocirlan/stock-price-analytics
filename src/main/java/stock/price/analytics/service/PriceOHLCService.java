@@ -122,6 +122,32 @@ public class PriceOHLCService {
                 .toList();
     }
 
+    private List<QuarterlyPriceOHLC> getPreviousTwoQuarterlyPrices(List<String> tickers) {
+        Set<String> cacheTickers = higherTimeframePricesCache.quarterlyPricesTickers();
+        List<QuarterlyPriceOHLC> previousQuarterlyPrices;
+        if (cacheTickers.isEmpty()) {
+            log.info("Fetching PreviousTwoQuarterlyPrices from database for {} tickers", tickers.size());
+            previousQuarterlyPrices = priceOHLCRepository.findPreviousThreeQuarterlyPricesForTickers(tickers);
+            higherTimeframePricesCache.addQuarterlyPrices(previousQuarterlyPrices);
+        } else if (cacheTickers.containsAll(tickers)) {
+            previousQuarterlyPrices = higherTimeframePricesCache.quarterlyPricesFor(tickers);
+        } else { // partial match
+            tickers.removeAll(cacheTickers);
+            previousQuarterlyPrices = priceOHLCRepository.findPreviousThreeQuarterlyPricesForTickers(tickers);
+            higherTimeframePricesCache.addQuarterlyPrices(previousQuarterlyPrices);
+            log.info("previousQuarterlyPrices partial match for {} tickers", tickers.size());
+            cacheTickers.addAll(tickers);
+            previousQuarterlyPrices = higherTimeframePricesCache.quarterlyPricesFor(cacheTickers.stream().toList());
+        }
+
+        return previousQuarterlyPrices
+                .stream()
+                .collect(Collectors.groupingBy(QuarterlyPriceOHLC::getTicker))
+                .values().stream()
+                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(QuarterlyPriceOHLC::getStartDate).reversed()).limit(2))
+                .toList();
+    }
+
     private List<YearlyPriceOHLC> getPreviousTwoYearlyPrices(List<String> tickers) {
         Set<String> cacheTickers = higherTimeframePricesCache.yearlyPricesTickers();
         List<YearlyPriceOHLC> previousYearlyPrices;
