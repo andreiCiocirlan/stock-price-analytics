@@ -11,6 +11,9 @@ import stock.price.analytics.model.prices.highlow.HighLow52Week;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.highlow.HighestLowestPrices;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
+import stock.price.analytics.model.prices.ohlc.MonthlyPriceOHLC;
+import stock.price.analytics.model.prices.ohlc.WeeklyPriceOHLC;
+import stock.price.analytics.model.prices.ohlc.YearlyPriceOHLC;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -47,17 +50,53 @@ public class Stock implements PriceEntity {
     @Column(name = "delisted_date")
     private LocalDate delistedDate; // date stock was added (IPO)
 
-    // real-time prices
-    @Column(name = "open")
-    private Double open; // Daily Opening Price
-    @Column(name = "high")
-    private Double high; // Daily High
-    @Column(name = "low")
-    private Double low; // Daily Low
-    @Column(name = "close")
-    private Double close; // Daily Close (real-time price)
+    // daily prices
+    @Column(name = "d_open")
+    private Double dailyOpen; // Daily Opening Price
+    @Column(name = "d_high")
+    private Double dailyHigh; // Daily High
+    @Column(name = "d_low")
+    private Double dailyLow; // Daily Low
+    @Column(name = "d_close")
+    private Double dailyClose; // Daily Close (real-time price)
     @Column(name = "d_performance")
-    private Double dPerformance; // Daily Performance (real-time price)
+    private Double dailyPerformance; // Daily Performance (real-time price)
+
+    // weekly prices
+    @Column(name = "w_open")
+    private Double weeklyOpen; // Weekly Opening Price
+    @Column(name = "w_high")
+    private Double weeklyHigh; // Weekly High
+    @Column(name = "w_low")
+    private Double weeklyLow; // Weekly Low
+    @Column(name = "w_close")
+    private Double weeklyClose; // Weekly Close (real-time price)
+    @Column(name = "w_performance")
+    private Double weeklyPerformance; // Weekly Performance
+
+    // monthly prices
+    @Column(name = "m_open")
+    private Double monthlyOpen; // Monthly Opening Price
+    @Column(name = "m_high")
+    private Double monthlyHigh; // Monthly High
+    @Column(name = "m_low")
+    private Double monthlyLow; // Monthly Low
+    @Column(name = "m_close")
+    private Double monthlyClose; // Monthly Close (real-time price)
+    @Column(name = "m_performance")
+    private Double monthlyPerformance; // Monthly Performance
+
+    // yearly prices
+    @Column(name = "y_open")
+    private Double yearlyOpen; // Yearly Opening Price
+    @Column(name = "y_high")
+    private Double yearlyHigh; // Yearly High
+    @Column(name = "y_low")
+    private Double yearlyLow; // Yearly Low
+    @Column(name = "y_close")
+    private Double yearlyClose; // Yearly Close (real-time price)
+    @Column(name = "y_performance")
+    private Double yearlyPerformance; // Yearly Performance
 
     @Column(name = "high4w")
     private double high4w; // high 4w
@@ -126,12 +165,36 @@ public class Stock implements PriceEntity {
     }
 
     public void updateFromDailyPrice(DailyPriceOHLC dailyPrice) {
-        this.setOpen(dailyPrice.getOpen());
-        this.setHigh(dailyPrice.getHigh());
-        this.setLow(dailyPrice.getLow());
-        this.setClose(dailyPrice.getClose());
-        this.setDPerformance(dailyPrice.getPerformance());
+        this.setDailyOpen(dailyPrice.getOpen());
+        this.setDailyHigh(dailyPrice.getHigh());
+        this.setDailyLow(dailyPrice.getLow());
+        this.setDailyClose(dailyPrice.getClose());
+        this.setDailyPerformance(dailyPrice.getPerformance());
         this.setLastUpdated(dailyPrice.getDate());
+    }
+
+    public void updateFromWeeklyPrice(WeeklyPriceOHLC weeklyPrice) {
+        this.setWeeklyOpen(weeklyPrice.getOpen());
+        this.setWeeklyHigh(weeklyPrice.getHigh());
+        this.setWeeklyLow(weeklyPrice.getLow());
+        this.setWeeklyClose(weeklyPrice.getClose());
+        this.setWeeklyPerformance(weeklyPrice.getPerformance());
+    }
+
+    public void updateFromMonthlyPrice(MonthlyPriceOHLC monthlyPrice) {
+        this.setMonthlyOpen(monthlyPrice.getOpen());
+        this.setMonthlyHigh(monthlyPrice.getHigh());
+        this.setMonthlyLow(monthlyPrice.getLow());
+        this.setMonthlyClose(monthlyPrice.getClose());
+        this.setMonthlyPerformance(monthlyPrice.getPerformance());
+    }
+
+    public void updateFromYearlyPrice(YearlyPriceOHLC yearlyPrice) {
+        this.setYearlyOpen(yearlyPrice.getOpen());
+        this.setYearlyHigh(yearlyPrice.getHigh());
+        this.setYearlyLow(yearlyPrice.getLow());
+        this.setYearlyClose(yearlyPrice.getClose());
+        this.setYearlyPerformance(yearlyPrice.getPerformance());
     }
 
     private void updateFromHighLow4w(HighLow4w highLow4w) {
