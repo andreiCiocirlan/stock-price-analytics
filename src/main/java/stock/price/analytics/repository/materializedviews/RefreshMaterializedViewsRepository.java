@@ -33,8 +33,4 @@ public interface RefreshMaterializedViewsRepository extends JpaRepository<Abstra
     @Query(value = "REFRESH MATERIALIZED VIEW latest_prices_view", nativeQuery = true)
     void refreshLatestPrices();
 
-    @Modifying
-    @Query(value = "REFRESH MATERIALIZED VIEW daily_prices_json_view", nativeQuery = true)
-    void refreshDailyJSONPricesPrices();
-
 }

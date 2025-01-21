@@ -30,7 +30,6 @@ import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 public class DailyPricesJSONService {
 
     private final DailyPricesJSONRepository dailyPricesJSONRepository;
-    private final RefreshMaterializedViewsService refreshMaterializedViewsService;
 
     public List<DailyPricesJSON> findByDateBetween(LocalDate from, LocalDate to) {
         return dailyPricesJSONRepository.findByDateBetween(from, to);
@@ -152,7 +151,6 @@ public class DailyPricesJSONService {
 
         if (!dailyPricesJSON_toSave.isEmpty()) {
             partitionDataAndSave(dailyPricesJSON_toSave, dailyPricesJSONRepository);
-            refreshMaterializedViewsService.refreshDailyJSONPrices();
         }
     }
 }
