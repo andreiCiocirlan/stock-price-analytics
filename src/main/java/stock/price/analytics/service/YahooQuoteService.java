@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.client.yahoo.YahooFinanceClient;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
+import stock.price.analytics.repository.prices.DailyPriceOHLCRepository;
 
 import java.io.File;
 import java.io.FileOutputStream;
