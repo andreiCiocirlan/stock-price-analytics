@@ -2,6 +2,7 @@ package stock.price.analytics.model.prices.enums;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.temporal.TemporalAdjusters;
 import java.util.HashSet;
 import java.util.List;
@@ -16,6 +17,7 @@ public enum StockTimeframe {
     DAILY,
     WEEKLY,
     MONTHLY,
+    QUARTERLY,
     YEARLY;
 
     public String dbTablePerfHeatmap() {
@@ -23,6 +25,7 @@ public enum StockTimeframe {
             case DAILY -> "daily_prices_performance_view";
             case WEEKLY -> "weekly_prices_performance_view";
             case MONTHLY -> "monthly_prices_performance_view";
+            case QUARTERLY -> "quarterly_prices_performance_view";
             case YEARLY -> "yearly_prices_performance_view";
         };
     }
@@ -32,16 +35,18 @@ public enum StockTimeframe {
             case DAILY -> "daily_prices";
             case WEEKLY -> "weekly_prices";
             case MONTHLY -> "monthly_prices";
+            case QUARTERLY -> "quarterly_prices";
             case YEARLY -> "yearly_prices";
         };
     }
 
     public String toSQLInterval() {
         return switch (this) {
-            case DAILY -> "DAY";
-            case WEEKLY -> "WEEK";
-            case MONTHLY -> "MONTH";
-            case YEARLY -> "YEAR";
+            case DAILY -> "2 DAY";
+            case WEEKLY -> "2 WEEK";
+            case MONTHLY -> "2 MONTH";
+            case QUARTERLY -> "6 MONTH"; // quarter = 3 months
+            case YEARLY -> "2 YEAR";
         };
     }
 
@@ -52,12 +57,35 @@ public enum StockTimeframe {
             case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
             case WEEKLY -> tradingDateNow.isBefore(date.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY))) ? tradingDateNow : date.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
             case MONTHLY -> tradingDateNow.isBefore(date.with(lastDayOfMonth())) ? tradingDateNow : date.with(lastDayOfMonth());
+            case QUARTERLY -> quarterEndDate(date, tradingDateNow);
             case YEARLY -> tradingDateNow.isBefore(date.with(lastDayOfYear())) ? tradingDateNow : date.with(lastDayOfYear());
         };
     }
 
+    private static LocalDate quarterEndDate(LocalDate date, LocalDate tradingDateNow) {
+        YearMonth yearMonth = YearMonth.from(date);
+        YearMonth lastMonthOfQuarter;
+
+        // Determine the last month of the quarter
+        int month = yearMonth.getMonthValue();
+        if (month <= 3) { // Q1
+            lastMonthOfQuarter = YearMonth.of(yearMonth.getYear(), 3);
+        } else if (month <= 6) { // Q2
+            lastMonthOfQuarter = YearMonth.of(yearMonth.getYear(), 6);
+        } else if (month <= 9) { // Q3
+            lastMonthOfQuarter = YearMonth.of(yearMonth.getYear(), 9);
+        } else { // Q4
+            lastMonthOfQuarter = YearMonth.of(yearMonth.getYear(), 12);
+        }
+
+        // Get the last day of that quarter
+        LocalDate lastDayOfQuarter = lastMonthOfQuarter.atEndOfMonth();
+
+        return tradingDateNow.isBefore(lastDayOfQuarter) ? tradingDateNow : lastDayOfQuarter;
+    }
+
     public static List<StockTimeframe> higherTimeframes() {
-        return List.of(WEEKLY, MONTHLY, YEARLY);
+        return List.of(WEEKLY, MONTHLY, QUARTERLY, YEARLY);
     }
 
     /**

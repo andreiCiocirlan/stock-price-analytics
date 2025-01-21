@@ -87,6 +87,12 @@ public interface PriceOHLCRepository extends JpaRepository<AbstractPriceOHLC, Lo
             """, nativeQuery = true)
     List<QuarterlyPriceOHLC> findPreviousThreeQuarterlyPricesForTickers(List<String> tickers);
 
+    @Query("SELECT q FROM QuarterlyPriceOHLC q WHERE q.ticker = :ticker AND q.startDate < :date")
+    List<MonthlyPriceOHLC> findQuarterlyByTickerAndStartDateBefore(String ticker, LocalDate date);
+
+    @Query("SELECT q FROM QuarterlyPriceOHLC q WHERE q.ticker = :ticker AND q.startDate = :date")
+    List<QuarterlyPriceOHLC> findQuarterlyByTickerAndStartDate(String ticker, LocalDate date);
+
     @Query(value = """
                 SELECT *
                 FROM yearly_prices

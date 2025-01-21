@@ -88,6 +88,7 @@ public class StockService {
                 case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
                 case WEEKLY -> stock.updateFromWeeklyPrice((WeeklyPriceOHLC) wmyPrice);
                 case MONTHLY -> stock.updateFromMonthlyPrice((MonthlyPriceOHLC) wmyPrice);
+                case QUARTERLY -> stock.updateFromQuarterlyPrice((QuarterlyPriceOHLC) wmyPrice);
                 case YEARLY -> stock.updateFromYearlyPrice((YearlyPriceOHLC) wmyPrice);
             }
             stocksUpdated.add(stock);

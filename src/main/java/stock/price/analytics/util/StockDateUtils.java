@@ -13,10 +13,16 @@ public class StockDateUtils {
         LocalDate weekEnd = weekStart.plusDays(4); // 4 days after Monday is Friday
 
         // Check if the date is within the range of the week
-        return !date.isBefore(weekStart) && !date.isAfter(weekEnd);    }
+        return !date.isBefore(weekStart) && !date.isAfter(weekEnd);
+    }
 
     public static boolean sameMonth(LocalDate date, LocalDate startOfMonth) {
         return date.getYear() == startOfMonth.getYear() && date.getMonthValue() == startOfMonth.getMonthValue();
+    }
+
+    public static boolean sameQuarter(LocalDate date, LocalDate latestEndDateQuarter) {
+        return date.getYear() == latestEndDateQuarter.getYear() &&
+                date.getMonth().firstMonthOfQuarter() == latestEndDateQuarter.getMonth().firstMonthOfQuarter();
     }
 
     public static boolean sameYear(LocalDate date, LocalDate startOfYear) {

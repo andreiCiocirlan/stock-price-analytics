@@ -55,6 +55,7 @@ public class PricesOHLCUtil {
         return switch (stockTimeframe) {
             case WEEKLY -> shp -> shp.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
             case MONTHLY -> YearMonth::from;
+            case QUARTERLY -> shp -> YearMonth.of(shp.getYear(), shp.getMonth().firstMonthOfQuarter().getValue());
             case YEARLY -> Year::from;
             case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
         };
@@ -81,6 +82,7 @@ public class PricesOHLCUtil {
         return switch (stockTimeframe) {
             case WEEKLY -> new WeeklyPriceOHLC(ticker, startDate, endDate, candleOHLC);
             case MONTHLY -> new MonthlyPriceOHLC(ticker, startDate, endDate, candleOHLC);
+            case QUARTERLY -> new QuarterlyPriceOHLC(ticker, startDate, endDate, candleOHLC);
             case YEARLY -> new YearlyPriceOHLC(ticker, startDate, endDate, candleOHLC);
             case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
         };

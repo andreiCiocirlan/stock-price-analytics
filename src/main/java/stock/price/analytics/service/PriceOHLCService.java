@@ -59,12 +59,14 @@ public class PriceOHLCService {
         // Fetch previous prices for each timeframe
         List<WeeklyPriceOHLC> previousTwoWeeklyPrices = getPreviousTwoWeeklyPrices(tickers);
         List<MonthlyPriceOHLC> previousTwoMonthlyPrices = getPreviousTwoMonthlyPrices(tickers);
+        List<QuarterlyPriceOHLC> previousTwoQuarterlyPrices = getPreviousTwoQuarterlyPrices(tickers);
         List<YearlyPriceOHLC> previousTwoYearlyPrices = getPreviousTwoYearlyPrices(tickers);
 
         // Update prices for each timeframe and return (used for stocks cache update)
         List<AbstractPriceOHLC> htfPricesUpdated = new ArrayList<>();
         htfPricesUpdated.addAll(updateAndSavePrices(importedDailyPrices, WEEKLY, previousTwoWeeklyPrices));
         htfPricesUpdated.addAll(updateAndSavePrices(importedDailyPrices, MONTHLY, previousTwoMonthlyPrices));
+        htfPricesUpdated.addAll(updateAndSavePrices(importedDailyPrices, QUARTERLY, previousTwoQuarterlyPrices));
         htfPricesUpdated.addAll(updateAndSavePrices(importedDailyPrices, YEARLY, previousTwoYearlyPrices));
 
         return htfPricesUpdated;
@@ -211,7 +213,7 @@ public class PriceOHLCService {
         } else {
             result = switch (timeframe) {
                 case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
-                case WEEKLY, MONTHLY, YEARLY ->
+                case WEEKLY, MONTHLY, QUARTERLY, YEARLY ->
                         updateOrCreateWMYPrice(previousTwoWMY, dailyPrice, latestEndDateWMY, timeframe);
             };
         }
@@ -238,6 +240,7 @@ public class PriceOHLCService {
             case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
             case WEEKLY -> sameWeek(date, latestEndDateWMY);
             case MONTHLY -> sameMonth(date, latestEndDateWMY);
+            case QUARTERLY -> sameQuarter(date, latestEndDateWMY);
             case YEARLY -> sameYear(date, latestEndDateWMY);
         };
     }
@@ -247,6 +250,7 @@ public class PriceOHLCService {
             case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
             case WEEKLY -> WeeklyPriceOHLC.newFrom(dailyPrice, previousClose);
             case MONTHLY -> MonthlyPriceOHLC.newFrom(dailyPrice, previousClose);
+            case QUARTERLY -> QuarterlyPriceOHLC.newFrom(dailyPrice, previousClose);
             case YEARLY -> YearlyPriceOHLC.newFrom(dailyPrice, previousClose);
         };
     }
@@ -256,6 +260,7 @@ public class PriceOHLCService {
             case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
             case WEEKLY -> ((WeeklyPriceOHLC) result).setEndDate(endDate);
             case MONTHLY -> ((MonthlyPriceOHLC) result).setEndDate(endDate);
+            case QUARTERLY -> ((QuarterlyPriceOHLC) result).setEndDate(endDate);
             case YEARLY -> ((YearlyPriceOHLC) result).setEndDate(endDate);
         }
     }
@@ -292,7 +297,7 @@ public class PriceOHLCService {
                 MAX(high) AS high,
                 MIN(low) AS low
             FROM daily_prices
-            WHERE date BETWEEN '\{dateFormatted}'::date - INTERVAL '2 \{timeframe}' AND '\{dateFormatted}'
+            WHERE date BETWEEN '\{dateFormatted}'::date - INTERVAL '\{timeframe}' AND '\{dateFormatted}'
             """;
 
         if (!tickers.isEmpty()) {

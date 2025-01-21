@@ -22,6 +22,7 @@ public class HigherTimeframePricesCacheService {
         List<String> tickers = xtbStocks.stream().map(Stock::getTicker).toList();
         higherTimeframePricesCache.addWeeklyPrices(priceOHLCRepository.findPreviousThreeWeeklyPricesForTickers(tickers));
         higherTimeframePricesCache.addMonthlyPrices(priceOHLCRepository.findPreviousThreeMonthlyPricesForTickers(tickers));
+        higherTimeframePricesCache.addQuarterlyPrices(priceOHLCRepository.findPreviousThreeQuarterlyPricesForTickers(tickers));
         higherTimeframePricesCache.addYearlyPrices(priceOHLCRepository.findPreviousThreeYearlyPricesForTickers(tickers));
     }
 

@@ -29,13 +29,13 @@ public class QuarterlyPriceOHLC extends AbstractPriceOHLC {
 
     public QuarterlyPriceOHLC(String ticker, LocalDate startDate, LocalDate endDate, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
-        this.startDate = startDate.with(TemporalAdjusters.firstDayOfMonth());
+        this.startDate = LocalDate.of(startDate.getYear(), startDate.getMonth().firstMonthOfQuarter().getValue(), 1);
         this.endDate = endDate.with(TemporalAdjusters.lastDayOfMonth());
     }
 
     public QuarterlyPriceOHLC(String ticker, LocalDate startDate, LocalDate endDate, double performance, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
-        this.startDate = startDate.with(TemporalAdjusters.firstDayOfYear());
+        this.startDate = LocalDate.of(startDate.getYear(), startDate.getMonth().firstMonthOfQuarter().getValue(), 1);
         this.endDate = endDate;
         this.setPerformance(performance);
     }
@@ -51,7 +51,7 @@ public class QuarterlyPriceOHLC extends AbstractPriceOHLC {
 
     @Override
     public StockTimeframe getTimeframe() {
-        return StockTimeframe.YEARLY; // todo to change in the future
+        return StockTimeframe.QUARTERLY;
     }
 
     @Override

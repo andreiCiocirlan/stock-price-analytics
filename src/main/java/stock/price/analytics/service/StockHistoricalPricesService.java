@@ -57,6 +57,7 @@ public class StockHistoricalPricesService {
             case DAILY -> priceOHLCS.stream().map(DailyPriceOHLC.class::cast).toList();
             case WEEKLY -> priceOHLCS.stream().map(WeeklyPriceOHLC.class::cast).toList();
             case MONTHLY -> priceOHLCS.stream().map(MonthlyPriceOHLC.class::cast).toList();
+            case QUARTERLY -> priceOHLCS.stream().map(QuarterlyPriceOHLC.class::cast).toList();
             case YEARLY -> priceOHLCS.stream().map(YearlyPriceOHLC.class::cast).toList();
         };
     }

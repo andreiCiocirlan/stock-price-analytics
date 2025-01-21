@@ -24,16 +24,19 @@ public class StockSplitAdjustPricesService {
         List<DailyPriceOHLC> dailyPricesToUpdate = priceOHLCRepository.findByTickerAndDateLessThan(ticker, stockSplitDate);
         List<WeeklyPriceOHLC> weeklyPricesToUpdate = priceOHLCRepository.findWeeklyByTickerAndStartDateBefore(ticker, stockSplitDate.with(previousOrSame(DayOfWeek.MONDAY)));
         List<MonthlyPriceOHLC> monthlyPricesToUpdate = priceOHLCRepository.findMonthlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfMonth()));
+        List<MonthlyPriceOHLC> quarterlyPricesToUpdate = priceOHLCRepository.findQuarterlyByTickerAndStartDateBefore(ticker, LocalDate.of(stockSplitDate.getYear(), stockSplitDate.getMonth().firstMonthOfQuarter().getValue(), 1));
         List<YearlyPriceOHLC> yearlyPricesToUpdate = priceOHLCRepository.findYearlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfYear()));
 
         dailyPricesToUpdate.forEach(dailyPriceOHLC -> updatePrices(dailyPriceOHLC, priceMultiplier));
         weeklyPricesToUpdate.forEach(weeklyPriceOHLC -> updatePrices(weeklyPriceOHLC, priceMultiplier));
         monthlyPricesToUpdate.forEach(monthlyPriceOHLC -> updatePrices(monthlyPriceOHLC, priceMultiplier));
+        quarterlyPricesToUpdate.forEach(quarterlyPriceOHLC -> updatePrices(quarterlyPriceOHLC, priceMultiplier));
         yearlyPricesToUpdate.forEach(yearlyPriceOHLC -> updatePrices(yearlyPriceOHLC, priceMultiplier));
 
         priceOHLCRepository.saveAll(dailyPricesToUpdate);
         priceOHLCRepository.saveAll(weeklyPricesToUpdate);
         priceOHLCRepository.saveAll(monthlyPricesToUpdate);
+        priceOHLCRepository.saveAll(quarterlyPricesToUpdate);
         priceOHLCRepository.saveAll(yearlyPricesToUpdate);
     }
 
@@ -42,6 +45,7 @@ public class StockSplitAdjustPricesService {
             case DAILY -> priceOHLCRepository.findByTickerAndDate(ticker, date);
             case WEEKLY -> priceOHLCRepository.findWeeklyByTickerAndStartDate(ticker, date);
             case MONTHLY -> priceOHLCRepository.findMonthlyByTickerAndStartDate(ticker, date);
+            case QUARTERLY -> priceOHLCRepository.findQuarterlyByTickerAndStartDate(ticker, date);
             case YEARLY -> priceOHLCRepository.findYearlyByTickerAndStartDate(ticker, date);
         };
 
