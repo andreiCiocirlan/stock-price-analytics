@@ -8,7 +8,6 @@ import stock.price.analytics.cache.StocksCache;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.highlow.*;
 import stock.price.analytics.model.stocks.Stock;
-import stock.price.analytics.repository.prices.DailyPricesJSONRepository;
 import stock.price.analytics.repository.prices.HighLowForPeriodRepository;
 import stock.price.analytics.repository.stocks.StockRepository;
 
@@ -30,7 +29,6 @@ public class HighLowPricesCacheService {
     private final StockRepository stockRepository;
     private final HighLowPricesCache highLowPricesCache;
     private final HighLowForPeriodRepository highLowForPeriodRepository;
-    private final DailyPricesJSONRepository dailyPricesJSONRepository;
 
     private static HighLowForPeriod convertToHighLowForPeriod(TickerHighLowView dto, LocalDate newWeekStartDate, LocalDate newWeekEndDate, HighLowPeriod highLowPeriod) {
         HighLowForPeriod highLowForPeriod = switch (highLowPeriod) {
