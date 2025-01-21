@@ -23,7 +23,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +30,6 @@ import java.util.stream.Collectors;
 
 import static stock.price.analytics.util.Constants.MAX_TICKER_COUNT_PRINT;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateImported;
-import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 @Slf4j
 @Service
@@ -60,34 +58,32 @@ public class YahooQuoteService {
     public List<DailyPriceOHLC> dailyPricesImport(boolean preMarketOnly) {
         int maxTickersPerRequest = 1700;
         List<DailyPriceOHLC> dailyImportedPrices = new ArrayList<>();
-        LocalDate minTradingDate = tradingDateNow().minusDays(5); // max 5 calendar days in the past for previous intraDay prices to be found
-        List<DailyPriceOHLC> latestByTicker = dailyPriceOHLCService.findXTBLatestDailyPricesWithDateAfter(minTradingDate);
-        List<String> tickersImported = new ArrayList<>(latestByTicker.stream().map(DailyPriceOHLC::getTicker).toList());
+        List<DailyPriceOHLC> latestPrices = dailyPriceOHLCService.dailyPricesCache();
+        List<String> tickersImported = new ArrayList<>(latestPrices.stream().map(DailyPriceOHLC::getTicker).toList());
 
         int start = 0;
-        int end = Math.min(maxTickersPerRequest, latestByTicker.size());
+        int end = Math.min(maxTickersPerRequest, latestPrices.size());
         int fileCounter = 1;
-        while (start < latestByTicker.size()) {
-            List<DailyPriceOHLC> partition = latestByTicker.subList(start, end);
+        while (start < latestPrices.size()) {
+            List<DailyPriceOHLC> partition = latestPrices.subList(start, end);
             String tickers = partition.stream().map(DailyPriceOHLC::getTicker).collect(Collectors.joining(","));
             String pricesJSON = quotePricesJSON(tickers, getCrumb());
 
-            List<DailyPriceOHLC> dailyPriceOHLCs = yahooFinanceClient.extractDailyPricesFromJSON(pricesJSON, preMarketOnly);
-            List<DailyPriceOHLC> dailyPricesImported = dailyPriceOHLCService.getDailyImportedPrices(dailyPriceOHLCs, latestByTicker.stream()
-                    .collect(Collectors.toMap(DailyPriceOHLC::getTicker, p -> p)));
+            List<DailyPriceOHLC> dailyPricesExtractedFromJSON = yahooFinanceClient.extractDailyPricesFromJSON(pricesJSON, preMarketOnly);
+            List<DailyPriceOHLC> dailyPricesImported = dailyPriceOHLCService.addDailyPricesInCacheAndReturn(dailyPricesExtractedFromJSON);
             dailyImportedPrices.addAll(dailyPricesImported);
 
             // keep track of which tickers were imported
             tickersImported.removeAll(dailyPricesImported.stream().map(DailyPriceOHLC::getTicker).toList());
 
             if (!preMarketOnly && !dailyPricesImported.isEmpty()) {
-                String fileName = tradingDateImported(dailyPriceOHLCs).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_" + fileCounter + ".json";
+                String fileName = tradingDateImported(dailyPricesExtractedFromJSON).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_" + fileCounter + ".json";
                 String path = "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/" + fileName;
                 writeToFile(path, pricesJSON);
             }
 
             start = end;
-            end = Math.min(start + maxTickersPerRequest, latestByTicker.size());
+            end = Math.min(start + maxTickersPerRequest, latestPrices.size());
             fileCounter++;
         }
 

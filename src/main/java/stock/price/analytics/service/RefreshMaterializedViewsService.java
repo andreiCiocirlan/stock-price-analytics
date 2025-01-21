@@ -17,11 +17,10 @@ public class RefreshMaterializedViewsService {
 
     @Transactional
     public void refreshMaterializedViews() {
-        refreshLatestAndPerformanceHeatmapPrices();
+        refreshPerformanceHeatmapPrices();
     }
 
-    private void refreshLatestAndPerformanceHeatmapPrices() {
-        logTime(refreshMaterializedViewsRepository::refreshLatestPrices, "refreshed latest prices");
+    private void refreshPerformanceHeatmapPrices() {
         logTime(refreshMaterializedViewsRepository::refreshDailyPerformanceHeatmapPrices, "refreshed daily performance prices");
         logTime(refreshMaterializedViewsRepository::refreshWeeklyPerformanceHeatmapPrices, "refreshed weekly performance prices");
         logTime(refreshMaterializedViewsRepository::refreshMonthlyPerformanceHeatmapPrices, "refreshed monthly performance prices");
