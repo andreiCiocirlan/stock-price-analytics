@@ -44,7 +44,7 @@ public class HighLowPricesCacheService {
     }
 
     public void initHighLowPricesCache() {
-        LocalDate latestDailyPriceImportDate = dailyPricesJSONRepository.findLastImportedDate();
+        LocalDate latestDailyPriceImportDate = stockRepository.findLastUpdate();
         initHighLowPricesCache(HighLowPeriod.HIGH_LOW_4W, latestDailyPriceImportDate);
         initHighLowPricesCache(HighLowPeriod.HIGH_LOW_52W, latestDailyPriceImportDate);
         initHighLowPricesCache(HighLowPeriod.HIGH_LOW_ALL_TIME, latestDailyPriceImportDate);
