@@ -4,18 +4,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.HighLowPricesCache;
-import stock.price.analytics.cache.StocksCache;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.highlow.*;
-import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.prices.HighLowForPeriodRepository;
 import stock.price.analytics.repository.stocks.StockRepository;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
@@ -25,7 +24,6 @@ import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 @RequiredArgsConstructor
 public class HighLowPricesCacheService {
 
-    private final StocksCache stocksCache;
     private final StockRepository stockRepository;
     private final HighLowPricesCache highLowPricesCache;
     private final HighLowForPeriodRepository highLowForPeriodRepository;
@@ -80,27 +78,6 @@ public class HighLowPricesCacheService {
                 case HIGH_LOW_ALL_TIME -> highLowForPeriodRepository.highestLowestPrices(startDate);
             };
             highLowPricesCache.addHighLowPrices(highLowPrices, highLowPeriod);
-        }
-    }
-
-    public void updateStocksHighLowFromHighLowCache() {
-        Map<String, Stock> stocksMap = stocksCache.stocksMap();
-        List<HighLowForPeriod> newHighLowPrices = highLowPricesCache.getNewHighLowPrices();
-        Set<Stock> updatedStocks = newHighLowPrices.stream()
-                .map(HighLowForPeriod::getTicker)
-                .filter(stocksMap::containsKey)
-                .map(stocksMap::get)
-                .collect(Collectors.toSet());
-        if (!updatedStocks.isEmpty()) {
-            for (HighLowForPeriod newHighLowPrice : newHighLowPrices) {
-                String ticker = newHighLowPrice.getTicker();
-                Stock stock = stocksMap.get(ticker);
-                stock.updateFrom(newHighLowPrice);
-            }
-            List<Stock> stocks = updatedStocks.stream().toList();
-            partitionDataAndSave(stocks, stockRepository);
-            stocksCache.addStocks(stocks);
-            highLowPricesCache.clearNewHighLowPrices(); // clear new high low prices for next import
         }
     }
 

@@ -4,7 +4,9 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import stock.price.analytics.cache.HighLowPricesCache;
 import stock.price.analytics.cache.StocksCache;
+import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.stocks.StockRepository;
@@ -19,6 +21,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.nio.file.Files.walk;
@@ -33,7 +36,7 @@ public class StockService {
 
     private final StockRepository stockRepository;
     private final StocksCache stocksCache;
-    private final HighLowPricesCacheService highLowPricesCacheService;
+    private final HighLowPricesCache highLowPricesCache;
 
     @Transactional
     public void saveStocks() throws IOException {
@@ -100,7 +103,24 @@ public class StockService {
     }
 
     public void updateStocksHighLowFromHighLowCache() {
-        highLowPricesCacheService.updateStocksHighLowFromHighLowCache();
+        Map<String, Stock> stocksMap = stocksCache.stocksMap();
+        List<HighLowForPeriod> newHighLowPrices = highLowPricesCache.getNewHighLowPrices();
+        Set<Stock> updatedStocks = newHighLowPrices.stream()
+                .map(HighLowForPeriod::getTicker)
+                .filter(stocksMap::containsKey)
+                .map(stocksMap::get)
+                .collect(Collectors.toSet());
+        if (!updatedStocks.isEmpty()) {
+            for (HighLowForPeriod newHighLowPrice : newHighLowPrices) {
+                String ticker = newHighLowPrice.getTicker();
+                Stock stock = stocksMap.get(ticker);
+                stock.updateFrom(newHighLowPrice);
+            }
+            List<Stock> stocks = updatedStocks.stream().toList();
+            partitionDataAndSave(stocks, stockRepository);
+            stocksCache.addStocks(stocks);
+            highLowPricesCache.clearNewHighLowPrices(); // clear new high low prices for next import
+        }
     }
 
     public void initStocksCache() {
