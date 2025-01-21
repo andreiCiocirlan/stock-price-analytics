@@ -30,15 +30,19 @@ public class DailyPricesCache {
     private void addToMap(DailyPriceOHLC newPrice, List<DailyPriceOHLC> addedPrices) {
         DailyPriceOHLC existingPrice = dailyPricesByTicker.get(newPrice.getTicker());
 
-        DailyPriceOHLC result = dailyPricesByTicker.merge(
-                newPrice.getTicker(),
-                newPrice,
-                DailyPriceOHLC::updateFrom
-        );
+        if (existingPrice != null) {
+            if (existingPrice.getDate().isEqual(newPrice.getDate())) { // intraday update
+                existingPrice.setOpen(newPrice.getOpen());
+                existingPrice.setHigh(newPrice.getHigh());
+                existingPrice.setLow(newPrice.getLow());
+                existingPrice.setClose(newPrice.getClose());
+                existingPrice.setPerformance(newPrice.getPerformance());
 
-        // Check if a new price was added or replaced
-        if (existingPrice == null || existingPrice.differentPrices(result)) {
-            addedPrices.add(result);
+                addedPrices.add(existingPrice);
+            } else if (newPrice.getDate().isAfter(existingPrice.getDate())) { // newPrice must be newer compared to DB existing price (first daily import)
+                dailyPricesByTicker.put(newPrice.getTicker(), newPrice);
+                addedPrices.add(newPrice);
+            }
         }
     }
 
