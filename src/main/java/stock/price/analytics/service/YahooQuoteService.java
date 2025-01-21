@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.util.Constants.MAX_TICKER_COUNT_PRINT;
+import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateImported;
 
 @Slf4j
@@ -40,7 +41,7 @@ public class YahooQuoteService {
     private static final int MAX_RETRIES_CRUMB = 5;
     private final YahooFinanceClient yahooFinanceClient;
     private final DailyPriceOHLCService dailyPriceOHLCService;
-    private final PriceOHLCService priceOHLCService;
+    private final DailyPriceOHLCRepository dailyPriceOHLCRepository;
     private int RETRY_COUNT_CRUMB = 0;
     private String COOKIE_FC_YAHOO = "";
     private String CRUMB_COOKIE = "";
@@ -88,7 +89,7 @@ public class YahooQuoteService {
         }
 
         if (!preMarketOnly || dailyImportedPrices.isEmpty()) { // only save if intraday prices, for pre-market only display
-            priceOHLCService.savePrices(dailyImportedPrices);
+            partitionDataAndSave(dailyImportedPrices, dailyPriceOHLCRepository);
         }
 
         if (!tickersImported.isEmpty()) {
