@@ -13,10 +13,10 @@ import java.util.stream.Collectors;
 @Component
 public class HigherTimeframePricesCache {
 
-    private final Map<String, WeeklyPriceOHLC> weeklyPricesByTickerAndDate = new TreeMap<>(Collections.reverseOrder());
-    private final Map<String, MonthlyPriceOHLC> monthlyPricesByTickerAndDate = new TreeMap<>(Collections.reverseOrder());
-    private final Map<String, QuarterlyPriceOHLC> quarterlyPricesByTickerAndDate = new TreeMap<>(Collections.reverseOrder());
-    private final Map<String, YearlyPriceOHLC> yearlyPricesByTickerAndDate = new TreeMap<>(Collections.reverseOrder());
+    private final Map<String, WeeklyPriceOHLC> weeklyPricesByTickerAndDate = new HashMap<>();
+    private final Map<String, MonthlyPriceOHLC> monthlyPricesByTickerAndDate = new HashMap<>();
+    private final Map<String, QuarterlyPriceOHLC> quarterlyPricesByTickerAndDate = new HashMap<>();
+    private final Map<String, YearlyPriceOHLC> yearlyPricesByTickerAndDate = new HashMap<>();
 
     public void addWeeklyPrices(List<WeeklyPriceOHLC> weeklyPrices) {
         weeklyPrices.forEach(price ->
