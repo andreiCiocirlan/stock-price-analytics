@@ -24,8 +24,12 @@ public class DailyPricesJSONCacheService {
         dailyPricesJSONCache.addDailyJSONPrices(dailyPricesJSONRepository.findByDateBetween(tradingDateNow.minusDays(7), tradingDateNow));
     }
 
+    public List<DailyPricesJSON> addDailyPricesJSONInCacheAndReturn(List<DailyPricesJSON> dailyPricesJSON) {
+        return dailyPricesJSONCache.addDailyPricesJSONInCacheAndReturn(dailyPricesJSON);
+    }
+
     public List<DailyPricesJSON> dailyPricesJSONCache() {
-        return dailyPricesJSONCache.getDailyPricesJSONCache();
+        return dailyPricesJSONCache.getDailyPricesJSONByTicker().values().stream().toList();
     }
 
 }

@@ -73,9 +73,10 @@ public class DailyPricesJSONService {
                 log.warn("{}", sameDailyPrices);
             }
         }
-        partitionDataAndSave(dailyJSONPrices, dailyPricesJSONRepository);
+        List<DailyPricesJSON> dailyPricesJSONSInCache = dailyPricesJSONCacheService.addDailyPricesJSONInCacheAndReturn(dailyJSONPrices);
+        partitionDataAndSave(dailyPricesJSONSInCache, dailyPricesJSONRepository);
 
-        return dailyJSONPrices;
+        return dailyPricesJSONSInCache;
     }
 
     public List<DailyPricesJSON> dailyPricesJSONFromFile(String fileName) {
