@@ -79,16 +79,14 @@ public class HighLowForPeriodService {
     }
 
     public void saveCurrentWeekHighLowPricesFrom(List<DailyPriceOHLC> dailyPricesImported, List<String> tickers) {
-        logTime(() -> {
-            for (HighLowPeriod highLowPeriod : values()) {
-                List<? extends HighLowForPeriod> hlPricesUpdated = highLowPricesCache.updateHighLowPricesCacheFrom(dailyPricesImported, tickers, highLowPeriod);
-                if (!hlPricesUpdated.isEmpty()) {
-                    log.info("found {} new {} prices {}", hlPricesUpdated.size(), highLowPeriod, hlPricesUpdated.stream().map(HighLowForPeriod::getTicker).toList());
-                    partitionDataAndSaveNoLogging(hlPricesUpdated, highLowForPeriodRepository);
-                    highLowPricesCache.addHighLowPrices(hlPricesUpdated, highLowPeriod);
-                }
+        for (HighLowPeriod highLowPeriod : values()) {
+            List<? extends HighLowForPeriod> hlPricesUpdated = highLowPricesCache.updateHighLowPricesCacheFrom(dailyPricesImported, tickers, highLowPeriod);
+            if (!hlPricesUpdated.isEmpty()) {
+                log.info("found {} new {} prices {}", hlPricesUpdated.size(), highLowPeriod, hlPricesUpdated.stream().map(HighLowForPeriod::getTicker).toList());
+                partitionDataAndSaveNoLogging(hlPricesUpdated, highLowForPeriodRepository);
+                highLowPricesCache.addHighLowPrices(hlPricesUpdated, highLowPeriod);
             }
-        }, "saved current week HighLow prices");
+        }
     }
 
     public void saveCurrentWeekHighLowPricesSingleTicker(String ticker, LocalDate tradingDate) {
