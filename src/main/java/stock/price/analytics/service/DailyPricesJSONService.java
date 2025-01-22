@@ -29,14 +29,11 @@ import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 @RequiredArgsConstructor
 public class DailyPricesJSONService {
 
+    private final DailyPricesJSONCacheService dailyPricesJSONCacheService;
     private final DailyPricesJSONRepository dailyPricesJSONRepository;
 
-    public List<DailyPricesJSON> findByDateBetween(LocalDate from, LocalDate to) {
-        return dailyPricesJSONRepository.findByDateBetween(from, to);
-    }
-
     public List<DailyPricesJSON> extractDailyJSONPricesAndSave(List<DailyPricesJSON> dailyPricesJSON) {
-        List<DailyPricesJSON> recentJsonPrices = findByDateBetween(tradingDateNow().minusDays(7), tradingDateNow());
+        List<DailyPricesJSON> recentJsonPrices = dailyPricesJSONCacheService.dailyPricesJSONCache();
         Map<String, DailyPricesJSON> latestJsonPricesById = recentJsonPrices.stream().collect(Collectors.toMap(DailyPricesJSON::getCompositeId, p -> p));
         List<String> sameDailyPrices = new ArrayList<>();
         List<DailyPricesJSON> dailyJSONPrices = new ArrayList<>();
@@ -102,7 +99,7 @@ public class DailyPricesJSONService {
             module.addDeserializer(LocalDate.class, new UnixTimestampToLocalDateDeserializer());
             objectMapper.registerModule(module);
             Response dailyPricesJSON = objectMapper.readValue(jsonData, Response.class);
-            List<DailyPricesJSON> recentJsonPrices = findByDateBetween(tradingDateNow().minusDays(700), tradingDateNow());
+            List<DailyPricesJSON> recentJsonPrices = dailyPricesJSONCacheService.dailyPricesJSONCache();
             Map<String, DailyPricesJSON> recentJsonPricesById = recentJsonPrices.stream().collect(Collectors.toMap(DailyPricesJSON::getCompositeId, p -> p));
 
             for (DailyPricesJSON dailyPriceJson : dailyPricesJSON.getQuoteResponse().getResult()) {
