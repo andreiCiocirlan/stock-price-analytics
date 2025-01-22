@@ -6,9 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
-import stock.price.analytics.repository.prices.DailyPriceOHLCRepository;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +18,6 @@ import static stock.price.analytics.util.Constants.MAX_TICKER_COUNT_PRINT;
 @RequiredArgsConstructor
 public class DailyPriceOHLCService {
 
-    private final DailyPriceOHLCRepository dailyPriceOHLCRepository;
     private final DailyPricesCacheService dailyPricesCacheService;
 
     @Transactional
@@ -62,10 +59,6 @@ public class DailyPriceOHLCService {
 
     public List<DailyPriceOHLC> addDailyPricesInCacheAndReturn(List<DailyPriceOHLC> dailyPriceOHLCs) {
         return dailyPricesCacheService.addDailyPricesInCacheAndReturn(dailyPriceOHLCs);
-    }
-
-    public List<DailyPriceOHLC> findXTBLatestDailyPricesWithDateAfter(LocalDate date) {
-        return dailyPriceOHLCRepository.findXTBLatestDailyPricesWithDateAfter(date);
     }
 
     private static boolean needsUpdate(DailyPriceOHLC dailyPrice, DailyPriceOHLC latestPrice) {
