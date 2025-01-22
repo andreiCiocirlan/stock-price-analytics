@@ -73,7 +73,7 @@ public class DailyPricesJSONService {
                 log.warn("{}", sameDailyPrices);
             }
         }
-        dailyPricesJSONRepository.saveAll(dailyJSONPrices);
+        partitionDataAndSave(dailyJSONPrices, dailyPricesJSONRepository);
 
         return dailyJSONPrices;
     }
