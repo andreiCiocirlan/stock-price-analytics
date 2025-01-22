@@ -52,7 +52,7 @@ public class IntraDayPricesController {
             List<AbstractPriceOHLC> htfPricesUpdated = priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
             logTime(() -> stockService.updateStocksOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks OHLC from DAILY, WEEKLY, MONTHLY, QUARTERLY, YEARLY imported prices ");
             // daily performance view based on stock last_updated (keep this order)
-            refreshMaterializedViewsService.refreshMaterializedViews();
+            logTime(refreshMaterializedViewsService::refreshMaterializedViews, "refreshed mviews");
 
             // high/low price update based on weekly perf view (refreshed before)
             List<String> tickers = dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList();
@@ -76,7 +76,7 @@ public class IntraDayPricesController {
             List<AbstractPriceOHLC> htfPricesUpdated = priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
             logTime(() -> stockService.updateStocksOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks OHLC from DAILY, WEEKLY, MONTHLY, QUARTERLY, YEARLY imported prices ");
             // daily performance view based on stock last_updated (keep this order)
-            refreshMaterializedViewsService.refreshMaterializedViews();
+            logTime(refreshMaterializedViewsService::refreshMaterializedViews, "refreshed materialized views");
 
             // high/low price update based on weekly perf view (refreshed before)
             List<String> tickers = dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList();
