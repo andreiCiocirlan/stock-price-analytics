@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.util.Constants.MAX_TICKER_COUNT_PRINT;
+import static stock.price.analytics.util.LoggingUtil.logTime;
+import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateImported;
 
@@ -69,7 +71,7 @@ public class YahooQuoteService {
         while (start < latestPrices.size()) {
             List<DailyPriceOHLC> partition = latestPrices.subList(start, end);
             String tickers = partition.stream().map(DailyPriceOHLC::getTicker).collect(Collectors.joining(","));
-            String pricesJSON = quotePricesJSON(tickers, getCrumb());
+            String pricesJSON = logTimeAndReturn(() -> quotePricesJSON(tickers, getCrumb()), "Yahoo API call and JSON result");
 
             List<DailyPriceOHLC> dailyPricesExtractedFromJSON = yahooFinanceClient.extractDailyPricesFromJSON(pricesJSON, preMarketOnly);
             List<DailyPriceOHLC> dailyPricesImported = dailyPriceOHLCService.addDailyPricesInCacheAndReturn(dailyPricesExtractedFromJSON);
@@ -90,7 +92,7 @@ public class YahooQuoteService {
         }
 
         if (!preMarketOnly || dailyImportedPrices.isEmpty()) { // only save if intraday prices, for pre-market only display
-            partitionDataAndSave(dailyImportedPrices, dailyPriceOHLCRepository);
+            logTime(() -> partitionDataAndSave(dailyImportedPrices, dailyPriceOHLCRepository), "saved daily prices");
         }
 
         if (!tickersImported.isEmpty()) {
