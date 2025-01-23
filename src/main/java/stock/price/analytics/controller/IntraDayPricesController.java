@@ -29,7 +29,6 @@ public class IntraDayPricesController {
     private final HighLowForPeriodService highLowForPeriodService;
     private final RefreshMaterializedViewsService refreshMaterializedViewsService;
     private final StockService stockService;
-    private final DailyPricesJSONService dailyPricesJSONService;
 
     @GetMapping("/finnhub")
     public DailyPriceOHLC intraDayPrices(@RequestParam("ticker") String ticker) {
@@ -86,10 +85,5 @@ public class IntraDayPricesController {
         return dailyImportedPrices;
     }
 
-    @Transactional
-    @PostMapping("/yahoo-prices/save-json-from-file")
-    public void saveDailyPricesJSONFrom(@RequestParam("fileName") String fileName) {
-        dailyPricesJSONService.saveDailyPricesJSONFrom(fileName);
-    }
 
 }
