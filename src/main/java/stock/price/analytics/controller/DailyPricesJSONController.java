@@ -15,11 +15,16 @@ public class DailyPricesJSONController {
 
     private final DailyPricesJSONService dailyPricesJSONService;
 
-
     @PostMapping("/db-to-json-file")
     @ResponseStatus(HttpStatus.CREATED)
     public void dbToJSONFile() {
         dailyPricesJSONService.exportDailyPricesToJson(LocalDate.of(2025, 1, 22));
+    }
+
+    @Transactional
+    @PostMapping("/save-json-from-file")
+    public void saveDailyPricesJSONFrom(@RequestParam("fileName") String fileName) {
+        dailyPricesJSONService.saveDailyPricesJSONFrom(fileName);
     }
 
 }
