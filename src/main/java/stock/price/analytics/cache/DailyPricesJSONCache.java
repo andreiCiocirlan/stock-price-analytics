@@ -29,19 +29,17 @@ public class DailyPricesJSONCache {
     private void addToMap(DailyPricesJSON newPrice, List<DailyPricesJSON> addedPrices) {
         DailyPricesJSON existingPrice = dailyPricesJSONByTicker.get(createKey(newPrice.getSymbol(), newPrice.getDate()));
 
-        if (existingPrice != null) {
-            if (existingPrice.getDate().isEqual(newPrice.getDate())) { // intraday update
-                existingPrice.setRegularMarketOpen(newPrice.getRegularMarketOpen());
-                existingPrice.setRegularMarketDayHigh(newPrice.getRegularMarketDayHigh());
-                existingPrice.setRegularMarketDayLow(newPrice.getRegularMarketDayLow());
-                existingPrice.setRegularMarketPrice(newPrice.getRegularMarketPrice());
-                existingPrice.setRegularMarketChangePercent(newPrice.getRegularMarketChangePercent());
+        if (existingPrice != null) { // intraday update
+            existingPrice.setRegularMarketOpen(newPrice.getRegularMarketOpen());
+            existingPrice.setRegularMarketDayHigh(newPrice.getRegularMarketDayHigh());
+            existingPrice.setRegularMarketDayLow(newPrice.getRegularMarketDayLow());
+            existingPrice.setRegularMarketPrice(newPrice.getRegularMarketPrice());
+            existingPrice.setRegularMarketChangePercent(newPrice.getRegularMarketChangePercent());
 
-                addedPrices.add(existingPrice);
-            } else if (newPrice.getDate().isAfter(existingPrice.getDate())) { // newPrice must be newer compared to DB existing price (first daily import)
-                dailyPricesJSONByTicker.put(createKey(newPrice.getSymbol(), newPrice.getDate()), newPrice);
-                addedPrices.add(newPrice);
-            }
+            addedPrices.add(existingPrice);
+        } else { // first import of the day
+            dailyPricesJSONByTicker.put(createKey(newPrice.getSymbol(), newPrice.getDate()), newPrice);
+            addedPrices.add(newPrice);
         }
     }
 
