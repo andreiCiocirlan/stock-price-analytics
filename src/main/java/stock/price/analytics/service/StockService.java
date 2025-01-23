@@ -98,7 +98,7 @@ public class StockService {
         }
 
         List<Stock> stocks = new ArrayList<>(stocksUpdated);
-        partitionDataAndSave(stocks, stockRepository);
+        logTime(() -> partitionDataAndSave(stocks, stockRepository), "saved stocks after OHLC wmy updates");
         stocksCache.addStocks(stocks);
     }
 
