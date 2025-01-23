@@ -15,5 +15,6 @@ public interface DailyPricesJSONRepository extends JpaRepository<DailyPricesJSON
     @Query(value = "SELECT * from daily_prices_json where date between :from and :to", nativeQuery = true)
     List<DailyPricesJSON> findByDateBetween(@Param("from") LocalDate from, @Param("to") LocalDate to);
 
+    List<DailyPricesJSON> findByDate(LocalDate date);
 
 }

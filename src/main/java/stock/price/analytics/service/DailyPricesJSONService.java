@@ -8,10 +8,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.model.prices.json.DailyPricesJSON;
+import stock.price.analytics.model.prices.json.QuoteResponse;
 import stock.price.analytics.model.prices.json.Response;
 import stock.price.analytics.model.prices.json.UnixTimestampToLocalDateDeserializer;
 import stock.price.analytics.repository.prices.DailyPricesJSONRepository;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDate;
@@ -149,6 +151,27 @@ public class DailyPricesJSONService {
 
         if (!dailyPricesJSON_toSave.isEmpty()) {
             partitionDataAndSave(dailyPricesJSON_toSave, dailyPricesJSONRepository);
+        }
+    }
+
+    public void exportDailyPricesToJson(LocalDate date) {
+        List<DailyPricesJSON> dailyPrices = dailyPricesJSONRepository.findByDate(date);
+        QuoteResponse quoteResponse = new QuoteResponse();
+        quoteResponse.setResult(dailyPrices);
+
+        Response response = new Response();
+        response.setQuoteResponse(quoteResponse);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+
+        try {
+            String path = "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/";
+            objectMapper.writeValue(new File(path + date + ".json"), response);
+            System.out.println("Data exported to JSON file successfully.");
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error writing JSON file: " + e.getMessage());
         }
     }
 }
