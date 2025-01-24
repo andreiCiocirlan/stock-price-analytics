@@ -12,6 +12,7 @@ import stock.price.analytics.service.HighLowForPeriodService;
 import stock.price.analytics.service.HighLowPricesCacheService;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -46,7 +47,8 @@ public class HighLowForPeriodController {
     @ResponseStatus(HttpStatus.OK)
     public void newDailyHighLowsForHLPeriod() {
         for (HighLowPeriod highLowPeriod : HighLowPeriod.values()) {
-            log.info("New {} : {}", highLowPeriod, highLowPricesCacheService.getNewHighLowsForHLPeriod(highLowPeriod));
+            List<String> newHighLowsForHLPeriod = highLowPricesCacheService.getNewHighLowsForHLPeriod(highLowPeriod);
+            log.info("{} New {} : {}", newHighLowsForHLPeriod.size(), highLowPeriod, newHighLowsForHLPeriod);
         }
     }
 
