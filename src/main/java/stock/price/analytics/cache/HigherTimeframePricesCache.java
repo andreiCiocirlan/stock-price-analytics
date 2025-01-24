@@ -7,7 +7,10 @@ import stock.price.analytics.model.prices.ohlc.WeeklyPriceOHLC;
 import stock.price.analytics.model.prices.ohlc.YearlyPriceOHLC;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
