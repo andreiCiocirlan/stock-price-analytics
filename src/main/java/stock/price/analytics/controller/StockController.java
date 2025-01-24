@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.stocks.StockRepository;
 import stock.price.analytics.service.StockService;
+import stock.price.analytics.service.TickerRenameService;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,6 +20,7 @@ public class StockController {
 
     private final StockService stockService;
     private final StockRepository stockRepository;
+    private final TickerRenameService tickerRenameService;
 
     @PostMapping("/save_all")
     @ResponseStatus(HttpStatus.OK)
@@ -46,5 +48,9 @@ public class StockController {
         stockService.updateStocksHighLow(tradingDateNow());
     }
 
+    @PutMapping("/rename-ticker")
+    public void renameTicker(@RequestParam(value = "oldTicker") String oldTicker, @RequestParam(value = "newTicker") String newTicker) {
+        tickerRenameService.renameTicker(oldTicker, newTicker);
+    }
 
 }
