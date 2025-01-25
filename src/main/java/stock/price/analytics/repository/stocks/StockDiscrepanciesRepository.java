@@ -35,6 +35,56 @@ public interface StockDiscrepanciesRepository extends StockRepository {
             """, nativeQuery = true)
     List<Stock> findStocksWithHighestLowestDiscrepancy();
 
+    @Modifying
+    @Transactional
+    @Query(value = """
+            WITH discrepancies AS (
+                SELECT s.ticker, hl.high, hl.low
+                FROM public.stocks s
+                JOIN high_low4w hl ON hl.start_date = DATE_TRUNC('week', s.last_updated)
+                                     AND hl.ticker = s.ticker
+                WHERE s.delisted_date IS NULL AND (hl.high <> s.high4w OR hl.low <> s.low4w)
+            )
+            UPDATE public.stocks s
+            SET high4w = d.high, low4w = d.low
+            FROM discrepancies d
+            WHERE s.ticker = d.ticker;
+            """, nativeQuery = true)
+    void updateStocksWithHighLow4wDiscrepancy();
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+            WITH discrepancies AS (
+                SELECT s.ticker, hl.high, hl.low
+                FROM public.stocks s
+                JOIN high_low52w hl ON hl.start_date = DATE_TRUNC('week', s.last_updated)
+                                     AND hl.ticker = s.ticker
+                WHERE s.delisted_date IS NULL AND (hl.high <> s.high52w OR hl.low <> s.low52w)
+            )
+            UPDATE public.stocks s
+            SET high52w = d.high, low52w = d.low
+            FROM discrepancies d
+            WHERE s.ticker = d.ticker
+            """, nativeQuery = true)
+    void updateStocksWithHighLow52wDiscrepancy();
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+            WITH discrepancies AS (
+                SELECT s.ticker, hl.high, hl.low
+                FROM public.stocks s
+                JOIN highest_lowest hl ON hl.start_date = DATE_TRUNC('week', s.last_updated) AND hl.ticker = s.ticker
+                WHERE s.delisted_date IS NULL AND (hl.high <> s.highest OR hl.low <> s.lowest)
+            )
+            UPDATE public.stocks s
+            SET highest = d.high, lowest = d.low
+            FROM discrepancies d
+            WHERE s.ticker = d.ticker AND DATE_TRUNC('week', s.last_updated) = DATE_TRUNC('week', CURRENT_DATE);
+            """, nativeQuery = true)
+    void updateStocksWithHighestLowestDiscrepancy();
+
     @Query(value = """
             SELECT s.*
             FROM public.stocks s

@@ -29,6 +29,15 @@ public class StockDiscrepanciesController {
         };
     }
 
+    @PutMapping("/high-low-for-period")
+    public void updateStocksWithHighLowDiscrepancy(@RequestParam(value = "period") HighLowPeriod period) {
+        switch (period) {
+            case HIGH_LOW_4W -> stockDiscrepanciesRepository.updateStocksWithHighLow4wDiscrepancy();
+            case HIGH_LOW_52W -> stockDiscrepanciesRepository.updateStocksWithHighLow52wDiscrepancy();
+            case HIGH_LOW_ALL_TIME -> stockDiscrepanciesRepository.updateStocksWithHighestLowestDiscrepancy();
+        }
+    }
+
     @GetMapping("/weekly-opening")
     public List<Stock> findStocksWithWeeklyOpeningDiscrepancy() {
         return stockDiscrepanciesRepository.findStocksWithWeeklyOpeningDiscrepancy();
