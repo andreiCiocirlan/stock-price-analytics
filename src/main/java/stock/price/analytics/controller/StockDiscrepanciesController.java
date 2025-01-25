@@ -3,6 +3,7 @@ package stock.price.analytics.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
+import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.stocks.StockDiscrepanciesRepository;
 
@@ -38,44 +39,26 @@ public class StockDiscrepanciesController {
         }
     }
 
-    @GetMapping("/weekly-opening")
-    public List<Stock> findStocksWithWeeklyOpeningDiscrepancy() {
-        return stockDiscrepanciesRepository.findStocksWithWeeklyOpeningDiscrepancy();
+    @GetMapping("/opening-price")
+    public List<Stock> findStocksWithOpeningPriceDiscrepancy(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
+        return switch (timeframe) {
+            case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
+            case WEEKLY -> stockDiscrepanciesRepository.findStocksWithWeeklyOpeningDiscrepancy();
+            case MONTHLY -> stockDiscrepanciesRepository.findStocksWithMonthlyOpeningDiscrepancy();
+            case QUARTERLY -> stockDiscrepanciesRepository.findStocksWithQuarterlyOpeningDiscrepancy();
+            case YEARLY -> stockDiscrepanciesRepository.findStocksWithYearlyOpeningDiscrepancy();
+        };
     }
 
-    @GetMapping("/monthly-opening")
-    public List<Stock> findStocksWithMonthlyOpeningDiscrepancy() {
-        return stockDiscrepanciesRepository.findStocksWithMonthlyOpeningDiscrepancy();
-    }
-
-    @GetMapping("/quarterly-opening")
-    public List<Stock> findStocksWithQuarterlyOpeningDiscrepancy() {
-        return stockDiscrepanciesRepository.findStocksWithQuarterlyOpeningDiscrepancy();
-    }
-
-    @GetMapping("/yearly-opening")
-    public List<Stock> findStocksWithYearlyOpeningDiscrepancy() {
-        return stockDiscrepanciesRepository.findStocksWithYearlyOpeningDiscrepancy();
-    }
-
-    @PutMapping("/weekly-opening")
-    public void updateStocksWithWeeklyOpeningDiscrepancy() {
-        stockDiscrepanciesRepository.updateStocksWithWeeklyOpeningDiscrepancy();
-    }
-
-    @PutMapping("/monthly-opening")
-    public void updateStocksWithMonthlyOpeningDiscrepancy() {
-        stockDiscrepanciesRepository.updateStocksWithMonthlyOpeningDiscrepancy();
-    }
-
-    @PutMapping("/quarterly-opening")
-    public void updateStocksWithQuarterlyOpeningDiscrepancy() {
-        stockDiscrepanciesRepository.updateStocksWithQuarterlyOpeningDiscrepancy();
-    }
-
-    @PutMapping("/yearly-opening")
-    public void updateStocksWithYearlyOpeningDiscrepancy() {
-        stockDiscrepanciesRepository.updateStocksWithYearlyOpeningDiscrepancy();
+    @PutMapping("/opening-price")
+    public void updateStocksWithOpeningPriceDiscrepancy(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
+        switch (timeframe) {
+            case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
+            case WEEKLY -> stockDiscrepanciesRepository.updateStocksWithWeeklyOpeningDiscrepancy();
+            case MONTHLY -> stockDiscrepanciesRepository.updateStocksWithMonthlyOpeningDiscrepancy();
+            case QUARTERLY -> stockDiscrepanciesRepository.updateStocksWithQuarterlyOpeningDiscrepancy();
+            case YEARLY -> stockDiscrepanciesRepository.updateStocksWithYearlyOpeningDiscrepancy();
+        }
     }
 
 }
