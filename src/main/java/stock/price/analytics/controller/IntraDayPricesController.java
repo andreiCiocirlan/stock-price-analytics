@@ -57,13 +57,13 @@ public class IntraDayPricesController {
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
             List<AbstractPriceOHLC> htfPricesUpdated = priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
             logTime(() -> stockService.updateStocksOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks OHLC from DAILY, WEEKLY, MONTHLY, QUARTERLY, YEARLY imported prices ");
-            // daily performance view based on stock last_updated (keep this order)
-            logTime(refreshMaterializedViewsService::refreshMaterializedViews, "refreshed mviews");
 
             // high/low price update based on weekly perf view (refreshed before)
             List<String> tickers = dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList();
             logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices, tickers), "saved current week HighLow prices" );
             logTime(stockService::updateStocksHighLowFromHighLowCache, "updated stocks high low 4w, 52w, all-time");
+            // all performance views based on stock last_updated
+            logTime(refreshMaterializedViewsService::refreshMaterializedViews, "refreshed materialized views");
         }
         long duration = (System.nanoTime() - start) / 1_000_000;
         log.info("Real-time import done in {} ms", duration);
@@ -85,13 +85,13 @@ public class IntraDayPricesController {
             priceOHLCService.savePrices(dailyImportedPrices);
             List<AbstractPriceOHLC> htfPricesUpdated = priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
             logTime(() -> stockService.updateStocksOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks OHLC from DAILY, WEEKLY, MONTHLY, QUARTERLY, YEARLY imported prices ");
-            // daily performance view based on stock last_updated (keep this order)
-            logTime(refreshMaterializedViewsService::refreshMaterializedViews, "refreshed materialized views");
 
             // high/low price update based on weekly perf view (refreshed before)
             List<String> tickers = dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList();
             logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices, tickers), "saved current week HighLow prices" );
             logTime(stockService::updateStocksHighLowFromHighLowCache, "updated stocks high low 4w, 52w, all-time");
+            // all performance views based on stock last_updated
+            logTime(refreshMaterializedViewsService::refreshMaterializedViews, "refreshed materialized views");
         }
         long duration = (System.nanoTime() - start) / 1_000_000;
         log.info("Import from file done in {} ms", duration);
