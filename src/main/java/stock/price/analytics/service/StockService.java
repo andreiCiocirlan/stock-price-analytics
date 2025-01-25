@@ -72,7 +72,7 @@ public class StockService {
                 "updated stocks high low 4w, 52w, all-time");
     }
 
-    public void updateStocksOHLCFrom(List<DailyPriceOHLC> dailyImportedPrices, List<AbstractPriceOHLC> htfPrices) {
+    public void updateStocksHighLowsAndOHLCFrom(List<DailyPriceOHLC> dailyImportedPrices, List<AbstractPriceOHLC> htfPrices) {
         Map<String, Stock> stocksMap = stocksCache.getStocksMap();
         Set<Stock> stocksUpdated = new HashSet<>();
         // update from daily prices
@@ -97,13 +97,6 @@ public class StockService {
             stocksUpdated.add(stock);
         }
 
-        List<Stock> stocks = new ArrayList<>(stocksUpdated);
-        logTime(() -> partitionDataAndSave(stocks, stockRepository), "saved stocks after OHLC wmy updates");
-        stocksCache.addStocks(stocks);
-    }
-
-    public void updateStocksHighLowFromHighLowCache() {
-        Map<String, Stock> stocksMap = stocksCache.getStocksMap();
         List<HighLowForPeriod> newHighLowPrices = highLowPricesCache.getNewHighLowPrices();
         Set<Stock> updatedStocks = newHighLowPrices.stream()
                 .map(HighLowForPeriod::getTicker)
@@ -115,12 +108,14 @@ public class StockService {
                 String ticker = newHighLowPrice.getTicker();
                 Stock stock = stocksMap.get(ticker);
                 stock.updateFrom(newHighLowPrice);
+                stocksUpdated.add(stock);
             }
-            List<Stock> stocks = updatedStocks.stream().toList();
-            partitionDataAndSave(stocks, stockRepository);
-            stocksCache.addStocks(stocks);
             highLowPricesCache.clearNewHighLowPrices(); // clear new high low prices for next import
         }
+
+        List<Stock> stocks = new ArrayList<>(stocksUpdated);
+        logTime(() -> partitionDataAndSave(stocks, stockRepository), "saved stocks after OHLC higher-timeframe and high-lows 4w, 52w, all-time updates");
+        stocksCache.addStocks(stocks);
     }
 
     public void initStocksCache() {
