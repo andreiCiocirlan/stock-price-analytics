@@ -52,6 +52,7 @@ public class IntraDayPricesController {
     @Transactional
     @GetMapping("/yahoo-prices/intraday")
     public void yahooPricesImport() {
+        long start = System.nanoTime();
         List<DailyPriceOHLC> dailyImportedPrices = logTimeAndReturn(yahooQuoteService::dailyPricesImport, "imported daily prices");
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
             List<AbstractPriceOHLC> htfPricesUpdated = priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
@@ -64,6 +65,8 @@ public class IntraDayPricesController {
             logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices, tickers), "saved current week HighLow prices" );
             logTime(stockService::updateStocksHighLowFromHighLowCache, "updated stocks high low 4w, 52w, all-time");
         }
+        long duration = (System.nanoTime() - start) / 1_000_000;
+        log.info("Real-time import done in {} ms", duration);
     }
 
     @Transactional
@@ -75,6 +78,7 @@ public class IntraDayPricesController {
     @Transactional
     @GetMapping("/yahoo-prices/from-file")
     public List<DailyPriceOHLC> yahooPricesImportFromFile(@RequestParam(value = "fileName", required = false) String fileNameStr) {
+        long start = System.nanoTime();
         String fileName = Objects.requireNonNullElseGet(fileNameStr, () -> tradingDateNow().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_1");
         List<DailyPriceOHLC> dailyImportedPrices = logTimeAndReturn(() -> yahooQuoteService.dailyPricesFromFile(fileName), "imported daily prices");
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
@@ -89,6 +93,8 @@ public class IntraDayPricesController {
             logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices, tickers), "saved current week HighLow prices" );
             logTime(stockService::updateStocksHighLowFromHighLowCache, "updated stocks high low 4w, 52w, all-time");
         }
+        long duration = (System.nanoTime() - start) / 1_000_000;
+        log.info("Import from file done in {} ms", duration);
         return dailyImportedPrices;
     }
 
