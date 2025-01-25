@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -86,13 +87,13 @@ public class DailyPricesJSONService {
             String jsonFilePath = String.join("", "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/", fileName, ".json");
             String jsonData = String.join("", readAllLines(Path.of(jsonFilePath)));
 
-            return extractAllDailyPricesJSONFrom(jsonData);
+             return extractAllDailyPricesJSONFrom(jsonData, LocalDate.parse(fileName.split("_")[0], DateTimeFormatter.ofPattern("dd-MM-yyyy")));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public List<DailyPricesJSON> extractAllDailyPricesJSONFrom(String jsonData) {
+    public List<DailyPricesJSON> extractAllDailyPricesJSONFrom(String jsonData, LocalDate date) {
         ObjectMapper objectMapper = new ObjectMapper();
         List<String> sameDailyPrices = new ArrayList<>();
         List<DailyPricesJSON> dailyJSONPrices = new ArrayList<>();
@@ -102,7 +103,7 @@ public class DailyPricesJSONService {
             module.addDeserializer(LocalDate.class, new UnixTimestampToLocalDateDeserializer());
             objectMapper.registerModule(module);
             Response dailyPricesJSON = objectMapper.readValue(jsonData, Response.class);
-            List<DailyPricesJSON> recentJsonPrices = dailyPricesJSONCacheService.dailyPricesJSONCache();
+            List<DailyPricesJSON> recentJsonPrices = dailyPricesJSONRepository.findByDateBetween(date.minusDays(10), date);
             Map<String, DailyPricesJSON> recentJsonPricesById = recentJsonPrices.stream().collect(Collectors.toMap(DailyPricesJSON::getCompositeId, p -> p));
 
             for (DailyPricesJSON dailyPriceJson : dailyPricesJSON.getQuoteResponse().getResult()) {
