@@ -2,6 +2,7 @@ package stock.price.analytics.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import stock.price.analytics.model.prices.enums.HighLowPeriod;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.stocks.StockDiscrepanciesRepository;
 
@@ -17,6 +18,15 @@ public class StockDiscrepanciesController {
     @GetMapping("/find-any")
     public List<Object[]> findStocksHighLowsOrHTFDiscrepancies() {
         return stockDiscrepanciesRepository.findStocksHighLowsOrHTFDiscrepancies();
+    }
+
+    @GetMapping("/high-low-for-period")
+    public List<Stock> findStocksWithHighLowDiscrepancy(@RequestParam(value = "period") HighLowPeriod period) {
+        return switch (period) {
+            case HIGH_LOW_4W -> stockDiscrepanciesRepository.findStocksWithHighLow4wDiscrepancy();
+            case HIGH_LOW_52W -> stockDiscrepanciesRepository.findStocksWithHighLow52wDiscrepancy();
+            case HIGH_LOW_ALL_TIME -> stockDiscrepanciesRepository.findStocksWithHighestLowestDiscrepancy();
+        };
     }
 
     @GetMapping("/weekly-opening")

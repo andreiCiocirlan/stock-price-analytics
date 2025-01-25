@@ -14,6 +14,30 @@ public interface StockDiscrepanciesRepository extends StockRepository {
     @Query(value = """
             SELECT s.*
             FROM public.stocks s
+            JOIN high_low4w hl ON hl.start_date = DATE_TRUNC('week', s.last_updated) AND hl.ticker = s.ticker
+            WHERE s.delisted_date IS NULL AND (hl.high <> s.high4w OR hl.low <> s.low4w)
+            """, nativeQuery = true)
+    List<Stock> findStocksWithHighLow4wDiscrepancy();
+
+    @Query(value = """
+            SELECT s.*
+            FROM public.stocks s
+            JOIN high_low52w hl ON hl.start_date = DATE_TRUNC('week', s.last_updated) AND hl.ticker = s.ticker
+            WHERE s.delisted_date IS NULL AND (hl.high <> s.high52w OR hl.low <> s.low52w)
+            """, nativeQuery = true)
+    List<Stock> findStocksWithHighLow52wDiscrepancy();
+
+    @Query(value = """
+            SELECT s.*
+            FROM public.stocks s
+            JOIN highest_lowest hl ON hl.start_date = DATE_TRUNC('week', s.last_updated) AND hl.ticker = s.ticker
+            WHERE s.delisted_date IS NULL AND (hl.high <> s.highest OR hl.low <> s.lowest)
+            """, nativeQuery = true)
+    List<Stock> findStocksWithHighestLowestDiscrepancy();
+
+    @Query(value = """
+            SELECT s.*
+            FROM public.stocks s
             JOIN weekly_prices wp ON wp.start_date = DATE_TRUNC('week', s.last_updated) AND wp.ticker = s.ticker
             WHERE s.delisted_date IS NULL AND (wp.open <> s.w_open)
             """, nativeQuery = true)
