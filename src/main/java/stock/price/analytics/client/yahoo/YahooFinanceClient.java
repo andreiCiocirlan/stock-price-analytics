@@ -71,7 +71,7 @@ public class YahooFinanceClient {
             double high = dailyPriceJson.getRegularMarketDayHigh();
             double low = dailyPriceJson.getRegularMarketDayLow();
             double close = preMarketPrices ? dailyPriceJson.getPreMarketPrice() : dailyPriceJson.getRegularMarketPrice();
-            double percentChange = Math.round(dailyPriceJson.getRegularMarketChangePercent() * 100.0) / 100.0;
+            double percentChange = dailyPriceJson.getRegularMarketChangePercent();
 
             DailyPriceOHLC dailyPrice = new DailyPriceOHLC(ticker, dailyPriceJson.getDate(), percentChange, new CandleOHLC(open, high, low, close));
             dailyOLHCPrices.add(dailyPrice);
