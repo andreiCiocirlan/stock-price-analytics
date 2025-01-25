@@ -13,10 +13,13 @@ import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 import stock.price.analytics.repository.prices.PriceOHLCRepository;
 import stock.price.analytics.service.*;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 
 import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
+import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 
 @Slf4j
@@ -71,7 +74,8 @@ public class IntraDayPricesController {
 
     @Transactional
     @GetMapping("/yahoo-prices/from-file")
-    public List<DailyPriceOHLC> yahooPricesImportFromFile(@RequestParam("fileName") String fileName) {
+    public List<DailyPriceOHLC> yahooPricesImportFromFile(@RequestParam(value = "fileName", required = false) String fileNameStr) {
+        String fileName = Objects.requireNonNullElseGet(fileNameStr, () -> tradingDateNow().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_1");
         List<DailyPriceOHLC> dailyImportedPrices = logTimeAndReturn(() -> yahooQuoteService.dailyPricesFromFile(fileName), "imported daily prices");
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
             priceOHLCService.savePrices(dailyImportedPrices);
