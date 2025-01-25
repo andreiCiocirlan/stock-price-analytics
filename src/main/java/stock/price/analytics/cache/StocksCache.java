@@ -1,5 +1,6 @@
 package stock.price.analytics.cache;
 
+import lombok.Getter;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.model.stocks.Stock;
 
@@ -9,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Getter
 @Component
 public class StocksCache {
 
@@ -29,7 +31,4 @@ public class StocksCache {
                 .collect(Collectors.toList());
     }
 
-    public Map<String, Stock> stocksMap() {
-        return stocksMap;
-    }
 }

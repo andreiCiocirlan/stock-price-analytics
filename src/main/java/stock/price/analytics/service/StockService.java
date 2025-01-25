@@ -73,7 +73,7 @@ public class StockService {
     }
 
     public void updateStocksOHLCFrom(List<DailyPriceOHLC> dailyImportedPrices, List<AbstractPriceOHLC> htfPrices) {
-        Map<String, Stock> stocksMap = stocksCache.stocksMap();
+        Map<String, Stock> stocksMap = stocksCache.getStocksMap();
         Set<Stock> stocksUpdated = new HashSet<>();
         // update from daily prices
         for (DailyPriceOHLC dailyImportedPrice : dailyImportedPrices) {
@@ -103,7 +103,7 @@ public class StockService {
     }
 
     public void updateStocksHighLowFromHighLowCache() {
-        Map<String, Stock> stocksMap = stocksCache.stocksMap();
+        Map<String, Stock> stocksMap = stocksCache.getStocksMap();
         List<HighLowForPeriod> newHighLowPrices = highLowPricesCache.getNewHighLowPrices();
         Set<Stock> updatedStocks = newHighLowPrices.stream()
                 .map(HighLowForPeriod::getTicker)
