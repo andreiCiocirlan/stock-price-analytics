@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.model.fvg.FairValueGap;
+import stock.price.analytics.model.prices.enums.FvgStatus;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.repository.fvg.FVGRepository;
 
@@ -40,10 +41,10 @@ public class FairValueGapService {
         List<FairValueGap> newFVGsFound = new ArrayList<>();
         List<FairValueGap> currentFVGs = findAllByTimeframe(timeframe);
 
-        Map<String, FairValueGap> dbFVGsByCompositeId = fvgRepository.findByTimeframe(timeframe).stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
+        Map<String, FairValueGap> dbFVGsByCompositeId = fvgRepository.findByTimeframeAndStatusOpen(timeframe.name()).stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
         Map<String, FairValueGap> currentFVGsByCompositeId = currentFVGs.stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
         currentFVGsByCompositeId.forEach((compositeKey, fvg) -> {
-            if (!dbFVGsByCompositeId.containsKey(compositeKey)){
+            if (!dbFVGsByCompositeId.containsKey(compositeKey)) {
                 newFVGsFound.add(fvg);
                 log.info("New {} fvg : {}", timeframe, fvg);
             }
@@ -56,11 +57,12 @@ public class FairValueGapService {
         List<FairValueGap> closedFVGsFound = new ArrayList<>();
         List<FairValueGap> currentFVGs = findAllByTimeframe(timeframe);
 
-        Map<String, FairValueGap> dbFVGsByCompositeId = fvgRepository.findByTimeframe(timeframe).stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
+        Map<String, FairValueGap> dbFVGsByCompositeId = fvgRepository.findByTimeframeAndStatusOpen(timeframe.name()).stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
         Map<String, FairValueGap> currentFVGsByCompositeId = currentFVGs.stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
 
         dbFVGsByCompositeId.forEach((compositeKey, fvg) -> {
-            if (!currentFVGsByCompositeId.containsKey(compositeKey)){
+            if (!currentFVGsByCompositeId.containsKey(compositeKey)) {
+                fvg.setStatus(FvgStatus.CLOSED);
                 closedFVGsFound.add(fvg);
                 log.info("Closed {} fvg : {}", timeframe, fvg);
             }

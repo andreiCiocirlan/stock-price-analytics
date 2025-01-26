@@ -2,16 +2,19 @@ package stock.price.analytics.repository.fvg;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import stock.price.analytics.model.fvg.FairValueGap;
-import stock.price.analytics.model.prices.enums.StockTimeframe;
 
 import java.util.List;
 
 @Repository
 public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
 
-    List<FairValueGap> findByTimeframe(StockTimeframe timeframe);
+    @Query(value = """
+            SELECT * FROM fvg WHERE timeframe = :timeframe AND status = 'OPEN';
+            """, nativeQuery = true)
+    List<FairValueGap> findByTimeframeAndStatusOpen(@Param(value = "timeframe") String timeframe);
 
     @Query(value = """
             WITH price_data AS (
