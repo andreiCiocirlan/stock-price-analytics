@@ -10,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 @Getter
@@ -62,6 +63,10 @@ public class DailyPriceOHLC extends AbstractPriceOHLC {
             return newPrice;
         }
         return this; // sometimes DB price is newer, default to existing price
+    }
+
+    public String getCompositeId() {
+        return getTicker() + "_" + getDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
     }
 
     @Override
