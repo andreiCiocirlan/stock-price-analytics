@@ -52,4 +52,21 @@ public class FairValueGapService {
         return newFVGsFound;
     }
 
+    public List<FairValueGap> findClosedFVGsFor(StockTimeframe timeframe) {
+        List<FairValueGap> closedFVGsFound = new ArrayList<>();
+        List<FairValueGap> currentFVGs = findAllByTimeframe(timeframe);
+
+        Map<String, FairValueGap> dbFVGsByCompositeId = fvgRepository.findByTimeframe(timeframe).stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
+        Map<String, FairValueGap> currentFVGsByCompositeId = currentFVGs.stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
+
+        dbFVGsByCompositeId.forEach((compositeKey, fvg) -> {
+            if (!currentFVGsByCompositeId.containsKey(compositeKey)){
+                closedFVGsFound.add(fvg);
+                log.info("Closed {} fvg : {}", timeframe, fvg);
+            }
+        });
+
+        return closedFVGsFound;
+    }
+
 }
