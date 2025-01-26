@@ -7,10 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import stock.price.analytics.model.prices.json.DailyPricesJSON;
-import stock.price.analytics.model.prices.json.QuoteResponse;
-import stock.price.analytics.model.prices.json.Response;
-import stock.price.analytics.model.prices.json.UnixTimestampToLocalDateDeserializer;
+import stock.price.analytics.model.prices.json.*;
 import stock.price.analytics.repository.prices.DailyPricesJSONRepository;
 
 import java.io.File;
@@ -165,6 +162,9 @@ public class DailyPricesJSONService {
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(LocalDate.class, new LocalDateToUnixTimestampSerializer());
+        objectMapper.registerModule(module);
 
         try {
             String path = "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/";
