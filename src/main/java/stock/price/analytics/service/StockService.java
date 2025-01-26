@@ -129,6 +129,21 @@ public class StockService {
         stocksCache.addStocks(stocks);
     }
 
+    public void updateHighLowForPeriodFromHLCachesAndAdjustWeekend() {
+        Set<Stock> stocksUpdated = new HashSet<>();
+        updateStocksFromHighLowCaches(stocksUpdated);
+
+        for (Stock stock : stocksUpdated) {
+            LocalDate lastUpdated = stock.getLastUpdated();
+            if (lastUpdated.getDayOfWeek().equals(DayOfWeek.FRIDAY)) { // change last_updated to monday
+                stock.setLastUpdated(lastUpdated.plusDays(3));
+            }
+        }
+        List<Stock> stocks = new ArrayList<>(stocksUpdated);
+        logTime(() -> partitionDataAndSave(stocks, stockRepository), "saved stocks after generating high-lows 4w, 52w, all-time for the first import of the week");
+        stocksCache.addStocks(stocks);
+    }
+
     public void initStocksCache() {
         stocksCache.addStocks(stockRepository.findByXtbStockTrueAndDelistedDateIsNull());
     }
