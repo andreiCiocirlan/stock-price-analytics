@@ -46,7 +46,7 @@ public class FairValueGapController {
 
     @PutMapping("/update-closed")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateClosedVsGsFor(@RequestParam(value = "timeframe", required = false) StockTimeframe timeframe) {
+    public void updateClosedFVGsFor(@RequestParam(value = "timeframe", required = false) StockTimeframe timeframe) {
         if (timeframe == null) { // update closed for all timeframes
             for (StockTimeframe stockTimeframe : StockTimeframe.values()) {
                 partitionDataAndSave(fairValueGapService.findClosedFVGsFor(stockTimeframe), fvgRepository);
