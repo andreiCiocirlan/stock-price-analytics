@@ -74,7 +74,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
             WITH price_data AS (
                 SELECT
             		ticker,
-                    date_trunc('month', start_date)::date AS wmy_date,
+                    date_trunc('quarter', start_date)::date AS wmy_date,
                     open, high, low, close,
                     ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY start_date) AS rn
                 FROM quarterly_prices
