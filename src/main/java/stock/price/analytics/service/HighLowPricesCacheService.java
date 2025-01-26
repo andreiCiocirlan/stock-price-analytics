@@ -7,7 +7,6 @@ import stock.price.analytics.cache.HighLowPricesCache;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.highlow.*;
 import stock.price.analytics.repository.prices.HighLowForPeriodRepository;
-import stock.price.analytics.repository.stocks.StockRepository;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
