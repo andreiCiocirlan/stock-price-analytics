@@ -6,7 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.HighLowPricesCache;
 import stock.price.analytics.cache.StocksCache;
-import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
+import stock.price.analytics.model.prices.highlow.HighLow4w;
+import stock.price.analytics.model.prices.highlow.HighLow52Week;
+import stock.price.analytics.model.prices.highlow.HighestLowestPrices;
 import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.stocks.StockRepository;
@@ -21,7 +23,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.nio.file.Files.walk;
@@ -99,20 +100,20 @@ public class StockService {
             stocksUpdated.add(stock);
         }
 
-        List<HighLowForPeriod> newHighLowPrices = highLowPricesCache.getNewHighLowPrices();
-        Set<Stock> updatedStocks = newHighLowPrices.stream()
-                .map(HighLowForPeriod::getTicker)
-                .filter(stocksMap::containsKey)
-                .map(stocksMap::get)
-                .collect(Collectors.toSet());
-        if (!updatedStocks.isEmpty()) {
-            for (HighLowForPeriod newHighLowPrice : newHighLowPrices) {
-                String ticker = newHighLowPrice.getTicker();
-                Stock stock = stocksMap.get(ticker);
-                stock.updateFrom(newHighLowPrice);
-                stocksUpdated.add(stock);
-            }
-            highLowPricesCache.clearNewHighLowPrices(); // clear new high low prices for next import
+        for (HighLow4w hl4 : highLowPricesCache.highLow4wCache()) {
+            Stock stock = stocksMap.get(hl4.getTicker());
+            stock.updateFrom(hl4);
+            stocksUpdated.add(stock);
+        }
+        for (HighLow52Week hl52 : highLowPricesCache.highLow52wCache()) {
+            Stock stock = stocksMap.get(hl52.getTicker());
+            stock.updateFrom(hl52);
+            stocksUpdated.add(stock);
+        }
+        for (HighestLowestPrices hl : highLowPricesCache.highestLowestCache()) {
+            Stock stock = stocksMap.get(hl.getTicker());
+            stock.updateFrom(hl);
+            stocksUpdated.add(stock);
         }
 
         List<Stock> stocks = new ArrayList<>(stocksUpdated);

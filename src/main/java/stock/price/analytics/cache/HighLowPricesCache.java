@@ -19,9 +19,17 @@ public class HighLowPricesCache {
     private final Map<String, HighLow52Week> highLow52wMap = new HashMap<>();
     private final Map<String, HighestLowestPrices> highestLowestMap = new HashMap<>();
     @Getter
-    private final List<HighLowForPeriod> newHighLowPrices = new ArrayList<>();
-    @Getter
     private final Map<HighLowPeriod, Set<String>> dailyNewHighLowsByHLPeriod = new HashMap<>();
+
+    public List<HighLow4w> highLow4wCache() {
+        return new ArrayList<>(highLow4wMap.values());
+    }
+    public List<HighLow52Week> highLow52wCache() {
+        return new ArrayList<>(highLow52wMap.values());
+    }
+    public List<HighestLowestPrices> highestLowestCache() {
+        return new ArrayList<>(highestLowestMap.values());
+    }
 
     public void addHighLowPrices(List<? extends HighLowForPeriod> hlPrices, HighLowPeriod highLowPeriod) {
         switch (highLowPeriod) {
@@ -61,18 +69,12 @@ public class HighLowPricesCache {
                         .filter(hlp -> hlp.newHighLow(dailyPricesImportedMap.get(ticker))) // the method also assigns new high/low price not just return true/false
                 ).collect(Collectors.toList());
 
-        newHighLowPrices.addAll(updatedHighLowPrices); // used for stocks update high-low prices
-
         // add new highs and lows for 4w, 52w, all-time into cache (to be printed on-demand)
-        for (HighLowForPeriod newHighLowPrice : newHighLowPrices) {
+        for (HighLowForPeriod newHighLowPrice : updatedHighLowPrices) {
             dailyNewHighLowsByHLPeriod.computeIfAbsent(newHighLowPrice.getHighLowPeriod(), _ -> new HashSet<>()).add(newHighLowPrice.getTicker());
         }
 
         return updatedHighLowPrices;
     }
 
-    // clean slate for next import
-    public void clearNewHighLowPrices() {
-        newHighLowPrices.clear();
-    }
 }
