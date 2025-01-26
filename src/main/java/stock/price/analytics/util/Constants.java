@@ -7,6 +7,6 @@ public class Constants {
     public static final int NR_THREADS = 10;
     public static final String CLASSPATH_TICKERS_XTB_TXT = "classpath:tickers_XTB.txt";
     public static final String TIMEFRAME_PATTERN = "^(DAILY|WEEKLY|MONTHLY|YEARLY)$";
-    public static final String HIGHER_TIMEFRAMES_PATTERN = "^[WMYwmy]{1,3}$";
+    public static final String HIGHER_TIMEFRAMES_PATTERN = "^[WMQYwmqy]{1,3}$";
     public static final int MAX_TICKER_COUNT_PRINT = 100;
 }
