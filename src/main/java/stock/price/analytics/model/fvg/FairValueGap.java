@@ -8,6 +8,7 @@ import stock.price.analytics.model.prices.enums.FvgType;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Getter
 @Entity
@@ -40,6 +41,10 @@ public class FairValueGap implements PriceEntity {
 
     @Column(name = "high")
     private double high;
+
+    public String compositeId() {
+        return getTicker() + "_" + getTimeframe() + "_" + date.format(DateTimeFormatter.ISO_LOCAL_DATE);
+    }
 
     @Override
     public String toString() {

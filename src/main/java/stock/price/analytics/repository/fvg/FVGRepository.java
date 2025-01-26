@@ -11,6 +11,8 @@ import java.util.List;
 @Repository
 public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
 
+    List<FairValueGap> findByTimeframe(StockTimeframe timeframe);
+
     @Query(value = """
             WITH price_data AS (
                 SELECT
