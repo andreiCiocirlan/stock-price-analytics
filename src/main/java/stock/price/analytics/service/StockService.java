@@ -124,4 +124,8 @@ public class StockService {
     public void initStocksCache() {
         stocksCache.addStocks(stockRepository.findByXtbStockTrueAndDelistedDateIsNull());
     }
+
+    public LocalDate findLastUpdate() {
+        return stockRepository.findLastUpdate();
+    }
 }

@@ -24,7 +24,7 @@ import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 @RequiredArgsConstructor
 public class HighLowPricesCacheService {
 
-    private final StockRepository stockRepository;
+    private final StockService stockService;
     private final HighLowPricesCache highLowPricesCache;
     private final HighLowForPeriodRepository highLowForPeriodRepository;
 
@@ -40,7 +40,7 @@ public class HighLowPricesCacheService {
     }
 
     public void initHighLowPricesCache() {
-        LocalDate latestDailyPriceImportDate = stockRepository.findLastUpdate();
+        LocalDate latestDailyPriceImportDate = stockService.findLastUpdate();
         initHighLowPricesCache(HighLowPeriod.HIGH_LOW_4W, latestDailyPriceImportDate);
         initHighLowPricesCache(HighLowPeriod.HIGH_LOW_52W, latestDailyPriceImportDate);
         initHighLowPricesCache(HighLowPeriod.HIGH_LOW_ALL_TIME, latestDailyPriceImportDate);
