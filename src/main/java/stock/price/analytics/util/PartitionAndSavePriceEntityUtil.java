@@ -39,7 +39,6 @@ public class PartitionAndSavePriceEntityUtil {
         for (List<T> partition : partitions) {
             try {
                 List<R> rs = (List<R>) partition;
-                rs.forEach(System.out::println);
                 repository.saveAllAndFlush(rs);
             } catch (Exception e) {
                 log.error("Error saving partition: {}", e.getMessage(), e);
