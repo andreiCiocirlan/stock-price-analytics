@@ -44,6 +44,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
             SELECT
                 nextval('sequence_fvg') as id,
             	'YEARLY' as timeframe,
+                'OPEN' as status,
             	fvg.ticker as ticker,
             	fvg.date2 as date,
                 fvg.type,
@@ -101,6 +102,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
             SELECT
                 nextval('sequence_fvg') as id,
             	'QUARTERLY' as timeframe,
+                'OPEN' as status,
             	fvg.ticker as ticker,
             	fvg.date2 as date,
                 fvg.type,
@@ -158,6 +160,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
             SELECT
                 nextval('sequence_fvg') as id,
                 'MONTHLY' as timeframe,
+                'OPEN' as status,
             	fvg.ticker as ticker,
             	fvg.date2 as date,
                 fvg.type,
@@ -215,6 +218,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
             SELECT
                 nextval('sequence_fvg') as id,
             	'WEEKLY' as timeframe,
+                'OPEN' as status,
             	fvg.ticker as ticker,
             	fvg.date2 as date,
                 fvg.type,
@@ -273,6 +277,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
             SELECT
                 nextval('sequence_fvg') as id,
             	'DAILY' as timeframe,
+                'OPEN' as status,
             	fvg.ticker as ticker,
             	fvg.date2 as date,
                 fvg.type,
