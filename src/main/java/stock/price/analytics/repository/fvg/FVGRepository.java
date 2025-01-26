@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import stock.price.analytics.model.fvg.FairValueGap;
+import stock.price.analytics.model.prices.enums.StockTimeframe;
 
 import java.util.List;
 
@@ -40,7 +41,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
             )
             SELECT
                 nextval('sequence_fvg') as id,
-            	'YEAR' as timeframe,
+            	'YEARLY' as timeframe,
             	fvg.ticker as ticker,
             	fvg.date2 as date,
                 fvg.type,
@@ -97,7 +98,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
             )
             SELECT
                 nextval('sequence_fvg') as id,
-            	'QUARTER' as timeframe,
+            	'QUARTERLY' as timeframe,
             	fvg.ticker as ticker,
             	fvg.date2 as date,
                 fvg.type,
@@ -154,7 +155,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
             )
             SELECT
                 nextval('sequence_fvg') as id,
-                'MONTH' as timeframe,
+                'MONTHLY' as timeframe,
             	fvg.ticker as ticker,
             	fvg.date2 as date,
                 fvg.type,
@@ -211,7 +212,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
             )
             SELECT
                 nextval('sequence_fvg') as id,
-            	'WEEK' as timeframe,
+            	'WEEKLY' as timeframe,
             	fvg.ticker as ticker,
             	fvg.date2 as date,
                 fvg.type,
@@ -269,7 +270,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
             )
             SELECT
                 nextval('sequence_fvg') as id,
-            	'DAY' as timeframe,
+            	'DAILY' as timeframe,
             	fvg.ticker as ticker,
             	fvg.date2 as date,
                 fvg.type,
