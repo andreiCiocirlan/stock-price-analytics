@@ -49,6 +49,16 @@ public class FairValueGap implements PriceEntity {
     @Column(name = "high")
     private double high;
 
+    public FairValueGap(String ticker, StockTimeframe timeframe, LocalDate date, FvgType type, FvgStatus status, double low, double high) {
+        this.ticker = ticker;
+        this.timeframe = timeframe;
+        this.date = date;
+        this.type = type;
+        this.status = status;
+        this.low = low;
+        this.high = high;
+    }
+
     public String compositeId() {
         return getTicker() + "_" + getTimeframe() + "_" + date.format(DateTimeFormatter.ISO_LOCAL_DATE);
     }
