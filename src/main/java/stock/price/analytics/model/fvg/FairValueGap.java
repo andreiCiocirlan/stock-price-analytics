@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import stock.price.analytics.model.prices.PriceEntity;
+import stock.price.analytics.model.prices.enums.FvgStatus;
 import stock.price.analytics.model.prices.enums.FvgType;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 
@@ -35,6 +36,10 @@ public class FairValueGap implements PriceEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
     private FvgType type;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private FvgStatus status;
 
     @Column(name = "low")
     private double low;
