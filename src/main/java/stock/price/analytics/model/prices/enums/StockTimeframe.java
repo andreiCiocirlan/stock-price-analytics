@@ -40,6 +40,16 @@ public enum StockTimeframe {
         };
     }
 
+    public String toDateTruncPeriod() {
+        return switch (this) {
+            case DAILY -> "DAY";
+            case WEEKLY -> "WEEK";
+            case MONTHLY -> "MONTH";
+            case QUARTERLY -> "QUARTER";
+            case YEARLY -> "YEAR";
+        };
+    }
+
     public String toSQLInterval() {
         return switch (this) {
             case DAILY -> "2 DAY";

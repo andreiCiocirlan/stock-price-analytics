@@ -273,21 +273,21 @@ public class PriceOHLCService {
     @Transactional
     public void updateHigherTimeframesPricesFor(LocalDate date, List<StockTimeframe> timeframes, String tickers) {
         for (StockTimeframe timeframe : timeframes) {
-            updateHigherTimeframeHistPrices(timeframe.toSQLInterval(), timeframe.dbTableOHLC(), timeframe.htfDateFrom(date), tickers);
+            updateHigherTimeframeHistPrices(timeframe.toDateTruncPeriod(), timeframe.toSQLInterval(), timeframe.dbTableOHLC(), timeframe.htfDateFrom(date), tickers);
         }
     }
 
-    private void updateHigherTimeframeHistPrices(String timeframe, String tableName, LocalDate date, String tickers) {
+    private void updateHigherTimeframeHistPrices(String dateTruncPeriod, String sqlInterval, String tableName, LocalDate date, String tickers) {
         String dateFormatted = date.format(DateTimeFormatter.ISO_LOCAL_DATE);
         int savedOrUpdatedCount = entityManager.createNativeQuery(
-                queryFrom(tickers, timeframe, tableName, dateFormatted)
+                queryFrom(tickers, dateTruncPeriod, sqlInterval, tableName, dateFormatted)
         ).executeUpdate();
         if (savedOrUpdatedCount != 0) {
-            log.info("saved/updated {} {} rows for date {} and tickers {}", savedOrUpdatedCount, timeframe, dateFormatted, tickers);
+            log.info("saved/updated {} {} rows for date {} and tickers {}", savedOrUpdatedCount, dateTruncPeriod, dateFormatted, tickers);
         }
     }
 
-    private String queryFrom(String tickers, String timeframe, String tableName, String dateFormatted) {
+    private String queryFrom(String tickers, String dateTruncPeriod, String sqlInterval, String tableName, String dateFormatted) {
         String query = STR."""
             WITH interval_data AS (
             SELECT
@@ -297,7 +297,7 @@ public class PriceOHLCService {
                 MAX(high) AS high,
                 MIN(low) AS low
             FROM daily_prices
-            WHERE date BETWEEN '\{dateFormatted}'::date - INTERVAL '\{timeframe}' AND '\{dateFormatted}'
+            WHERE date BETWEEN '\{dateFormatted}'::date - INTERVAL '\{sqlInterval}' AND '\{dateFormatted}'
             """;
 
         if (!tickers.isEmpty()) {
@@ -308,7 +308,7 @@ public class PriceOHLCService {
         }
 
         query = query.concat(STR."""
-            GROUP BY ticker, DATE_TRUNC('\{timeframe}', date)
+            GROUP BY ticker, DATE_TRUNC('\{dateTruncPeriod}', date)
             ),
             last_week AS (
                 SELECT
@@ -335,10 +335,10 @@ public class PriceOHLCService {
             final_result AS (
                 SELECT *
                 FROM last_week
-                    WHERE start_date >= DATE_TRUNC('\{timeframe}', '\{dateFormatted}'::date)
+                    WHERE start_date >= DATE_TRUNC('\{dateTruncPeriod}', '\{dateFormatted}'::date)
             )
             INSERT INTO \{tableName} (ticker, start_date, end_date, high, low, open, close, performance)
-            SELECT ticker, DATE_TRUNC('\{timeframe}', start_date), end_date, high, low, open, close, performance
+            SELECT ticker, DATE_TRUNC('\{dateTruncPeriod}', start_date), end_date, high, low, open, close, performance
             FROM final_result
             ON CONFLICT (ticker, start_date)
                 DO UPDATE SET
