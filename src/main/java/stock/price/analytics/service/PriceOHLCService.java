@@ -280,7 +280,7 @@ public class PriceOHLCService {
     private void updateHigherTimeframeHistPrices(String timeframe, String tableName, LocalDate date, String tickers) {
         String dateFormatted = date.format(DateTimeFormatter.ISO_LOCAL_DATE);
         int savedOrUpdatedCount = entityManager.createNativeQuery(
-                String.format(queryFrom(tickers, timeframe, tableName, dateFormatted), timeframe, tableName)
+                queryFrom(tickers, timeframe, tableName, dateFormatted)
         ).executeUpdate();
         if (savedOrUpdatedCount != 0) {
             log.info("saved/updated {} {} rows for date {} and tickers {}", savedOrUpdatedCount, timeframe, dateFormatted, tickers);
