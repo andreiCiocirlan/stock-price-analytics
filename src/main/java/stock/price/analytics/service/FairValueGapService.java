@@ -22,7 +22,7 @@ public class FairValueGapService {
 
     private final FVGRepository fvgRepository;
 
-    public void findAndSaveFVGsFor(StockTimeframe timeframe) {
+    public void findAllFVGsAndSaveFor(StockTimeframe timeframe) {
         List<FairValueGap> fvgs = findAllByTimeframe(timeframe);
         partitionDataAndSave(fvgs, fvgRepository);
     }

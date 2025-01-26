@@ -16,10 +16,10 @@ public class FairValueGapController {
 
     private final FairValueGapService fairValueGapService;
 
-    @PostMapping("/find-and-save")
+    @PostMapping("/find-all-and-save")
     @ResponseStatus(HttpStatus.CREATED)
     public void findAndSaveFVGsFor(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
-        fairValueGapService.findAndSaveFVGsFor(timeframe);
+        fairValueGapService.findAllFVGsAndSaveFor(timeframe);
     }
 
     @GetMapping("/find-new")
