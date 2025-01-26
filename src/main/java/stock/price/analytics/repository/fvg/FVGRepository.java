@@ -66,7 +66,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                 )
             order by ticker, fvg.date2 desc;
             """, nativeQuery = true)
-    List<FairValueGap> findYearlyFVGs();
+    List<FairValueGap> findAllYearlyFVGs();
 
     @Query(value = """
             WITH price_data AS (
@@ -123,7 +123,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                 )
             order by ticker, fvg.date2 desc;
             """, nativeQuery = true)
-    List<FairValueGap> findQuarterlyFVGs();
+    List<FairValueGap> findAllQuarterlyFVGs();
 
     @Query(value = """
             WITH price_data AS (
@@ -180,7 +180,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                 )
             order by ticker, fvg.date2 desc;
             """, nativeQuery = true)
-    List<FairValueGap> findMonthlyFVGs();
+    List<FairValueGap> findAllMonthlyFVGs();
 
     @Query(value = """
             WITH price_data AS (
@@ -237,7 +237,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                 )
             order by ticker, fvg.date2 desc;
             """, nativeQuery = true)
-    List<FairValueGap> findWeeklyFVGs();
+    List<FairValueGap> findAllWeeklyFVGs();
 
     @Query(value = """
             WITH price_data AS (
@@ -295,6 +295,6 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                 )
             order by ticker, fvg.date2 desc;
             """, nativeQuery = true)
-    List<FairValueGap> findDailyFVGs();
+    List<FairValueGap> findAllDailyFVGs();
 
 }

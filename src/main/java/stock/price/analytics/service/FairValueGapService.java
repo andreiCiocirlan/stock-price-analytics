@@ -17,14 +17,18 @@ public class FairValueGapService {
     private final FVGRepository fvgRepository;
 
     public void findAndSaveFVGsFor(StockTimeframe timeframe) {
-        List<FairValueGap> entities = switch (timeframe) {
-            case DAILY -> fvgRepository.findDailyFVGs();
-            case WEEKLY -> fvgRepository.findWeeklyFVGs();
-            case MONTHLY -> fvgRepository.findMonthlyFVGs();
-            case QUARTERLY -> fvgRepository.findQuarterlyFVGs();
-            case YEARLY -> fvgRepository.findYearlyFVGs();
+        List<FairValueGap> fvgs = findAllByTimeframe(timeframe);
+        partitionDataAndSave(fvgs, fvgRepository);
+    }
+
+    private List<FairValueGap> findAllByTimeframe(StockTimeframe timeframe) {
+        return switch (timeframe) {
+            case DAILY -> fvgRepository.findAllDailyFVGs();
+            case WEEKLY -> fvgRepository.findAllWeeklyFVGs();
+            case MONTHLY -> fvgRepository.findAllMonthlyFVGs();
+            case QUARTERLY -> fvgRepository.findAllQuarterlyFVGs();
+            case YEARLY -> fvgRepository.findAllYearlyFVGs();
         };
-        partitionDataAndSave(entities, fvgRepository);
     }
 
 }
