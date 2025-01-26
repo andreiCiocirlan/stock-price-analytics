@@ -79,8 +79,10 @@ public class StockService {
         for (DailyPriceOHLC dailyImportedPrice : dailyImportedPrices) {
             String ticker = dailyImportedPrice.getTicker();
             Stock stock = stocksMap.getOrDefault(ticker, new Stock(ticker, dailyImportedPrice.getDate(), true));
-            stock.updateFromDailyPrice(dailyImportedPrice);
-            stocksUpdated.add(stock);
+            if (!stock.getLastUpdated().isAfter(dailyImportedPrice.getDate())) { // don't update for imports from the past
+                stock.updateFromDailyPrice(dailyImportedPrice);
+                stocksUpdated.add(stock);
+            }
         }
 
         // update from higher timeframe prices
