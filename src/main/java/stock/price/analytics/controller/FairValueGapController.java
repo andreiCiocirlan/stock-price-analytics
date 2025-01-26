@@ -43,4 +43,16 @@ public class FairValueGapController {
     public List<FairValueGap> findClosedVsGsFor(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
         return fairValueGapService.findClosedFVGsFor(timeframe);
     }
+
+    @PutMapping("/update-closed")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateClosedVsGsFor(@RequestParam(value = "timeframe", required = false) StockTimeframe timeframe) {
+        if (timeframe == null) { // update closed for all timeframes
+            for (StockTimeframe stockTimeframe : StockTimeframe.values()) {
+                partitionDataAndSave(fairValueGapService.findClosedFVGsFor(stockTimeframe), fvgRepository);
+            }
+        } else {
+            partitionDataAndSave(fairValueGapService.findClosedFVGsFor(timeframe), fvgRepository);
+        }
+    }
 }
