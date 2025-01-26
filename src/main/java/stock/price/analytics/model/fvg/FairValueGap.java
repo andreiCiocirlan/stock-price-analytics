@@ -53,6 +53,6 @@ public class FairValueGap implements PriceEntity {
 
     @Override
     public String toString() {
-        return STR."FairValueGap{ticker='\{ticker}', type='\{type}', timeframe='\{timeframe}, date=\{date}, high=\{high}, low=\{low}'}";
+        return STR."FairValueGap{ticker='\{ticker}', status='\{status}', type='\{type}', timeframe='\{timeframe}, date=\{date}, high=\{high}, low=\{low}'}";
     }
 }
