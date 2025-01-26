@@ -5,9 +5,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.model.fvg.FairValueGap;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
+import stock.price.analytics.repository.fvg.FVGRepository;
 import stock.price.analytics.service.FairValueGapService;
 
 import java.util.List;
+
+import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 
 @RequestMapping("/fvg")
 @RestController
@@ -15,6 +18,7 @@ import java.util.List;
 public class FairValueGapController {
 
     private final FairValueGapService fairValueGapService;
+    private final FVGRepository fvgRepository;
 
     @PostMapping("/find-all-and-save")
     @ResponseStatus(HttpStatus.CREATED)
@@ -26,6 +30,12 @@ public class FairValueGapController {
     @ResponseStatus(HttpStatus.OK)
     public List<FairValueGap> findNewFVsGsFor(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
         return fairValueGapService.findNewFVGsFor(timeframe);
+    }
+
+    @PostMapping("/find-new-and-save")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void findNewFVsGsAndSaveFor(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
+        partitionDataAndSave(fairValueGapService.findNewFVGsFor(timeframe), fvgRepository);
     }
 
     @GetMapping("/find-closed")
