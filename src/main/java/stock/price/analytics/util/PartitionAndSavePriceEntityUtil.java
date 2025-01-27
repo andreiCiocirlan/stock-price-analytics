@@ -38,6 +38,7 @@ public class PartitionAndSavePriceEntityUtil {
     private static <T, R extends PriceEntity> void save(List<List<T>> partitions, JpaRepository<R, Long> repository) {
         for (List<T> partition : partitions) {
             try {
+                @SuppressWarnings("unchecked")
                 List<R> rs = (List<R>) partition;
                 repository.saveAllAndFlush(rs);
             } catch (Exception e) {
