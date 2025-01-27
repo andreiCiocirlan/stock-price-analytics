@@ -7,6 +7,7 @@ import stock.price.analytics.model.prices.PriceEntity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Component
@@ -36,16 +37,15 @@ public class PartitionAndSavePriceEntityUtil {
     }
 
     private static <T, R extends PriceEntity> void save(List<List<T>> partitions, JpaRepository<R, Long> repository) {
-        for (List<T> partition : partitions) {
-            try {
-                @SuppressWarnings("unchecked")
-                List<R> rs = (List<R>) partition;
-                repository.saveAllAndFlush(rs);
-            } catch (Exception e) {
-                log.error("Error saving partition: {}", e.getMessage(), e);
-                throw e; // Re-throw to stop execution if save fails
-            }
-        }
+        List<CompletableFuture<Void>> futures = partitions.stream()
+                .map(partition -> CompletableFuture.runAsync(() -> {
+                    @SuppressWarnings("unchecked")
+                    List<R> entitiesToSave = (List<R>) partition;
+                    repository.saveAll(entitiesToSave);
+                }))
+                .toList();
+
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
     }
 
 }
