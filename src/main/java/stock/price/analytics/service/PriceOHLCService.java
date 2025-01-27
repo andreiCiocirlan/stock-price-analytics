@@ -64,10 +64,19 @@ public class PriceOHLCService {
 
         // Update prices for each timeframe and return (used for stocks cache update)
         List<AbstractPriceOHLC> htfPricesUpdated = new ArrayList<>();
-        htfPricesUpdated.addAll(updateAndSavePrices(importedDailyPrices, WEEKLY, previousTwoWeeklyPrices));
-        htfPricesUpdated.addAll(updateAndSavePrices(importedDailyPrices, MONTHLY, previousTwoMonthlyPrices));
-        htfPricesUpdated.addAll(updateAndSavePrices(importedDailyPrices, QUARTERLY, previousTwoQuarterlyPrices));
-        htfPricesUpdated.addAll(updateAndSavePrices(importedDailyPrices, YEARLY, previousTwoYearlyPrices));
+        List<WeeklyPriceOHLC> weeklyPrices = updateAndSavePrices(importedDailyPrices, WEEKLY, previousTwoWeeklyPrices);
+        List<MonthlyPriceOHLC> monthlyPrices = updateAndSavePrices(importedDailyPrices, MONTHLY, previousTwoMonthlyPrices);
+        List<QuarterlyPriceOHLC> quarterlyPrices = updateAndSavePrices(importedDailyPrices, QUARTERLY, previousTwoQuarterlyPrices);
+        List<YearlyPriceOHLC> yearlyPrices = updateAndSavePrices(importedDailyPrices, YEARLY, previousTwoYearlyPrices);
+        htfPricesUpdated.addAll(weeklyPrices);
+        htfPricesUpdated.addAll(monthlyPrices);
+        htfPricesUpdated.addAll(quarterlyPrices);
+        htfPricesUpdated.addAll(yearlyPrices);
+
+        higherTimeframePricesCache.addWeeklyPrices(weeklyPrices);
+        higherTimeframePricesCache.addMonthlyPrices(monthlyPrices);
+        higherTimeframePricesCache.addQuarterlyPrices(quarterlyPrices);
+        higherTimeframePricesCache.addYearlyPrices(yearlyPrices);
 
         return htfPricesUpdated;
     }
