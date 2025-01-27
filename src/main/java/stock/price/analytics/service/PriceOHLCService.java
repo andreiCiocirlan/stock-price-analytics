@@ -177,15 +177,17 @@ public class PriceOHLCService {
     }
 
 
-    private List<AbstractPriceOHLC> updateAndSavePrices(List<DailyPriceOHLC> importedDailyPrices,
+    @SuppressWarnings("unchecked")
+    private <T extends AbstractPriceOHLC> List<T> updateAndSavePrices(List<DailyPriceOHLC> importedDailyPrices,
                                                         StockTimeframe timeframe,
-                                                        List<? extends AbstractPriceOHLC> previousPrices) {
+                                                        List<T> previousPrices) {
         Map<String, List<AbstractPriceOHLC>> previousPricesByTicker = previousPrices.stream()
                 .collect(Collectors.groupingBy(AbstractPriceOHLC::getTicker, Collectors.mapping(p -> (AbstractPriceOHLC) p, Collectors.toList())));
 
         List<AbstractPriceOHLC> updatedPrices = updatePricesAndPerformance(importedDailyPrices, timeframe, previousPricesByTicker);
         partitionDataAndSaveNoLogging(updatedPrices, priceOHLCRepository);
-        return updatedPrices;
+
+        return (List<T>) updatedPrices;
     }
 
     private List<AbstractPriceOHLC> updatePricesAndPerformance(List<DailyPriceOHLC> dailyPrices, StockTimeframe timeframe, Map<String, List<AbstractPriceOHLC>> previousTwoWMYPricesByTicker) {
