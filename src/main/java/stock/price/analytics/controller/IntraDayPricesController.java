@@ -19,6 +19,7 @@ import java.util.Objects;
 
 import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
+import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 
@@ -45,8 +46,7 @@ public class IntraDayPricesController {
     @GetMapping("/finnhub-all-xtb")
     public void finnhubIntraDayPricesTickersXTB() {
         List<DailyPriceOHLC> dailyPrices = finnhubClient.intraDayPricesXTB();
-        pricesRepository.saveAll(dailyPrices);
-        log.info("saved {} daily prices", dailyPrices.size());
+        partitionDataAndSaveWithLogTime(dailyPrices, pricesRepository, "saved " + dailyPrices.size() + " daily prices");
     }
 
     @Transactional

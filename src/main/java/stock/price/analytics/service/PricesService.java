@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
+import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveNoLogging;
 import static stock.price.analytics.util.StockDateUtils.*;
 
@@ -366,6 +367,6 @@ public class PricesService {
 
     @Transactional
     public void savePrices(List<? extends AbstractPriceOHLC> prices) {
-        pricesRepository.saveAll(prices);
+        partitionDataAndSave(prices, pricesRepository);
     }
 }

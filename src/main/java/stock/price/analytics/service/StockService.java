@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 
 import static java.nio.file.Files.walk;
 import static stock.price.analytics.util.LoggingUtil.logTime;
+import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
 import static stock.price.analytics.util.PricesUtil.tickerFrom;
 
@@ -57,7 +58,7 @@ public class StockService {
         boolean removed = stocks.removeAll(stockRepository.findAll());
         log.info("remaining stocks {}", stocks);
         log.info("removed {}", removed);
-        stockRepository.saveAll(stocks);
+        partitionDataAndSave(stocks, stockRepository);
     }
 
     @Transactional

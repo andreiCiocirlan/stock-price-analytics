@@ -52,7 +52,7 @@ public class StockSplitAdjustPricesService {
 
         pricesToUpdate.forEach(dailyPrice -> updatePrices(dailyPrice, ohlc, priceMultiplier));
         log.info("{}", pricesToUpdate);
-        pricesRepository.saveAll(pricesToUpdate);
+        partitionDataAndSave(pricesToUpdate, pricesRepository);
         return pricesToUpdate;
     }
 
