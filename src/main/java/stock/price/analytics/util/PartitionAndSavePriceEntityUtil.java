@@ -9,19 +9,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import static stock.price.analytics.util.LoggingUtil.logTime;
+
 @Slf4j
 @Component
 public class PartitionAndSavePriceEntityUtil {
 
+    public static <T, R extends PriceEntity> void partitionDataAndSaveWithLogTime(List<T> entities, JpaRepository<R, Long> repository, String functionName) {
+        logTime(() -> partitionAndSave(entities, repository), functionName);
+    }
+
     public static <T, R extends PriceEntity> void partitionDataAndSave(List<T> entities, JpaRepository<R, Long> repository) {
-        partitionDataAndSave(entities, repository, true);
+        partitionAndSave(entities, repository);
+        log.info("Saved {} rows of type: {} ", entities.size(), entities.getFirst().getClass().getName());
     }
 
     public static <T, R extends PriceEntity> void partitionDataAndSaveNoLogging(List<T> entities, JpaRepository<R, Long> repository) {
-        partitionDataAndSave(entities, repository, false);
+        partitionAndSave(entities, repository);
     }
 
-    public static <T, R extends PriceEntity> void partitionDataAndSave(List<T> entities, JpaRepository<R, Long> repository, boolean logging) {
+    private static <T, R extends PriceEntity> void partitionAndSave(List<T> entities, JpaRepository<R, Long> repository) {
         if (entities.isEmpty()) {
             log.info("entities isEmpty");
             return;
@@ -30,13 +37,6 @@ public class PartitionAndSavePriceEntityUtil {
         for (int i = 0; i < entities.size(); i += 250) { // default batchSize to 250 like in application.properties
             partitions.add(entities.subList(i, Math.min(i + 250, entities.size())));
         }
-        save(partitions, repository);
-        if (logging) {
-            log.info("Saved {} rows of type: {} ", entities.size(), entities.getFirst().getClass().getName());
-        }
-    }
-
-    private static <T, R extends PriceEntity> void save(List<List<T>> partitions, JpaRepository<R, Long> repository) {
         List<CompletableFuture<Void>> futures = partitions.stream()
                 .map(partition -> CompletableFuture.runAsync(() -> {
                     @SuppressWarnings("unchecked")
