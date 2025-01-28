@@ -7,10 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import stock.price.analytics.client.finnhub.FinnhubClient;
 import stock.price.analytics.model.prices.ohlc.AbstractPriceOHLC;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
-import stock.price.analytics.repository.prices.PricesRepository;
 import stock.price.analytics.service.*;
 
 import java.time.format.DateTimeFormatter;
@@ -19,7 +17,6 @@ import java.util.Objects;
 
 import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
-import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 
@@ -30,24 +27,10 @@ import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 public class IntraDayPricesController {
 
     private final YahooQuoteService yahooQuoteService;
-    private final FinnhubClient finnhubClient;
-    private final PricesRepository pricesRepository;
     private final PricesService pricesService;
     private final HighLowForPeriodService highLowForPeriodService;
     private final RefreshMaterializedViewsService refreshMaterializedViewsService;
     private final StockService stockService;
-
-    @GetMapping("/finnhub")
-    public DailyPriceOHLC intraDayPrices(@RequestParam("ticker") String ticker) {
-        return finnhubClient.intraDayPricesFor(ticker).orElseThrow();
-    }
-
-    @Transactional
-    @GetMapping("/finnhub-all-xtb")
-    public void finnhubIntraDayPricesTickersXTB() {
-        List<DailyPriceOHLC> dailyPrices = finnhubClient.intraDayPricesXTB();
-        partitionDataAndSaveWithLogTime(dailyPrices, pricesRepository, "saved " + dailyPrices.size() + " daily prices");
-    }
 
     @Transactional
     @GetMapping("/yahoo-prices/intraday")
