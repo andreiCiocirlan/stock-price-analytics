@@ -30,9 +30,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.util.Constants.MAX_TICKER_COUNT_PRINT;
-import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
-import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
+import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateImported;
 
 @Slf4j
@@ -92,7 +91,7 @@ public class YahooQuoteService {
         }
 
         if (!preMarketOnly || dailyImportedPrices.isEmpty()) { // only save if intraday prices, for pre-market only display
-            logTime(() -> partitionDataAndSave(dailyImportedPrices, dailyPriceOHLCRepository), "saved daily prices");
+            partitionDataAndSaveWithLogTime(dailyImportedPrices, dailyPriceOHLCRepository, "saved daily prices");
         }
 
         if (!tickersImported.isEmpty()) {

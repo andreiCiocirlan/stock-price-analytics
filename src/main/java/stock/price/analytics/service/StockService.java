@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 
 import static java.nio.file.Files.walk;
 import static stock.price.analytics.util.LoggingUtil.logTime;
-import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
+import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
 import static stock.price.analytics.util.PricesOHLCUtil.tickerFrom;
 
 @Slf4j
@@ -125,7 +125,7 @@ public class StockService {
         updateStocksFromHighLowCaches(stocksUpdated);
 
         List<Stock> stocks = new ArrayList<>(stocksUpdated);
-        logTime(() -> partitionDataAndSave(stocks, stockRepository), "saved stocks after OHLC higher-timeframe and high-lows 4w, 52w, all-time updates");
+        partitionDataAndSaveWithLogTime(stocks, stockRepository, "saved stocks after OHLC higher-timeframe and high-lows 4w, 52w, all-time updates");
         stocksCache.addStocks(stocks);
     }
 
@@ -140,7 +140,7 @@ public class StockService {
             }
         }
         List<Stock> stocks = new ArrayList<>(stocksUpdated);
-        logTime(() -> partitionDataAndSave(stocks, stockRepository), "saved stocks after generating high-lows 4w, 52w, all-time for the first import of the week");
+        partitionDataAndSaveWithLogTime(stocks, stockRepository, "saved stocks after generating high-lows 4w, 52w, all-time for the first import of the week");
         stocksCache.addStocks(stocks);
     }
 

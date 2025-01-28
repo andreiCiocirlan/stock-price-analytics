@@ -10,8 +10,7 @@ import stock.price.analytics.service.FairValueGapService;
 
 import java.util.List;
 
-import static stock.price.analytics.util.LoggingUtil.logTime;
-import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
+import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
 
 @RequestMapping("/fvg")
 @RestController
@@ -37,7 +36,7 @@ public class FairValueGapController {
     @ResponseStatus(HttpStatus.CREATED)
     public void findNewFVsGsAndSaveFor(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
         List<FairValueGap> newFVGs = fairValueGapService.findNewFVGsFor(timeframe);
-        logTime(() -> partitionDataAndSave(newFVGs, fvgRepository), "found new FVGs and saved for " + timeframe);
+        partitionDataAndSaveWithLogTime(newFVGs, fvgRepository, "saved new FVGs for " + timeframe);
     }
 
     @GetMapping("/find-closed")
@@ -52,11 +51,11 @@ public class FairValueGapController {
         if (timeframe == null) { // update closed for all timeframes
             for (StockTimeframe stockTimeframe : StockTimeframe.values()) {
                 List<FairValueGap> closedFVGs = fairValueGapService.findClosedFVGsFor(stockTimeframe);
-                logTime(() -> partitionDataAndSave(closedFVGs, fvgRepository), "found closed FVGs and updated for " + timeframe);
+                partitionDataAndSaveWithLogTime(closedFVGs, fvgRepository, "updated closed FVGs for " + timeframe);
             }
         } else {
             List<FairValueGap> closedFVGs = fairValueGapService.findClosedFVGsFor(timeframe);
-            logTime(() -> partitionDataAndSave(closedFVGs, fvgRepository), "found closed FVGs and updated for " + timeframe);
+            partitionDataAndSaveWithLogTime(closedFVGs, fvgRepository, "updated closed FVGs for " + timeframe);
         }
     }
 }

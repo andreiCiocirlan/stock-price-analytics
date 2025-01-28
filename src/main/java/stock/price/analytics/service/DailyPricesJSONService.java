@@ -20,9 +20,8 @@ import java.util.stream.Collectors;
 
 import static java.nio.file.Files.readAllLines;
 import static stock.price.analytics.util.Constants.MAX_TICKER_COUNT_PRINT;
-import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
-import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
+import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 @Slf4j
@@ -75,7 +74,7 @@ public class DailyPricesJSONService {
             }
         }
         List<DailyPricesJSON> dailyPricesJSONSInCache = dailyPricesJSONCacheService.addDailyPricesJSONInCacheAndReturn(dailyJSONPrices);
-        logTime(() -> partitionDataAndSave(dailyPricesJSONSInCache, dailyPricesJSONRepository), "saved daily json prices");
+        partitionDataAndSaveWithLogTime(dailyPricesJSONSInCache, dailyPricesJSONRepository, "saved daily json prices");
 
         return dailyPricesJSONSInCache;
     }
@@ -149,7 +148,7 @@ public class DailyPricesJSONService {
                 .toList();
 
         if (!dailyPricesJSON_toSave.isEmpty()) {
-            logTime(() -> partitionDataAndSave(dailyPricesJSON_toSave, dailyPricesJSONRepository), "saved daily json prices");
+            partitionDataAndSaveWithLogTime(dailyPricesJSON_toSave, dailyPricesJSONRepository, "saved daily json prices");
         }
     }
 
