@@ -6,12 +6,14 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.repository.prices.PriceOHLCRepository;
+import stock.price.analytics.util.PartitionAndSavePriceEntityUtil;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 
 import static java.time.temporal.TemporalAdjusters.*;
+import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 
 @Slf4j
 @Service
@@ -33,11 +35,11 @@ public class StockSplitAdjustPricesService {
         quarterlyPricesToUpdate.forEach(quarterlyPriceOHLC -> updatePrices(quarterlyPriceOHLC, priceMultiplier));
         yearlyPricesToUpdate.forEach(yearlyPriceOHLC -> updatePrices(yearlyPriceOHLC, priceMultiplier));
 
-        priceOHLCRepository.saveAll(dailyPricesToUpdate);
-        priceOHLCRepository.saveAll(weeklyPricesToUpdate);
-        priceOHLCRepository.saveAll(monthlyPricesToUpdate);
-        priceOHLCRepository.saveAll(quarterlyPricesToUpdate);
-        priceOHLCRepository.saveAll(yearlyPricesToUpdate);
+        partitionDataAndSave(dailyPricesToUpdate, priceOHLCRepository);
+        partitionDataAndSave(weeklyPricesToUpdate, priceOHLCRepository);
+        partitionDataAndSave(monthlyPricesToUpdate, priceOHLCRepository);
+        partitionDataAndSave(quarterlyPricesToUpdate, priceOHLCRepository);
+        partitionDataAndSave(yearlyPricesToUpdate, priceOHLCRepository);
     }
 
     public List<? extends AbstractPriceOHLC> adjustPricesForDateAndTimeframe(String ticker, LocalDate date, double priceMultiplier, StockTimeframe timeframe, String ohlc) {
