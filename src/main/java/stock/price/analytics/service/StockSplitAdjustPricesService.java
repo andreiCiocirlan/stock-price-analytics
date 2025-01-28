@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.repository.prices.PriceOHLCRepository;
-import stock.price.analytics.util.PartitionAndSavePriceEntityUtil;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
