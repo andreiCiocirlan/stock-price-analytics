@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
+import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
 
 @Slf4j
 @Service
@@ -37,6 +38,11 @@ public class FairValueGapService {
         };
     }
 
+    public void findNewFVsGsAndSaveFor(StockTimeframe timeframe) {
+        List<FairValueGap> newFVGs = findNewFVGsFor(timeframe);
+        partitionDataAndSaveWithLogTime(newFVGs, fvgRepository, "saved new FVGs for " + timeframe);
+    }
+
     public List<FairValueGap> findNewFVGsFor(StockTimeframe timeframe) {
         List<FairValueGap> newFVGsFound = new ArrayList<>();
         List<FairValueGap> currentFVGs = findAllByTimeframe(timeframe);
@@ -51,6 +57,18 @@ public class FairValueGapService {
         });
 
         return newFVGsFound;
+    }
+
+    public void updateClosedFVGsFor(StockTimeframe timeframe) {
+        if (timeframe == null) { // update closed for all timeframes
+            for (StockTimeframe stockTimeframe : StockTimeframe.values()) {
+                List<FairValueGap> closedFVGs = findClosedFVGsFor(stockTimeframe);
+                partitionDataAndSaveWithLogTime(closedFVGs, fvgRepository, "updated closed FVGs for " + timeframe);
+            }
+        } else {
+            List<FairValueGap> closedFVGs = findClosedFVGsFor(timeframe);
+            partitionDataAndSaveWithLogTime(closedFVGs, fvgRepository, "updated closed FVGs for " + timeframe);
+        }
     }
 
     public List<FairValueGap> findClosedFVGsFor(StockTimeframe timeframe) {
@@ -70,5 +88,4 @@ public class FairValueGapService {
 
         return closedFVGsFound;
     }
-
 }

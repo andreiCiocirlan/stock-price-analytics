@@ -5,12 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.model.fvg.FairValueGap;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.repository.fvg.FVGRepository;
 import stock.price.analytics.service.FairValueGapService;
 
 import java.util.List;
-
-import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
 
 @RequestMapping("/fvg")
 @RestController
@@ -18,7 +15,6 @@ import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partiti
 public class FairValueGapController {
 
     private final FairValueGapService fairValueGapService;
-    private final FVGRepository fvgRepository;
 
     @PostMapping("/find-all-and-save")
     @ResponseStatus(HttpStatus.CREATED)
@@ -35,8 +31,7 @@ public class FairValueGapController {
     @PostMapping("/find-new-and-save")
     @ResponseStatus(HttpStatus.CREATED)
     public void findNewFVsGsAndSaveFor(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
-        List<FairValueGap> newFVGs = fairValueGapService.findNewFVGsFor(timeframe);
-        partitionDataAndSaveWithLogTime(newFVGs, fvgRepository, "saved new FVGs for " + timeframe);
+        fairValueGapService.findNewFVsGsAndSaveFor(timeframe);
     }
 
     @GetMapping("/find-closed")
@@ -48,14 +43,6 @@ public class FairValueGapController {
     @PutMapping("/update-closed")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateClosedFVGsFor(@RequestParam(value = "timeframe", required = false) StockTimeframe timeframe) {
-        if (timeframe == null) { // update closed for all timeframes
-            for (StockTimeframe stockTimeframe : StockTimeframe.values()) {
-                List<FairValueGap> closedFVGs = fairValueGapService.findClosedFVGsFor(stockTimeframe);
-                partitionDataAndSaveWithLogTime(closedFVGs, fvgRepository, "updated closed FVGs for " + timeframe);
-            }
-        } else {
-            List<FairValueGap> closedFVGs = fairValueGapService.findClosedFVGsFor(timeframe);
-            partitionDataAndSaveWithLogTime(closedFVGs, fvgRepository, "updated closed FVGs for " + timeframe);
-        }
+        fairValueGapService.updateClosedFVGsFor(timeframe);
     }
 }
