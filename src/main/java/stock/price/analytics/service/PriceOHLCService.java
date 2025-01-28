@@ -284,21 +284,21 @@ public class PriceOHLCService {
     @Transactional
     public void updateHigherTimeframesPricesFor(LocalDate date, List<StockTimeframe> timeframes, String tickers) {
         for (StockTimeframe timeframe : timeframes) {
-            updateHigherTimeframeHistPrices(timeframe.toDateTruncPeriod(), timeframe.toSQLInterval(), timeframe.dbTableOHLC(), timeframe.htfDateFrom(date), tickers);
+            updateHigherTimeframeHistPrices(timeframe.toDateTruncPeriod(), timeframe.sequenceName(), timeframe.toSQLInterval(), timeframe.dbTableOHLC(), timeframe.htfDateFrom(date), tickers);
         }
     }
 
-    private void updateHigherTimeframeHistPrices(String dateTruncPeriod, String sqlInterval, String tableName, LocalDate date, String tickers) {
+    private void updateHigherTimeframeHistPrices(String dateTruncPeriod, String sequenceName, String sqlInterval, String tableName, LocalDate date, String tickers) {
         String dateFormatted = date.format(DateTimeFormatter.ISO_LOCAL_DATE);
         int savedOrUpdatedCount = entityManager.createNativeQuery(
-                queryFrom(tickers, dateTruncPeriod, sqlInterval, tableName, dateFormatted)
+                queryFrom(tickers, dateTruncPeriod, sequenceName, sqlInterval, tableName, dateFormatted)
         ).executeUpdate();
         if (savedOrUpdatedCount != 0) {
             log.info("saved/updated {} {} rows for date {} and tickers {}", savedOrUpdatedCount, dateTruncPeriod, dateFormatted, tickers);
         }
     }
 
-    private String queryFrom(String tickers, String dateTruncPeriod, String sqlInterval, String tableName, String dateFormatted) {
+    private String queryFrom(String tickers, String dateTruncPeriod, String sequenceName, String sqlInterval, String tableName, String dateFormatted) {
         String query = STR."""
             WITH interval_data AS (
             SELECT
@@ -348,8 +348,8 @@ public class PriceOHLCService {
                 FROM last_week
                     WHERE start_date >= DATE_TRUNC('\{dateTruncPeriod}', '\{dateFormatted}'::date)
             )
-            INSERT INTO \{tableName} (ticker, start_date, end_date, high, low, open, close, performance)
-            SELECT ticker, DATE_TRUNC('\{dateTruncPeriod}', start_date), end_date, high, low, open, close, performance
+            INSERT INTO \{tableName} (id, ticker, start_date, end_date, high, low, open, close, performance)
+            SELECT nextval('\{sequenceName}') AS id, ticker, DATE_TRUNC('\{dateTruncPeriod}', start_date), end_date, high, low, open, close, performance
             FROM final_result
             ON CONFLICT (ticker, start_date)
                 DO UPDATE SET

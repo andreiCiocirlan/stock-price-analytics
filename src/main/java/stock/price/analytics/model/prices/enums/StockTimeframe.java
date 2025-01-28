@@ -98,6 +98,12 @@ public enum StockTimeframe {
         return List.of(WEEKLY, MONTHLY, QUARTERLY, YEARLY);
     }
 
+    public String sequenceName() {
+        return switch (this) {
+            case DAILY, YEARLY, QUARTERLY, MONTHLY, WEEKLY -> "sequence_prices";
+        };
+    }
+
     /**
      * @param timeframeLetters any of WMY
      * @return corresponding stock timeframes from WMY -> [WEEKLY, MONTHLY, YEARLY]
