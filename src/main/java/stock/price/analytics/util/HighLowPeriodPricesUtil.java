@@ -17,10 +17,10 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 
-public class HighLowPeriodPricesUtil extends PricesOHLCUtil {
+public class HighLowPeriodPricesUtil extends PricesUtil {
 
     public static List<HighLowForPeriod> highLowFromFileForPeriod(Path srcFile, LocalDate startDate, LocalDate endDate, StockPerformanceInterval stockPerformanceInterval) throws IOException {
-        List<DailyPriceOHLC> dailyPrices = dailyPricesOHLCFromFile(srcFile);
+        List<DailyPriceOHLC> dailyPrices = dailyPricesFromFile(srcFile);
         List<WeeklyPriceOHLC> weeklyGroupedPrices = getPriceOHLCsForTimeframe(dailyPrices, StockTimeframe.WEEKLY).stream().map(WeeklyPriceOHLC.class::cast).toList();
         return getHighLowForPeriod(
                 weeklyGroupedPrices.stream().filter(whp -> whp.getStartDate().isAfter(startDate) && whp.getStartDate().isBefore(endDate)).toList(),

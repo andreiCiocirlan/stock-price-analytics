@@ -12,8 +12,8 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.controller.dto.StockWithPrevCloseDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
-import stock.price.analytics.repository.prices.DailyPriceOHLCRepository;
-import stock.price.analytics.repository.prices.PriceOHLCRepository;
+import stock.price.analytics.repository.prices.DailyPricesRepository;
+import stock.price.analytics.repository.prices.PricesRepository;
 import stock.price.analytics.util.Constants;
 
 import java.io.IOException;
@@ -27,7 +27,7 @@ import java.util.stream.Stream;
 
 import static java.nio.file.Files.walk;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
-import static stock.price.analytics.util.PricesOHLCUtil.*;
+import static stock.price.analytics.util.PricesUtil.*;
 
 @Slf4j
 @Service
@@ -37,28 +37,28 @@ public class StockHistoricalPricesService {
     @PersistenceContext
     private final EntityManager entityManager;
 
-    private final PriceOHLCService priceOHLCService;
-    private final PriceOHLCRepository priceOhlcRepository;
-    private final DailyPriceOHLCRepository dailyPriceOHLCRepository;
+    private final PricesService pricesService;
+    private final PricesRepository pricesRepository;
+    private final DailyPricesRepository dailyPricesRepository;
     private final RefreshMaterializedViewsService refreshMaterializedViewsService;
 
     private static List<? extends AbstractPriceOHLC> pricesOHLCForTimeframe(StockTimeframe stockTimeframe) {
-        List<AbstractPriceOHLC> priceOHLCS = new ArrayList<>();
+        List<AbstractPriceOHLC> prices = new ArrayList<>();
         try (Stream<Path> walk = walk(Paths.get(Constants.STOCKS_LOCATION))) {
             walk.filter(Files::isRegularFile)
                     .parallel().forEachOrdered(srcFile -> { // must be forEachOrdered
-                        priceOHLCS.addAll(pricesOHLCForFileAndTimeframe(srcFile, stockTimeframe));
+                        prices.addAll(pricesOHLCForFileAndTimeframe(srcFile, stockTimeframe));
                     });
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
         return switch (stockTimeframe) {
-            case DAILY -> priceOHLCS.stream().map(DailyPriceOHLC.class::cast).toList();
-            case WEEKLY -> priceOHLCS.stream().map(WeeklyPriceOHLC.class::cast).toList();
-            case MONTHLY -> priceOHLCS.stream().map(MonthlyPriceOHLC.class::cast).toList();
-            case QUARTERLY -> priceOHLCS.stream().map(QuarterlyPriceOHLC.class::cast).toList();
-            case YEARLY -> priceOHLCS.stream().map(YearlyPriceOHLC.class::cast).toList();
+            case DAILY -> prices.stream().map(DailyPriceOHLC.class::cast).toList();
+            case WEEKLY -> prices.stream().map(WeeklyPriceOHLC.class::cast).toList();
+            case MONTHLY -> prices.stream().map(MonthlyPriceOHLC.class::cast).toList();
+            case QUARTERLY -> prices.stream().map(QuarterlyPriceOHLC.class::cast).toList();
+            case YEARLY -> prices.stream().map(YearlyPriceOHLC.class::cast).toList();
         };
     }
 
@@ -78,14 +78,14 @@ public class StockHistoricalPricesService {
         }
 
         tickerAndPrevDaysPricesImported.forEach((_, dailyPricesPrevDays) -> prevDaysHistPrices.addAll(dailyPriceWithPerformance(dailyPricesPrevDays)));
-        List<DailyPriceOHLC> dailyPricesDB = dailyPriceOHLCRepository.findByDate(tradingDate);
+        List<DailyPriceOHLC> dailyPricesDB = dailyPricesRepository.findByDate(tradingDate);
         Map<String, DailyPriceOHLC> importedPricesMap = prevDaysHistPrices.stream().filter(dp -> dp.getDate().isEqual(tradingDate)).collect(Collectors.toMap(DailyPriceOHLC::getTicker, p -> p));
         dailyPricesDB.forEach(dp -> BeanUtils.copyProperties(importedPricesMap.get(dp.getTicker()), dp, "id", "date"));
-        partitionDataAndSave(dailyPricesDB, priceOhlcRepository);
+        partitionDataAndSave(dailyPricesDB, pricesRepository);
 
         // insert/update higher timeframe prices
         String tickersQuery = tickers.stream().map(ticker -> STR."'\{ticker}'").collect(Collectors.joining(", "));
-        priceOHLCService.updateAllHigherTimeframesPricesForTickers(higherTimeFrameDate, tickersQuery);
+        pricesService.updateAllHigherTimeframesPricesForTickers(higherTimeFrameDate, tickersQuery);
 
         // refresh views
         refreshMaterializedViewsService.refreshMaterializedViews();
@@ -110,11 +110,11 @@ public class StockHistoricalPricesService {
 
         tickerAndPrevDaysPricesImported.forEach((_, dailyPricesPrevDays) -> prevDaysHistPrices.addAll(dailyPriceWithPerformance(dailyPricesPrevDays)));
 
-        partitionDataAndSave(prevDaysHistPrices.stream().filter(dp -> dp.getDate().isAfter(tradingDate)).toList(), priceOhlcRepository);
+        partitionDataAndSave(prevDaysHistPrices.stream().filter(dp -> dp.getDate().isAfter(tradingDate)).toList(), pricesRepository);
 
         // insert/update higher timeframe prices
         String tickersQueryParam = tickers != null ? STR."'\{tickers.replace(",", "','")}'" : null;
-        priceOHLCService.updateAllHigherTimeframesPricesForTickers(tradingDate, tickersQueryParam);
+        pricesService.updateAllHigherTimeframesPricesForTickers(tradingDate, tickersQueryParam);
     }
 
     private List<DailyPriceOHLC> dailyPriceWithPerformance(List<DailyPriceOHLC> dailyPrices) {
@@ -150,7 +150,7 @@ public class StockHistoricalPricesService {
         try (Stream<Path> walk = walk(Paths.get(Constants.STOCKS_LOCATION))) {
             walk.filter(Files::isRegularFile)
                     .parallel().forEachOrdered(srcFile -> { // must be forEachOrdered
-                        ohlcList.addAll(dailyPricesOHLCFromFile(srcFile));
+                        ohlcList.addAll(dailyPricesFromFile(srcFile));
                     });
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -163,13 +163,13 @@ public class StockHistoricalPricesService {
         log.info("HIGH_LOW_ERROR {} problems", HIGH_LOW_ERROR.get());
         log.info("ohlcList size {}", dailyOHLCList.size());
 
-        partitionDataAndSave(dailyOHLCList, priceOhlcRepository);
+        partitionDataAndSave(dailyOHLCList, pricesRepository);
     }
 
     @Transactional
     public void savePricesForTimeframe(StockTimeframe stockTimeframe) {
         List<? extends AbstractPriceOHLC> pricesOHLCs = pricesOHLCForTimeframe(stockTimeframe);
-        partitionDataAndSave(pricesOHLCs, priceOhlcRepository);
+        partitionDataAndSave(pricesOHLCs, pricesRepository);
     }
 
 }

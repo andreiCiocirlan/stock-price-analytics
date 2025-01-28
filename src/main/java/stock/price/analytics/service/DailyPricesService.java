@@ -16,7 +16,7 @@ import static stock.price.analytics.util.Constants.MAX_TICKER_COUNT_PRINT;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DailyPriceOHLCService {
+public class DailyPricesService {
 
     private final DailyPricesCacheService dailyPricesCacheService;
 
@@ -57,8 +57,8 @@ public class DailyPriceOHLCService {
         return dailyPricesCacheService.dailyPricesCache();
     }
 
-    public List<DailyPriceOHLC> addDailyPricesInCacheAndReturn(List<DailyPriceOHLC> dailyPriceOHLCs) {
-        return dailyPricesCacheService.addDailyPricesInCacheAndReturn(dailyPriceOHLCs);
+    public List<DailyPriceOHLC> addDailyPricesInCacheAndReturn(List<DailyPriceOHLC> dailyPrices) {
+        return dailyPricesCacheService.addDailyPricesInCacheAndReturn(dailyPrices);
     }
 
     private static boolean needsUpdate(DailyPriceOHLC dailyPrice, DailyPriceOHLC latestPrice) {

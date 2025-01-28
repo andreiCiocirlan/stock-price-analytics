@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import stock.price.analytics.client.finnhub.FinnhubClient;
 import stock.price.analytics.model.prices.ohlc.AbstractPriceOHLC;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
-import stock.price.analytics.repository.prices.PriceOHLCRepository;
+import stock.price.analytics.repository.prices.PricesRepository;
 import stock.price.analytics.service.*;
 
 import java.time.format.DateTimeFormatter;
@@ -30,8 +30,8 @@ public class IntraDayPricesController {
 
     private final YahooQuoteService yahooQuoteService;
     private final FinnhubClient finnhubClient;
-    private final PriceOHLCRepository priceOHLCRepository;
-    private final PriceOHLCService priceOHLCService;
+    private final PricesRepository pricesRepository;
+    private final PricesService pricesService;
     private final HighLowForPeriodService highLowForPeriodService;
     private final RefreshMaterializedViewsService refreshMaterializedViewsService;
     private final StockService stockService;
@@ -44,9 +44,9 @@ public class IntraDayPricesController {
     @Transactional
     @GetMapping("/finnhub-all-xtb")
     public void finnhubIntraDayPricesTickersXTB() {
-        List<DailyPriceOHLC> dailyPriceOHLCs = finnhubClient.intraDayPricesXTB();
-        priceOHLCRepository.saveAll(dailyPriceOHLCs);
-        log.info("saved {} daily prices", dailyPriceOHLCs.size());
+        List<DailyPriceOHLC> dailyPrices = finnhubClient.intraDayPricesXTB();
+        pricesRepository.saveAll(dailyPrices);
+        log.info("saved {} daily prices", dailyPrices.size());
     }
 
     @Transactional
@@ -55,7 +55,7 @@ public class IntraDayPricesController {
         long start = System.nanoTime();
         List<DailyPriceOHLC> dailyImportedPrices = logTimeAndReturn(yahooQuoteService::dailyPricesImport, "imported daily prices");
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
-            List<AbstractPriceOHLC> htfPricesUpdated = priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
+            List<AbstractPriceOHLC> htfPricesUpdated = pricesService.updatePricesForHigherTimeframes(dailyImportedPrices);
 
             // high/low price update based on weekly perf view (refreshed before)
             List<String> tickers = dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList();
@@ -81,8 +81,8 @@ public class IntraDayPricesController {
         String fileName = Objects.requireNonNullElseGet(fileNameStr, () -> tradingDateNow().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_1");
         List<DailyPriceOHLC> dailyImportedPrices = logTimeAndReturn(() -> yahooQuoteService.dailyPricesFromFile(fileName), "imported daily prices");
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
-            priceOHLCService.savePrices(dailyImportedPrices);
-            List<AbstractPriceOHLC> htfPricesUpdated = priceOHLCService.updatePricesForHigherTimeframes(dailyImportedPrices);
+            pricesService.savePrices(dailyImportedPrices);
+            List<AbstractPriceOHLC> htfPricesUpdated = pricesService.updatePricesForHigherTimeframes(dailyImportedPrices);
 
             // high/low price update based on weekly perf view (refreshed before)
             List<String> tickers = dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList();

@@ -60,11 +60,11 @@ public class YahooFinanceClient {
             throw new RuntimeException(ex);
         }
 
-        return dailyPricesOHLCFrom(dailyPricesJSONList, preMarketPrices);
+        return dailyPricesFrom(dailyPricesJSONList, preMarketPrices);
     }
 
-    public List<DailyPriceOHLC> dailyPricesOHLCFrom(List<DailyPricesJSON> dailyPricesJSON, boolean preMarketPrices) {
-        List<DailyPriceOHLC> dailyOLHCPrices = new ArrayList<>();
+    public List<DailyPriceOHLC> dailyPricesFrom(List<DailyPricesJSON> dailyPricesJSON, boolean preMarketPrices) {
+        List<DailyPriceOHLC> dailyPrices = new ArrayList<>();
         for (DailyPricesJSON dailyPriceJson : dailyPricesJSON) {
             String ticker = dailyPriceJson.getSymbol();
             double open = dailyPriceJson.getRegularMarketOpen();
@@ -74,9 +74,9 @@ public class YahooFinanceClient {
             double percentChange = dailyPriceJson.getRegularMarketChangePercent();
 
             DailyPriceOHLC dailyPrice = new DailyPriceOHLC(ticker, dailyPriceJson.getDate(), percentChange, new CandleOHLC(open, high, low, close));
-            dailyOLHCPrices.add(dailyPrice);
+            dailyPrices.add(dailyPrice);
         }
-        return dailyOLHCPrices;
+        return dailyPrices;
     }
 
     public List<DailyPriceOHLC> extractDailyPricesFromJSON_old(String jsonData, boolean preMarketPrices) {

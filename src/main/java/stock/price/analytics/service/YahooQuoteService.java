@@ -17,7 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.client.yahoo.YahooFinanceClient;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
-import stock.price.analytics.repository.prices.DailyPriceOHLCRepository;
+import stock.price.analytics.repository.prices.DailyPricesRepository;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -42,15 +42,15 @@ public class YahooQuoteService {
     private static final String USER_AGENT_VALUE = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0";
     private static final int MAX_RETRIES_CRUMB = 5;
     private final YahooFinanceClient yahooFinanceClient;
-    private final DailyPriceOHLCService dailyPriceOHLCService;
-    private final DailyPriceOHLCRepository dailyPriceOHLCRepository;
+    private final DailyPricesService dailyPricesService;
+    private final DailyPricesRepository dailyPricesRepository;
     private int RETRY_COUNT_CRUMB = 0;
     private String COOKIE_FC_YAHOO = "";
     private String CRUMB_COOKIE = "";
 
     public List<DailyPriceOHLC> dailyPricesFromFile(String fileName) {
-        List<DailyPriceOHLC> dailyPriceOHLCs = yahooFinanceClient.dailyPricesFromFile(fileName);
-        return dailyPriceOHLCService.addDailyPricesInCacheAndReturn(dailyPriceOHLCs);
+        List<DailyPriceOHLC> dailyPrices = yahooFinanceClient.dailyPricesFromFile(fileName);
+        return dailyPricesService.addDailyPricesInCacheAndReturn(dailyPrices);
     }
 
     public List<DailyPriceOHLC> dailyPricesImport() {
@@ -61,7 +61,7 @@ public class YahooQuoteService {
     public List<DailyPriceOHLC> dailyPricesImport(boolean preMarketOnly) {
         int maxTickersPerRequest = 1700;
         List<DailyPriceOHLC> dailyImportedPrices = new ArrayList<>();
-        List<DailyPriceOHLC> latestPrices = dailyPriceOHLCService.dailyPricesCache();
+        List<DailyPriceOHLC> latestPrices = dailyPricesService.dailyPricesCache();
         List<String> tickersImported = new ArrayList<>(latestPrices.stream().map(DailyPriceOHLC::getTicker).toList());
 
         int start = 0;
@@ -73,7 +73,7 @@ public class YahooQuoteService {
             String pricesJSON = logTimeAndReturn(() -> quotePricesJSON(tickers, getCrumb()), "Yahoo API call and JSON result");
 
             List<DailyPriceOHLC> dailyPricesExtractedFromJSON = yahooFinanceClient.extractDailyPricesFromJSON(pricesJSON, preMarketOnly);
-            List<DailyPriceOHLC> dailyPricesImported = dailyPriceOHLCService.addDailyPricesInCacheAndReturn(dailyPricesExtractedFromJSON);
+            List<DailyPriceOHLC> dailyPricesImported = dailyPricesService.addDailyPricesInCacheAndReturn(dailyPricesExtractedFromJSON);
             dailyImportedPrices.addAll(dailyPricesImported);
 
             // keep track of which tickers were imported
@@ -91,7 +91,7 @@ public class YahooQuoteService {
         }
 
         if (!preMarketOnly || dailyImportedPrices.isEmpty()) { // only save if intraday prices, for pre-market only display
-            partitionDataAndSaveWithLogTime(dailyImportedPrices, dailyPriceOHLCRepository, "saved daily prices");
+            partitionDataAndSaveWithLogTime(dailyImportedPrices, dailyPricesRepository, "saved daily prices");
         }
 
         if (!tickersImported.isEmpty()) {

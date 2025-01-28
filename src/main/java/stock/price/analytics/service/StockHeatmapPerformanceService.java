@@ -26,9 +26,9 @@ public class StockHeatmapPerformanceService {
         Query nativeQuery = entityManager.createNativeQuery(queryStr, StockPerformanceDTO.class);
 
         @SuppressWarnings("unchecked")
-        List<StockPerformanceDTO> priceOHLCs = (List<StockPerformanceDTO>) nativeQuery.getResultList();
+        List<StockPerformanceDTO> performanceDTOs = (List<StockPerformanceDTO>) nativeQuery.getResultList();
 
-        return priceOHLCs;
+        return performanceDTOs;
     }
 
     private static String queryFrom(StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, Boolean xtb, Double cfdMargin, List<String> tickers) {

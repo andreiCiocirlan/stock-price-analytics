@@ -87,21 +87,21 @@ public class FinnhubClient {
     public List<DailyPriceOHLC> intraDayPricesXTB() {
         try {
             List<String> tickers = FileUtils.readTickersXTB();
-            List<DailyPriceOHLC> dailyPriceOHLCs = new ArrayList<>();
+            List<DailyPriceOHLC> dailyPrices = new ArrayList<>();
 
             for (String ticker : tickers) {
                 Optional<DailyPriceOHLC> intraDayPrice = intraDayPricesFor(ticker);
-                intraDayPrice.ifPresent(dailyPrices -> addToListAndLog(dailyPrices, dailyPriceOHLCs));
+                intraDayPrice.ifPresent(dailyPrice -> addToListAndLog(dailyPrice, dailyPrices));
                 Thread.sleep(1005); // rate limit 60 req / min
             }
-            return dailyPriceOHLCs;
+            return dailyPrices;
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void addToListAndLog(DailyPriceOHLC dailyPrices, List<DailyPriceOHLC> dailyPriceOHLCs) {
-        log.info("{}", dailyPrices);
-        dailyPriceOHLCs.add(dailyPrices);
+    private void addToListAndLog(DailyPriceOHLC dailyPrice, List<DailyPriceOHLC> dailyPrices) {
+        log.info("{}", dailyPrice);
+        dailyPrices.add(dailyPrice);
     }
 }

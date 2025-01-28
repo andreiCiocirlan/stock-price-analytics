@@ -26,12 +26,12 @@ import static java.time.LocalDate.parse;
 
 @Component
 @Slf4j
-public class PricesOHLCUtil {
+public class PricesUtil {
     public static final AtomicInteger OPEN_IS_ZERO_ERROR = new AtomicInteger(0);
     public static final AtomicInteger HIGH_LOW_ERROR = new AtomicInteger(0);
 
     public static List<AbstractPriceOHLC> pricesOHLCForFileAndTimeframe(Path srcFile, StockTimeframe stockTimeframe) {
-        List<DailyPriceOHLC> dailyPrices = dailyPricesOHLCFromFile(srcFile);
+        List<DailyPriceOHLC> dailyPrices = dailyPricesFromFile(srcFile);
 
         if (StockTimeframe.DAILY == stockTimeframe)
             return new ArrayList<>(dailyPrices);
@@ -88,15 +88,15 @@ public class PricesOHLCUtil {
         };
     }
 
-    public static List<DailyPriceOHLC> dailyPricesOHLCFromFile(Path srcFile) {
-        List<DailyPriceOHLC> dailyPricesOHLC = new ArrayList<>();
+    public static List<DailyPriceOHLC> dailyPricesFromFile(Path srcFile) {
+        List<DailyPriceOHLC> dailyPrices = new ArrayList<>();
         final String ticker = tickerFrom(srcFile);
         try {
-            readAllLines(srcFile).stream().skip(1).parallel().forEachOrdered(line -> addDailyPrices(line, ticker, dailyPricesOHLC));
+            readAllLines(srcFile).stream().skip(1).parallel().forEachOrdered(line -> addDailyPrices(line, ticker, dailyPrices));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return dailyPricesOHLC;
+        return dailyPrices;
     }
 
     public static List<DailyPriceOHLC> dailyPricesFromFileWithDate(Path srcFile, LocalDate tradingDate) {

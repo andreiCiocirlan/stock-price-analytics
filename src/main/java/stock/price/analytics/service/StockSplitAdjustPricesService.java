@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
-import stock.price.analytics.repository.prices.PriceOHLCRepository;
+import stock.price.analytics.repository.prices.PricesRepository;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -19,55 +19,55 @@ import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partiti
 @RequiredArgsConstructor
 public class StockSplitAdjustPricesService {
 
-    private final PriceOHLCRepository priceOHLCRepository;
+    private final PricesRepository pricesRepository;
 
     public void adjustPricesFor(String ticker, LocalDate stockSplitDate, double priceMultiplier) {
-        List<DailyPriceOHLC> dailyPricesToUpdate = priceOHLCRepository.findByTickerAndDateLessThan(ticker, stockSplitDate);
-        List<WeeklyPriceOHLC> weeklyPricesToUpdate = priceOHLCRepository.findWeeklyByTickerAndStartDateBefore(ticker, stockSplitDate.with(previousOrSame(DayOfWeek.MONDAY)));
-        List<MonthlyPriceOHLC> monthlyPricesToUpdate = priceOHLCRepository.findMonthlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfMonth()));
-        List<QuarterlyPriceOHLC> quarterlyPricesToUpdate = priceOHLCRepository.findQuarterlyByTickerAndStartDateBefore(ticker, LocalDate.of(stockSplitDate.getYear(), stockSplitDate.getMonth().firstMonthOfQuarter().getValue(), 1));
-        List<YearlyPriceOHLC> yearlyPricesToUpdate = priceOHLCRepository.findYearlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfYear()));
+        List<DailyPriceOHLC> dailyPricesToUpdate = pricesRepository.findByTickerAndDateLessThan(ticker, stockSplitDate);
+        List<WeeklyPriceOHLC> weeklyPricesToUpdate = pricesRepository.findWeeklyByTickerAndStartDateBefore(ticker, stockSplitDate.with(previousOrSame(DayOfWeek.MONDAY)));
+        List<MonthlyPriceOHLC> monthlyPricesToUpdate = pricesRepository.findMonthlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfMonth()));
+        List<QuarterlyPriceOHLC> quarterlyPricesToUpdate = pricesRepository.findQuarterlyByTickerAndStartDateBefore(ticker, LocalDate.of(stockSplitDate.getYear(), stockSplitDate.getMonth().firstMonthOfQuarter().getValue(), 1));
+        List<YearlyPriceOHLC> yearlyPricesToUpdate = pricesRepository.findYearlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfYear()));
 
-        dailyPricesToUpdate.forEach(dailyPriceOHLC -> updatePrices(dailyPriceOHLC, priceMultiplier));
-        weeklyPricesToUpdate.forEach(weeklyPriceOHLC -> updatePrices(weeklyPriceOHLC, priceMultiplier));
-        monthlyPricesToUpdate.forEach(monthlyPriceOHLC -> updatePrices(monthlyPriceOHLC, priceMultiplier));
-        quarterlyPricesToUpdate.forEach(quarterlyPriceOHLC -> updatePrices(quarterlyPriceOHLC, priceMultiplier));
-        yearlyPricesToUpdate.forEach(yearlyPriceOHLC -> updatePrices(yearlyPriceOHLC, priceMultiplier));
+        dailyPricesToUpdate.forEach(dailyPrice -> updatePrices(dailyPrice, priceMultiplier));
+        weeklyPricesToUpdate.forEach(weeklyPrices -> updatePrices(weeklyPrices, priceMultiplier));
+        monthlyPricesToUpdate.forEach(monthlyPrices -> updatePrices(monthlyPrices, priceMultiplier));
+        quarterlyPricesToUpdate.forEach(quarterlyPrices -> updatePrices(quarterlyPrices, priceMultiplier));
+        yearlyPricesToUpdate.forEach(yearlyPrices -> updatePrices(yearlyPrices, priceMultiplier));
 
-        partitionDataAndSave(dailyPricesToUpdate, priceOHLCRepository);
-        partitionDataAndSave(weeklyPricesToUpdate, priceOHLCRepository);
-        partitionDataAndSave(monthlyPricesToUpdate, priceOHLCRepository);
-        partitionDataAndSave(quarterlyPricesToUpdate, priceOHLCRepository);
-        partitionDataAndSave(yearlyPricesToUpdate, priceOHLCRepository);
+        partitionDataAndSave(dailyPricesToUpdate, pricesRepository);
+        partitionDataAndSave(weeklyPricesToUpdate, pricesRepository);
+        partitionDataAndSave(monthlyPricesToUpdate, pricesRepository);
+        partitionDataAndSave(quarterlyPricesToUpdate, pricesRepository);
+        partitionDataAndSave(yearlyPricesToUpdate, pricesRepository);
     }
 
     public List<? extends AbstractPriceOHLC> adjustPricesForDateAndTimeframe(String ticker, LocalDate date, double priceMultiplier, StockTimeframe timeframe, String ohlc) {
         List<? extends AbstractPriceOHLC> pricesToUpdate = switch (timeframe) {
-            case DAILY -> priceOHLCRepository.findByTickerAndDate(ticker, date);
-            case WEEKLY -> priceOHLCRepository.findWeeklyByTickerAndStartDate(ticker, date);
-            case MONTHLY -> priceOHLCRepository.findMonthlyByTickerAndStartDate(ticker, date);
-            case QUARTERLY -> priceOHLCRepository.findQuarterlyByTickerAndStartDate(ticker, date);
-            case YEARLY -> priceOHLCRepository.findYearlyByTickerAndStartDate(ticker, date);
+            case DAILY -> pricesRepository.findByTickerAndDate(ticker, date);
+            case WEEKLY -> pricesRepository.findWeeklyByTickerAndStartDate(ticker, date);
+            case MONTHLY -> pricesRepository.findMonthlyByTickerAndStartDate(ticker, date);
+            case QUARTERLY -> pricesRepository.findQuarterlyByTickerAndStartDate(ticker, date);
+            case YEARLY -> pricesRepository.findYearlyByTickerAndStartDate(ticker, date);
         };
 
-        pricesToUpdate.forEach(dailyPriceOHLC -> updatePrices(dailyPriceOHLC, ohlc, priceMultiplier));
+        pricesToUpdate.forEach(dailyPrice -> updatePrices(dailyPrice, ohlc, priceMultiplier));
         log.info("{}", pricesToUpdate);
-        priceOHLCRepository.saveAll(pricesToUpdate);
+        pricesRepository.saveAll(pricesToUpdate);
         return pricesToUpdate;
     }
 
-    private void updatePrices(AbstractPriceOHLC priceOHLC, double priceMultiplier) {
-        priceOHLC.setOpen(Math.round((priceMultiplier * priceOHLC.getOpen()) * 100.0) / 100.0);
-        priceOHLC.setHigh(Math.round((priceMultiplier * priceOHLC.getHigh()) * 100.0) / 100.0);
-        priceOHLC.setLow(Math.round((priceMultiplier * priceOHLC.getLow()) * 100.0) / 100.0);
-        priceOHLC.setClose(Math.round((priceMultiplier * priceOHLC.getClose()) * 100.0) / 100.0);
+    private void updatePrices(AbstractPriceOHLC price, double priceMultiplier) {
+        price.setOpen(Math.round((priceMultiplier * price.getOpen()) * 100.0) / 100.0);
+        price.setHigh(Math.round((priceMultiplier * price.getHigh()) * 100.0) / 100.0);
+        price.setLow(Math.round((priceMultiplier * price.getLow()) * 100.0) / 100.0);
+        price.setClose(Math.round((priceMultiplier * price.getClose()) * 100.0) / 100.0);
     }
 
-    private void updatePrices(AbstractPriceOHLC dailyPriceOHLC, String ohlc, double priceMultiplier) {
+    private void updatePrices(AbstractPriceOHLC dailyPrice, String ohlc, double priceMultiplier) {
         ohlc = ohlc.toUpperCase();
-        if (ohlc.contains("O")) dailyPriceOHLC.setOpen(Math.round((priceMultiplier * dailyPriceOHLC.getOpen()) * 100.0) / 100.0);
-        if (ohlc.contains("H")) dailyPriceOHLC.setHigh(Math.round((priceMultiplier * dailyPriceOHLC.getHigh()) * 100.0) / 100.0);
-        if (ohlc.contains("L")) dailyPriceOHLC.setLow(Math.round((priceMultiplier * dailyPriceOHLC.getLow()) * 100.0) / 100.0);
-        if (ohlc.contains("C")) dailyPriceOHLC.setClose(Math.round((priceMultiplier * dailyPriceOHLC.getClose()) * 100.0) / 100.0);
+        if (ohlc.contains("O")) dailyPrice.setOpen(Math.round((priceMultiplier * dailyPrice.getOpen()) * 100.0) / 100.0);
+        if (ohlc.contains("H")) dailyPrice.setHigh(Math.round((priceMultiplier * dailyPrice.getHigh()) * 100.0) / 100.0);
+        if (ohlc.contains("L")) dailyPrice.setLow(Math.round((priceMultiplier * dailyPrice.getLow()) * 100.0) / 100.0);
+        if (ohlc.contains("C")) dailyPrice.setClose(Math.round((priceMultiplier * dailyPrice.getClose()) * 100.0) / 100.0);
     }
 }

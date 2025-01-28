@@ -10,7 +10,7 @@ import java.util.List;
 
 
 @Repository
-public interface DailyPriceOHLCRepository extends JpaRepository<DailyPriceOHLC, Long> {
+public interface DailyPricesRepository extends JpaRepository<DailyPriceOHLC, Long> {
 
     long countByDateBefore(LocalDate date);
     long countByDateAfter(LocalDate date);

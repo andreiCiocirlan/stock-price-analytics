@@ -3,9 +3,9 @@ package stock.price.analytics.controller.dto;
 
 import java.sql.Date;
 
-public record CandleOHLCWithDateDTO(Date date, double open, double high, double low, double close) {
+public record CandleWithDateDTO(Date date, double open, double high, double low, double close) {
 
-    public CandleOHLCWithDateDTO {
+    public CandleWithDateDTO {
         // Validate that high is greater than low
         if (high < low) {
             if (Math.abs(high) <= 0.11 * low && Math.abs(high) >= 0.09 * low) { // correct high is 10% of actual high price

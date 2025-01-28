@@ -8,10 +8,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.HigherTimeframePricesCache;
-import stock.price.analytics.controller.dto.CandleOHLCWithDateDTO;
+import stock.price.analytics.controller.dto.CandleWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
-import stock.price.analytics.repository.prices.PriceOHLCRepository;
+import stock.price.analytics.repository.prices.PricesRepository;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -27,26 +27,26 @@ import static stock.price.analytics.util.StockDateUtils.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PriceOHLCService {
+public class PricesService {
 
     @PersistenceContext
     private final EntityManager entityManager;
 
-    private final PriceOHLCRepository priceOHLCRepository;
+    private final PricesRepository pricesRepository;
     private final HigherTimeframePricesCache higherTimeframePricesCache;
 
-    public List<CandleOHLCWithDateDTO> findOHLCFor(String ticker, StockTimeframe timeframe) {
+    public List<CandleWithDateDTO> findFor(String ticker, StockTimeframe timeframe) {
         String tableNameOHLC = timeframe.dbTableOHLC();
         String orderByIdField = timeframe == DAILY ? "date" : "start_date";
         String queryStr = STR."SELECT \{orderByIdField}, open, high, low, close FROM \{tableNameOHLC} WHERE ticker = :ticker ORDER BY \{orderByIdField} ASC";
 
-        Query nativeQuery = entityManager.createNativeQuery(queryStr, CandleOHLCWithDateDTO.class);
+        Query nativeQuery = entityManager.createNativeQuery(queryStr, CandleWithDateDTO.class);
         nativeQuery.setParameter("ticker", ticker);
 
         @SuppressWarnings("unchecked")
-        List<CandleOHLCWithDateDTO> priceOHLCs = (List<CandleOHLCWithDateDTO>) nativeQuery.getResultList();
+        List<CandleWithDateDTO> candles = (List<CandleWithDateDTO>) nativeQuery.getResultList();
 
-        return priceOHLCs;
+        return candles;
     }
 
     public List<AbstractPriceOHLC> updatePricesForHigherTimeframes(List<DailyPriceOHLC> importedDailyPrices) {
@@ -86,13 +86,13 @@ public class PriceOHLCService {
         List<WeeklyPriceOHLC> previousWeeklyPrices;
         if (cacheTickers.isEmpty()) {
             log.info("Fetching PreviousTwoWeeklyPrices from database for {} tickers", tickers.size());
-            previousWeeklyPrices = priceOHLCRepository.findPreviousThreeWeeklyPricesForTickers(tickers);
+            previousWeeklyPrices = pricesRepository.findPreviousThreeWeeklyPricesForTickers(tickers);
             higherTimeframePricesCache.addWeeklyPrices(previousWeeklyPrices);
         } else if (cacheTickers.containsAll(tickers)) {
             previousWeeklyPrices = higherTimeframePricesCache.weeklyPricesFor(tickers);
         } else { // partial match
             tickers.removeAll(cacheTickers);
-            previousWeeklyPrices = priceOHLCRepository.findPreviousThreeWeeklyPricesForTickers(tickers);
+            previousWeeklyPrices = pricesRepository.findPreviousThreeWeeklyPricesForTickers(tickers);
             higherTimeframePricesCache.addWeeklyPrices(previousWeeklyPrices);
             log.info("previousWeeklyPrices partial match for {} tickers", tickers.size());
             cacheTickers.addAll(tickers);
@@ -112,13 +112,13 @@ public class PriceOHLCService {
         List<MonthlyPriceOHLC> previousMonthlyPrices;
         if (cacheTickers.isEmpty()) {
             log.info("Fetching PreviousTwoMonthlyPrices from database for {} tickers", tickers.size());
-            previousMonthlyPrices = priceOHLCRepository.findPreviousThreeMonthlyPricesForTickers(tickers);
+            previousMonthlyPrices = pricesRepository.findPreviousThreeMonthlyPricesForTickers(tickers);
             higherTimeframePricesCache.addMonthlyPrices(previousMonthlyPrices);
         } else if (cacheTickers.containsAll(tickers)) {
             previousMonthlyPrices = higherTimeframePricesCache.monthlyPricesFor(tickers);
         } else { // partial match
             tickers.removeAll(cacheTickers);
-            previousMonthlyPrices = priceOHLCRepository.findPreviousThreeMonthlyPricesForTickers(tickers);
+            previousMonthlyPrices = pricesRepository.findPreviousThreeMonthlyPricesForTickers(tickers);
             higherTimeframePricesCache.addMonthlyPrices(previousMonthlyPrices);
             log.info("previousMonthlyPrices partial match for {} tickers", tickers.size());
             cacheTickers.addAll(tickers);
@@ -138,13 +138,13 @@ public class PriceOHLCService {
         List<QuarterlyPriceOHLC> previousQuarterlyPrices;
         if (cacheTickers.isEmpty()) {
             log.info("Fetching PreviousTwoQuarterlyPrices from database for {} tickers", tickers.size());
-            previousQuarterlyPrices = priceOHLCRepository.findPreviousThreeQuarterlyPricesForTickers(tickers);
+            previousQuarterlyPrices = pricesRepository.findPreviousThreeQuarterlyPricesForTickers(tickers);
             higherTimeframePricesCache.addQuarterlyPrices(previousQuarterlyPrices);
         } else if (cacheTickers.containsAll(tickers)) {
             previousQuarterlyPrices = higherTimeframePricesCache.quarterlyPricesFor(tickers);
         } else { // partial match
             tickers.removeAll(cacheTickers);
-            previousQuarterlyPrices = priceOHLCRepository.findPreviousThreeQuarterlyPricesForTickers(tickers);
+            previousQuarterlyPrices = pricesRepository.findPreviousThreeQuarterlyPricesForTickers(tickers);
             higherTimeframePricesCache.addQuarterlyPrices(previousQuarterlyPrices);
             log.info("previousQuarterlyPrices partial match for {} tickers", tickers.size());
             cacheTickers.addAll(tickers);
@@ -164,13 +164,13 @@ public class PriceOHLCService {
         List<YearlyPriceOHLC> previousYearlyPrices;
         if (cacheTickers.isEmpty()) {
             log.info("Fetching PreviousTwoYearlyPrices from database for {} tickers", tickers.size());
-            previousYearlyPrices = priceOHLCRepository.findPreviousThreeYearlyPricesForTickers(tickers);
+            previousYearlyPrices = pricesRepository.findPreviousThreeYearlyPricesForTickers(tickers);
             higherTimeframePricesCache.addYearlyPrices(previousYearlyPrices);
         } else if (cacheTickers.containsAll(tickers)) {
             previousYearlyPrices = higherTimeframePricesCache.yearlyPricesFor(tickers);
         } else { // partial match
             tickers.removeAll(cacheTickers);
-            previousYearlyPrices = priceOHLCRepository.findPreviousThreeYearlyPricesForTickers(tickers);
+            previousYearlyPrices = pricesRepository.findPreviousThreeYearlyPricesForTickers(tickers);
             higherTimeframePricesCache.addYearlyPrices(previousYearlyPrices);
             log.info("previousYearlyPrices partial match for {} tickers", tickers.size());
             cacheTickers.addAll(tickers);
@@ -194,7 +194,7 @@ public class PriceOHLCService {
                 .collect(Collectors.groupingBy(AbstractPriceOHLC::getTicker, Collectors.mapping(p -> (AbstractPriceOHLC) p, Collectors.toList())));
 
         List<AbstractPriceOHLC> updatedPrices = updatePricesAndPerformance(importedDailyPrices, timeframe, previousPricesByTicker);
-        partitionDataAndSaveNoLogging(updatedPrices, priceOHLCRepository);
+        partitionDataAndSaveNoLogging(updatedPrices, pricesRepository);
 
         return (List<T>) updatedPrices;
     }
@@ -366,6 +366,6 @@ public class PriceOHLCService {
 
     @Transactional
     public void savePrices(List<? extends AbstractPriceOHLC> prices) {
-        priceOHLCRepository.saveAll(prices);
+        pricesRepository.saveAll(prices);
     }
 }

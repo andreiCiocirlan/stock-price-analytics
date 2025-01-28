@@ -12,7 +12,7 @@ import java.util.List;
 
 
 @Repository
-public interface PriceOHLCRepository extends JpaRepository<AbstractPriceOHLC, Long> {
+public interface PricesRepository extends JpaRepository<AbstractPriceOHLC, Long> {
 
     List<DailyPriceOHLC> findByTickerAndDateLessThan(String ticker, LocalDate date);
 

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.model.prices.ohlc.CandleOHLC;
 import stock.price.analytics.model.prices.ohlc.MonthlyPriceOHLC;
 import stock.price.analytics.model.prices.ohlc.QuarterlyPriceOHLC;
-import stock.price.analytics.repository.prices.PriceOHLCRepository;
+import stock.price.analytics.repository.prices.PricesRepository;
 
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
@@ -24,11 +24,11 @@ import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partiti
 @Slf4j
 public class QuarterlyPriceService {
 
-    private final PriceOHLCRepository priceOHLCRepository;
+    private final PricesRepository pricesRepository;
 
     @Transactional
     public void saveAllQuarterlyPrices() {
-        List<MonthlyPriceOHLC> monthlyPrices = priceOHLCRepository.findAllMonthlyPrices();
+        List<MonthlyPriceOHLC> monthlyPrices = pricesRepository.findAllMonthlyPrices();
 
         Map<String, Map<String, List<MonthlyPriceOHLC>>> groupedByTickerAndQuarter =
                 monthlyPrices.stream()
@@ -51,8 +51,8 @@ public class QuarterlyPriceService {
                 )
         );
 
-        partitionDataAndSave(quarterlyPrices, priceOHLCRepository);
-        priceOHLCRepository.quarterlyPricesUpdatePerformance();
+        partitionDataAndSave(quarterlyPrices, pricesRepository);
+        pricesRepository.quarterlyPricesUpdatePerformance();
     }
 
     private QuarterlyPriceOHLC quarterlyPricesFrom(List<MonthlyPriceOHLC> monthlyPrices) {

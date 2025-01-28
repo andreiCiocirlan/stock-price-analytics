@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
-import stock.price.analytics.controller.dto.CandleOHLCWithDateDTO;
+import stock.price.analytics.controller.dto.CandleWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.service.PriceOHLCService;
+import stock.price.analytics.service.PricesService;
 import stock.price.analytics.service.QuarterlyPriceService;
 
 import java.time.LocalDate;
@@ -20,14 +20,14 @@ import static stock.price.analytics.util.Constants.HIGHER_TIMEFRAMES_PATTERN;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-public class PricesOHLCController {
+public class PricesController {
 
-    private final PriceOHLCService priceOHLCService;
+    private final PricesService pricesService;
     private final QuarterlyPriceService quarterlyPriceService;
 
     @GetMapping("/prices")
-    public List<CandleOHLCWithDateDTO> dailyOHLC(@RequestParam("ticker") String ticker, @RequestParam("timeFrame") String timeFrame) {
-        return priceOHLCService.findOHLCFor(ticker, StockTimeframe.valueOf(timeFrame.toUpperCase()));
+    public List<CandleWithDateDTO> pricesFor(@RequestParam("ticker") String ticker, @RequestParam("timeFrame") String timeFrame) {
+        return pricesService.findFor(ticker, StockTimeframe.valueOf(timeFrame.toUpperCase()));
     }
 
     @PostMapping("/update-higher-timeframes")
@@ -37,7 +37,7 @@ public class PricesOHLCController {
         String tickersQueryParam = tickers != null ? STR."'\{tickers.replace(",", "','")}'" : null;
         List<StockTimeframe> timeframes = timeFrames != null ?
                 StockTimeframe.valuesFromLetters(timeFrames.toUpperCase()) : Arrays.stream(StockTimeframe.values()).toList();
-        priceOHLCService.updateHigherTimeframesPricesFor(date, timeframes, tickersQueryParam);
+        pricesService.updateHigherTimeframesPricesFor(date, timeframes, tickersQueryParam);
     }
 
     @PostMapping("/save-quarterly-prices")

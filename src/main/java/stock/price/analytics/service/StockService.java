@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 import static java.nio.file.Files.walk;
 import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
-import static stock.price.analytics.util.PricesOHLCUtil.tickerFrom;
+import static stock.price.analytics.util.PricesUtil.tickerFrom;
 
 @Slf4j
 @Service
