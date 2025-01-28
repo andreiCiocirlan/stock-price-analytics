@@ -24,7 +24,7 @@ public class StockSplitAdjustPricesService {
         List<DailyPriceOHLC> dailyPricesToUpdate = priceOHLCRepository.findByTickerAndDateLessThan(ticker, stockSplitDate);
         List<WeeklyPriceOHLC> weeklyPricesToUpdate = priceOHLCRepository.findWeeklyByTickerAndStartDateBefore(ticker, stockSplitDate.with(previousOrSame(DayOfWeek.MONDAY)));
         List<MonthlyPriceOHLC> monthlyPricesToUpdate = priceOHLCRepository.findMonthlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfMonth()));
-        List<MonthlyPriceOHLC> quarterlyPricesToUpdate = priceOHLCRepository.findQuarterlyByTickerAndStartDateBefore(ticker, LocalDate.of(stockSplitDate.getYear(), stockSplitDate.getMonth().firstMonthOfQuarter().getValue(), 1));
+        List<QuarterlyPriceOHLC> quarterlyPricesToUpdate = priceOHLCRepository.findQuarterlyByTickerAndStartDateBefore(ticker, LocalDate.of(stockSplitDate.getYear(), stockSplitDate.getMonth().firstMonthOfQuarter().getValue(), 1));
         List<YearlyPriceOHLC> yearlyPricesToUpdate = priceOHLCRepository.findYearlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfYear()));
 
         dailyPricesToUpdate.forEach(dailyPriceOHLC -> updatePrices(dailyPriceOHLC, priceMultiplier));
