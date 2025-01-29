@@ -91,7 +91,7 @@ public class YahooQuoteService {
         }
 
         if (!preMarketOnly || dailyImportedPrices.isEmpty()) { // only save if intraday prices, for pre-market only display
-            partitionDataAndSaveWithLogTime(dailyImportedPrices, dailyPricesRepository, "saved daily prices");
+            partitionDataAndSaveWithLogTime(dailyImportedPrices, dailyPricesRepository, "saved " + dailyImportedPrices.size() + " daily prices");
         }
 
         if (!tickersImported.isEmpty()) {

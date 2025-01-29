@@ -74,7 +74,7 @@ public class DailyPricesJSONService {
             }
         }
         List<DailyPricesJSON> dailyPricesJSONSInCache = dailyPricesJSONCacheService.addDailyPricesJSONInCacheAndReturn(dailyJSONPrices);
-        partitionDataAndSaveWithLogTime(dailyPricesJSONSInCache, dailyPricesJSONRepository, "saved daily json prices");
+        partitionDataAndSaveWithLogTime(dailyPricesJSONSInCache, dailyPricesJSONRepository, "saved " + dailyJSONPrices.size() + " daily json prices");
 
         return dailyPricesJSONSInCache;
     }
@@ -148,7 +148,7 @@ public class DailyPricesJSONService {
                 .toList();
 
         if (!dailyPricesJSON_toSave.isEmpty()) {
-            partitionDataAndSaveWithLogTime(dailyPricesJSON_toSave, dailyPricesJSONRepository, "saved daily json prices");
+            partitionDataAndSaveWithLogTime(dailyPricesJSON_toSave, dailyPricesJSONRepository, "saved " + dailyPricesJSON_toSave.size() + " daily json prices");
         }
     }
 
