@@ -1,5 +1,6 @@
 package stock.price.analytics.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -7,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.client.finnhub.FinnhubClient;
-import stock.price.analytics.service.StockFinancialDataService;
 import stock.price.analytics.util.Constants;
 import stock.price.analytics.util.FileUtils;
 
@@ -18,18 +18,13 @@ import java.util.Collections;
 @Slf4j
 @RequestMapping("/financial-data")
 @RestController
+@RequiredArgsConstructor
 public class StockFinancialDataController {
 
-    private final StockFinancialDataService stockFinancialDataService;
     private final FinnhubClient finnhubClient;
 
     @Value("${stock.financial.data.input.directory}")
     private String stockFinancialDataInputDirectory;
-
-    public StockFinancialDataController(StockFinancialDataService stockFinancialDataService, FinnhubClient finnhubClient) {
-        this.stockFinancialDataService = stockFinancialDataService;
-        this.finnhubClient = finnhubClient;
-    }
 
     @PostMapping("/tickers-to-json-files")
     @ResponseStatus(HttpStatus.OK)
