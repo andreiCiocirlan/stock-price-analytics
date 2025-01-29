@@ -63,7 +63,7 @@ public class FairValueGapService {
         if (timeframe == null) { // update closed for all timeframes
             for (StockTimeframe stockTimeframe : StockTimeframe.values()) {
                 List<FairValueGap> closedFVGs = findClosedFVGsFor(stockTimeframe);
-                partitionDataAndSaveWithLogTime(closedFVGs, fvgRepository, "updated closed FVGs for " + timeframe);
+                partitionDataAndSaveWithLogTime(closedFVGs, fvgRepository, "updated closed FVGs for " + stockTimeframe);
             }
         } else {
             List<FairValueGap> closedFVGs = findClosedFVGsFor(timeframe);
