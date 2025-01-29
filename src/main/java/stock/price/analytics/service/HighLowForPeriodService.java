@@ -56,13 +56,8 @@ public class HighLowForPeriodService {
         List<HighLowForPeriod> highLowForPeriod = new ArrayList<>();
         try (Stream<Path> walk = walk(Paths.get(Constants.STOCKS_LOCATION))) {
             walk.filter(Files::isRegularFile)
-                    .parallel().forEachOrdered(srcFile -> {
-                        try {
-                            highLowForPeriod.addAll(highLowFromFileForPeriod(srcFile, START_DATE, END_DATE, stockPerformanceInterval));
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
+                    .parallel()
+                    .forEachOrdered(srcFile -> highLowForPeriod.addAll(highLowFromFileForPeriod(srcFile, START_DATE, END_DATE, stockPerformanceInterval)));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
