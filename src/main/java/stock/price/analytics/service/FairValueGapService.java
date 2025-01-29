@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
 
 @Slf4j
@@ -22,11 +21,6 @@ import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partiti
 public class FairValueGapService {
 
     private final FVGRepository fvgRepository;
-
-    public void findAllFVGsAndSaveFor(StockTimeframe timeframe) {
-        List<FairValueGap> fvgs = findAllByTimeframe(timeframe);
-        partitionDataAndSave(fvgs, fvgRepository);
-    }
 
     private List<FairValueGap> findAllByTimeframe(StockTimeframe timeframe) {
         return switch (timeframe) {
