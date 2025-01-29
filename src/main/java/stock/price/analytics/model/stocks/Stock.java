@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 import stock.price.analytics.model.prices.PriceEntity;
+import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.highlow.HighLow4w;
 import stock.price.analytics.model.prices.highlow.HighLow52Week;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
@@ -217,6 +218,16 @@ public class Stock implements PriceEntity {
     private void updateFromHighLow4w(HighLow4w highLow4w) {
         this.setLow4w(highLow4w.getLow4w());
         this.setHigh4w(highLow4w.getHigh4w());
+    }
+
+    public double performanceFor(StockTimeframe timeFrame) {
+        return switch (timeFrame) {
+            case DAILY -> getDailyPerformance();
+            case WEEKLY -> getWeeklyPerformance();
+            case MONTHLY -> getMonthlyPerformance();
+            case QUARTERLY -> getQuarterlyPerformance();
+            case YEARLY -> getYearlyPerformance();
+        };
     }
 
     @Override
