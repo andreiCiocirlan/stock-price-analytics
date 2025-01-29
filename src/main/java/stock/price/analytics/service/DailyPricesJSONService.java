@@ -169,10 +169,9 @@ public class DailyPricesJSONService {
         try {
             String path = "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/";
             objectMapper.writeValue(new File(path + date + ".json"), response);
-            System.out.println("Data exported to JSON file successfully.");
+            log.info("Data exported to JSON file successfully.");
         } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("Error writing JSON file: " + e.getMessage());
+            log.error("trading date missing from json file for ticker {}", e.getMessage());
         }
     }
 }
