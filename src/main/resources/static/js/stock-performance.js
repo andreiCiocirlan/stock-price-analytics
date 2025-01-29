@@ -54,7 +54,6 @@ function updateStockPerformanceChart(timeFrame) {
     const numRows = document.getElementById('numRows').value || 5;
     const numCols = document.getElementById('numCols').value || 5;
     const positivePerfFirst = document.getElementById('positivePerfFirst').checked || false;
-    const xtb = document.getElementById('xtbOnly').checked;
     const cfdMargin = document.getElementById('cfdMargin');
     const priceMilestone = document.getElementById('priceMilestone');
 
@@ -68,9 +67,6 @@ function updateStockPerformanceChart(timeFrame) {
     }
     if (priceMilestone) {
         url += '&priceMilestone=' + priceMilestone.value;
-    }
-    if (xtb) {
-        url += '&xtb=true';
     }
 
     fetch(url)

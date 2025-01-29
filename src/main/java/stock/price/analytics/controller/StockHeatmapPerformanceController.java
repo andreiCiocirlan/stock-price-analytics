@@ -33,7 +33,6 @@ public class StockHeatmapPerformanceController {
     @GetMapping("/stock-performance-json")
     @ResponseBody
     public List<StockPerformanceDTO> getStockPerformance(@RequestParam(required = false, value = "timeFrame") String timeFrame,
-                                                         @RequestParam(required = false, value = "xtb") Boolean xtb,
                                                          @RequestParam(required = false, value = "positivePerfFirst") Boolean positivePerfFirst,
                                                          @RequestParam(required = false, value = "limit") Integer limit,
                                                          @RequestParam(required = false, value = "cfdMargin") Double cfdMargin,
@@ -48,7 +47,6 @@ public class StockHeatmapPerformanceController {
         }
         return stockHeatmapPerformanceService.stockPerformanceForDateAndTimeframeAndFilters(
                 stockTimeframe,
-                xtb,
                 positivePerfFirst,
                 limit,
                 cfdMargin,
