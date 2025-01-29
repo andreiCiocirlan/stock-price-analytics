@@ -1,15 +1,15 @@
 package stock.price.analytics.service;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.controller.dto.StockPerformanceDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
+import stock.price.analytics.model.stocks.Stock;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -17,50 +17,34 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class StockHeatmapPerformanceService {
 
-    @PersistenceContext
-    private final EntityManager entityManager;
+    private final StockService stockService;
 
-    public List<StockPerformanceDTO> stockPerformanceForDateAndTimeframeAndFilters(StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, Double cfdMargin, List<String> tickers) {
-        String queryStr = queryFrom(timeFrame, positivePerfFirst, limit, cfdMargin, tickers);
+    public List<StockPerformanceDTO> stockPerformanceForDateAndTimeframeAndFilters(
+            StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, Double cfdMargin, List<String> tickers) {
+        List<Stock> result = stockService.stocksCacheMap().values().stream()
+                .filter(stockFilterPredicate(tickers, cfdMargin))
+                .toList();
 
-        Query nativeQuery = entityManager.createNativeQuery(queryStr, StockPerformanceDTO.class);
+        List<StockPerformanceDTO> performanceDTOs = result.stream()
+                .map(stock -> new StockPerformanceDTO(stock.getTicker(), stock.performanceFor(timeFrame)))
+                .sorted(Comparator.comparingDouble(StockPerformanceDTO::performance))
+                .toList();
 
-        @SuppressWarnings("unchecked")
-        List<StockPerformanceDTO> performanceDTOs = (List<StockPerformanceDTO>) nativeQuery.getResultList();
+        if (Boolean.TRUE.equals(positivePerfFirst)) {
+            performanceDTOs = performanceDTOs.stream()
+                    .sorted(Comparator.comparingDouble(StockPerformanceDTO::performance).reversed())
+                    .collect(Collectors.toList());
+        }
+        if (limit != null) {
+            performanceDTOs = performanceDTOs.subList(0, Math.min(limit, performanceDTOs.size()));
+        }
 
         return performanceDTOs;
     }
 
-    private static String queryFrom(StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, Double cfdMargin, List<String> tickers) {
-        String dbTable = timeFrame.dbTablePerfHeatmap();
-        String query = STR."""
-            SELECT p.ticker, p.performance FROM \{dbTable} p JOIN Stocks s ON s.ticker = p.ticker
-            """;
-
-        query += " AND s.xtb_stock = true ";
-        query += STR."""
-            WHERE (COALESCE(\{cfdMargin}, -1) = -1 OR s.cfd_margin = \{cfdMargin})
-            """; // only XTB tickers use cfdMargin field
-
-        if (!tickers.isEmpty()) {
-            String tickersFormatted = tickers.stream().map(ticker -> STR."'\{ticker}'").collect(Collectors.joining(", "));
-            query +=  STR."""
-             AND p.ticker in (\{tickersFormatted})
-             """;
-        }
-
-        // default negative performance first (ascending by performance)
-        query += """
-                ORDER BY p.performance
-                """;
-        if (Boolean.TRUE.equals(positivePerfFirst)) {
-            query += " DESC";
-        }
-        if (limit != null) {
-            query += STR." LIMIT \{limit}";
-        }
-        return query;
+    private Predicate<? super Stock> stockFilterPredicate(List<String> tickers, Double cfdMargin) {
+        return stock -> (cfdMargin == null || stock.getCfdMargin() == cfdMargin) &&
+                (tickers.isEmpty() || tickers.contains(stock.getTicker()));
     }
-
 
 }

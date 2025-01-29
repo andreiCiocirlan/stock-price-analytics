@@ -145,6 +145,10 @@ public class StockService {
         stocksCache.addStocks(stocks);
     }
 
+    public Map<String, Stock> stocksCacheMap() {
+        return stocksCache.getStocksMap();
+    }
+
     public void initStocksCache() {
         stocksCache.addStocks(stockRepository.findByXtbStockTrueAndDelistedDateIsNull());
     }
