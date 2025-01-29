@@ -18,14 +18,14 @@ public class FairValueGapController {
 
     @GetMapping("/find-new")
     @ResponseStatus(HttpStatus.OK)
-    public List<FairValueGap> findNewFVsGsFor(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
+    public List<FairValueGap> findNewFVGsFor(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
         return fairValueGapService.findNewFVGsFor(timeframe);
     }
 
     @PostMapping("/find-new-and-save")
     @ResponseStatus(HttpStatus.CREATED)
-    public void findNewFVsGsAndSaveFor(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
-        fairValueGapService.findNewFVsGsAndSaveFor(timeframe);
+    public void findNewFVGsAndSaveFor(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
+        fairValueGapService.findNewFVGsAndSaveFor(timeframe);
     }
 
     @GetMapping("/find-closed")

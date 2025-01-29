@@ -32,7 +32,7 @@ public class FairValueGapService {
         };
     }
 
-    public void findNewFVsGsAndSaveFor(StockTimeframe timeframe) {
+    public void findNewFVGsAndSaveFor(StockTimeframe timeframe) {
         List<FairValueGap> newFVGs = findNewFVGsFor(timeframe);
         partitionDataAndSaveWithLogTime(newFVGs, fvgRepository, "saved new FVGs for " + timeframe);
     }
