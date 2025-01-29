@@ -20,16 +20,6 @@ public enum StockTimeframe {
     QUARTERLY,
     YEARLY;
 
-    public String dbTablePerfHeatmap() {
-        return switch (this) {
-            case DAILY -> "daily_prices_performance_view";
-            case WEEKLY -> "weekly_prices_performance_view";
-            case MONTHLY -> "monthly_prices_performance_view";
-            case QUARTERLY -> "quarterly_prices_performance_view";
-            case YEARLY -> "yearly_prices_performance_view";
-        };
-    }
-
     public String dbTableOHLC() {
         return switch (this) {
             case DAILY -> "daily_prices";
