@@ -34,13 +34,13 @@ public class HighLowForPeriodController {
         highLowForPeriodService.saveHighLowPricesForPeriod(StockPerformanceInterval.STOCK_PERF_INTERVAL_30D);
     }
 
-    @PostMapping("/save-hl-4w-52w-ticker")
+    @PostMapping("/save-all-hl-4w-52w-ticker")
     @ResponseStatus(HttpStatus.OK)
     @Transactional
-    public void saveHighLow_4w_52wForTickerAndDate(@RequestParam("ticker") String ticker,
+    public void saveAllHistoricalHighLowPrices(@RequestParam("ticker") String ticker,
                                                        @RequestParam(name = "tradingDate")
                                                             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate tradingDate) {
-        highLowForPeriodService.saveCurrentWeekHighLowPricesSingleTicker(ticker, tradingDate);
+        highLowForPeriodService.saveAllHistoricalHighLowPrices(List.of(ticker), tradingDate);
     }
 
     @GetMapping("/daily-new-high-lows-for-hl-period")
