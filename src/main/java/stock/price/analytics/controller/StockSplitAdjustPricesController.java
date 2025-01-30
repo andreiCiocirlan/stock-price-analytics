@@ -14,7 +14,6 @@ import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.AbstractPriceOHLC;
 import stock.price.analytics.service.HighLowForPeriodService;
 import stock.price.analytics.service.PricesService;
-import stock.price.analytics.service.RefreshMaterializedViewsService;
 import stock.price.analytics.service.StockSplitAdjustPricesService;
 
 import java.time.LocalDate;
@@ -29,7 +28,6 @@ public class StockSplitAdjustPricesController {
     private final StockSplitAdjustPricesService stockSplitAdjustPricesService;
     private final PricesService pricesService;
     private final HighLowForPeriodService highLowForPeriodService;
-    private final RefreshMaterializedViewsService refreshMaterializedViewsService;
 
     @PostMapping("/adjust-prices")
     @Transactional
@@ -39,7 +37,6 @@ public class StockSplitAdjustPricesController {
         stockSplitAdjustPricesService.adjustPricesFor(ticker, stockSplitDate, priceMultiplier);
         pricesService.updateAllHigherTimeframesPricesForTickers(stockSplitDate, STR."'\{ticker}'");
         highLowForPeriodService.saveAllHistoricalHighLowPrices(List.of(ticker), stockSplitDate);
-        refreshMaterializedViewsService.refreshMaterializedViews();
     }
 
     @PostMapping("/adjust-prices-for-date")

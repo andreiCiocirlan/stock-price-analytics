@@ -9,7 +9,6 @@ import stock.price.analytics.repository.prices.TickerRenameRepository;
 public class TickerRenameService {
 
     private final TickerRenameRepository tickerRenameRepository;
-    private final RefreshMaterializedViewsService refreshMaterializedViewsService;
 
     public void renameTicker(String oldTicker, String newTicker) {
         tickerRenameRepository.updateStockTicker(oldTicker, newTicker);
@@ -23,8 +22,5 @@ public class TickerRenameService {
         tickerRenameRepository.updateHighLow52WeekTicker(oldTicker, newTicker);
         tickerRenameRepository.updateHighestLowestPricesTicker(oldTicker, newTicker);
         tickerRenameRepository.updateFairValueGapTicker(oldTicker, newTicker);
-
-        // final step refresh views to reflect changes
-        refreshMaterializedViewsService.refreshMaterializedViews();
     }
 }

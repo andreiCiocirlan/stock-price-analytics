@@ -9,7 +9,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import stock.price.analytics.model.prices.ohlc.AbstractPriceOHLC;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
-import stock.price.analytics.service.*;
+import stock.price.analytics.service.HighLowForPeriodService;
+import stock.price.analytics.service.PricesService;
+import stock.price.analytics.service.StockService;
+import stock.price.analytics.service.YahooQuoteService;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -29,7 +32,6 @@ public class IntraDayPricesController {
     private final YahooQuoteService yahooQuoteService;
     private final PricesService pricesService;
     private final HighLowForPeriodService highLowForPeriodService;
-    private final RefreshMaterializedViewsService refreshMaterializedViewsService;
     private final StockService stockService;
 
     @Transactional
@@ -44,8 +46,6 @@ public class IntraDayPricesController {
             List<String> tickers = dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList();
             logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices, tickers), "saved current week HighLow prices" );
             logTime(() -> stockService.updateStocksHighLowsAndOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks highs-lows 4w,52w,all-time and higher-timeframe OHLC prices");
-            // all performance views based on stock last_updated
-            logTime(refreshMaterializedViewsService::refreshMaterializedViews, "refreshed materialized views");
         }
         long duration = (System.nanoTime() - start) / 1_000_000;
         log.info("Real-time import done in {} ms", duration);
@@ -71,8 +71,6 @@ public class IntraDayPricesController {
             List<String> tickers = dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList();
             logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices, tickers), "saved current week HighLow prices" );
             logTime(() -> stockService.updateStocksHighLowsAndOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks highs-lows 4w,52w,all-time and higher-timeframe OHLC prices");
-            // all performance views based on stock last_updated
-            logTime(refreshMaterializedViewsService::refreshMaterializedViews, "refreshed materialized views");
         }
         long duration = (System.nanoTime() - start) / 1_000_000;
         log.info("Import from file done in {} ms", duration);

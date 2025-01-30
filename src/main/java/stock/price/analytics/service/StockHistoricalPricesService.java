@@ -40,7 +40,6 @@ public class StockHistoricalPricesService {
     private final PricesService pricesService;
     private final PricesRepository pricesRepository;
     private final DailyPricesRepository dailyPricesRepository;
-    private final RefreshMaterializedViewsService refreshMaterializedViewsService;
 
     private static List<? extends AbstractPriceOHLC> pricesOHLCForTimeframe(StockTimeframe stockTimeframe) {
         List<AbstractPriceOHLC> prices = new ArrayList<>();
@@ -86,9 +85,6 @@ public class StockHistoricalPricesService {
         // insert/update higher timeframe prices
         String tickersQuery = tickers.stream().map(ticker -> STR."'\{ticker}'").collect(Collectors.joining(", "));
         pricesService.updateAllHigherTimeframesPricesForTickers(higherTimeFrameDate, tickersQuery);
-
-        // refresh views
-        refreshMaterializedViewsService.refreshMaterializedViews();
     }
 
     @Transactional
