@@ -25,7 +25,7 @@ public record CandleWithDateDTO(Date date, double open, double high, double low,
             if (open == 0 || (Math.abs(open) >= 0.1 * low && Math.abs(open) <= 0.1 * high)) {
                 open = close;
             } else if (open < low * 0.9 || open > high * 1.1) { // way off the mark (manual error)
-                throw new IllegalArgumentException(STR."Opening price \{open} must be between: \{low} and \{high}");
+//                throw new IllegalArgumentException(STR."Opening price \{open} must be between: \{low} and \{high}");
             }
         }
 
