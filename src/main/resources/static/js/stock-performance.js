@@ -46,6 +46,9 @@ function updatePricesIntraday() {
                 throw new Error('Network response was not ok');
             }
         })
+        .then(() => {
+            updateStockPerformanceChart(currentTimeFrame);
+        })
         .catch(error => console.error(error));
 }
 
