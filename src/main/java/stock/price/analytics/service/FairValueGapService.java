@@ -8,6 +8,8 @@ import stock.price.analytics.model.prices.enums.FvgStatus;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.repository.fvg.FVGRepository;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -88,5 +90,10 @@ public class FairValueGapService {
         });
 
         return closedFVGsFound;
+    }
+
+    public void updateFVGPricesForStockSplit(String ticker, LocalDate stockSplitDate, double stockSplitMultiplier) {
+        int updatedRows = fvgRepository.updateFVGPricesForStockSplit(ticker, stockSplitDate, stockSplitMultiplier);
+        log.warn("updated {} FVG rows for {} and stockSplitDate {}", updatedRows, ticker, stockSplitDate);
     }
 }

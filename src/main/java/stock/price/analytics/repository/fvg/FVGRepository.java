@@ -1,11 +1,14 @@
 package stock.price.analytics.repository.fvg;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import stock.price.analytics.model.fvg.FairValueGap;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -306,5 +309,24 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
             order by ticker, fvg.date2 desc;
             """, nativeQuery = true)
     List<FairValueGap> findAllDailyFVGs();
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+            UPDATE fvg
+                   SET high = high * :multiplier,
+                   low = low * :multiplier
+                           WHERE
+                   ticker = :ticker AND
+                   CASE
+                   WHEN timeframe = 'DAILY' THEN date <= :stockSplitDate
+                   WHEN timeframe = 'WEEKLY' THEN date_trunc('week', date) <= CAST(:stockSplitDate AS date)
+                   WHEN timeframe = 'MONTHLY' THEN date_trunc('month', date) <= CAST(:stockSplitDate AS date)
+                   WHEN timeframe = 'QUARTERLY' THEN date_trunc('quarter', date) <= CAST(:stockSplitDate AS date)
+                   WHEN timeframe = 'YEARLY' THEN date_trunc('year', date) <= CAST(:stockSplitDate AS date)
+                   ELSE FALSE
+                   END;
+            """, nativeQuery = true)
+    int updateFVGPricesForStockSplit(@Param(value = "ticker") String ticker, @Param(value = "stockSplitDate") LocalDate  stockSplitDate, @Param(value = "multiplier") double multiplier);
 
 }

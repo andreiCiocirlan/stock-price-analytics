@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.AbstractPriceOHLC;
+import stock.price.analytics.service.FairValueGapService;
 import stock.price.analytics.service.HighLowForPeriodService;
 import stock.price.analytics.service.PricesService;
 import stock.price.analytics.service.StockSplitAdjustPricesService;
@@ -28,6 +29,7 @@ public class StockSplitAdjustPricesController {
     private final StockSplitAdjustPricesService stockSplitAdjustPricesService;
     private final PricesService pricesService;
     private final HighLowForPeriodService highLowForPeriodService;
+    private final FairValueGapService fairValueGapService;
 
     @PostMapping("/adjust-prices")
     @Transactional
@@ -37,6 +39,7 @@ public class StockSplitAdjustPricesController {
         stockSplitAdjustPricesService.adjustPricesFor(ticker, stockSplitDate, priceMultiplier);
         pricesService.updateAllHigherTimeframesPricesForTickers(stockSplitDate, STR."'\{ticker}'");
         highLowForPeriodService.saveAllHistoricalHighLowPrices(List.of(ticker), stockSplitDate);
+        fairValueGapService.updateFVGPricesForStockSplit(ticker, stockSplitDate, priceMultiplier);
     }
 
     @PostMapping("/adjust-prices-for-date")
