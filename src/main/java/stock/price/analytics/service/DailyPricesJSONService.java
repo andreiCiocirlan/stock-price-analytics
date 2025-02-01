@@ -42,17 +42,16 @@ public class DailyPricesJSONService {
             Response response = objectMapper.readValue(jsonData, Response.class);
             List<DailyPricesJSON> dailyPricesJSON = response.getQuoteResponse().getResult();
 
-            return extractDailyJSONPricesAndSave(dailyPricesJSON);
+            return extractDailyJSONPricesAndSave(dailyPricesJSON, dailyPricesJSONCacheService.dailyPricesJSONCache());
         } catch (JsonProcessingException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    public List<DailyPricesJSON> extractDailyJSONPricesAndSave(List<DailyPricesJSON> dailyPricesJSON) {
-        List<DailyPricesJSON> recentJsonPrices = dailyPricesJSONCacheService.dailyPricesJSONCache();
-        Map<String, DailyPricesJSON> latestJsonPricesById = recentJsonPrices.stream().collect(Collectors.toMap(DailyPricesJSON::getCompositeId, p -> p));
+    public List<DailyPricesJSON> extractDailyJSONPricesAndSave(List<DailyPricesJSON> dailyPricesJSON, List<DailyPricesJSON> recentJsonPrices) {
         List<String> sameDailyPrices = new ArrayList<>();
         List<DailyPricesJSON> dailyJSONPrices = new ArrayList<>();
+        Map<String, DailyPricesJSON> recentJsonPricesById = recentJsonPrices.stream().collect(Collectors.toMap(DailyPricesJSON::getCompositeId, p -> p));
         for (DailyPricesJSON dailyPriceJson : dailyPricesJSON) {
             String ticker = dailyPriceJson.getSymbol();
             LocalDate tradingDate = dailyPriceJson.getDate();
@@ -70,17 +69,7 @@ public class DailyPricesJSONService {
                     log.warn("Extracting stock daily prices for ticker {} and date {}", ticker, tradingDate);
                 }
             }
-            String key = dailyPriceJson.getCompositeId();
-            if (latestJsonPricesById.containsKey(key)) {
-                DailyPricesJSON found = latestJsonPricesById.get(key);
-                if (found.differentPrices(dailyPriceJson)) { // compare OHLC, performance
-                    dailyJSONPrices.add(found.updateFrom(dailyPriceJson));
-                } else {
-                    sameDailyPrices.add(ticker);
-                }
-            } else {
-                dailyJSONPrices.add(dailyPriceJson);
-            }
+            compareAndAddToList(dailyPriceJson, recentJsonPricesById, dailyJSONPrices, sameDailyPrices, ticker);
         }
 
         if (!sameDailyPrices.isEmpty()) {
@@ -100,47 +89,36 @@ public class DailyPricesJSONService {
             String jsonFilePath = String.join("", "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/", fileName, ".json");
             String jsonData = String.join("", readAllLines(Path.of(jsonFilePath)));
 
-             return extractAllDailyPricesJSONFrom(jsonData, LocalDate.parse(fileName.split("_")[0], DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            SimpleModule module = new SimpleModule();
+            module.addDeserializer(LocalDate.class, new UnixTimestampToLocalDateDeserializer());
+            objectMapper.registerModule(module);
+            Response response = objectMapper.readValue(jsonData, Response.class);
+            List<DailyPricesJSON> dailyPricesJSON = response.getQuoteResponse().getResult();
+
+            LocalDate to = LocalDate.parse(fileName.split("_")[0], DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+            LocalDate from = to.minusDays(10);
+
+            return extractAllDailyPricesJSONFrom(dailyPricesJSON, dailyPricesJSONRepository.findByDateBetween(from, to));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public List<DailyPricesJSON> extractAllDailyPricesJSONFrom(String jsonData, LocalDate date) {
-        ObjectMapper objectMapper = new ObjectMapper();
+    public List<DailyPricesJSON> extractAllDailyPricesJSONFrom(List<DailyPricesJSON> dailyPricesJSON, List<DailyPricesJSON> recentJsonPrices) {
         List<String> sameDailyPrices = new ArrayList<>();
         List<DailyPricesJSON> dailyJSONPrices = new ArrayList<>();
-        try {
-            objectMapper.registerModule(new JavaTimeModule());
-            SimpleModule module = new SimpleModule();
-            module.addDeserializer(LocalDate.class, new UnixTimestampToLocalDateDeserializer());
-            objectMapper.registerModule(module);
-            Response dailyPricesJSON = objectMapper.readValue(jsonData, Response.class);
-            List<DailyPricesJSON> recentJsonPrices = dailyPricesJSONRepository.findByDateBetween(date.minusDays(10), date);
-            Map<String, DailyPricesJSON> recentJsonPricesById = recentJsonPrices.stream().collect(Collectors.toMap(DailyPricesJSON::getCompositeId, p -> p));
+        Map<String, DailyPricesJSON> recentJsonPricesById = recentJsonPrices.stream().collect(Collectors.toMap(DailyPricesJSON::getCompositeId, p -> p));
 
-            for (DailyPricesJSON dailyPriceJson : dailyPricesJSON.getQuoteResponse().getResult()) {
-                String ticker = dailyPriceJson.getSymbol();
-                LocalDate tradingDate = dailyPriceJson.getDate();
-                if (tradingDate == null) {
-                    log.warn("trading date missing from json file for ticker {}", ticker);
-                    continue;
-                }
-                String key = dailyPriceJson.getCompositeId();
-                if (recentJsonPricesById.containsKey(key)) {
-                    DailyPricesJSON found = recentJsonPricesById.get(key);
-                    if (found.differentPrices(dailyPriceJson)) { // compare OHLC, performance
-                        dailyJSONPrices.add(found.updateFrom(dailyPriceJson));
-                    } else {
-                        sameDailyPrices.add(ticker);
-                    }
-                } else {
-                    dailyJSONPrices.add(dailyPriceJson);
-                }
+        for (DailyPricesJSON dailyPriceJson : dailyPricesJSON) {
+            String ticker = dailyPriceJson.getSymbol();
+            LocalDate tradingDate = dailyPriceJson.getDate();
+            if (tradingDate == null) {
+                log.warn("trading date missing from json file for ticker {}", ticker);
+                continue;
             }
-        } catch (JsonProcessingException ex) {
-            log.error("Something went wrong processing JSON data {}", ex.getMessage());
-            throw new RuntimeException(ex);
+            compareAndAddToList(dailyPriceJson, recentJsonPricesById, dailyJSONPrices, sameDailyPrices, ticker);
         }
 
         if (!sameDailyPrices.isEmpty()) {
@@ -150,6 +128,20 @@ public class DailyPricesJSONService {
             }
         }
         return dailyJSONPrices;
+    }
+
+    private void compareAndAddToList(DailyPricesJSON dailyPriceJson, Map<String, DailyPricesJSON> recentJsonPricesById, List<DailyPricesJSON> dailyJSONPrices, List<String> sameDailyPrices, String ticker) {
+        String key = dailyPriceJson.getCompositeId();
+        if (recentJsonPricesById.containsKey(key)) {
+            DailyPricesJSON found = recentJsonPricesById.get(key);
+            if (found.differentPrices(dailyPriceJson)) { // compare OHLC, performance
+                dailyJSONPrices.add(found.updateFrom(dailyPriceJson));
+            } else {
+                sameDailyPrices.add(ticker);
+            }
+        } else {
+            dailyJSONPrices.add(dailyPriceJson);
+        }
     }
 
     public void saveDailyPricesJSONFrom(String fileName) {
