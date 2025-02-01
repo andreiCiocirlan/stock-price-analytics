@@ -6,9 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.HighLowPricesCache;
 import stock.price.analytics.cache.StocksCache;
-import stock.price.analytics.model.prices.highlow.HighLow4w;
-import stock.price.analytics.model.prices.highlow.HighLow52Week;
-import stock.price.analytics.model.prices.highlow.HighestLowestPrices;
+import stock.price.analytics.model.prices.enums.HighLowPeriod;
+import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.stocks.StockRepository;
@@ -103,20 +102,16 @@ public class StockService {
 
     private void updateStocksFromHighLowCaches(Set<Stock> stocksUpdated) {
         Map<String, Stock> stocksMap = stocksCache.getStocksMap();
-        for (HighLow4w hl4 : highLowPricesCache.highLow4wCache()) {
-            Stock stock = stocksMap.get(hl4.getTicker());
-            stock.updateFrom(hl4);
-            stocksUpdated.add(stock);
-        }
-        for (HighLow52Week hl52 : highLowPricesCache.highLow52wCache()) {
-            Stock stock = stocksMap.get(hl52.getTicker());
-            stock.updateFrom(hl52);
-            stocksUpdated.add(stock);
-        }
-        for (HighestLowestPrices hl : highLowPricesCache.highestLowestCache()) {
-            Stock stock = stocksMap.get(hl.getTicker());
-            stock.updateFrom(hl);
-            stocksUpdated.add(stock);
+
+        for (HighLowPeriod period : HighLowPeriod.values()) {
+            List<? extends HighLowForPeriod> cache = highLowPricesCache.cacheForHighLowPeriod(period);
+            for (HighLowForPeriod hl : cache) {
+                Stock stock = stocksMap.get(hl.getTicker());
+                if (stock != null) { // Check if stock exists
+                    stock.updateFrom(hl);
+                    stocksUpdated.add(stock);
+                }
+            }
         }
     }
 
