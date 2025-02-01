@@ -7,8 +7,6 @@ import stock.price.analytics.model.stocks.Stock;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Getter
 @Component
@@ -22,13 +20,6 @@ public class StocksCache {
 
     public List<String> tickers() {
         return stocksMap.keySet().stream().toList();
-    }
-
-    public List<Stock> stocksFor(List<String> tickers) {
-        return tickers.stream()
-                .map(stocksMap::get)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
     }
 
 }
