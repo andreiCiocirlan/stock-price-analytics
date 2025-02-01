@@ -27,6 +27,7 @@ import java.util.stream.Stream;
 
 import static java.nio.file.Files.walk;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
+import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
 import static stock.price.analytics.util.PricesUtil.*;
 
 @Slf4j
@@ -164,7 +165,8 @@ public class StockHistoricalPricesService {
 
     @Transactional
     public void savePricesForTimeframe(StockTimeframe stockTimeframe) {
-        partitionDataAndSave(pricesForTimeframe(stockTimeframe), pricesRepository);
+        List<? extends AbstractPrice> prices = pricesForTimeframe(stockTimeframe);
+        partitionDataAndSaveWithLogTime(prices, pricesRepository, "saved " + prices.size() + " " + stockTimeframe + " prices");
     }
 
 }
