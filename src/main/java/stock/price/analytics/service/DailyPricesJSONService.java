@@ -32,6 +32,22 @@ public class DailyPricesJSONService {
     private final DailyPricesJSONCacheService dailyPricesJSONCacheService;
     private final DailyPricesJSONRepository dailyPricesJSONRepository;
 
+    public List<DailyPricesJSON> dailyPricesJSONFrom(String jsonData) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            SimpleModule module = new SimpleModule();
+            module.addDeserializer(LocalDate.class, new UnixTimestampToLocalDateDeserializer());
+            objectMapper.registerModule(module);
+            Response response = objectMapper.readValue(jsonData, Response.class);
+            List<DailyPricesJSON> dailyPricesJSON = response.getQuoteResponse().getResult();
+
+            return extractDailyJSONPricesAndSave(dailyPricesJSON);
+        } catch (JsonProcessingException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
     public List<DailyPricesJSON> extractDailyJSONPricesAndSave(List<DailyPricesJSON> dailyPricesJSON) {
         List<DailyPricesJSON> recentJsonPrices = dailyPricesJSONCacheService.dailyPricesJSONCache();
         Map<String, DailyPricesJSON> latestJsonPricesById = recentJsonPrices.stream().collect(Collectors.toMap(DailyPricesJSON::getCompositeId, p -> p));

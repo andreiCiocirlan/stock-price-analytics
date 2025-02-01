@@ -1,21 +1,14 @@
 package stock.price.analytics.client.yahoo;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.model.prices.json.DailyPricesJSON;
-import stock.price.analytics.model.prices.json.Response;
-import stock.price.analytics.model.prices.json.UnixTimestampToLocalDateDeserializer;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 import stock.price.analytics.service.DailyPricesJSONService;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,22 +33,7 @@ public class YahooFinanceClient {
     }
 
     public List<DailyPriceOHLC> extractDailyPricesFromJSON(String jsonData, boolean preMarketPrices) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<DailyPricesJSON> dailyPricesJSONList = new ArrayList<>();
-        try {
-            objectMapper.registerModule(new JavaTimeModule());
-            SimpleModule module = new SimpleModule();
-            module.addDeserializer(LocalDate.class, new UnixTimestampToLocalDateDeserializer());
-            objectMapper.registerModule(module);
-            Response response = objectMapper.readValue(jsonData, Response.class);
-            List<DailyPricesJSON> dailyPricesJSON = response.getQuoteResponse().getResult();
-
-            dailyPricesJSONList.addAll(dailyPricesJSONService.extractDailyJSONPricesAndSave(dailyPricesJSON));
-        } catch (JsonProcessingException ex) {
-            throw new RuntimeException(ex);
-        }
-
-        return dailyPricesFrom(dailyPricesJSONList, preMarketPrices);
+        return dailyPricesFrom(dailyPricesJSONService.dailyPricesJSONFrom(jsonData), preMarketPrices);
     }
 
     public List<DailyPriceOHLC> dailyPricesFrom(List<DailyPricesJSON> dailyPricesJSON, boolean preMarketPrices) {
