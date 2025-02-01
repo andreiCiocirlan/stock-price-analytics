@@ -78,6 +78,14 @@ public class HighLowPricesCache {
         return updatedHighLowPrices;
     }
 
+    public List<? extends HighLowForPeriod> cacheForHighLowPeriod(HighLowPeriod highLowPeriod) {
+        return switch (highLowPeriod) {
+            case HIGH_LOW_4W -> highLow4wCache();
+            case HIGH_LOW_52W -> highLow52wCache();
+            case HIGH_LOW_ALL_TIME -> highestLowestCache();
+        };
+    }
+
     public List<? extends HighLowForPeriod> cacheForMilestone(PriceMilestone priceMilestone) {
         return switch (priceMilestone) {
             case NEW_4W_HIGH, NEW_4W_LOW, HIGH_4W_95, LOW_4W_95 -> highLow4wCache();
