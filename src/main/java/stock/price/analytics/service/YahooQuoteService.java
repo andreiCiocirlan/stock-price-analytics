@@ -90,7 +90,7 @@ public class YahooQuoteService {
             fileCounter++;
         }
 
-        if (!preMarketOnly || dailyImportedPrices.isEmpty()) { // only save if intraday prices, for pre-market only display
+        if (!preMarketOnly) { // only save if intraday prices, for pre-market only display
             partitionDataAndSaveWithLogTime(dailyImportedPrices, dailyPricesRepository, "saved " + dailyImportedPrices.size() + " daily prices");
         }
 
