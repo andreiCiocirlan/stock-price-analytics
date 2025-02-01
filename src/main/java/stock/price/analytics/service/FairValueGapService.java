@@ -9,7 +9,6 @@ import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.repository.fvg.FVGRepository;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -37,12 +36,10 @@ public class FairValueGapService {
     public void findNewFVGsAndSaveFor(StockTimeframe timeframe) {
         if (timeframe == null) { // find new FVGs and save for all timeframes
             for (StockTimeframe stockTimeframe : StockTimeframe.values()) {
-                List<FairValueGap> newFVGs = findNewFVGsFor(stockTimeframe);
-                partitionDataAndSaveWithLogTime(newFVGs, fvgRepository, "saved new FVGs for " + stockTimeframe);
+                partitionDataAndSaveWithLogTime(findNewFVGsFor(stockTimeframe), fvgRepository, "saved new FVGs for " + stockTimeframe);
             }
         } else {
-            List<FairValueGap> newFVGs = findNewFVGsFor(timeframe);
-            partitionDataAndSaveWithLogTime(newFVGs, fvgRepository, "saved new FVGs for " + timeframe);
+            partitionDataAndSaveWithLogTime(findNewFVGsFor(timeframe), fvgRepository, "saved new FVGs for " + timeframe);
         }
     }
 
@@ -65,12 +62,10 @@ public class FairValueGapService {
     public void updateClosedFVGsFor(StockTimeframe timeframe) {
         if (timeframe == null) { // update closed for all timeframes
             for (StockTimeframe stockTimeframe : StockTimeframe.values()) {
-                List<FairValueGap> closedFVGs = findClosedFVGsFor(stockTimeframe);
-                partitionDataAndSaveWithLogTime(closedFVGs, fvgRepository, "updated closed FVGs for " + stockTimeframe);
+                partitionDataAndSaveWithLogTime(findClosedFVGsFor(stockTimeframe), fvgRepository, "updated closed FVGs for " + stockTimeframe);
             }
         } else {
-            List<FairValueGap> closedFVGs = findClosedFVGsFor(timeframe);
-            partitionDataAndSaveWithLogTime(closedFVGs, fvgRepository, "updated closed FVGs for " + timeframe);
+            partitionDataAndSaveWithLogTime(findClosedFVGsFor(timeframe), fvgRepository, "updated closed FVGs for " + timeframe);
         }
     }
 
