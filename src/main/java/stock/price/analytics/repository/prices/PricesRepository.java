@@ -12,18 +12,18 @@ import java.util.List;
 
 
 @Repository
-public interface PricesRepository extends JpaRepository<AbstractPriceOHLC, Long> {
+public interface PricesRepository extends JpaRepository<AbstractPrice, Long> {
 
-    List<DailyPriceOHLC> findByTickerAndDateLessThan(String ticker, LocalDate date);
+    List<DailyPrice> findByTickerAndDateLessThan(String ticker, LocalDate date);
 
-    List<DailyPriceOHLC> findByTickerAndDate(String ticker, LocalDate date);
+    List<DailyPrice> findByTickerAndDate(String ticker, LocalDate date);
 
     @Query(value = """
                 SELECT *
                 FROM monthly_prices
                 ORDER BY start_date desc
             """, nativeQuery = true)
-    List<MonthlyPriceOHLC> findAllMonthlyPrices();
+    List<MonthlyPrice> findAllMonthlyPrices();
 
     @Query(value = """
                 SELECT *
@@ -32,13 +32,13 @@ public interface PricesRepository extends JpaRepository<AbstractPriceOHLC, Long>
                 AND ticker in (:tickers)
                 ORDER BY ticker, start_date DESC
             """, nativeQuery = true)
-    List<WeeklyPriceOHLC> findPreviousThreeWeeklyPricesForTickers(@Param("tickers") List<String> tickers);
+    List<WeeklyPrice> findPreviousThreeWeeklyPricesForTickers(@Param("tickers") List<String> tickers);
 
-    @Query("SELECT w FROM WeeklyPriceOHLC w WHERE w.ticker = :ticker AND w.startDate < :date")
-    List<WeeklyPriceOHLC> findWeeklyByTickerAndStartDateBefore(String ticker, LocalDate date);
+    @Query("SELECT w FROM WeeklyPrice w WHERE w.ticker = :ticker AND w.startDate < :date")
+    List<WeeklyPrice> findWeeklyByTickerAndStartDateBefore(String ticker, LocalDate date);
 
-    @Query("SELECT w FROM WeeklyPriceOHLC w WHERE w.ticker = :ticker AND w.startDate = :date")
-    List<WeeklyPriceOHLC> findWeeklyByTickerAndStartDate(String ticker, LocalDate date);
+    @Query("SELECT w FROM WeeklyPrice w WHERE w.ticker = :ticker AND w.startDate = :date")
+    List<WeeklyPrice> findWeeklyByTickerAndStartDate(String ticker, LocalDate date);
 
     @Query(value = """
                 SELECT *
@@ -47,13 +47,13 @@ public interface PricesRepository extends JpaRepository<AbstractPriceOHLC, Long>
                 AND ticker in (:tickers)
                 ORDER BY ticker, start_date DESC
             """, nativeQuery = true)
-    List<MonthlyPriceOHLC> findPreviousThreeMonthlyPricesForTickers(@Param("tickers") List<String> tickers);
+    List<MonthlyPrice> findPreviousThreeMonthlyPricesForTickers(@Param("tickers") List<String> tickers);
 
-    @Query("SELECT m FROM MonthlyPriceOHLC m WHERE m.ticker = :ticker AND m.startDate < :date")
-    List<MonthlyPriceOHLC> findMonthlyByTickerAndStartDateBefore(String ticker, LocalDate date);
+    @Query("SELECT m FROM MonthlyPrice m WHERE m.ticker = :ticker AND m.startDate < :date")
+    List<MonthlyPrice> findMonthlyByTickerAndStartDateBefore(String ticker, LocalDate date);
 
-    @Query("SELECT m FROM MonthlyPriceOHLC m WHERE m.ticker = :ticker AND m.startDate = :date")
-    List<MonthlyPriceOHLC> findMonthlyByTickerAndStartDate(String ticker, LocalDate date);
+    @Query("SELECT m FROM MonthlyPrice m WHERE m.ticker = :ticker AND m.startDate = :date")
+    List<MonthlyPrice> findMonthlyByTickerAndStartDate(String ticker, LocalDate date);
 
     @Modifying
     @Query(value = """
@@ -85,13 +85,13 @@ public interface PricesRepository extends JpaRepository<AbstractPriceOHLC, Long>
                 AND ticker in (:tickers)
                 ORDER BY ticker, start_date DESC
             """, nativeQuery = true)
-    List<QuarterlyPriceOHLC> findPreviousThreeQuarterlyPricesForTickers(List<String> tickers);
+    List<QuarterlyPrice> findPreviousThreeQuarterlyPricesForTickers(List<String> tickers);
 
-    @Query("SELECT q FROM QuarterlyPriceOHLC q WHERE q.ticker = :ticker AND q.startDate < :date")
-    List<QuarterlyPriceOHLC> findQuarterlyByTickerAndStartDateBefore(String ticker, LocalDate date);
+    @Query("SELECT q FROM QuarterlyPrice q WHERE q.ticker = :ticker AND q.startDate < :date")
+    List<QuarterlyPrice> findQuarterlyByTickerAndStartDateBefore(String ticker, LocalDate date);
 
-    @Query("SELECT q FROM QuarterlyPriceOHLC q WHERE q.ticker = :ticker AND q.startDate = :date")
-    List<QuarterlyPriceOHLC> findQuarterlyByTickerAndStartDate(String ticker, LocalDate date);
+    @Query("SELECT q FROM QuarterlyPrice q WHERE q.ticker = :ticker AND q.startDate = :date")
+    List<QuarterlyPrice> findQuarterlyByTickerAndStartDate(String ticker, LocalDate date);
 
     @Query(value = """
                 SELECT *
@@ -100,11 +100,11 @@ public interface PricesRepository extends JpaRepository<AbstractPriceOHLC, Long>
                 AND ticker in (:tickers)
                 ORDER BY ticker, start_date DESC
             """, nativeQuery = true)
-    List<YearlyPriceOHLC> findPreviousThreeYearlyPricesForTickers(@Param("tickers") List<String> tickers);
+    List<YearlyPrice> findPreviousThreeYearlyPricesForTickers(@Param("tickers") List<String> tickers);
 
-    @Query("SELECT y FROM YearlyPriceOHLC y WHERE y.ticker = :ticker AND y.startDate < :date")
-    List<YearlyPriceOHLC> findYearlyByTickerAndStartDateBefore(String ticker, LocalDate date);
+    @Query("SELECT y FROM YearlyPrice y WHERE y.ticker = :ticker AND y.startDate < :date")
+    List<YearlyPrice> findYearlyByTickerAndStartDateBefore(String ticker, LocalDate date);
 
-    @Query("SELECT y FROM YearlyPriceOHLC y WHERE y.ticker = :ticker AND y.startDate = :date")
-    List<YearlyPriceOHLC> findYearlyByTickerAndStartDate(String ticker, LocalDate date);
+    @Query("SELECT y FROM YearlyPrice y WHERE y.ticker = :ticker AND y.startDate = :date")
+    List<YearlyPrice> findYearlyByTickerAndStartDate(String ticker, LocalDate date);
 }

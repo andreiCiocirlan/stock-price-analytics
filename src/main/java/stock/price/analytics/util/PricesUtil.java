@@ -30,23 +30,23 @@ public class PricesUtil {
     public static final AtomicInteger OPEN_IS_ZERO_ERROR = new AtomicInteger(0);
     public static final AtomicInteger HIGH_LOW_ERROR = new AtomicInteger(0);
 
-    public static List<AbstractPriceOHLC> pricesOHLCForFileAndTimeframe(Path srcFile, StockTimeframe stockTimeframe) {
-        List<DailyPriceOHLC> dailyPrices = dailyPricesFromFile(srcFile);
+    public static List<AbstractPrice> pricesForFileAndTimeframe(Path srcFile, StockTimeframe stockTimeframe) {
+        List<DailyPrice> dailyPrices = dailyPricesFromFile(srcFile);
 
         if (StockTimeframe.DAILY == stockTimeframe)
             return new ArrayList<>(dailyPrices);
 
-        return getPriceOHLCsForTimeframe(dailyPrices, stockTimeframe);
+        return getPricesForTimeframe(dailyPrices, stockTimeframe);
     }
 
-    public static List<AbstractPriceOHLC> getPriceOHLCsForTimeframe(List<DailyPriceOHLC> dailyPrices, StockTimeframe stockTimeframe) {
+    public static List<AbstractPrice> getPricesForTimeframe(List<DailyPrice> dailyPrices, StockTimeframe stockTimeframe) {
         return new ArrayList<>(
                 dailyPrices.stream()
                         .collect(Collectors.groupingBy(
                                 shp -> groupingFunctionFor(stockTimeframe).apply(shp.getDate()),
                                 Collectors.collectingAndThen(
                                         Collectors.toList(),
-                                        pricesOHLC -> extractOHLCForTimeframe(pricesOHLC, stockTimeframe)
+                                        prices -> extractPriceForTimeframe(prices, stockTimeframe)
                                 )
                         )).values());
     }
@@ -61,35 +61,35 @@ public class PricesUtil {
         };
     }
 
-    private static AbstractPriceOHLC extractOHLCForTimeframe(List<DailyPriceOHLC> pricesGroupedByTimeFrame, StockTimeframe stockTimeframe) {
-        DailyPriceOHLC firstInChronologicalOrder = pricesGroupedByTimeFrame.getFirst(); // already sorted
-        DailyPriceOHLC lastInChronologicalOrder = pricesGroupedByTimeFrame.getLast();
+    private static AbstractPrice extractPriceForTimeframe(List<DailyPrice> pricesGroupedByTimeFrame, StockTimeframe stockTimeframe) {
+        DailyPrice firstInChronologicalOrder = pricesGroupedByTimeFrame.getFirst(); // already sorted
+        DailyPrice lastInChronologicalOrder = pricesGroupedByTimeFrame.getLast();
         String ticker = firstInChronologicalOrder.getTicker();
         LocalDate startDate = firstInChronologicalOrder.getDate();
         LocalDate endDate = lastInChronologicalOrder.getDate();
         double open = firstInChronologicalOrder.getOpen();
         double close = lastInChronologicalOrder.getClose();
         double high = pricesGroupedByTimeFrame.stream()
-                .mapToDouble(DailyPriceOHLC::getHigh)
+                .mapToDouble(DailyPrice::getHigh)
                 .max()
                 .orElseThrow();
         double low = pricesGroupedByTimeFrame.stream()
-                .mapToDouble(DailyPriceOHLC::getLow)
+                .mapToDouble(DailyPrice::getLow)
                 .min()
                 .orElseThrow();
 
         CandleOHLC candleOHLC = new CandleOHLC(open, high, low, close);
         return switch (stockTimeframe) {
-            case WEEKLY -> new WeeklyPriceOHLC(ticker, startDate, endDate, candleOHLC);
-            case MONTHLY -> new MonthlyPriceOHLC(ticker, startDate, endDate, candleOHLC);
-            case QUARTERLY -> new QuarterlyPriceOHLC(ticker, startDate, endDate, candleOHLC);
-            case YEARLY -> new YearlyPriceOHLC(ticker, startDate, endDate, candleOHLC);
+            case WEEKLY -> new WeeklyPrice(ticker, startDate, endDate, candleOHLC);
+            case MONTHLY -> new MonthlyPrice(ticker, startDate, endDate, candleOHLC);
+            case QUARTERLY -> new QuarterlyPrice(ticker, startDate, endDate, candleOHLC);
+            case YEARLY -> new YearlyPrice(ticker, startDate, endDate, candleOHLC);
             case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
         };
     }
 
-    public static List<DailyPriceOHLC> dailyPricesFromFile(Path srcFile) {
-        List<DailyPriceOHLC> dailyPrices = new ArrayList<>();
+    public static List<DailyPrice> dailyPricesFromFile(Path srcFile) {
+        List<DailyPrice> dailyPrices = new ArrayList<>();
         final String ticker = tickerFrom(srcFile);
         try {
             readAllLines(srcFile).stream().skip(1).parallel().forEachOrdered(line -> addDailyPrices(line, ticker, dailyPrices));
@@ -99,8 +99,8 @@ public class PricesUtil {
         return dailyPrices;
     }
 
-    public static List<DailyPriceOHLC> dailyPricesFromFileWithDate(Path srcFile, LocalDate tradingDate) {
-        List<DailyPriceOHLC> dailyPrices = new ArrayList<>();
+    public static List<DailyPrice> dailyPricesFromFileWithDate(Path srcFile, LocalDate tradingDate) {
+        List<DailyPrice> dailyPrices = new ArrayList<>();
         final String ticker = tickerFrom(srcFile);
 
         List<String> lines;
@@ -117,8 +117,8 @@ public class PricesUtil {
         return dailyPrices;
     }
 
-    public static List<DailyPriceOHLC> dailyPricesFromFileWithCount(Path srcFile, int lastDays) {
-        List<DailyPriceOHLC> dailyPrices = new ArrayList<>();
+    public static List<DailyPrice> dailyPricesFromFileWithCount(Path srcFile, int lastDays) {
+        List<DailyPrice> dailyPrices = new ArrayList<>();
         final String ticker = tickerFrom(srcFile);
 
         List<String> lines;
@@ -132,13 +132,13 @@ public class PricesUtil {
         return dailyPrices;
     }
 
-    private static void addDailyPrices(String line, String ticker, List<DailyPriceOHLC> dailyPrices) {
+    private static void addDailyPrices(String line, String ticker, List<DailyPrice> dailyPrices) {
         String[] split = line.split(",");
         if (split.length != 6) {
             throw new RuntimeException("Not all fields found!");
         }
         try {
-            dailyPrices.add(new DailyPriceOHLC(ticker, parse(split[1], DateTimeFormatter.ISO_LOCAL_DATE),
+            dailyPrices.add(new DailyPrice(ticker, parse(split[1], DateTimeFormatter.ISO_LOCAL_DATE),
                     new CandleOHLC(parseDouble(split[2]), parseDouble(split[3]), parseDouble(split[4]), parseDouble(split[5]))));
         } catch (NumberFormatException e) {
             log.error("HIGH_LOW_ERROR ticker {} date {} error: {}", ticker, parse(split[1], DateTimeFormatter.ISO_LOCAL_DATE), e.getMessage());

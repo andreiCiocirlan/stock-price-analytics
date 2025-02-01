@@ -10,7 +10,7 @@ import org.springframework.web.client.RestTemplate;
 import stock.price.analytics.client.finnhub.dto.IntradayPriceDTO;
 import stock.price.analytics.model.annual.FinancialData;
 import stock.price.analytics.model.prices.ohlc.CandleOHLC;
-import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
+import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.util.FileUtils;
 
 import java.io.IOException;
@@ -34,8 +34,8 @@ public class FinnhubClient {
         this.restTemplate = restTemplate;
     }
 
-    public Optional<DailyPriceOHLC> intraDayPricesFor(String ticker) {
-        DailyPriceOHLC response = null;
+    public Optional<DailyPrice> intraDayPricesFor(String ticker) {
+        DailyPrice response = null;
         try {
             ResponseEntity<IntradayPriceDTO> finnHubResponse = restTemplate.getForEntity(FINNHUB_BASE_URL + "/quote?symbol={ticker}&token={apiKey}",
                     IntradayPriceDTO.class, ticker, apiKey);
@@ -43,7 +43,7 @@ public class FinnhubClient {
             IntradayPriceDTO intraDayPrice = finnHubResponse.getBody();
             LocalDate tradingDate = tradingDateNow();
             if (intraDayPrice != null) {
-                response = new DailyPriceOHLC(ticker, tradingDate, Math.round(intraDayPrice.getPercentChange() * 100.0) / 100.0,
+                response = new DailyPrice(ticker, tradingDate, Math.round(intraDayPrice.getPercentChange() * 100.0) / 100.0,
                         getCandleOHLC(intraDayPrice));
             } else {
                 log.error("intraDayPrice null for ticker {}", ticker);
@@ -84,13 +84,13 @@ public class FinnhubClient {
         }
     }
 
-    public List<DailyPriceOHLC> intraDayPricesXTB() {
+    public List<DailyPrice> intraDayPricesXTB() {
         try {
             List<String> tickers = FileUtils.readTickersXTB();
-            List<DailyPriceOHLC> dailyPrices = new ArrayList<>();
+            List<DailyPrice> dailyPrices = new ArrayList<>();
 
             for (String ticker : tickers) {
-                Optional<DailyPriceOHLC> intraDayPrice = intraDayPricesFor(ticker);
+                Optional<DailyPrice> intraDayPrice = intraDayPricesFor(ticker);
                 intraDayPrice.ifPresent(dailyPrice -> addToListAndLog(dailyPrice, dailyPrices));
                 Thread.sleep(1005); // rate limit 60 req / min
             }
@@ -100,7 +100,7 @@ public class FinnhubClient {
         }
     }
 
-    private void addToListAndLog(DailyPriceOHLC dailyPrice, List<DailyPriceOHLC> dailyPrices) {
+    private void addToListAndLog(DailyPrice dailyPrice, List<DailyPrice> dailyPrices) {
         log.info("{}", dailyPrice);
         dailyPrices.add(dailyPrice);
     }

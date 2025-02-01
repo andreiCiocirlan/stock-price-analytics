@@ -13,7 +13,7 @@ import stock.price.analytics.model.prices.enums.StockPerformanceInterval;
 import stock.price.analytics.model.prices.highlow.HighLow4w;
 import stock.price.analytics.model.prices.highlow.HighLow52Week;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
-import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
+import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.repository.prices.HighLowForPeriodRepository;
 import stock.price.analytics.util.Constants;
 
@@ -71,7 +71,7 @@ public class HighLowForPeriodService {
         partitionDataAndSave(highLowPrices, highLowForPeriodRepository);
     }
 
-    public void saveCurrentWeekHighLowPricesFrom(List<DailyPriceOHLC> dailyPricesImported, List<String> tickers) {
+    public void saveCurrentWeekHighLowPricesFrom(List<DailyPrice> dailyPricesImported, List<String> tickers) {
         for (HighLowPeriod highLowPeriod : values()) {
             List<? extends HighLowForPeriod> hlPricesUpdated = highLowPricesCache.updateHighLowPricesCacheFrom(dailyPricesImported, tickers, highLowPeriod);
             if (!hlPricesUpdated.isEmpty()) {

@@ -74,10 +74,10 @@ public class StockService {
                 "updated stocks high low 4w, 52w, all-time");
     }
 
-    private void updateStocksFromOHLCPrices(List<DailyPriceOHLC> dailyImportedPrices, List<AbstractPriceOHLC> htfPrices, Set<Stock> stocksUpdated) {
+    private void updateStocksFromOHLCPrices(List<DailyPrice> dailyImportedPrices, List<AbstractPrice> htfPrices, Set<Stock> stocksUpdated) {
         Map<String, Stock> stocksMap = stocksCache.getStocksMap();
         // update from daily prices
-        for (DailyPriceOHLC dailyImportedPrice : dailyImportedPrices) {
+        for (DailyPrice dailyImportedPrice : dailyImportedPrices) {
             String ticker = dailyImportedPrice.getTicker();
             Stock stock = stocksMap.getOrDefault(ticker, new Stock(ticker, dailyImportedPrice.getDate(), true));
             if (!stock.getLastUpdated().isAfter(dailyImportedPrice.getDate())) { // don't update for imports from the past
@@ -87,15 +87,15 @@ public class StockService {
         }
 
         // update from higher timeframe prices
-        for (AbstractPriceOHLC wmyPrice : htfPrices) {
+        for (AbstractPrice wmyPrice : htfPrices) {
             String ticker = wmyPrice.getTicker();
             Stock stock = stocksMap.getOrDefault(ticker, new Stock(ticker, wmyPrice.getStartDate(), true));
             switch (wmyPrice.getTimeframe()) {
                 case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
-                case WEEKLY -> stock.updateFromWeeklyPrice((WeeklyPriceOHLC) wmyPrice);
-                case MONTHLY -> stock.updateFromMonthlyPrice((MonthlyPriceOHLC) wmyPrice);
-                case QUARTERLY -> stock.updateFromQuarterlyPrice((QuarterlyPriceOHLC) wmyPrice);
-                case YEARLY -> stock.updateFromYearlyPrice((YearlyPriceOHLC) wmyPrice);
+                case WEEKLY -> stock.updateFromWeeklyPrice((WeeklyPrice) wmyPrice);
+                case MONTHLY -> stock.updateFromMonthlyPrice((MonthlyPrice) wmyPrice);
+                case QUARTERLY -> stock.updateFromQuarterlyPrice((QuarterlyPrice) wmyPrice);
+                case YEARLY -> stock.updateFromYearlyPrice((YearlyPrice) wmyPrice);
             }
             stocksUpdated.add(stock);
         }
@@ -120,7 +120,7 @@ public class StockService {
         }
     }
 
-    public void updateStocksHighLowsAndOHLCFrom(List<DailyPriceOHLC> dailyImportedPrices, List<AbstractPriceOHLC> htfPrices) {
+    public void updateStocksHighLowsAndOHLCFrom(List<DailyPrice> dailyImportedPrices, List<AbstractPrice> htfPrices) {
         Set<Stock> stocksUpdated = new HashSet<>();
         updateStocksFromOHLCPrices(dailyImportedPrices, htfPrices, stocksUpdated);
         updateStocksFromHighLowCaches(stocksUpdated);

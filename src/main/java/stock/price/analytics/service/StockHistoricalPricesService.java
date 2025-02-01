@@ -41,35 +41,35 @@ public class StockHistoricalPricesService {
     private final PricesRepository pricesRepository;
     private final DailyPricesRepository dailyPricesRepository;
 
-    private static List<? extends AbstractPriceOHLC> pricesOHLCForTimeframe(StockTimeframe stockTimeframe) {
-        List<AbstractPriceOHLC> prices = new ArrayList<>();
+    private static List<? extends AbstractPrice> pricesForTimeframe(StockTimeframe stockTimeframe) {
+        List<AbstractPrice> prices = new ArrayList<>();
         try (Stream<Path> walk = walk(Paths.get(Constants.STOCKS_LOCATION))) {
             walk.filter(Files::isRegularFile)
                     .parallel().forEachOrdered(srcFile -> { // must be forEachOrdered
-                        prices.addAll(pricesOHLCForFileAndTimeframe(srcFile, stockTimeframe));
+                        prices.addAll(pricesForFileAndTimeframe(srcFile, stockTimeframe));
                     });
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
         return switch (stockTimeframe) {
-            case DAILY -> prices.stream().map(DailyPriceOHLC.class::cast).toList();
-            case WEEKLY -> prices.stream().map(WeeklyPriceOHLC.class::cast).toList();
-            case MONTHLY -> prices.stream().map(MonthlyPriceOHLC.class::cast).toList();
-            case QUARTERLY -> prices.stream().map(QuarterlyPriceOHLC.class::cast).toList();
-            case YEARLY -> prices.stream().map(YearlyPriceOHLC.class::cast).toList();
+            case DAILY -> prices.stream().map(DailyPrice.class::cast).toList();
+            case WEEKLY -> prices.stream().map(WeeklyPrice.class::cast).toList();
+            case MONTHLY -> prices.stream().map(MonthlyPrice.class::cast).toList();
+            case QUARTERLY -> prices.stream().map(QuarterlyPrice.class::cast).toList();
+            case YEARLY -> prices.stream().map(YearlyPrice.class::cast).toList();
         };
     }
 
     @Transactional
     public void savePricesForTradingDate(List<String> tickers, LocalDate tradingDate, LocalDate higherTimeFrameDate) {
-        List<DailyPriceOHLC> prevDaysHistPrices = new ArrayList<>();
-        Map<String, List<DailyPriceOHLC>> tickerAndPrevDaysPricesImported = new HashMap<>();
+        List<DailyPrice> prevDaysHistPrices = new ArrayList<>();
+        Map<String, List<DailyPrice>> tickerAndPrevDaysPricesImported = new HashMap<>();
         try (Stream<Path> walk = walk(Paths.get(Constants.STOCKS_LOCATION))) {
             walk.filter(Files::isRegularFile)
                     .filter(srcFile -> tickers.contains(tickerFrom(srcFile)))
                     .parallel().forEachOrdered(srcFile -> { // must be forEachOrdered
-                        List<DailyPriceOHLC> dailyPrices = dailyPricesFromFileWithDate(srcFile, tradingDate);
+                        List<DailyPrice> dailyPrices = dailyPricesFromFileWithDate(srcFile, tradingDate);
                         tickerAndPrevDaysPricesImported.put(tickerFrom(srcFile), dailyPrices);
                     });
         } catch (IOException e) {
@@ -77,8 +77,8 @@ public class StockHistoricalPricesService {
         }
 
         tickerAndPrevDaysPricesImported.forEach((_, dailyPricesPrevDays) -> prevDaysHistPrices.addAll(dailyPriceWithPerformance(dailyPricesPrevDays)));
-        List<DailyPriceOHLC> dailyPricesDB = dailyPricesRepository.findByDate(tradingDate);
-        Map<String, DailyPriceOHLC> importedPricesMap = prevDaysHistPrices.stream().filter(dp -> dp.getDate().isEqual(tradingDate)).collect(Collectors.toMap(DailyPriceOHLC::getTicker, p -> p));
+        List<DailyPrice> dailyPricesDB = dailyPricesRepository.findByDate(tradingDate);
+        Map<String, DailyPrice> importedPricesMap = prevDaysHistPrices.stream().filter(dp -> dp.getDate().isEqual(tradingDate)).collect(Collectors.toMap(DailyPrice::getTicker, p -> p));
         dailyPricesDB.forEach(dp -> BeanUtils.copyProperties(importedPricesMap.get(dp.getTicker()), dp, "id", "date"));
         partitionDataAndSave(dailyPricesDB, pricesRepository);
 
@@ -89,15 +89,15 @@ public class StockHistoricalPricesService {
 
     @Transactional
     public void savePricesAfterTradingDate(String tickers, int prevDaysCount, LocalDate tradingDate) {
-        List<DailyPriceOHLC> prevDaysHistPrices = new ArrayList<>();
-        Map<String, List<DailyPriceOHLC>> tickerAndPrevDaysPricesImported = new HashMap<>();
+        List<DailyPrice> prevDaysHistPrices = new ArrayList<>();
+        Map<String, List<DailyPrice>> tickerAndPrevDaysPricesImported = new HashMap<>();
         try (Stream<Path> walk = walk(Paths.get(Constants.STOCKS_LOCATION))) {
             walk.filter(Files::isRegularFile)
                     .parallel().forEachOrdered(srcFile -> { // must be forEachOrdered
                         String stockTicker = tickerFrom(srcFile);
                         if (tickers != null && Arrays.stream(tickers.split(",")).noneMatch(ticker -> ticker.equals(stockTicker)))
                             return;
-                        List<DailyPriceOHLC> dailyPrices = dailyPricesFromFileWithCount(srcFile, prevDaysCount + 1); // +1 to get previous day close
+                        List<DailyPrice> dailyPrices = dailyPricesFromFileWithCount(srcFile, prevDaysCount + 1); // +1 to get previous day close
                         tickerAndPrevDaysPricesImported.put(stockTicker, dailyPrices);
                     });
         } catch (IOException e) {
@@ -113,7 +113,7 @@ public class StockHistoricalPricesService {
         pricesService.updateAllHigherTimeframesPricesForTickers(tradingDate, tickersQueryParam);
     }
 
-    private List<DailyPriceOHLC> dailyPriceWithPerformance(List<DailyPriceOHLC> dailyPrices) {
+    private List<DailyPrice> dailyPriceWithPerformance(List<DailyPrice> dailyPrices) {
         for (int i = dailyPrices.size() - 1; i >= 1; i--) {
             double previousClose = dailyPrices.get(i - 1).getClose();
             double performance = ((dailyPrices.get(i).getClose() - previousClose) / previousClose) * 100;
@@ -142,7 +142,7 @@ public class StockHistoricalPricesService {
 
     @Transactional
     public void saveAllDailyPricesFromFiles() {
-        List<AbstractPriceOHLC> ohlcList = new ArrayList<>();
+        List<AbstractPrice> ohlcList = new ArrayList<>();
         try (Stream<Path> walk = walk(Paths.get(Constants.STOCKS_LOCATION))) {
             walk.filter(Files::isRegularFile)
                     .parallel().forEachOrdered(srcFile -> { // must be forEachOrdered
@@ -152,8 +152,8 @@ public class StockHistoricalPricesService {
             throw new RuntimeException(e);
         }
 
-        List<DailyPriceOHLC> dailyOHLCList = ohlcList.stream()
-                .map(DailyPriceOHLC.class::cast)
+        List<DailyPrice> dailyOHLCList = ohlcList.stream()
+                .map(DailyPrice.class::cast)
                 .toList();
         log.info("OPEN_IS_ZERO_ERROR {} problems", OPEN_IS_ZERO_ERROR.get());
         log.info("HIGH_LOW_ERROR {} problems", HIGH_LOW_ERROR.get());
@@ -164,8 +164,7 @@ public class StockHistoricalPricesService {
 
     @Transactional
     public void savePricesForTimeframe(StockTimeframe stockTimeframe) {
-        List<? extends AbstractPriceOHLC> pricesOHLCs = pricesOHLCForTimeframe(stockTimeframe);
-        partitionDataAndSave(pricesOHLCs, pricesRepository);
+        partitionDataAndSave(pricesForTimeframe(stockTimeframe), pricesRepository);
     }
 
 }

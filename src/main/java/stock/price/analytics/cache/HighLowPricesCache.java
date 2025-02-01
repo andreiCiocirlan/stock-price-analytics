@@ -8,7 +8,7 @@ import stock.price.analytics.model.prices.highlow.HighLow4w;
 import stock.price.analytics.model.prices.highlow.HighLow52Week;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.highlow.HighestLowestPrices;
-import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
+import stock.price.analytics.model.prices.ohlc.DailyPrice;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -56,8 +56,8 @@ public class HighLowPricesCache {
         }
     }
 
-    public List<? extends HighLowForPeriod> updateHighLowPricesCacheFrom(List<DailyPriceOHLC> dailyPricesImported, List<String> tickers, HighLowPeriod highLowPeriod) {
-        Map<String, DailyPriceOHLC> dailyPricesImportedMap = dailyPricesImported.stream().collect(Collectors.toMap(DailyPriceOHLC::getTicker, p -> p));
+    public List<? extends HighLowForPeriod> updateHighLowPricesCacheFrom(List<DailyPrice> dailyPricesImported, List<String> tickers, HighLowPeriod highLowPeriod) {
+        Map<String, DailyPrice> dailyPricesImportedMap = dailyPricesImported.stream().collect(Collectors.toMap(DailyPrice::getTicker, p -> p));
         Map<String, ? extends HighLowForPeriod> highLowPrices = switch (highLowPeriod) {
             case HIGH_LOW_4W -> highLow4wMap;
             case HIGH_LOW_52W -> highLow52wMap;

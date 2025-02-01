@@ -13,11 +13,11 @@ import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 
 @Entity
-@Table(name = "yearly_prices")
+@Table(name = "monthly_prices")
 @Getter
 @Setter
 @NoArgsConstructor
-public class YearlyPriceOHLC extends AbstractPriceOHLC {
+public class MonthlyPrice extends AbstractPrice {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "end_date")
@@ -27,21 +27,21 @@ public class YearlyPriceOHLC extends AbstractPriceOHLC {
     @Column(name = "start_date")
     private LocalDate startDate;
 
-    public YearlyPriceOHLC(String ticker, LocalDate startDate, LocalDate endDate, CandleOHLC candleOHLC) {
+    public MonthlyPrice(String ticker, LocalDate startDate, LocalDate endDate, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
-        this.startDate = startDate.with(TemporalAdjusters.firstDayOfYear());
+        this.startDate = startDate.with(TemporalAdjusters.firstDayOfMonth());
         this.endDate = endDate;
     }
 
-    public YearlyPriceOHLC(String ticker, LocalDate startDate, LocalDate endDate, double performance, CandleOHLC candleOHLC) {
+    public MonthlyPrice(String ticker, LocalDate startDate, LocalDate endDate, double performance, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
-        this.startDate = startDate.with(TemporalAdjusters.firstDayOfYear());
+        this.startDate = startDate.with(TemporalAdjusters.firstDayOfMonth());
         this.endDate = endDate;
         this.setPerformance(performance);
     }
 
-    public static YearlyPriceOHLC newFrom(DailyPriceOHLC dailyPrices, double previousClose) {
-        return new YearlyPriceOHLC(
+    public static MonthlyPrice newFrom(DailyPrice dailyPrices, double previousClose) {
+        return new MonthlyPrice(
                 dailyPrices.getTicker(),
                 dailyPrices.getDate(),
                 dailyPrices.getDate(),
@@ -51,12 +51,12 @@ public class YearlyPriceOHLC extends AbstractPriceOHLC {
 
     @Override
     public StockTimeframe getTimeframe() {
-        return StockTimeframe.YEARLY;
+        return StockTimeframe.MONTHLY;
     }
 
     @Override
     public String toString() {
-        return STR."Yearly_OHLC {  StartDate=\{startDate} EndDate=\{endDate} \{super.toString()}";
+        return STR."Monthly_OHLC { StartDate=\{startDate} EndDate=\{endDate} \{super.toString()}";
     }
 
 }

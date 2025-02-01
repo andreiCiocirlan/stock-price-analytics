@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import stock.price.analytics.model.prices.ohlc.AbstractPriceOHLC;
-import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
+import stock.price.analytics.model.prices.ohlc.AbstractPrice;
+import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.service.HighLowForPeriodService;
 import stock.price.analytics.service.PricesService;
 import stock.price.analytics.service.StockService;
@@ -38,12 +38,12 @@ public class IntraDayPricesController {
     @GetMapping("/yahoo-prices/intraday")
     public void yahooPricesImport() {
         long start = System.nanoTime();
-        List<DailyPriceOHLC> dailyImportedPrices = logTimeAndReturn(yahooQuoteService::dailyPricesImport, "imported daily prices");
+        List<DailyPrice> dailyImportedPrices = logTimeAndReturn(yahooQuoteService::dailyPricesImport, "imported daily prices");
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
-            List<AbstractPriceOHLC> htfPricesUpdated = pricesService.updatePricesForHigherTimeframes(dailyImportedPrices);
+            List<AbstractPrice> htfPricesUpdated = pricesService.updatePricesForHigherTimeframes(dailyImportedPrices);
 
             // high/low price update based on weekly perf view (refreshed before)
-            List<String> tickers = dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList();
+            List<String> tickers = dailyImportedPrices.stream().map(DailyPrice::getTicker).toList();
             logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices, tickers), "saved current week HighLow prices" );
             logTime(() -> stockService.updateStocksHighLowsAndOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks highs-lows 4w,52w,all-time and higher-timeframe OHLC prices");
         }
@@ -59,16 +59,16 @@ public class IntraDayPricesController {
 
     @Transactional
     @GetMapping("/yahoo-prices/from-file")
-    public List<DailyPriceOHLC> yahooPricesImportFromFile(@RequestParam(value = "fileName", required = false) String fileNameStr) {
+    public List<DailyPrice> yahooPricesImportFromFile(@RequestParam(value = "fileName", required = false) String fileNameStr) {
         long start = System.nanoTime();
         String fileName = Objects.requireNonNullElseGet(fileNameStr, () -> tradingDateNow().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_1");
-        List<DailyPriceOHLC> dailyImportedPrices = logTimeAndReturn(() -> yahooQuoteService.dailyPricesFromFile(fileName), "imported daily prices");
+        List<DailyPrice> dailyImportedPrices = logTimeAndReturn(() -> yahooQuoteService.dailyPricesFromFile(fileName), "imported daily prices");
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
             pricesService.savePrices(dailyImportedPrices);
-            List<AbstractPriceOHLC> htfPricesUpdated = pricesService.updatePricesForHigherTimeframes(dailyImportedPrices);
+            List<AbstractPrice> htfPricesUpdated = pricesService.updatePricesForHigherTimeframes(dailyImportedPrices);
 
             // high/low price update based on weekly perf view (refreshed before)
-            List<String> tickers = dailyImportedPrices.stream().map(DailyPriceOHLC::getTicker).toList();
+            List<String> tickers = dailyImportedPrices.stream().map(DailyPrice::getTicker).toList();
             logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices, tickers), "saved current week HighLow prices" );
             logTime(() -> stockService.updateStocksHighLowsAndOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks highs-lows 4w,52w,all-time and higher-timeframe OHLC prices");
         }

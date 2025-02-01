@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import stock.price.analytics.model.prices.PriceEntity;
 import stock.price.analytics.model.prices.ohlc.CandleOHLC;
-import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
+import stock.price.analytics.model.prices.ohlc.DailyPrice;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -334,14 +334,14 @@ public class DailyPricesJSON implements PriceEntity {
 		return getSymbol() + "_" + getDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
 	}
 
-	public DailyPriceOHLC convertToDailyPrice(boolean preMarketPrices) {
+	public DailyPrice convertToDailyPrice(boolean preMarketPrices) {
         double open = this.getRegularMarketOpen();
 		double high = this.getRegularMarketDayHigh();
 		double low = this.getRegularMarketDayLow();
 		double close = preMarketPrices ? this.getPreMarketPrice() : this.getRegularMarketPrice();
 		double percentChange = this.getRegularMarketChangePercent();
 
-		return new DailyPriceOHLC(this.getSymbol(), this.getDate(), percentChange, new CandleOHLC(open, high, low, close));
+		return new DailyPrice(this.getSymbol(), this.getDate(), percentChange, new CandleOHLC(open, high, low, close));
 	}
 
 	public DailyPricesJSON updateFrom(DailyPricesJSON dailyPricesJSON) {

@@ -18,7 +18,7 @@ import java.time.temporal.TemporalAdjusters;
 @Getter
 @Setter
 @NoArgsConstructor
-public class WeeklyPriceOHLC extends AbstractPriceOHLC {
+public class WeeklyPrice extends AbstractPrice {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "end_date")
@@ -28,21 +28,21 @@ public class WeeklyPriceOHLC extends AbstractPriceOHLC {
     @Column(name = "start_date")
     private LocalDate startDate;
 
-    public WeeklyPriceOHLC(String ticker, LocalDate startDate, LocalDate endDate, CandleOHLC candleOHLC) {
+    public WeeklyPrice(String ticker, LocalDate startDate, LocalDate endDate, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
         this.startDate = startDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         this.endDate = endDate;
     }
 
-    public WeeklyPriceOHLC(String ticker, LocalDate startDate, LocalDate endDate, double performance, CandleOHLC candleOHLC) {
+    public WeeklyPrice(String ticker, LocalDate startDate, LocalDate endDate, double performance, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
         this.startDate = startDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         this.endDate = endDate;
         this.setPerformance(performance);
     }
 
-    public static WeeklyPriceOHLC newFrom(DailyPriceOHLC dailyPrices, double previousClose) {
-        return new WeeklyPriceOHLC(
+    public static WeeklyPrice newFrom(DailyPrice dailyPrices, double previousClose) {
+        return new WeeklyPrice(
                 dailyPrices.getTicker(),
                 dailyPrices.getDate(),
                 dailyPrices.getDate(),

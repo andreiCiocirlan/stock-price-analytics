@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Setter
 @MappedSuperclass
 @NoArgsConstructor
-public abstract class AbstractPriceOHLC implements PriceEntity {
+public abstract class AbstractPrice implements PriceEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequence_prices")
@@ -40,7 +40,7 @@ public abstract class AbstractPriceOHLC implements PriceEntity {
     @Column(name = "performance")
     private double performance;
 
-    public AbstractPriceOHLC(String ticker, CandleOHLC candleOHLC) {
+    public AbstractPrice(String ticker, CandleOHLC candleOHLC) {
         this.ticker = ticker;
         this.high = candleOHLC.high();
         this.low = candleOHLC.low();
@@ -52,7 +52,7 @@ public abstract class AbstractPriceOHLC implements PriceEntity {
     public abstract LocalDate getEndDate();
     public abstract StockTimeframe getTimeframe();
 
-    public AbstractPriceOHLC convertFrom(DailyPriceOHLC dailyPrice, Double previousClose) {
+    public AbstractPrice convertFrom(DailyPrice dailyPrice, Double previousClose) {
         this.setClose(dailyPrice.getClose());
         this.setLow(Math.min(getLow(), dailyPrice.getLow()));
         this.setHigh(Math.max(getHigh(), dailyPrice.getHigh()));
@@ -61,7 +61,7 @@ public abstract class AbstractPriceOHLC implements PriceEntity {
         return this;
     }
 
-    protected static double performanceFrom(DailyPriceOHLC dailyPrice, Double previousClose) {
+    protected static double performanceFrom(DailyPrice dailyPrice, Double previousClose) {
         double currentClose = dailyPrice.getClose();
         double performance;
         if (previousClose != null) {

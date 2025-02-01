@@ -19,31 +19,31 @@ public interface TickerRenameRepository extends JpaRepository<Stock, Long> {
 
     @Modifying
     @Transactional
-    @Query("UPDATE DailyPriceOHLC d SET d.ticker = :newTicker WHERE d.ticker = :oldTicker")
+    @Query("UPDATE DailyPrice d SET d.ticker = :newTicker WHERE d.ticker = :oldTicker")
     void updateDailyPricesTicker(@Param("oldTicker") String oldTicker, 
                                  @Param("newTicker") String newTicker);
 
     @Modifying
     @Transactional
-    @Query("UPDATE WeeklyPriceOHLC w SET w.ticker = :newTicker WHERE w.ticker = :oldTicker")
+    @Query("UPDATE WeeklyPrice w SET w.ticker = :newTicker WHERE w.ticker = :oldTicker")
     void updateWeeklyPricesTicker(@Param("oldTicker") String oldTicker,
                                   @Param("newTicker") String newTicker);
 
     @Modifying
     @Transactional
-    @Query("UPDATE MonthlyPriceOHLC w SET w.ticker = :newTicker WHERE w.ticker = :oldTicker")
+    @Query("UPDATE MonthlyPrice w SET w.ticker = :newTicker WHERE w.ticker = :oldTicker")
     void updateMonthlyPricesTicker(@Param("oldTicker") String oldTicker,
                                   @Param("newTicker") String newTicker);
 
     @Modifying
     @Transactional
-    @Query("UPDATE QuarterlyPriceOHLC w SET w.ticker = :newTicker WHERE w.ticker = :oldTicker")
+    @Query("UPDATE QuarterlyPrice w SET w.ticker = :newTicker WHERE w.ticker = :oldTicker")
     void updateQuarterlyPricesTicker(@Param("oldTicker") String oldTicker,
                                   @Param("newTicker") String newTicker);
 
     @Modifying
     @Transactional
-    @Query("UPDATE YearlyPriceOHLC w SET w.ticker = :newTicker WHERE w.ticker = :oldTicker")
+    @Query("UPDATE YearlyPrice w SET w.ticker = :newTicker WHERE w.ticker = :oldTicker")
     void updateYearlyPricesTicker(@Param("oldTicker") String oldTicker,
                                   @Param("newTicker") String newTicker);
 

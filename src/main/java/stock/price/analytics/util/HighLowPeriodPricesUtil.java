@@ -5,8 +5,8 @@ import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.highlow.HighLow4w;
 import stock.price.analytics.model.prices.highlow.HighLow52Week;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
-import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
-import stock.price.analytics.model.prices.ohlc.WeeklyPriceOHLC;
+import stock.price.analytics.model.prices.ohlc.DailyPrice;
+import stock.price.analytics.model.prices.ohlc.WeeklyPrice;
 
 import java.nio.file.Path;
 import java.time.DayOfWeek;
@@ -19,8 +19,8 @@ import java.util.List;
 public class HighLowPeriodPricesUtil extends PricesUtil {
 
     public static List<HighLowForPeriod> highLowFromFileForPeriod(Path srcFile, LocalDate startDate, LocalDate endDate, StockPerformanceInterval stockPerformanceInterval) {
-        List<DailyPriceOHLC> dailyPrices = dailyPricesFromFile(srcFile);
-        List<WeeklyPriceOHLC> weeklyGroupedPrices = getPriceOHLCsForTimeframe(dailyPrices, StockTimeframe.WEEKLY).stream().map(WeeklyPriceOHLC.class::cast).toList();
+        List<DailyPrice> dailyPrices = dailyPricesFromFile(srcFile);
+        List<WeeklyPrice> weeklyGroupedPrices = getPricesForTimeframe(dailyPrices, StockTimeframe.WEEKLY).stream().map(WeeklyPrice.class::cast).toList();
         return getHighLowForPeriod(
                 weeklyGroupedPrices.stream().filter(whp -> whp.getStartDate().isAfter(startDate) && whp.getStartDate().isBefore(endDate)).toList(),
                 dailyPrices.stream().filter(shp -> shp.getDate().isAfter(startDate) && shp.getDate().isBefore(endDate)).toList(),
@@ -28,9 +28,9 @@ public class HighLowPeriodPricesUtil extends PricesUtil {
         );
     }
 
-    private static List<HighLowForPeriod> getHighLowForPeriod(List<WeeklyPriceOHLC> weeklyHistoricalPrices, List<DailyPriceOHLC> dailyPrices, StockPerformanceInterval stockPerformanceInterval) {
+    private static List<HighLowForPeriod> getHighLowForPeriod(List<WeeklyPrice> weeklyHistoricalPrices, List<DailyPrice> dailyPrices, StockPerformanceInterval stockPerformanceInterval) {
         List<HighLowForPeriod> highLowsForPeriod = new ArrayList<>();
-        for (WeeklyPriceOHLC wp : weeklyHistoricalPrices) {
+        for (WeeklyPrice wp : weeklyHistoricalPrices) {
             String ticker = wp.getTicker();
             LocalDate week_end = wp.getEndDate(); // Friday
             LocalDate startDate; // going back in time for the past X days/weeks etc.
@@ -48,13 +48,13 @@ public class HighLowPeriodPricesUtil extends PricesUtil {
             highLowForPeriod.setHigh(dailyPrices.stream()
                     .filter(shp1 -> shp1.getTicker().equals(ticker))
                     .filter(p1 -> p1.getDate().isAfter(startDate) && p1.getDate().isBefore(endDate))
-                    .mapToDouble(DailyPriceOHLC::getHigh)
+                    .mapToDouble(DailyPrice::getHigh)
                     .max()
                     .orElseThrow());
             highLowForPeriod.setLow(dailyPrices.stream()
                     .filter(shp -> shp.getTicker().equals(ticker))
                     .filter(p -> p.getDate().isAfter(startDate) && p.getDate().isBefore(endDate))
-                    .mapToDouble(DailyPriceOHLC::getLow)
+                    .mapToDouble(DailyPrice::getLow)
                     .min()
                     .orElseThrow());
 

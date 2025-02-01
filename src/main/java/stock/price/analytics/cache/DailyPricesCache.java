@@ -1,7 +1,7 @@
 package stock.price.analytics.cache;
 
 import org.springframework.stereotype.Component;
-import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
+import stock.price.analytics.model.prices.ohlc.DailyPrice;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,22 +12,22 @@ import java.util.stream.Collectors;
 @Component
 public class DailyPricesCache {
 
-    private final Map<String, DailyPriceOHLC> dailyPricesByTicker = new HashMap<>();
+    private final Map<String, DailyPrice> dailyPricesByTicker = new HashMap<>();
 
-    public void addDailyPrices(List<DailyPriceOHLC> dailyPrices) {
+    public void addDailyPrices(List<DailyPrice> dailyPrices) {
         dailyPrices.forEach(price -> dailyPricesByTicker.put(
                 price.getTicker(),
                 price));
     }
 
-    public List<DailyPriceOHLC> addDailyPricesInCacheAndReturn(List<DailyPriceOHLC> dailyPrices) {
-        List<DailyPriceOHLC> addedPrices = new ArrayList<>();
+    public List<DailyPrice> addDailyPricesInCacheAndReturn(List<DailyPrice> dailyPrices) {
+        List<DailyPrice> addedPrices = new ArrayList<>();
         dailyPrices.forEach(price -> addToMap(price, addedPrices));
         return addedPrices;
     }
 
-    private void addToMap(DailyPriceOHLC newPrice, List<DailyPriceOHLC> addedPrices) {
-        DailyPriceOHLC existingPrice = dailyPricesByTicker.get(newPrice.getTicker());
+    private void addToMap(DailyPrice newPrice, List<DailyPrice> addedPrices) {
+        DailyPrice existingPrice = dailyPricesByTicker.get(newPrice.getTicker());
 
         if (existingPrice != null) {
             if (existingPrice.getDate().isEqual(newPrice.getDate())) { // intraday update
@@ -45,11 +45,11 @@ public class DailyPricesCache {
         }
     }
 
-    public List<DailyPriceOHLC> dailyPrices() {
+    public List<DailyPrice> dailyPrices() {
         return new ArrayList<>(dailyPricesByTicker.values());
     }
 
-    public List<DailyPriceOHLC> dailyPricesFor(List<String> tickers) {
+    public List<DailyPrice> dailyPricesFor(List<String> tickers) {
         return tickers.stream()
                 .flatMap(ticker ->
                         dailyPricesByTicker.entrySet().stream()

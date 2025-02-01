@@ -13,11 +13,11 @@ import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 
 @Entity
-@Table(name = "monthly_prices")
+@Table(name = "quarterly_prices")
 @Getter
 @Setter
 @NoArgsConstructor
-public class MonthlyPriceOHLC extends AbstractPriceOHLC {
+public class QuarterlyPrice extends AbstractPrice {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "end_date")
@@ -27,21 +27,21 @@ public class MonthlyPriceOHLC extends AbstractPriceOHLC {
     @Column(name = "start_date")
     private LocalDate startDate;
 
-    public MonthlyPriceOHLC(String ticker, LocalDate startDate, LocalDate endDate, CandleOHLC candleOHLC) {
+    public QuarterlyPrice(String ticker, LocalDate startDate, LocalDate endDate, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
-        this.startDate = startDate.with(TemporalAdjusters.firstDayOfMonth());
-        this.endDate = endDate;
+        this.startDate = LocalDate.of(startDate.getYear(), startDate.getMonth().firstMonthOfQuarter().getValue(), 1);
+        this.endDate = endDate.with(TemporalAdjusters.lastDayOfMonth());
     }
 
-    public MonthlyPriceOHLC(String ticker, LocalDate startDate, LocalDate endDate, double performance, CandleOHLC candleOHLC) {
+    public QuarterlyPrice(String ticker, LocalDate startDate, LocalDate endDate, double performance, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
-        this.startDate = startDate.with(TemporalAdjusters.firstDayOfMonth());
+        this.startDate = LocalDate.of(startDate.getYear(), startDate.getMonth().firstMonthOfQuarter().getValue(), 1);
         this.endDate = endDate;
         this.setPerformance(performance);
     }
 
-    public static MonthlyPriceOHLC newFrom(DailyPriceOHLC dailyPrices, double previousClose) {
-        return new MonthlyPriceOHLC(
+    public static QuarterlyPrice newFrom(DailyPrice dailyPrices, double previousClose) {
+        return new QuarterlyPrice(
                 dailyPrices.getTicker(),
                 dailyPrices.getDate(),
                 dailyPrices.getDate(),
@@ -51,12 +51,12 @@ public class MonthlyPriceOHLC extends AbstractPriceOHLC {
 
     @Override
     public StockTimeframe getTimeframe() {
-        return StockTimeframe.MONTHLY;
+        return StockTimeframe.QUARTERLY;
     }
 
     @Override
     public String toString() {
-        return STR."Monthly_OHLC { StartDate=\{startDate} EndDate=\{endDate} \{super.toString()}";
+        return STR."Quarterly_OHLC {  StartDate=\{startDate} EndDate=\{endDate} \{super.toString()}";
     }
 
 }

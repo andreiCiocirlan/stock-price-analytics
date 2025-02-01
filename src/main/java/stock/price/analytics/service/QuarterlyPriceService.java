@@ -5,8 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.model.prices.ohlc.CandleOHLC;
-import stock.price.analytics.model.prices.ohlc.MonthlyPriceOHLC;
-import stock.price.analytics.model.prices.ohlc.QuarterlyPriceOHLC;
+import stock.price.analytics.model.prices.ohlc.MonthlyPrice;
+import stock.price.analytics.model.prices.ohlc.QuarterlyPrice;
 import stock.price.analytics.repository.prices.PricesRepository;
 
 import java.time.LocalDate;
@@ -28,12 +28,12 @@ public class QuarterlyPriceService {
 
     @Transactional
     public void saveAllQuarterlyPrices() {
-        List<MonthlyPriceOHLC> monthlyPrices = pricesRepository.findAllMonthlyPrices();
+        List<MonthlyPrice> monthlyPrices = pricesRepository.findAllMonthlyPrices();
 
-        Map<String, Map<String, List<MonthlyPriceOHLC>>> groupedByTickerAndQuarter =
+        Map<String, Map<String, List<MonthlyPrice>>> groupedByTickerAndQuarter =
                 monthlyPrices.stream()
                         .collect(Collectors.groupingBy(
-                                MonthlyPriceOHLC::getTicker,
+                                MonthlyPrice::getTicker,
                                 Collectors.groupingBy(price -> {
                                     int year = price.getStartDate().getYear();
                                     int quarter = (price.getStartDate().getMonthValue() - 1) / 3 + 1;
@@ -41,11 +41,11 @@ public class QuarterlyPriceService {
                                 })
                         ));
 
-        List<QuarterlyPriceOHLC> quarterlyPrices = new ArrayList<>();
+        List<QuarterlyPrice> quarterlyPrices = new ArrayList<>();
         groupedByTickerAndQuarter.forEach(
                 (_, quarterlyData) -> quarterlyData.forEach(
                         (_, prices) -> {
-                            List<MonthlyPriceOHLC> monthlyPricesSortedChronologically = prices.stream().sorted(Comparator.comparing(MonthlyPriceOHLC::getStartDate)).toList();
+                            List<MonthlyPrice> monthlyPricesSortedChronologically = prices.stream().sorted(Comparator.comparing(MonthlyPrice::getStartDate)).toList();
                             quarterlyPrices.add(quarterlyPricesFrom(monthlyPricesSortedChronologically));
                         }
                 )
@@ -55,7 +55,7 @@ public class QuarterlyPriceService {
         pricesRepository.quarterlyPricesUpdatePerformance();
     }
 
-    private QuarterlyPriceOHLC quarterlyPricesFrom(List<MonthlyPriceOHLC> monthlyPrices) {
+    private QuarterlyPrice quarterlyPricesFrom(List<MonthlyPrice> monthlyPrices) {
         if (monthlyPrices.isEmpty()) return null;
 
         String ticker = monthlyPrices.getFirst().getTicker();
@@ -64,9 +64,9 @@ public class QuarterlyPriceService {
 
         double open = monthlyPrices.getFirst().getOpen();
         double close = monthlyPrices.getLast().getClose();
-        double high = monthlyPrices.stream().mapToDouble(MonthlyPriceOHLC::getHigh).max().orElse(0);
-        double low = monthlyPrices.stream().mapToDouble(MonthlyPriceOHLC::getLow).min().orElse(0);
+        double high = monthlyPrices.stream().mapToDouble(MonthlyPrice::getHigh).max().orElse(0);
+        double low = monthlyPrices.stream().mapToDouble(MonthlyPrice::getLow).min().orElse(0);
 
-        return new QuarterlyPriceOHLC(ticker, quarterStartDate, quarterEndDate, new CandleOHLC(open, high, low, close));
+        return new QuarterlyPrice(ticker, quarterStartDate, quarterEndDate, new CandleOHLC(open, high, low, close));
     }
 }

@@ -1,10 +1,10 @@
 package stock.price.analytics.cache;
 
 import org.springframework.stereotype.Component;
-import stock.price.analytics.model.prices.ohlc.MonthlyPriceOHLC;
-import stock.price.analytics.model.prices.ohlc.QuarterlyPriceOHLC;
-import stock.price.analytics.model.prices.ohlc.WeeklyPriceOHLC;
-import stock.price.analytics.model.prices.ohlc.YearlyPriceOHLC;
+import stock.price.analytics.model.prices.ohlc.MonthlyPrice;
+import stock.price.analytics.model.prices.ohlc.QuarterlyPrice;
+import stock.price.analytics.model.prices.ohlc.WeeklyPrice;
+import stock.price.analytics.model.prices.ohlc.YearlyPrice;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -16,12 +16,12 @@ import java.util.stream.Collectors;
 @Component
 public class HigherTimeframePricesCache {
 
-    private final Map<String, WeeklyPriceOHLC> weeklyPricesByTickerAndDate = new HashMap<>();
-    private final Map<String, MonthlyPriceOHLC> monthlyPricesByTickerAndDate = new HashMap<>();
-    private final Map<String, QuarterlyPriceOHLC> quarterlyPricesByTickerAndDate = new HashMap<>();
-    private final Map<String, YearlyPriceOHLC> yearlyPricesByTickerAndDate = new HashMap<>();
+    private final Map<String, WeeklyPrice> weeklyPricesByTickerAndDate = new HashMap<>();
+    private final Map<String, MonthlyPrice> monthlyPricesByTickerAndDate = new HashMap<>();
+    private final Map<String, QuarterlyPrice> quarterlyPricesByTickerAndDate = new HashMap<>();
+    private final Map<String, YearlyPrice> yearlyPricesByTickerAndDate = new HashMap<>();
 
-    public void addWeeklyPrices(List<WeeklyPriceOHLC> weeklyPrices) {
+    public void addWeeklyPrices(List<WeeklyPrice> weeklyPrices) {
         weeklyPrices.forEach(price ->
                 this.weeklyPricesByTickerAndDate.merge(
                         createKey(price.getTicker(), price.getStartDate()),
@@ -31,7 +31,7 @@ public class HigherTimeframePricesCache {
         );
     }
 
-    public void addMonthlyPrices(List<MonthlyPriceOHLC> monthlyPrices) {
+    public void addMonthlyPrices(List<MonthlyPrice> monthlyPrices) {
         monthlyPrices.forEach(price ->
                 this.monthlyPricesByTickerAndDate.merge(
                         createKey(price.getTicker(), price.getStartDate()),
@@ -41,7 +41,7 @@ public class HigherTimeframePricesCache {
         );
     }
 
-    public void addQuarterlyPrices(List<QuarterlyPriceOHLC> quarterlyPrices) {
+    public void addQuarterlyPrices(List<QuarterlyPrice> quarterlyPrices) {
         quarterlyPrices.forEach(price ->
                 this.quarterlyPricesByTickerAndDate.merge(
                         createKey(price.getTicker(), price.getStartDate()),
@@ -51,7 +51,7 @@ public class HigherTimeframePricesCache {
         );
     }
 
-    public void addYearlyPrices(List<YearlyPriceOHLC> yearlyPrices) {
+    public void addYearlyPrices(List<YearlyPrice> yearlyPrices) {
         yearlyPrices.forEach(price ->
                 this.yearlyPricesByTickerAndDate.merge(
                         createKey(price.getTicker(), price.getStartDate()),
@@ -61,7 +61,7 @@ public class HigherTimeframePricesCache {
         );
     }
 
-    public List<WeeklyPriceOHLC> weeklyPricesFor(List<String> tickers) {
+    public List<WeeklyPrice> weeklyPricesFor(List<String> tickers) {
         return tickers.stream()
                 .flatMap(ticker ->
                         weeklyPricesByTickerAndDate.entrySet().stream()
@@ -70,7 +70,7 @@ public class HigherTimeframePricesCache {
                 .collect(Collectors.toList());
     }
 
-    public List<MonthlyPriceOHLC> monthlyPricesFor(List<String> tickers) {
+    public List<MonthlyPrice> monthlyPricesFor(List<String> tickers) {
         return tickers.stream()
                 .flatMap(ticker ->
                         monthlyPricesByTickerAndDate.entrySet().stream()
@@ -79,7 +79,7 @@ public class HigherTimeframePricesCache {
                 .collect(Collectors.toList());
     }
 
-    public List<QuarterlyPriceOHLC> quarterlyPricesFor(List<String> tickers) {
+    public List<QuarterlyPrice> quarterlyPricesFor(List<String> tickers) {
         return tickers.stream()
                 .flatMap(ticker ->
                         quarterlyPricesByTickerAndDate.entrySet().stream()
@@ -88,7 +88,7 @@ public class HigherTimeframePricesCache {
                 .collect(Collectors.toList());
     }
 
-    public List<YearlyPriceOHLC> yearlyPricesFor(List<String> tickers) {
+    public List<YearlyPrice> yearlyPricesFor(List<String> tickers) {
         return tickers.stream()
                 .flatMap(ticker ->
                         yearlyPricesByTickerAndDate.entrySet().stream()

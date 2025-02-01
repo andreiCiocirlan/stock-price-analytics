@@ -17,18 +17,18 @@ import java.util.Objects;
 @Entity
 @Table(name = "daily_prices")
 @NoArgsConstructor
-public class DailyPriceOHLC extends AbstractPriceOHLC {
+public class DailyPrice extends AbstractPrice {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "date")
     private LocalDate date;
 
-    public DailyPriceOHLC(String ticker, @NonNull LocalDate date, CandleOHLC candleOHLC) {
+    public DailyPrice(String ticker, @NonNull LocalDate date, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
         this.date = date;
     }
 
-    public DailyPriceOHLC(String ticker, @NonNull LocalDate date, double performance, CandleOHLC candleOHLC) {
+    public DailyPrice(String ticker, @NonNull LocalDate date, double performance, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
         this.date = date;
         this.setPerformance(performance);
@@ -50,7 +50,7 @@ public class DailyPriceOHLC extends AbstractPriceOHLC {
     }
 
     // used for real-time import and update (create new daily price if dates do not match, update otherwise)
-    public DailyPriceOHLC updateFrom(DailyPriceOHLC newPrice) {
+    public DailyPrice updateFrom(DailyPrice newPrice) {
         if (getDate().equals(newPrice.getDate())) {
             // Update properties of the existing object
             setOpen(newPrice.getOpen());
@@ -78,7 +78,7 @@ public class DailyPriceOHLC extends AbstractPriceOHLC {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        DailyPriceOHLC that = (DailyPriceOHLC) o;
+        DailyPrice that = (DailyPrice) o;
 
         return Objects.equals(getTicker(), that.getTicker()) &&
                 Objects.equals(date, that.date) &&

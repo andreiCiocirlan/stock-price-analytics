@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import stock.price.analytics.model.prices.PriceEntity;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
-import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
+import stock.price.analytics.model.prices.ohlc.DailyPrice;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -44,7 +44,7 @@ public abstract class HighLowForPeriod implements PriceEntity {
         this.endDate = endDate;
     }
 
-    public boolean newHighLow(DailyPriceOHLC dailyPriceImported) {
+    public boolean newHighLow(DailyPrice dailyPriceImported) {
         boolean newHighLowFound = false;
 
         startDate = dailyPriceImported.getDate().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));

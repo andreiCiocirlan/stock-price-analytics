@@ -50,25 +50,25 @@ public class PricesService {
         return candles;
     }
 
-    public List<AbstractPriceOHLC> updatePricesForHigherTimeframes(List<DailyPriceOHLC> importedDailyPrices) {
+    public List<AbstractPrice> updatePricesForHigherTimeframes(List<DailyPrice> importedDailyPrices) {
         return logTimeAndReturn(() -> updateHTF(importedDailyPrices), "updated prices for higher timeframes");
     }
 
-    private List<AbstractPriceOHLC> updateHTF(List<DailyPriceOHLC> importedDailyPrices) {
-        List<String> tickers = new ArrayList<>(importedDailyPrices.stream().map(DailyPriceOHLC::getTicker).toList());
+    private List<AbstractPrice> updateHTF(List<DailyPrice> importedDailyPrices) {
+        List<String> tickers = new ArrayList<>(importedDailyPrices.stream().map(DailyPrice::getTicker).toList());
 
         // Fetch previous prices for each timeframe
-        List<WeeklyPriceOHLC> previousTwoWeeklyPrices = getPreviousTwoWeeklyPrices(tickers);
-        List<MonthlyPriceOHLC> previousTwoMonthlyPrices = getPreviousTwoMonthlyPrices(tickers);
-        List<QuarterlyPriceOHLC> previousTwoQuarterlyPrices = getPreviousTwoQuarterlyPrices(tickers);
-        List<YearlyPriceOHLC> previousTwoYearlyPrices = getPreviousTwoYearlyPrices(tickers);
+        List<WeeklyPrice> previousTwoWeeklyPrices = getPreviousTwoWeeklyPrices(tickers);
+        List<MonthlyPrice> previousTwoMonthlyPrices = getPreviousTwoMonthlyPrices(tickers);
+        List<QuarterlyPrice> previousTwoQuarterlyPrices = getPreviousTwoQuarterlyPrices(tickers);
+        List<YearlyPrice> previousTwoYearlyPrices = getPreviousTwoYearlyPrices(tickers);
 
         // Update prices for each timeframe and return (used for stocks cache update)
-        List<AbstractPriceOHLC> htfPricesUpdated = new ArrayList<>();
-        List<WeeklyPriceOHLC> weeklyPrices = updateAndSavePrices(importedDailyPrices, WEEKLY, previousTwoWeeklyPrices);
-        List<MonthlyPriceOHLC> monthlyPrices = updateAndSavePrices(importedDailyPrices, MONTHLY, previousTwoMonthlyPrices);
-        List<QuarterlyPriceOHLC> quarterlyPrices = updateAndSavePrices(importedDailyPrices, QUARTERLY, previousTwoQuarterlyPrices);
-        List<YearlyPriceOHLC> yearlyPrices = updateAndSavePrices(importedDailyPrices, YEARLY, previousTwoYearlyPrices);
+        List<AbstractPrice> htfPricesUpdated = new ArrayList<>();
+        List<WeeklyPrice> weeklyPrices = updateAndSavePrices(importedDailyPrices, WEEKLY, previousTwoWeeklyPrices);
+        List<MonthlyPrice> monthlyPrices = updateAndSavePrices(importedDailyPrices, MONTHLY, previousTwoMonthlyPrices);
+        List<QuarterlyPrice> quarterlyPrices = updateAndSavePrices(importedDailyPrices, QUARTERLY, previousTwoQuarterlyPrices);
+        List<YearlyPrice> yearlyPrices = updateAndSavePrices(importedDailyPrices, YEARLY, previousTwoYearlyPrices);
         htfPricesUpdated.addAll(weeklyPrices);
         htfPricesUpdated.addAll(monthlyPrices);
         htfPricesUpdated.addAll(quarterlyPrices);
@@ -82,9 +82,9 @@ public class PricesService {
         return htfPricesUpdated;
     }
 
-    private List<WeeklyPriceOHLC> getPreviousTwoWeeklyPrices(List<String> tickers) {
+    private List<WeeklyPrice> getPreviousTwoWeeklyPrices(List<String> tickers) {
         Set<String> cacheTickers = higherTimeframePricesCache.weeklyPricesTickers();
-        List<WeeklyPriceOHLC> previousWeeklyPrices;
+        List<WeeklyPrice> previousWeeklyPrices;
         if (cacheTickers.isEmpty()) {
             log.info("Fetching PreviousTwoWeeklyPrices from database for {} tickers", tickers.size());
             previousWeeklyPrices = pricesRepository.findPreviousThreeWeeklyPricesForTickers(tickers);
@@ -102,15 +102,15 @@ public class PricesService {
 
         return previousWeeklyPrices
                 .stream()
-                .collect(Collectors.groupingBy(WeeklyPriceOHLC::getTicker))
+                .collect(Collectors.groupingBy(WeeklyPrice::getTicker))
                 .values().stream()
-                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(WeeklyPriceOHLC::getStartDate).reversed()).limit(2))
+                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(WeeklyPrice::getStartDate).reversed()).limit(2))
                 .toList();
     }
 
-    private List<MonthlyPriceOHLC> getPreviousTwoMonthlyPrices(List<String> tickers) {
+    private List<MonthlyPrice> getPreviousTwoMonthlyPrices(List<String> tickers) {
         Set<String> cacheTickers = higherTimeframePricesCache.monthlyPricesTickers();
-        List<MonthlyPriceOHLC> previousMonthlyPrices;
+        List<MonthlyPrice> previousMonthlyPrices;
         if (cacheTickers.isEmpty()) {
             log.info("Fetching PreviousTwoMonthlyPrices from database for {} tickers", tickers.size());
             previousMonthlyPrices = pricesRepository.findPreviousThreeMonthlyPricesForTickers(tickers);
@@ -128,15 +128,15 @@ public class PricesService {
 
         return previousMonthlyPrices
                 .stream()
-                .collect(Collectors.groupingBy(MonthlyPriceOHLC::getTicker))
+                .collect(Collectors.groupingBy(MonthlyPrice::getTicker))
                 .values().stream()
-                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(MonthlyPriceOHLC::getStartDate).reversed()).limit(2))
+                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(MonthlyPrice::getStartDate).reversed()).limit(2))
                 .toList();
     }
 
-    private List<QuarterlyPriceOHLC> getPreviousTwoQuarterlyPrices(List<String> tickers) {
+    private List<QuarterlyPrice> getPreviousTwoQuarterlyPrices(List<String> tickers) {
         Set<String> cacheTickers = higherTimeframePricesCache.quarterlyPricesTickers();
-        List<QuarterlyPriceOHLC> previousQuarterlyPrices;
+        List<QuarterlyPrice> previousQuarterlyPrices;
         if (cacheTickers.isEmpty()) {
             log.info("Fetching PreviousTwoQuarterlyPrices from database for {} tickers", tickers.size());
             previousQuarterlyPrices = pricesRepository.findPreviousThreeQuarterlyPricesForTickers(tickers);
@@ -154,15 +154,15 @@ public class PricesService {
 
         return previousQuarterlyPrices
                 .stream()
-                .collect(Collectors.groupingBy(QuarterlyPriceOHLC::getTicker))
+                .collect(Collectors.groupingBy(QuarterlyPrice::getTicker))
                 .values().stream()
-                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(QuarterlyPriceOHLC::getStartDate).reversed()).limit(2))
+                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(QuarterlyPrice::getStartDate).reversed()).limit(2))
                 .toList();
     }
 
-    private List<YearlyPriceOHLC> getPreviousTwoYearlyPrices(List<String> tickers) {
+    private List<YearlyPrice> getPreviousTwoYearlyPrices(List<String> tickers) {
         Set<String> cacheTickers = higherTimeframePricesCache.yearlyPricesTickers();
-        List<YearlyPriceOHLC> previousYearlyPrices;
+        List<YearlyPrice> previousYearlyPrices;
         if (cacheTickers.isEmpty()) {
             log.info("Fetching PreviousTwoYearlyPrices from database for {} tickers", tickers.size());
             previousYearlyPrices = pricesRepository.findPreviousThreeYearlyPricesForTickers(tickers);
@@ -180,29 +180,29 @@ public class PricesService {
 
         return previousYearlyPrices
                 .stream()
-                .collect(Collectors.groupingBy(YearlyPriceOHLC::getTicker))
+                .collect(Collectors.groupingBy(YearlyPrice::getTicker))
                 .values().stream()
-                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(YearlyPriceOHLC::getStartDate).reversed()).limit(2))
+                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(YearlyPrice::getStartDate).reversed()).limit(2))
                 .toList();
     }
 
 
     @SuppressWarnings("unchecked")
-    private <T extends AbstractPriceOHLC> List<T> updateAndSavePrices(List<DailyPriceOHLC> importedDailyPrices,
-                                                        StockTimeframe timeframe,
-                                                        List<T> previousPrices) {
-        Map<String, List<AbstractPriceOHLC>> previousPricesByTicker = previousPrices.stream()
-                .collect(Collectors.groupingBy(AbstractPriceOHLC::getTicker, Collectors.mapping(p -> (AbstractPriceOHLC) p, Collectors.toList())));
+    private <T extends AbstractPrice> List<T> updateAndSavePrices(List<DailyPrice> importedDailyPrices,
+                                                                  StockTimeframe timeframe,
+                                                                  List<T> previousPrices) {
+        Map<String, List<AbstractPrice>> previousPricesByTicker = previousPrices.stream()
+                .collect(Collectors.groupingBy(AbstractPrice::getTicker, Collectors.mapping(p -> (AbstractPrice) p, Collectors.toList())));
 
-        List<AbstractPriceOHLC> updatedPrices = updatePricesAndPerformance(importedDailyPrices, timeframe, previousPricesByTicker);
+        List<AbstractPrice> updatedPrices = updatePricesAndPerformance(importedDailyPrices, timeframe, previousPricesByTicker);
         partitionDataAndSaveNoLogging(updatedPrices, pricesRepository);
 
         return (List<T>) updatedPrices;
     }
 
-    private List<AbstractPriceOHLC> updatePricesAndPerformance(List<DailyPriceOHLC> dailyPrices, StockTimeframe timeframe, Map<String, List<AbstractPriceOHLC>> previousTwoWMYPricesByTicker) {
-        List<AbstractPriceOHLC> wmyPrices = new ArrayList<>();
-        for (DailyPriceOHLC dailyPrice : dailyPrices) {
+    private List<AbstractPrice> updatePricesAndPerformance(List<DailyPrice> dailyPrices, StockTimeframe timeframe, Map<String, List<AbstractPrice>> previousTwoWMYPricesByTicker) {
+        List<AbstractPrice> wmyPrices = new ArrayList<>();
+        for (DailyPrice dailyPrice : dailyPrices) {
             String ticker = dailyPrice.getTicker();
             if (previousTwoWMYPricesByTicker.containsKey(ticker)) {
                 wmyPrices.add(wmyPriceUpdatedFrom(previousTwoWMYPricesByTicker.get(ticker), dailyPrice, timeframe));
@@ -213,9 +213,9 @@ public class PricesService {
         return wmyPrices;
     }
 
-    private AbstractPriceOHLC wmyPriceUpdatedFrom(List<AbstractPriceOHLC> previousTwoWMY, DailyPriceOHLC dailyPrice, StockTimeframe timeframe) {
-        AbstractPriceOHLC result;
-        AbstractPriceOHLC latestPriceWMY = previousTwoWMY.getFirst();
+    private AbstractPrice wmyPriceUpdatedFrom(List<AbstractPrice> previousTwoWMY, DailyPrice dailyPrice, StockTimeframe timeframe) {
+        AbstractPrice result;
+        AbstractPrice latestPriceWMY = previousTwoWMY.getFirst();
         LocalDate latestEndDateWMY = latestPriceWMY.getEndDate();
         LocalDate dailyPriceDate = dailyPrice.getDate();
         if (latestEndDateWMY.equals(dailyPriceDate)) { // already imported (intraday update prices, performance)
@@ -232,10 +232,10 @@ public class PricesService {
         return result;
     }
 
-    private AbstractPriceOHLC updateOrCreateWMYPrice(List<AbstractPriceOHLC> previousTwoWMY, DailyPriceOHLC dailyPrice, LocalDate latestEndDateWMY, StockTimeframe timeframe) {
-        AbstractPriceOHLC result;
+    private AbstractPrice updateOrCreateWMYPrice(List<AbstractPrice> previousTwoWMY, DailyPrice dailyPrice, LocalDate latestEndDateWMY, StockTimeframe timeframe) {
+        AbstractPrice result;
         LocalDate dailyPriceDate = dailyPrice.getDate();
-        AbstractPriceOHLC latestPriceWMY = previousTwoWMY.getFirst();
+        AbstractPrice latestPriceWMY = previousTwoWMY.getFirst();
         if (isWithinSameTimeframe(dailyPriceDate, latestEndDateWMY, timeframe)) {
             double previousClose = previousTwoWMY.size() < 2 ? latestPriceWMY.getOpen() : previousTwoWMY.getLast().getClose();
             result = latestPriceWMY.convertFrom(dailyPrice, previousClose);
@@ -257,23 +257,23 @@ public class PricesService {
         };
     }
 
-    private AbstractPriceOHLC createNewWMYPrice(DailyPriceOHLC dailyPrice, StockTimeframe timeframe, double previousClose) {
+    private AbstractPrice createNewWMYPrice(DailyPrice dailyPrice, StockTimeframe timeframe, double previousClose) {
         return switch (timeframe) {
             case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
-            case WEEKLY -> WeeklyPriceOHLC.newFrom(dailyPrice, previousClose);
-            case MONTHLY -> MonthlyPriceOHLC.newFrom(dailyPrice, previousClose);
-            case QUARTERLY -> QuarterlyPriceOHLC.newFrom(dailyPrice, previousClose);
-            case YEARLY -> YearlyPriceOHLC.newFrom(dailyPrice, previousClose);
+            case WEEKLY -> WeeklyPrice.newFrom(dailyPrice, previousClose);
+            case MONTHLY -> MonthlyPrice.newFrom(dailyPrice, previousClose);
+            case QUARTERLY -> QuarterlyPrice.newFrom(dailyPrice, previousClose);
+            case YEARLY -> YearlyPrice.newFrom(dailyPrice, previousClose);
         };
     }
 
-    private void setEndDate(AbstractPriceOHLC result, LocalDate endDate, StockTimeframe timeframe) {
+    private void setEndDate(AbstractPrice result, LocalDate endDate, StockTimeframe timeframe) {
         switch (timeframe) {
             case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
-            case WEEKLY -> ((WeeklyPriceOHLC) result).setEndDate(endDate);
-            case MONTHLY -> ((MonthlyPriceOHLC) result).setEndDate(endDate);
-            case QUARTERLY -> ((QuarterlyPriceOHLC) result).setEndDate(endDate);
-            case YEARLY -> ((YearlyPriceOHLC) result).setEndDate(endDate);
+            case WEEKLY -> ((WeeklyPrice) result).setEndDate(endDate);
+            case MONTHLY -> ((MonthlyPrice) result).setEndDate(endDate);
+            case QUARTERLY -> ((QuarterlyPrice) result).setEndDate(endDate);
+            case YEARLY -> ((YearlyPrice) result).setEndDate(endDate);
         }
     }
 
@@ -366,7 +366,7 @@ public class PricesService {
     }
 
     @Transactional
-    public void savePrices(List<? extends AbstractPriceOHLC> prices) {
+    public void savePrices(List<? extends AbstractPrice> prices) {
         partitionDataAndSave(prices, pricesRepository);
     }
 }
