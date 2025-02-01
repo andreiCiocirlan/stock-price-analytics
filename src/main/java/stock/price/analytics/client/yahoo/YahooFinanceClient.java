@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.nio.file.Files.readAllLines;
 
@@ -37,11 +38,9 @@ public class YahooFinanceClient {
     }
 
     public List<DailyPrice> dailyPricesFrom(List<DailyPricesJSON> dailyPricesJSON, boolean preMarketPrices) {
-        List<DailyPrice> dailyPrices = new ArrayList<>();
-        for (DailyPricesJSON dailyPriceJson : dailyPricesJSON) {
-            dailyPrices.add(dailyPriceJson.convertToDailyPrice(preMarketPrices));
-        }
-        return dailyPrices;
+        return dailyPricesJSON.stream()
+                .map(dailyPriceJson -> dailyPriceJson.convertToDailyPrice(preMarketPrices))
+                .toList();
     }
 
 }
