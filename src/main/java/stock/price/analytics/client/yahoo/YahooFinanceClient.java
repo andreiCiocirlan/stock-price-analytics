@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import stock.price.analytics.model.prices.json.DailyPricesJSON;
 import stock.price.analytics.model.prices.json.Response;
 import stock.price.analytics.model.prices.json.UnixTimestampToLocalDateDeserializer;
-import stock.price.analytics.model.prices.ohlc.CandleOHLC;
 import stock.price.analytics.model.prices.ohlc.DailyPriceOHLC;
 import stock.price.analytics.service.DailyPricesJSONService;
 
@@ -62,15 +61,7 @@ public class YahooFinanceClient {
     public List<DailyPriceOHLC> dailyPricesFrom(List<DailyPricesJSON> dailyPricesJSON, boolean preMarketPrices) {
         List<DailyPriceOHLC> dailyPrices = new ArrayList<>();
         for (DailyPricesJSON dailyPriceJson : dailyPricesJSON) {
-            String ticker = dailyPriceJson.getSymbol();
-            double open = dailyPriceJson.getRegularMarketOpen();
-            double high = dailyPriceJson.getRegularMarketDayHigh();
-            double low = dailyPriceJson.getRegularMarketDayLow();
-            double close = preMarketPrices ? dailyPriceJson.getPreMarketPrice() : dailyPriceJson.getRegularMarketPrice();
-            double percentChange = dailyPriceJson.getRegularMarketChangePercent();
-
-            DailyPriceOHLC dailyPrice = new DailyPriceOHLC(ticker, dailyPriceJson.getDate(), percentChange, new CandleOHLC(open, high, low, close));
-            dailyPrices.add(dailyPrice);
+            dailyPrices.add(dailyPriceJson.convertToDailyPrice(preMarketPrices));
         }
         return dailyPrices;
     }
