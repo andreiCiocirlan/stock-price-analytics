@@ -22,16 +22,6 @@ public class HighLowPricesCache {
     @Getter
     private final Map<HighLowPeriod, Set<String>> dailyNewHighLowsByHLPeriod = new HashMap<>();
 
-    public List<HighLow4w> highLow4wCache() {
-        return new ArrayList<>(highLow4wMap.values());
-    }
-    public List<HighLow52Week> highLow52wCache() {
-        return new ArrayList<>(highLow52wMap.values());
-    }
-    public List<HighestLowestPrices> highestLowestCache() {
-        return new ArrayList<>(highestLowestMap.values());
-    }
-
     public void addHighLowPrices(List<? extends HighLowForPeriod> hlPrices, HighLowPeriod highLowPeriod) {
         switch (highLowPeriod) {
             case HIGH_LOW_4W -> hlPrices.forEach(hlPrice -> highLow4wMap.merge(
@@ -80,17 +70,17 @@ public class HighLowPricesCache {
 
     public List<? extends HighLowForPeriod> cacheForHighLowPeriod(HighLowPeriod highLowPeriod) {
         return switch (highLowPeriod) {
-            case HIGH_LOW_4W -> highLow4wCache();
-            case HIGH_LOW_52W -> highLow52wCache();
-            case HIGH_LOW_ALL_TIME -> highestLowestCache();
+            case HIGH_LOW_4W -> new ArrayList<>(highLow4wMap.values());
+            case HIGH_LOW_52W -> new ArrayList<>(highLow52wMap.values());
+            case HIGH_LOW_ALL_TIME -> new ArrayList<>(highestLowestMap.values());
         };
     }
 
     public List<? extends HighLowForPeriod> cacheForMilestone(PriceMilestone priceMilestone) {
         return switch (priceMilestone) {
-            case NEW_4W_HIGH, NEW_4W_LOW, HIGH_4W_95, LOW_4W_95 -> highLow4wCache();
-            case NEW_52W_HIGH, NEW_52W_LOW, HIGH_52W_95, LOW_52W_95 -> highLow52wCache();
-            case NEW_ALL_TIME_HIGH, NEW_ALL_TIME_LOW, HIGH_ALL_TIME_95, LOW_ALL_TIME_95 -> highestLowestCache();
+            case NEW_4W_HIGH, NEW_4W_LOW, HIGH_4W_95, LOW_4W_95 -> new ArrayList<>(highLow4wMap.values());
+            case NEW_52W_HIGH, NEW_52W_LOW, HIGH_52W_95, LOW_52W_95 -> new ArrayList<>(highLow52wMap.values());
+            case NEW_ALL_TIME_HIGH, NEW_ALL_TIME_LOW, HIGH_ALL_TIME_95, LOW_ALL_TIME_95 -> new ArrayList<>(highestLowestMap.values());
             case NONE -> null;
         };
     }
