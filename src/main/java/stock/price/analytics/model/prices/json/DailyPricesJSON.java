@@ -9,6 +9,7 @@ import lombok.Setter;
 import stock.price.analytics.model.prices.PriceEntity;
 import stock.price.analytics.model.prices.ohlc.CandleOHLC;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
+import stock.price.analytics.model.stocks.enums.MarketState;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -243,7 +244,8 @@ public class DailyPricesJSON implements PriceEntity {
 	private double regularMarketPrice;
 
 	@JsonProperty("marketState")
-	private String marketState;
+	@Enumerated(EnumType.STRING)
+	private MarketState marketState;
 
 	@JsonProperty("postMarketChange")
 	private double postMarketChange;
