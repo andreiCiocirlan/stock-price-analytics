@@ -56,8 +56,8 @@ public class HighLowPricesCache {
         }
     }
 
-    public List<? extends HighLowForPeriod> updateHighLowPricesCacheFrom(List<DailyPrice> dailyPricesImported, List<String> tickers, HighLowPeriod highLowPeriod) {
-        Map<String, DailyPrice> dailyPricesImportedMap = dailyPricesImported.stream().collect(Collectors.toMap(DailyPrice::getTicker, p -> p));
+    public List<? extends HighLowForPeriod> updateHighLowPricesCacheFrom(List<DailyPrice> dailyPrices, List<String> tickers, HighLowPeriod highLowPeriod) {
+        Map<String, DailyPrice> dailyPricesByTicker = dailyPrices.stream().collect(Collectors.toMap(DailyPrice::getTicker, p -> p));
         Map<String, ? extends HighLowForPeriod> highLowPrices = switch (highLowPeriod) {
             case HIGH_LOW_4W -> highLow4wMap;
             case HIGH_LOW_52W -> highLow52wMap;
@@ -67,7 +67,7 @@ public class HighLowPricesCache {
                 .flatMap(ticker -> highLowPrices.entrySet().stream()
                         .filter(entry -> entry.getKey().equals(ticker))
                         .map(Map.Entry::getValue)
-                        .filter(hlp -> hlp.newHighLow(dailyPricesImportedMap.get(ticker))) // the method also assigns new high/low price not just return true/false
+                        .filter(hlp -> hlp.newHighLow(dailyPricesByTicker.get(ticker))) // the method also assigns new high/low price not just return true/false
                 ).collect(Collectors.toList());
 
         // add new highs and lows for 4w, 52w, all-time into cache (to be printed on-demand)

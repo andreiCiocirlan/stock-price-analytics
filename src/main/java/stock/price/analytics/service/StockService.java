@@ -73,14 +73,14 @@ public class StockService {
                 "updated stocks high low 4w, 52w, all-time");
     }
 
-    private void updateStocksFromOHLCPrices(List<DailyPrice> dailyImportedPrices, List<AbstractPrice> htfPrices, Set<Stock> stocksUpdated) {
+    private void updateStocksFromOHLCPrices(List<DailyPrice> dailyPrices, List<AbstractPrice> htfPrices, Set<Stock> stocksUpdated) {
         Map<String, Stock> stocksMap = stocksCache.getStocksMap();
         // update from daily prices
-        for (DailyPrice dailyImportedPrice : dailyImportedPrices) {
-            String ticker = dailyImportedPrice.getTicker();
-            Stock stock = stocksMap.getOrDefault(ticker, new Stock(ticker, dailyImportedPrice.getDate(), true));
-            if (!stock.getLastUpdated().isAfter(dailyImportedPrice.getDate())) { // don't update for imports from the past
-                stock.updateFromDailyPrice(dailyImportedPrice);
+        for (DailyPrice dailyPrice : dailyPrices) {
+            String ticker = dailyPrice.getTicker();
+            Stock stock = stocksMap.getOrDefault(ticker, new Stock(ticker, dailyPrice.getDate(), true));
+            if (!stock.getLastUpdated().isAfter(dailyPrice.getDate())) { // don't update for imports from the past
+                stock.updateFromDailyPrice(dailyPrice);
                 stocksUpdated.add(stock);
             }
         }
@@ -115,9 +115,9 @@ public class StockService {
         }
     }
 
-    public void updateStocksHighLowsAndOHLCFrom(List<DailyPrice> dailyImportedPrices, List<AbstractPrice> htfPrices) {
+    public void updateStocksHighLowsAndOHLCFrom(List<DailyPrice> dailyPrices, List<AbstractPrice> htfPrices) {
         Set<Stock> stocksUpdated = new HashSet<>();
-        updateStocksFromOHLCPrices(dailyImportedPrices, htfPrices, stocksUpdated);
+        updateStocksFromOHLCPrices(dailyPrices, htfPrices, stocksUpdated);
         updateStocksFromHighLowCaches(stocksUpdated);
 
         List<Stock> stocks = new ArrayList<>(stocksUpdated);

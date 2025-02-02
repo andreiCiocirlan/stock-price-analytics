@@ -73,13 +73,13 @@ public class YahooQuoteService {
             String pricesJSON = logTimeAndReturn(() -> quotePricesJSON(tickers, getCrumb()), "Yahoo API call and JSON result");
 
             List<DailyPrice> dailyPricesExtractedFromJSON = yahooFinanceClient.extractDailyPricesFromJSON(pricesJSON);
-            List<DailyPrice> dailyPricesImported = dailyPricesService.addDailyPricesInCacheAndReturn(dailyPricesExtractedFromJSON);
-            dailyImportedPrices.addAll(dailyPricesImported);
+            List<DailyPrice> dailyPrices = dailyPricesService.addDailyPricesInCacheAndReturn(dailyPricesExtractedFromJSON);
+            dailyImportedPrices.addAll(dailyPrices);
 
             // keep track of which tickers were imported
-            tickersImported.removeAll(dailyPricesImported.stream().map(DailyPrice::getTicker).toList());
+            tickersImported.removeAll(dailyPrices.stream().map(DailyPrice::getTicker).toList());
 
-            if (!preMarketOnly && !dailyPricesImported.isEmpty()) {
+            if (!preMarketOnly && !dailyPrices.isEmpty()) {
                 String fileName = tradingDateImported(dailyPricesExtractedFromJSON).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_" + fileCounter + ".json";
                 String path = "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/" + fileName;
                 writeToFile(path, pricesJSON);
