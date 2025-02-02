@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import static stock.price.analytics.util.Constants.MAX_TICKER_COUNT_PRINT;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
+import static stock.price.analytics.util.TradingDateUtil.isBeforeMarketHours;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateImported;
 
 @Slf4j
@@ -53,12 +54,8 @@ public class YahooQuoteService {
         return dailyPricesService.addDailyPricesInCacheAndReturn(dailyPrices);
     }
 
-    public List<DailyPrice> dailyPricesImport() {
-        return dailyPricesImport(false);
-    }
-
     @Transactional
-    public List<DailyPrice> dailyPricesImport(boolean preMarketOnly) {
+    public List<DailyPrice> dailyPricesImport() {
         int maxTickersPerRequest = 1700;
         List<DailyPrice> dailyImportedPrices = new ArrayList<>();
         List<DailyPrice> latestPrices = dailyPricesService.dailyPricesCache();
@@ -79,7 +76,7 @@ public class YahooQuoteService {
             // keep track of which tickers were imported
             tickersImported.removeAll(dailyPrices.stream().map(DailyPrice::getTicker).toList());
 
-            if (!preMarketOnly && !dailyPrices.isEmpty()) {
+            if (!isBeforeMarketHours() && !dailyPrices.isEmpty()) {
                 String fileName = tradingDateImported(dailyPricesExtractedFromJSON).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_" + fileCounter + ".json";
                 String path = "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/" + fileName;
                 writeToFile(path, pricesJSON);
@@ -90,7 +87,7 @@ public class YahooQuoteService {
             fileCounter++;
         }
 
-        if (!preMarketOnly && !dailyImportedPrices.isEmpty()) { // only save if intraday prices, for pre-market only display
+        if (!isBeforeMarketHours() && !dailyImportedPrices.isEmpty()) { // only save if intraday prices, for pre-market only display
             partitionDataAndSaveWithLogTime(dailyImportedPrices, dailyPricesRepository, "saved " + dailyImportedPrices.size() + " daily prices");
         }
 

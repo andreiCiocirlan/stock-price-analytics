@@ -20,6 +20,7 @@ import java.util.Objects;
 
 import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
+import static stock.price.analytics.util.TradingDateUtil.isBeforeMarketHours;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 
@@ -42,7 +43,9 @@ public class IntraDayPricesController {
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
             List<AbstractPrice> htfPricesUpdated = pricesService.updatePricesForHigherTimeframes(dailyImportedPrices);
 
-            logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices), "saved current week HighLow prices" );
+            if (isBeforeMarketHours()) { // cannot save high-low prices if pre-market (can cause discrepancies)
+                logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices), "saved current week HighLow prices");
+            }
             logTime(() -> stockService.updateStocksHighLowsAndOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks highs-lows 4w,52w,all-time and higher-timeframe OHLC prices");
         }
         long duration = (System.nanoTime() - start) / 1_000_000;
@@ -56,6 +59,9 @@ public class IntraDayPricesController {
         String fileName = Objects.requireNonNullElseGet(fileNameStr, () -> tradingDateNow().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_1");
         List<DailyPrice> dailyImportedPrices = logTimeAndReturn(() -> yahooQuoteService.dailyPricesFromFile(fileName), "imported daily prices");
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
+            if (isBeforeMarketHours()) {
+                return dailyImportedPrices; // prevent other operations and simply return the daily pre-market prices from file
+            }
             pricesService.savePrices(dailyImportedPrices);
             List<AbstractPrice> htfPricesUpdated = pricesService.updatePricesForHigherTimeframes(dailyImportedPrices);
 
