@@ -40,9 +40,9 @@ public class HighLowPricesCacheService {
 
     public void initHighLowPricesCache() {
         LocalDate latestDailyPriceImportDate = stockService.findLastUpdate();
-        initHighLowPricesCache(HighLowPeriod.HIGH_LOW_4W, latestDailyPriceImportDate);
-        initHighLowPricesCache(HighLowPeriod.HIGH_LOW_52W, latestDailyPriceImportDate);
-        initHighLowPricesCache(HighLowPeriod.HIGH_LOW_ALL_TIME, latestDailyPriceImportDate);
+        for (HighLowPeriod highLowPeriod : HighLowPeriod.values()) {
+            initHighLowPricesCache(highLowPeriod, latestDailyPriceImportDate);
+        }
         boolean firstImportMonday = tradingDateNow().getDayOfWeek().equals(DayOfWeek.MONDAY) && latestDailyPriceImportDate.getDayOfWeek().equals(DayOfWeek.FRIDAY);
         if (firstImportMonday) {
             stockService.updateHighLowForPeriodFromHLCachesAndAdjustWeekend();
