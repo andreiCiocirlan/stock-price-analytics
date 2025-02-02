@@ -25,19 +25,19 @@ public class YahooFinanceClient {
             String jsonFilePath = String.join("", "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/", fileName, ".json");
             String jsonData = String.join("", readAllLines(Path.of(jsonFilePath)));
 
-            return extractDailyPricesFromJSON(jsonData, false);
+            return extractDailyPricesFromJSON(jsonData);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public List<DailyPrice> extractDailyPricesFromJSON(String jsonData, boolean preMarketPrices) {
-        return dailyPricesFrom(dailyPricesJSONService.dailyPricesJSONFrom(jsonData), preMarketPrices);
+    public List<DailyPrice> extractDailyPricesFromJSON(String jsonData) {
+        return dailyPricesFrom(dailyPricesJSONService.dailyPricesJSONFrom(jsonData));
     }
 
-    public List<DailyPrice> dailyPricesFrom(List<DailyPricesJSON> dailyPricesJSON, boolean preMarketPrices) {
+    public List<DailyPrice> dailyPricesFrom(List<DailyPricesJSON> dailyPricesJSON) {
         return dailyPricesJSON.stream()
-                .map(dailyPriceJson -> dailyPriceJson.convertToDailyPrice(preMarketPrices))
+                .map(DailyPricesJSON::convertToDailyPrice)
                 .toList();
     }
 
