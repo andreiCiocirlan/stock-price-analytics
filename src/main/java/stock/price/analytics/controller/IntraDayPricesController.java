@@ -42,9 +42,7 @@ public class IntraDayPricesController {
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
             List<AbstractPrice> htfPricesUpdated = pricesService.updatePricesForHigherTimeframes(dailyImportedPrices);
 
-            // high/low price update based on weekly perf view (refreshed before)
-            List<String> tickers = dailyImportedPrices.stream().map(DailyPrice::getTicker).toList();
-            logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices, tickers), "saved current week HighLow prices" );
+            logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices), "saved current week HighLow prices" );
             logTime(() -> stockService.updateStocksHighLowsAndOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks highs-lows 4w,52w,all-time and higher-timeframe OHLC prices");
         }
         long duration = (System.nanoTime() - start) / 1_000_000;
@@ -61,9 +59,7 @@ public class IntraDayPricesController {
             pricesService.savePrices(dailyImportedPrices);
             List<AbstractPrice> htfPricesUpdated = pricesService.updatePricesForHigherTimeframes(dailyImportedPrices);
 
-            // high/low price update based on weekly perf view (refreshed before)
-            List<String> tickers = dailyImportedPrices.stream().map(DailyPrice::getTicker).toList();
-            logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices, tickers), "saved current week HighLow prices" );
+            logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices), "saved current week HighLow prices" );
             logTime(() -> stockService.updateStocksHighLowsAndOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks highs-lows 4w,52w,all-time and higher-timeframe OHLC prices");
         }
         long duration = (System.nanoTime() - start) / 1_000_000;
