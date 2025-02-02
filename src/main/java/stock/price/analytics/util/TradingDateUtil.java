@@ -20,7 +20,7 @@ public class TradingDateUtil {
         return LocalDateTime.now().toLocalTime().isAfter(startMarketHours) && LocalDateTime.now().toLocalTime().isBefore(endMarketHours);
     }
 
-    private static boolean isBeforeMarketHours() {
+    public static boolean isBeforeMarketHours() {
         return LocalDateTime.now().toLocalTime().isBefore(startMarketHours);
     }
 
