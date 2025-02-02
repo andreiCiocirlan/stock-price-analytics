@@ -52,12 +52,6 @@ public class IntraDayPricesController {
     }
 
     @Transactional
-    @GetMapping("/yahoo-prices/pre-market")
-    public void yahooPreMarketPricesImport() {
-        yahooQuoteService.dailyPricesImport(true);
-    }
-
-    @Transactional
     @GetMapping("/yahoo-prices/from-file")
     public List<DailyPrice> yahooPricesImportFromFile(@RequestParam(value = "fileName", required = false) String fileNameStr) {
         long start = System.nanoTime();
