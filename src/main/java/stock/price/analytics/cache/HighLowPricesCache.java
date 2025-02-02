@@ -19,8 +19,36 @@ public class HighLowPricesCache {
     private final Map<String, HighLow4w> highLow4wMap = new HashMap<>();
     private final Map<String, HighLow52Week> highLow52wMap = new HashMap<>();
     private final Map<String, HighestLowestPrices> highestLowestMap = new HashMap<>();
+    private final Map<String, HighLow4w> prevWeekHighLow4wMap = new HashMap<>();
+    private final Map<String, HighLow52Week> prevWeekHighLow52wMap = new HashMap<>();
+    private final Map<String, HighestLowestPrices> prevWeekHighestLowestMap = new HashMap<>();
     @Getter
     private final Map<HighLowPeriod, Set<String>> dailyNewHighLowsByHLPeriod = new HashMap<>();
+
+    public void addPrevWeekHighLowPrices(List<? extends HighLowForPeriod> prevWeekHighLowPrices, HighLowPeriod highLowPeriod) {
+        switch (highLowPeriod) {
+            case HIGH_LOW_4W -> prevWeekHighLowPrices.forEach(hlPrice ->
+                    prevWeekHighLow4wMap.merge(
+                            hlPrice.getTicker(),
+                            (HighLow4w) hlPrice,
+                            (_, newPrice) -> newPrice
+                    ));
+            case HIGH_LOW_52W -> prevWeekHighLowPrices.forEach(hlPrice ->
+                    prevWeekHighLow52wMap.merge(
+                            hlPrice.getTicker(),
+                            (HighLow52Week) hlPrice,
+                            (_, newPrice) -> newPrice
+                    )
+            );
+            case HIGH_LOW_ALL_TIME -> prevWeekHighLowPrices.forEach(hlPrice ->
+                    prevWeekHighestLowestMap.merge(
+                            hlPrice.getTicker(),
+                            (HighestLowestPrices) hlPrice,
+                            (_, newPrice) -> newPrice
+                    )
+            );
+        }
+    }
 
     public void addHighLowPrices(List<? extends HighLowForPeriod> hlPrices, HighLowPeriod highLowPeriod) {
         switch (highLowPeriod) {
@@ -78,10 +106,13 @@ public class HighLowPricesCache {
 
     public List<? extends HighLowForPeriod> cacheForMilestone(PriceMilestone priceMilestone) {
         return switch (priceMilestone) {
-            case NEW_4W_HIGH, NEW_4W_LOW, HIGH_4W_95, LOW_4W_95 -> new ArrayList<>(highLow4wMap.values());
-            case NEW_52W_HIGH, NEW_52W_LOW, HIGH_52W_95, LOW_52W_95 -> new ArrayList<>(highLow52wMap.values());
-            case NEW_ALL_TIME_HIGH, NEW_ALL_TIME_LOW, HIGH_ALL_TIME_95, LOW_ALL_TIME_95 -> new ArrayList<>(highestLowestMap.values());
-            case NONE -> null;
+            case HIGH_4W_95, LOW_4W_95 -> new ArrayList<>(highLow4wMap.values());
+            case NEW_4W_HIGH, NEW_4W_LOW -> new ArrayList<>(prevWeekHighLow4wMap.values());
+            case HIGH_52W_95, LOW_52W_95 -> new ArrayList<>(highLow52wMap.values());
+            case NEW_52W_HIGH, NEW_52W_LOW -> new ArrayList<>(prevWeekHighLow52wMap.values());
+            case HIGH_ALL_TIME_95, LOW_ALL_TIME_95 -> new ArrayList<>(highestLowestMap.values());
+            case NEW_ALL_TIME_HIGH, NEW_ALL_TIME_LOW -> new ArrayList<>(prevWeekHighestLowestMap.values());
+            case NONE -> throw new IllegalStateException("Unexpected value NONE");
         };
     }
 }
