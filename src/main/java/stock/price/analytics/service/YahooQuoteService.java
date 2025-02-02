@@ -72,7 +72,7 @@ public class YahooQuoteService {
             String tickers = partition.stream().map(DailyPrice::getTicker).collect(Collectors.joining(","));
             String pricesJSON = logTimeAndReturn(() -> quotePricesJSON(tickers, getCrumb()), "Yahoo API call and JSON result");
 
-            List<DailyPrice> dailyPricesExtractedFromJSON = yahooFinanceClient.extractDailyPricesFromJSON(pricesJSON, preMarketOnly);
+            List<DailyPrice> dailyPricesExtractedFromJSON = yahooFinanceClient.extractDailyPricesFromJSON(pricesJSON);
             List<DailyPrice> dailyPricesImported = dailyPricesService.addDailyPricesInCacheAndReturn(dailyPricesExtractedFromJSON);
             dailyImportedPrices.addAll(dailyPricesImported);
 
