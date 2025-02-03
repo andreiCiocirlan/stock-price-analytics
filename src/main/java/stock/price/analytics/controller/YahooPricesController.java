@@ -28,7 +28,7 @@ import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/stock-prices")
-public class IntraDayPricesController {
+public class YahooPricesController {
 
     private final YahooQuoteService yahooQuoteService;
     private final PricesService pricesService;
