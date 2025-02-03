@@ -340,8 +340,8 @@ public class DailyPricesJSON implements PriceEntity {
         double open = this.getRegularMarketOpen();
 		double high = this.getRegularMarketDayHigh();
 		double low = this.getRegularMarketDayLow();
-		double close = this.getPreMarketPrice() != 0d ? this.getPreMarketPrice() : this.getRegularMarketPrice();
-		double percentChange = this.getPreMarketPrice() != 0d ? this.getPreMarketChangePercent() : this.getRegularMarketChangePercent();
+		double close = this.getRegularMarketPrice();
+		double percentChange = this.getRegularMarketChangePercent();
 
 		return new DailyPrice(this.getSymbol(), this.getDate(), percentChange, new CandleOHLC(open, high, low, close));
 	}
