@@ -23,7 +23,6 @@ import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveNoLogging;
 import static stock.price.analytics.util.StockDateUtils.*;
-import static stock.price.analytics.util.TradingDateUtil.isBeforeMarketHours;
 
 
 @Slf4j
@@ -66,30 +65,19 @@ public class PricesService {
 
         // Update prices for each timeframe and return (used for stocks cache update)
         List<AbstractPrice> htfPricesUpdated = new ArrayList<>();
-        List<WeeklyPrice> weeklyPrices = updatePrices(importedDailyPrices, WEEKLY, previousTwoWeeklyPrices);
-        List<MonthlyPrice> monthlyPrices = updatePrices(importedDailyPrices, MONTHLY, previousTwoMonthlyPrices);
-        List<QuarterlyPrice> quarterlyPrices = updatePrices(importedDailyPrices, QUARTERLY, previousTwoQuarterlyPrices);
-        List<YearlyPrice> yearlyPrices = updatePrices(importedDailyPrices, YEARLY, previousTwoYearlyPrices);
-
-        if (!isBeforeMarketHours()) {
-            // don't save prices if preMarket
-            partitionDataAndSaveNoLogging(weeklyPrices, pricesRepository);
-            partitionDataAndSaveNoLogging(monthlyPrices, pricesRepository);
-            partitionDataAndSaveNoLogging(quarterlyPrices, pricesRepository);
-            partitionDataAndSaveNoLogging(yearlyPrices, pricesRepository);
-
-            // htfPricesCache not updated if preMarket (can cause discrepancies)
-            // values returned and copied in stocksCache, which again is not saved in DB
-            higherTimeframePricesCache.addWeeklyPrices(weeklyPrices);
-            higherTimeframePricesCache.addMonthlyPrices(monthlyPrices);
-            higherTimeframePricesCache.addQuarterlyPrices(quarterlyPrices);
-            higherTimeframePricesCache.addYearlyPrices(yearlyPrices);
-        }
-
+        List<WeeklyPrice> weeklyPrices = updateAndSavePrices(importedDailyPrices, WEEKLY, previousTwoWeeklyPrices);
+        List<MonthlyPrice> monthlyPrices = updateAndSavePrices(importedDailyPrices, MONTHLY, previousTwoMonthlyPrices);
+        List<QuarterlyPrice> quarterlyPrices = updateAndSavePrices(importedDailyPrices, QUARTERLY, previousTwoQuarterlyPrices);
+        List<YearlyPrice> yearlyPrices = updateAndSavePrices(importedDailyPrices, YEARLY, previousTwoYearlyPrices);
         htfPricesUpdated.addAll(weeklyPrices);
         htfPricesUpdated.addAll(monthlyPrices);
         htfPricesUpdated.addAll(quarterlyPrices);
         htfPricesUpdated.addAll(yearlyPrices);
+
+        higherTimeframePricesCache.addWeeklyPrices(weeklyPrices);
+        higherTimeframePricesCache.addMonthlyPrices(monthlyPrices);
+        higherTimeframePricesCache.addQuarterlyPrices(quarterlyPrices);
+        higherTimeframePricesCache.addYearlyPrices(yearlyPrices);
 
         return htfPricesUpdated;
     }
@@ -200,13 +188,16 @@ public class PricesService {
 
 
     @SuppressWarnings("unchecked")
-    private <T extends AbstractPrice> List<T> updatePrices(List<DailyPrice> importedDailyPrices,
-                                                           StockTimeframe timeframe,
-                                                           List<T> previousPrices) {
+    private <T extends AbstractPrice> List<T> updateAndSavePrices(List<DailyPrice> importedDailyPrices,
+                                                                  StockTimeframe timeframe,
+                                                                  List<T> previousPrices) {
         Map<String, List<AbstractPrice>> previousPricesByTicker = previousPrices.stream()
                 .collect(Collectors.groupingBy(AbstractPrice::getTicker, Collectors.mapping(p -> (AbstractPrice) p, Collectors.toList())));
 
-        return (List<T>) updatePricesAndPerformance(importedDailyPrices, timeframe, previousPricesByTicker);
+        List<AbstractPrice> updatedPrices = updatePricesAndPerformance(importedDailyPrices, timeframe, previousPricesByTicker);
+        partitionDataAndSaveNoLogging(updatedPrices, pricesRepository);
+
+        return (List<T>) updatedPrices;
     }
 
     private List<AbstractPrice> updatePricesAndPerformance(List<DailyPrice> dailyPrices, StockTimeframe timeframe, Map<String, List<AbstractPrice>> previousTwoWMYPricesByTicker) {
