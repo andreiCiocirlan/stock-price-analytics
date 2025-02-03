@@ -81,7 +81,7 @@ public class DailyPricesJSONService {
             }
         }
         List<DailyPricesJSON> dailyPricesJSONSInCache = dailyPricesJSONCacheService.addDailyPricesJSONInCacheAndReturn(dailyJSONPrices);
-        if (!isBeforeMarketHours() && !dailyPricesJSONSInCache.isEmpty()) {
+        if (!dailyPricesJSONSInCache.isEmpty()) {
             partitionDataAndSaveWithLogTime(dailyPricesJSONSInCache, dailyPricesJSONRepository, "saved " + dailyJSONPrices.size() + " daily json prices");
         }
 
