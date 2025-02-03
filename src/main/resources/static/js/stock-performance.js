@@ -39,7 +39,7 @@ function handleTimeFrameButtonClick(timeFrame) {
 }
 
 function updatePricesIntraday() {
-    const url = `/stock-prices/yahoo-prices/intraday`;
+    const url = `/yahoo-prices/import`;
     fetch(url)
         .then(response => {
             if (!response.ok) {

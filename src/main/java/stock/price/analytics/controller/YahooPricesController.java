@@ -27,7 +27,7 @@ import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/stock-prices")
+@RequestMapping("/yahoo-prices")
 public class YahooPricesController {
 
     private final YahooQuoteService yahooQuoteService;
@@ -36,7 +36,7 @@ public class YahooPricesController {
     private final StockService stockService;
 
     @Transactional
-    @GetMapping("/yahoo-prices/intraday")
+    @GetMapping("/import")
     public void yahooPricesImport() {
         long start = System.nanoTime();
         List<DailyPrice> dailyImportedPrices = logTimeAndReturn(yahooQuoteService::dailyPricesImport, "imported daily prices");
@@ -53,7 +53,7 @@ public class YahooPricesController {
     }
 
     @Transactional
-    @GetMapping("/yahoo-prices/from-file")
+    @GetMapping("/from-file")
     public List<DailyPrice> yahooPricesImportFromFile(@RequestParam(value = "fileName", required = false) String fileNameStr) {
         long start = System.nanoTime();
         String fileName = Objects.requireNonNullElseGet(fileNameStr, () -> tradingDateNow().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_1");
