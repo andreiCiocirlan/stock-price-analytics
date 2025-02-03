@@ -43,7 +43,7 @@ public class YahooPricesController {
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
             List<AbstractPrice> htfPricesUpdated = pricesService.updatePricesForHigherTimeframes(dailyImportedPrices);
 
-            if (isBeforeMarketHours()) { // cannot save high-low prices if pre-market (can cause discrepancies)
+            if (!isBeforeMarketHours()) { // cannot save high-low prices if pre-market (can cause discrepancies)
                 logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices), "saved current week HighLow prices");
             }
             logTime(() -> stockService.updateStocksHighLowsAndOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks highs-lows 4w,52w,all-time and higher-timeframe OHLC prices");
