@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 public class TradingDateUtil {
 
+    private static final LocalTime preMarketStartHours = LocalTime.of(14, 0, 0, 0);
     private static final LocalTime startMarketHours = LocalTime.of(16, 30, 0, 0);
     private static final LocalTime endMarketHours = LocalTime.of(23, 0, 0, 0);
 
@@ -57,5 +58,13 @@ public class TradingDateUtil {
                 .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
                 .orElseThrow();
+    }
+
+    private static boolean isPreMarketHours() {
+        return LocalDateTime.now().toLocalTime().isAfter(preMarketStartHours) && LocalDateTime.now().toLocalTime().isBefore(startMarketHours);
+    }
+
+    public static boolean isFirstImportMonday(LocalDate lastImportDate) {
+        return lastImportDate.getDayOfWeek().equals(DayOfWeek.FRIDAY) && (LocalDate.now().getDayOfWeek().equals(DayOfWeek.MONDAY) && isPreMarketHours());
     }
 }
