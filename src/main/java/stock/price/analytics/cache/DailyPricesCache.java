@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Component
 public class DailyPricesCache {
@@ -47,15 +46,6 @@ public class DailyPricesCache {
 
     public List<DailyPrice> dailyPrices() {
         return new ArrayList<>(dailyPricesByTicker.values());
-    }
-
-    public List<DailyPrice> dailyPricesFor(List<String> tickers) {
-        return tickers.stream()
-                .flatMap(ticker ->
-                        dailyPricesByTicker.entrySet().stream()
-                                .filter(entry -> entry.getKey().equals(ticker))
-                                .map(Map.Entry::getValue))
-                .collect(Collectors.toList());
     }
 
 }
