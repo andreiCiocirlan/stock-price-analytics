@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.model.prices.json.*;
+import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.repository.prices.DailyPricesJSONRepository;
 
 import java.io.File;
@@ -107,6 +108,12 @@ public class DailyPricesJSONService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public List<DailyPrice> dailyPricesFrom(List<DailyPricesJSON> dailyPricesJSON) {
+        return dailyPricesJSON.stream()
+                .map(DailyPricesJSON::convertToDailyPrice)
+                .toList();
     }
 
     public List<DailyPricesJSON> extractAllDailyPricesJSONFrom(List<DailyPricesJSON> dailyPricesJSON, List<DailyPricesJSON> recentJsonPrices) {

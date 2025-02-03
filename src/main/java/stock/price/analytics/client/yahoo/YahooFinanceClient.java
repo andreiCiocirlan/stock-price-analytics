@@ -32,13 +32,7 @@ public class YahooFinanceClient {
     }
 
     public List<DailyPrice> extractDailyPricesFromJSON(String jsonData) {
-        return dailyPricesFrom(dailyPricesJSONService.dailyPricesJSONFrom(jsonData));
-    }
-
-    public List<DailyPrice> dailyPricesFrom(List<DailyPricesJSON> dailyPricesJSON) {
-        return dailyPricesJSON.stream()
-                .map(DailyPricesJSON::convertToDailyPrice)
-                .toList();
+        return dailyPricesJSONService.dailyPricesFrom(dailyPricesJSONService.dailyPricesJSONFrom(jsonData));
     }
 
 }
