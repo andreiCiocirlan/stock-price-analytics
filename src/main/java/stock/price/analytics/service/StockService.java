@@ -121,7 +121,7 @@ public class StockService {
         updateStocksFromHighLowCaches(stocksUpdated);
 
         List<Stock> stocks = new ArrayList<>(stocksUpdated);
-        partitionDataAndSaveWithLogTime(stocks, stockRepository, "saved stocks after OHLC higher-timeframe and high-lows 4w, 52w, all-time updates");
+        partitionDataAndSaveWithLogTime(stocks, stockRepository, "saved stocks " + stocks.size() + " after OHLC higher-timeframe and high-lows 4w, 52w, all-time updates");
         stocksCache.addStocks(stocks);
     }
 
