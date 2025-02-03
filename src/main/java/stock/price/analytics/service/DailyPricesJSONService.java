@@ -53,10 +53,10 @@ public class DailyPricesJSONService {
         List<String> sameDailyPrices = new ArrayList<>();
         List<DailyPricesJSON> dailyJSONPrices = new ArrayList<>();
         Map<String, DailyPricesJSON> recentJsonPricesById = recentJsonPrices.stream().collect(Collectors.toMap(DailyPricesJSON::getCompositeId, p -> p));
+        LocalDate tradingDateNow = tradingDateNow();
         for (DailyPricesJSON dailyPriceJson : dailyPricesJSON) {
             String ticker = dailyPriceJson.getSymbol();
             LocalDate tradingDate = dailyPriceJson.getDate();
-            LocalDate tradingDateNow = tradingDateNow();
             if (!tradingDateNow.equals(tradingDate)) {
                 if (tradingDate == null) {
                     log.warn("trading date missing for ticker {}", ticker);
