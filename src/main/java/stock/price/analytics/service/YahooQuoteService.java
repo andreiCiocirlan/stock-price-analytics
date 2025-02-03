@@ -59,7 +59,7 @@ public class YahooQuoteService {
         int maxTickersPerRequest = 1700;
         List<DailyPrice> dailyImportedPrices = new ArrayList<>();
         List<DailyPrice> latestPrices = dailyPricesService.dailyPricesCache();
-        List<String> tickersImported = new ArrayList<>(latestPrices.stream().map(DailyPrice::getTicker).toList());
+        List<String> tickersNotImported = new ArrayList<>(latestPrices.stream().map(DailyPrice::getTicker).toList());
 
         int start = 0;
         int end = Math.min(maxTickersPerRequest, latestPrices.size());
@@ -74,7 +74,7 @@ public class YahooQuoteService {
             dailyImportedPrices.addAll(dailyPrices);
 
             // keep track of which tickers were imported
-            tickersImported.removeAll(dailyPrices.stream().map(DailyPrice::getTicker).toList());
+            tickersNotImported.removeAll(dailyPrices.stream().map(DailyPrice::getTicker).toList());
 
             if (!dailyPrices.isEmpty()) {
                 String fileName = tradingDateImported(dailyPricesExtractedFromJSON).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_" + fileCounter + ".json";
@@ -91,11 +91,13 @@ public class YahooQuoteService {
             partitionDataAndSaveWithLogTime(dailyImportedPrices, dailyPricesRepository, "saved " + dailyImportedPrices.size() + " daily prices");
         }
 
-        if (!tickersImported.isEmpty()) {
-            log.warn("Did not import {} tickers", tickersImported.size());
-            if (tickersImported.size() <= MAX_TICKER_COUNT_PRINT) {
-                log.warn("{}", tickersImported);
+        if (!tickersNotImported.isEmpty()) {
+            log.warn("Did not import {} tickers", tickersNotImported.size());
+            if (tickersNotImported.size() <= MAX_TICKER_COUNT_PRINT) {
+                log.warn("{}", tickersNotImported);
             }
+        } else {
+            log.warn("Imported {} tickers", dailyImportedPrices.size());
         }
 
         return dailyImportedPrices;
