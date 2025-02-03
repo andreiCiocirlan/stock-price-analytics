@@ -27,12 +27,14 @@ public class StockHeatmapPerformanceService {
 
         List<StockPerformanceDTO> performanceDTOs = result.stream()
                 .map(stock -> new StockPerformanceDTO(stock.getTicker(), stock.performanceFor(timeFrame)))
-                .sorted(Comparator.comparingDouble(StockPerformanceDTO::performance))
+                .sorted(Comparator.comparingDouble(StockPerformanceDTO::performance)
+                        .thenComparing(StockPerformanceDTO::ticker))
                 .toList();
 
         if (Boolean.TRUE.equals(positivePerfFirst)) {
             performanceDTOs = performanceDTOs.stream()
-                    .sorted(Comparator.comparingDouble(StockPerformanceDTO::performance).reversed())
+                    .sorted(Comparator.comparingDouble(StockPerformanceDTO::performance).reversed()
+                            .thenComparing(StockPerformanceDTO::ticker))
                     .collect(Collectors.toList());
         }
         if (limit != null) {
