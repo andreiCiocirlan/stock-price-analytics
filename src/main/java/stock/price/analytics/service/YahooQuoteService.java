@@ -76,7 +76,7 @@ public class YahooQuoteService {
             // keep track of which tickers were imported
             tickersImported.removeAll(dailyPrices.stream().map(DailyPrice::getTicker).toList());
 
-            if (!isBeforeMarketHours() && !dailyPrices.isEmpty()) {
+            if (!dailyPrices.isEmpty()) {
                 String fileName = tradingDateImported(dailyPricesExtractedFromJSON).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_" + fileCounter + ".json";
                 String path = "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/" + fileName;
                 writeToFile(path, pricesJSON);
