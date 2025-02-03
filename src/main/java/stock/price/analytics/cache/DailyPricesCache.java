@@ -2,21 +2,27 @@ package stock.price.analytics.cache;
 
 import org.springframework.stereotype.Component;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
+import stock.price.analytics.model.stocks.enums.MarketState;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
+
 @Component
 public class DailyPricesCache {
 
+    private final Map<String, DailyPrice> preMarketDailyPricesByTicker = new HashMap<>();
     private final Map<String, DailyPrice> dailyPricesByTicker = new HashMap<>();
 
-    public void addDailyPrices(List<DailyPrice> dailyPrices) {
-        dailyPrices.forEach(price -> dailyPricesByTicker.put(
-                price.getTicker(),
-                price));
+    public void addDailyPrices(List<DailyPrice> dailyPrices, MarketState marketState) {
+        if (PRE == marketState) {
+            dailyPrices.forEach(price -> preMarketDailyPricesByTicker.put(price.getTicker(), price));
+        } else {
+            dailyPrices.forEach(price -> dailyPricesByTicker.put(price.getTicker(), price));
+        }
     }
 
     public List<DailyPrice> addDailyPricesInCacheAndReturn(List<DailyPrice> dailyPrices) {
@@ -44,7 +50,10 @@ public class DailyPricesCache {
         }
     }
 
-    public List<DailyPrice> dailyPrices() {
+    public List<DailyPrice> dailyPrices(MarketState marketState) {
+        if (PRE == marketState) {
+            return new ArrayList<>(preMarketDailyPricesByTicker.values());
+        }
         return new ArrayList<>(dailyPricesByTicker.values());
     }
 
