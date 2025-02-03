@@ -336,12 +336,12 @@ public class DailyPricesJSON implements PriceEntity {
 		return getSymbol() + "_" + getDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
 	}
 
-	public DailyPrice convertToDailyPrice() {
+	public DailyPrice convertToDailyPrice(boolean preMarket) {
         double open = this.getRegularMarketOpen();
 		double high = this.getRegularMarketDayHigh();
 		double low = this.getRegularMarketDayLow();
-		double close = this.getRegularMarketPrice();
-		double percentChange = this.getRegularMarketChangePercent();
+		double close = preMarket ? this.getPreMarketPrice() : this.getRegularMarketPrice();
+		double percentChange = preMarket ? this.getPreMarketChangePercent() : this.getRegularMarketChangePercent();
 
 		return new DailyPrice(this.getSymbol(), this.getDate(), percentChange, new CandleOHLC(open, high, low, close));
 	}

@@ -111,7 +111,7 @@ public class DailyPricesJSONService {
 
     public List<DailyPrice> dailyPricesFrom(List<DailyPricesJSON> dailyPricesJSON) {
         return dailyPricesJSON.stream()
-                .map(DailyPricesJSON::convertToDailyPrice)
+                .map((dp -> dp.convertToDailyPrice(false)))
                 .toList();
     }
 
