@@ -23,7 +23,6 @@ import static java.nio.file.Files.readAllLines;
 import static stock.price.analytics.util.Constants.MAX_TICKER_COUNT_PRINT;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
-import static stock.price.analytics.util.TradingDateUtil.isBeforeMarketHours;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 @Slf4j
