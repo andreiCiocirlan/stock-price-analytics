@@ -29,7 +29,6 @@ import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
 import static stock.price.analytics.util.PricesUtil.tickerFrom;
-import static stock.price.analytics.util.TradingDateUtil.isBeforeMarketHours;
 
 @Slf4j
 @Service
@@ -122,9 +121,7 @@ public class StockService {
         updateStocksFromHighLowCaches(stocksUpdated);
 
         List<Stock> stocks = new ArrayList<>(stocksUpdated);
-        if (!isBeforeMarketHours()) {
-            partitionDataAndSaveWithLogTime(stocks, stockRepository, "saved stocks after OHLC higher-timeframe and high-lows 4w, 52w, all-time updates");
-        }
+        partitionDataAndSaveWithLogTime(stocks, stockRepository, "saved stocks after OHLC higher-timeframe and high-lows 4w, 52w, all-time updates");
         stocksCache.addStocks(stocks);
     }
 
