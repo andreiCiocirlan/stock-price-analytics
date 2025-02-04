@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.model.prices.json.DailyPricesJSON;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
+import stock.price.analytics.service.DailyPricesCacheService;
 import stock.price.analytics.service.DailyPricesJSONService;
 
 import java.io.IOException;
@@ -19,6 +20,7 @@ import static java.nio.file.Files.readAllLines;
 public class YahooFinanceClient {
 
     public final DailyPricesJSONService dailyPricesJSONService;
+    public final DailyPricesCacheService dailyPricesCacheService;
 
     public List<DailyPrice> dailyPricesFromFile(String fileName) {
         try {
@@ -32,7 +34,17 @@ public class YahooFinanceClient {
     }
 
     public List<DailyPrice> extractDailyPricesFromJSON(String jsonData) {
-        return dailyPricesJSONService.dailyPricesFrom(dailyPricesJSONService.dailyPricesJSONFrom(jsonData));
+        List<DailyPricesJSON> dailyPricesJSON = dailyPricesJSONService.dailyPricesJSONFrom(jsonData);
+        List<DailyPrice> preMarketPrices = dailyPricesJSON.stream()
+                .filter(dp -> dp.getPreMarketPrice() != 0d)
+                .map(dp -> dp.convertToDailyPrice(true))
+                .toList();
+
+        if (!preMarketPrices.isEmpty()) { // Cache premarket prices
+            dailyPricesCacheService.addPreMarketDailyPricesInCache(preMarketPrices);
+        }
+
+        return dailyPricesJSONService.dailyPricesFrom(dailyPricesJSON);
     }
 
 }
