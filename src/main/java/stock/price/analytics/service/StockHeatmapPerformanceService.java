@@ -19,7 +19,7 @@ public class StockHeatmapPerformanceService {
 
     private final StockService stockService;
 
-    public List<StockPerformanceDTO> stockPerformanceForDateAndTimeframeAndFilters(
+    public List<StockPerformanceDTO> stockPerformanceFor(
             StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, Double cfdMargin, List<String> tickers) {
         List<Stock> result = stockService.stocksCacheMap().values().stream()
                 .filter(stockFilterPredicate(tickers, cfdMargin))

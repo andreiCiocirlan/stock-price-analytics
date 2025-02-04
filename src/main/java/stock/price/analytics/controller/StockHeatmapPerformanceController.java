@@ -45,7 +45,7 @@ public class StockHeatmapPerformanceController {
                 return Collections.emptyList();
             }
         }
-        return stockHeatmapPerformanceService.stockPerformanceForDateAndTimeframeAndFilters(stockTimeframe, positivePerfFirst, limit, cfdMargin, tickers);
+        return stockHeatmapPerformanceService.stockPerformanceFor(stockTimeframe, positivePerfFirst, limit, cfdMargin, tickers);
     }
 
 }
