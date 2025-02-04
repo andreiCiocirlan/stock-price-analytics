@@ -25,12 +25,12 @@ public class PriceMilestoneCache {
                 .stream()
                 .collect(Collectors.toMap(HighLowForPeriod::getTicker, p -> p));
         Collection<Stock> stocksList = stocksCache.getStocksMap().values();
-        List<Stock> stocks = stocksList.stream()
+
+        return stocksList.stream()
                 .filter(stock -> stock.getCfdMargin() == cfdMargin)
                 .filter(stock -> priceWithinMilestone(stock, hlPricesCache.get(stock.getTicker()), priceMilestone))
+                .map(Stock::getTicker)
                 .toList();
-
-        return stocks.stream().map(Stock::getTicker).toList();
     }
 
     private boolean priceWithinMilestone(Stock s, HighLowForPeriod highLowForPeriod, PriceMilestone priceMilestone) {
