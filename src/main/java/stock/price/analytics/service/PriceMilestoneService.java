@@ -47,4 +47,8 @@ public class PriceMilestoneService {
         }
     }
 
+    public boolean isNoneMilestone(String milestone) {
+        return getPriceMilestone(milestone).isEmpty() && getPreMarketPriceMilestone(milestone).isEmpty();
+    }
+
 }

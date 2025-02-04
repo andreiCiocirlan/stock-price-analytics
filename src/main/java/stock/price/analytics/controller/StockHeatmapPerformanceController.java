@@ -38,7 +38,7 @@ public class StockHeatmapPerformanceController {
                                                          @RequestParam(required = false, value = "priceMilestone") String priceMilestone) {
         StockTimeframe stockTimeframe = ("undefined".equals(timeFrame)) ? StockTimeframe.MONTHLY : StockTimeframe.valueOf(timeFrame);
         List<String> tickers = Collections.emptyList();
-        if (priceMilestone != null && PriceMilestone.NONE != PriceMilestone.valueOf(priceMilestone) && PreMarketPriceMilestone.NONE != PreMarketPriceMilestone.valueOf(priceMilestone)) {
+        if (priceMilestone != null && !priceMilestoneService.isNoneMilestone(priceMilestone)) {
             tickers = priceMilestoneService.findTickersForMilestone(priceMilestone, cfdMargin);
             if (tickers.isEmpty()) {
                 return Collections.emptyList();
