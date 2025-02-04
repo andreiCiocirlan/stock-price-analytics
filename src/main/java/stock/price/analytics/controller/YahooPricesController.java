@@ -3,10 +3,8 @@ package stock.price.analytics.controller;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.service.HighLowForPeriodService;
@@ -36,7 +34,8 @@ public class YahooPricesController {
 
     @Transactional
     @GetMapping("/import")
-    public void yahooPricesImport() {
+    @ResponseStatus(HttpStatus.OK)
+    public List<DailyPrice> yahooPricesImport() {
         long start = System.nanoTime();
         List<DailyPrice> dailyImportedPrices = logTimeAndReturn(yahooQuoteService::dailyPricesImport, "imported daily prices");
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
@@ -47,10 +46,12 @@ public class YahooPricesController {
         }
         long duration = (System.nanoTime() - start) / 1_000_000;
         log.info("Real-time import done in {} ms", duration);
+        return dailyImportedPrices;
     }
 
     @Transactional
     @GetMapping("/from-file")
+    @ResponseStatus(HttpStatus.OK)
     public List<DailyPrice> yahooPricesImportFromFile(@RequestParam(value = "fileName", required = false) String fileNameStr) {
         long start = System.nanoTime();
         String fileName = Objects.requireNonNullElseGet(fileNameStr, () -> tradingDateNow().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_1");
