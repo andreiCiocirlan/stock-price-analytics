@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import stock.price.analytics.controller.dto.StockPerformanceDTO;
+import stock.price.analytics.model.prices.enums.PreMarketPriceMilestone;
+import stock.price.analytics.model.prices.enums.PriceMilestone;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.service.PriceMilestoneService;
 import stock.price.analytics.service.StockHeatmapPerformanceService;
@@ -36,7 +38,7 @@ public class StockHeatmapPerformanceController {
                                                          @RequestParam(required = false, value = "priceMilestone") String priceMilestone) {
         StockTimeframe stockTimeframe = ("undefined".equals(timeFrame)) ? StockTimeframe.MONTHLY : StockTimeframe.valueOf(timeFrame);
         List<String> tickers = Collections.emptyList();
-        if (priceMilestone != null) {
+        if (priceMilestone != null && PriceMilestone.NONE != PriceMilestone.valueOf(priceMilestone) && PreMarketPriceMilestone.NONE != PreMarketPriceMilestone.valueOf(priceMilestone)) {
             tickers = priceMilestoneService.findTickersForMilestone(priceMilestone, cfdMargin);
             if (tickers.isEmpty()) {
                 return Collections.emptyList();
