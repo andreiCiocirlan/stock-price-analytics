@@ -2,7 +2,6 @@ package stock.price.analytics.controller;
 
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.controller.dto.CandleWithDateDTO;
@@ -18,7 +17,6 @@ import static stock.price.analytics.util.Constants.HIGHER_TIMEFRAMES_PATTERN;
 
 @RequestMapping("/ohlc")
 @RestController
-@Slf4j
 @RequiredArgsConstructor
 public class PricesController {
 

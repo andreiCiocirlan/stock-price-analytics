@@ -1,7 +1,6 @@
 package stock.price.analytics.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.controller.dto.StockPerformanceDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
@@ -12,7 +11,6 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StockHeatmapPerformanceService {

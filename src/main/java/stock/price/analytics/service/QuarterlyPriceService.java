@@ -2,7 +2,6 @@ package stock.price.analytics.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.model.prices.ohlc.CandleOHLC;
 import stock.price.analytics.model.prices.ohlc.MonthlyPrice;
@@ -21,7 +20,6 @@ import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partiti
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class QuarterlyPriceService {
 
     private final PricesRepository pricesRepository;

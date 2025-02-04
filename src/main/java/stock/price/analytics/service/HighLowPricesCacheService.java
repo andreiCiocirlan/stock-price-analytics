@@ -1,7 +1,6 @@
 package stock.price.analytics.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.HighLowPricesCache;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
@@ -18,7 +17,6 @@ import java.util.List;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 import static stock.price.analytics.util.TradingDateUtil.isFirstImportMonday;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class HighLowPricesCacheService {

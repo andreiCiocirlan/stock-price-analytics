@@ -1,7 +1,6 @@
 package stock.price.analytics.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -17,7 +16,6 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
-@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class StockHistoricalPricesController {

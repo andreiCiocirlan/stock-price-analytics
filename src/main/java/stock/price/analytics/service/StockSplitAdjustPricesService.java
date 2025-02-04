@@ -1,7 +1,6 @@
 package stock.price.analytics.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
@@ -14,7 +13,6 @@ import java.util.List;
 import static java.time.temporal.TemporalAdjusters.*;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StockSplitAdjustPricesService {
@@ -51,7 +49,6 @@ public class StockSplitAdjustPricesService {
         };
 
         pricesToUpdate.forEach(dailyPrice -> updatePrices(dailyPrice, ohlc, priceMultiplier));
-        log.info("{}", pricesToUpdate);
         partitionDataAndSave(pricesToUpdate, pricesRepository);
         return pricesToUpdate;
     }

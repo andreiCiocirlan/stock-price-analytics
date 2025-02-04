@@ -1,7 +1,6 @@
 package stock.price.analytics.client.yahoo;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.model.prices.json.DailyPricesJSON;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
@@ -14,7 +13,6 @@ import java.util.List;
 
 import static java.nio.file.Files.readAllLines;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class YahooFinanceClient {

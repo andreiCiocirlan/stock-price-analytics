@@ -2,7 +2,6 @@ package stock.price.analytics;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
@@ -13,7 +12,6 @@ import stock.price.analytics.util.LoggingUtil;
 
 @RequiredArgsConstructor
 @SpringBootApplication
-@Slf4j
 public class Application implements ApplicationRunner {
 
     private final StockRepository stockRepository;
