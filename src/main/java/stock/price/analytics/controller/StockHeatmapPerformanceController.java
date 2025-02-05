@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import stock.price.analytics.controller.dto.StockPerformanceDTO;
-import stock.price.analytics.model.prices.enums.PreMarketPriceMilestone;
-import stock.price.analytics.model.prices.enums.PriceMilestone;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.service.PriceMilestoneService;
 import stock.price.analytics.service.StockHeatmapPerformanceService;
