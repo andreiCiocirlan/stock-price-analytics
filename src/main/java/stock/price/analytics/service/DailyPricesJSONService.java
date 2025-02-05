@@ -31,7 +31,7 @@ import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 public class DailyPricesJSONService {
 
     private final DailyPricesJSONCacheService dailyPricesJSONCacheService;
-    private final DailyPricesCacheService dailyPricesCacheService;
+    private final DailyPricesService dailyPricesService;
     private final DailyPricesJSONRepository dailyPricesJSONRepository;
 
     public List<DailyPrice> dailyPricesFromFile(String fileName) {
@@ -131,7 +131,7 @@ public class DailyPricesJSONService {
                 .toList();
 
         if (!preMarketPrices.isEmpty()) {
-            dailyPricesCacheService.addPreMarketDailyPricesInCache(preMarketPrices);
+            dailyPricesService.addPreMarketDailyPricesInCache(preMarketPrices);
         }
         return dailyPricesFrom(dailyPricesJSON);
     }

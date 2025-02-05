@@ -23,15 +23,15 @@ public class DailyPricesCacheService {
         dailyPricesCache.addDailyPrices(dailyPricesRepository.findLatestDailyPrices(), REGULAR);
     }
 
-    public List<DailyPrice> addDailyPricesInCacheAndReturn(List<DailyPrice> dailyPrices) {
+    protected List<DailyPrice> addDailyPricesInCacheAndReturn(List<DailyPrice> dailyPrices) {
         return dailyPricesCache.addDailyPricesInCacheAndReturn(dailyPrices);
     }
 
-    public List<DailyPrice> dailyPricesCache(MarketState marketState) {
+    protected List<DailyPrice> dailyPricesCache(MarketState marketState) {
         return dailyPricesCache.dailyPrices(marketState);
     }
 
-    public void addPreMarketDailyPricesInCache(List<DailyPrice> dailyPrices) {
+    protected void addPreMarketDailyPricesInCache(List<DailyPrice> dailyPrices) {
         dailyPricesCache.addDailyPrices(dailyPrices, PRE);
     }
 }

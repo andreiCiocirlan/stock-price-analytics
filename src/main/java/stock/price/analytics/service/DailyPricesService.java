@@ -21,4 +21,7 @@ public class DailyPricesService {
         return dailyPricesCacheService.addDailyPricesInCacheAndReturn(dailyPrices);
     }
 
+    public void addPreMarketDailyPricesInCache(List<DailyPrice> preMarketPrices) {
+        dailyPricesCacheService.addPreMarketDailyPricesInCache(preMarketPrices);
+    }
 }
