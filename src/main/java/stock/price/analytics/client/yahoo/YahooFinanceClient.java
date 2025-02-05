@@ -25,7 +25,7 @@ public class YahooFinanceClient {
             String jsonFilePath = String.join("", "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/", fileName, ".json");
             String jsonData = String.join("", readAllLines(Path.of(jsonFilePath)));
 
-            return extractDailyPricesFromJSON(jsonData);
+            return dailyPricesJSONService.dailyPricesFrom(jsonData);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

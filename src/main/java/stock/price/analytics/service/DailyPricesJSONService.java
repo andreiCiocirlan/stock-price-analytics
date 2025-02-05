@@ -115,6 +115,12 @@ public class DailyPricesJSONService {
                 .toList();
     }
 
+    public List<DailyPrice> dailyPricesFrom(String jsonData) {
+        return dailyPricesJSONFrom(jsonData).stream()
+                .map((dp -> dp.convertToDailyPrice(false)))
+                .toList();
+    }
+
     public List<DailyPricesJSON> extractAllDailyPricesJSONFrom(List<DailyPricesJSON> dailyPricesJSON, List<DailyPricesJSON> recentJsonPrices) {
         List<String> sameDailyPrices = new ArrayList<>();
         List<DailyPricesJSON> dailyJSONPrices = new ArrayList<>();
