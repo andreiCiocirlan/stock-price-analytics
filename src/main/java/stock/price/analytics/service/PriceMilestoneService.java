@@ -25,9 +25,8 @@ public class PriceMilestoneService {
 
         if (priceMilestoneEnum.isPresent())
             tickers = priceMilestoneCache.findTickersForMilestone(priceMilestoneEnum.get(), cfdMargin);
-        else if (preMarketMilestoneEnum.isPresent()) {
+        else if (preMarketMilestoneEnum.isPresent())
             tickers = preMarketPriceMilestoneCache.findTickersForPreMarketMilestone(preMarketMilestoneEnum.get(), cfdMargin);
-        }
         return tickers;
     }
 
