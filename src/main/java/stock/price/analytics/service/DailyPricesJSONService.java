@@ -31,7 +31,19 @@ import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 public class DailyPricesJSONService {
 
     private final DailyPricesJSONCacheService dailyPricesJSONCacheService;
+    private final DailyPricesCacheService dailyPricesCacheService;
     private final DailyPricesJSONRepository dailyPricesJSONRepository;
+
+    public List<DailyPrice> dailyPricesFromFile(String fileName) {
+        try {
+            String jsonFilePath = String.join("", "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/", fileName, ".json");
+            String jsonData = String.join("", readAllLines(Path.of(jsonFilePath)));
+
+            return dailyPricesFrom(jsonData);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public List<DailyPricesJSON> dailyPricesJSONFrom(String jsonData) {
         try {
@@ -107,6 +119,21 @@ public class DailyPricesJSONService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public List<DailyPrice> extractDailyPricesFromJSON(String pricesJSON) {
+        List<DailyPricesJSON> dailyPricesJSON = dailyPricesJSONFrom(pricesJSON);
+
+        // Cache premarket prices if during pre-market hours
+        List<DailyPrice> preMarketPrices = dailyPricesJSON.stream()
+                .filter(dp -> dp.getPreMarketPrice() != 0d)
+                .map(dp -> dp.convertToDailyPrice(true))
+                .toList();
+
+        if (!preMarketPrices.isEmpty()) {
+            dailyPricesCacheService.addPreMarketDailyPricesInCache(preMarketPrices);
+        }
+        return dailyPricesFrom(dailyPricesJSON);
     }
 
     public List<DailyPrice> dailyPricesFrom(List<DailyPricesJSON> dailyPricesJSON) {

@@ -15,7 +15,6 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import stock.price.analytics.client.yahoo.YahooFinanceClient;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.repository.prices.DailyPricesRepository;
 
@@ -42,15 +41,15 @@ public class YahooQuoteService {
 
     private static final String USER_AGENT_VALUE = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0";
     private static final int MAX_RETRIES_CRUMB = 5;
-    private final YahooFinanceClient yahooFinanceClient;
     private final DailyPricesService dailyPricesService;
+    private final DailyPricesJSONService dailyPricesJSONService;
     private final DailyPricesRepository dailyPricesRepository;
     private int RETRY_COUNT_CRUMB = 0;
     private String COOKIE_FC_YAHOO = "";
     private String CRUMB_COOKIE = "";
 
     public List<DailyPrice> dailyPricesFromFile(String fileName) {
-        List<DailyPrice> dailyPrices = yahooFinanceClient.dailyPricesFromFile(fileName);
+        List<DailyPrice> dailyPrices = dailyPricesJSONService.dailyPricesFromFile(fileName);
         return dailyPricesService.addDailyPricesInCacheAndReturn(dailyPrices);
     }
 
@@ -69,7 +68,7 @@ public class YahooQuoteService {
             String tickers = partition.stream().map(DailyPrice::getTicker).collect(Collectors.joining(","));
             String pricesJSON = logTimeAndReturn(() -> quotePricesJSON(tickers, getCrumb()), "Yahoo API call and JSON result");
 
-            List<DailyPrice> dailyPricesExtractedFromJSON = yahooFinanceClient.extractDailyPricesFromJSON(pricesJSON);
+            List<DailyPrice> dailyPricesExtractedFromJSON = dailyPricesJSONService.extractDailyPricesFromJSON(pricesJSON);
             List<DailyPrice> dailyPrices = dailyPricesService.addDailyPricesInCacheAndReturn(dailyPricesExtractedFromJSON);
             dailyImportedPrices.addAll(dailyPrices);
 
