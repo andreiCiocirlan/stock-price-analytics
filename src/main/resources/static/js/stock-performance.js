@@ -1,7 +1,25 @@
 let currentTimeFrame = 'WEEKLY';
 let stockPerformanceChart;
-window.onload = showHidePreMarketOptions;
+window.onload = onloadFunction;
 setInterval(showHidePreMarketOptions, 300000); // poll every 5 minute to show/hide GAP_* premarket options
+
+function onloadFunction() {
+    showHidePreMarketOptions();
+    pollForHeatmapUpdates();
+}
+
+function pollForHeatmapUpdates() {
+    setInterval(() => {
+        fetch('/stock-heatmap/refresh')
+            .then(response => response.json())
+            .then(isUpdated => {
+                if (isUpdated) {
+                    updateStockPerformanceChart(currentTimeFrame);
+                }
+            })
+            .catch(error => console.error('Error checking for updates:', error));
+    }, 1000 * 60 * 1); // Poll every minute
+}
 
 function showHidePreMarketOptions() {
     const selectElement = document.getElementById('priceMilestone');
