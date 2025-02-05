@@ -19,6 +19,10 @@ public class DailyPricesService {
         dailyPricesCacheService.initDailyPricesCache(dailyPricesRepository.findLatestDailyPrices());
     }
 
+    public void initPreMarketDailyPricesCache() {
+        dailyPricesCacheService.initPreMarketDailyPricesCache();
+    }
+
     public List<DailyPrice> dailyPricesCache(MarketState marketState) {
         return dailyPricesCacheService.dailyPricesCache(marketState);
     }

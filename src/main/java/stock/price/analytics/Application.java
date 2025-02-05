@@ -36,5 +36,6 @@ public class Application implements ApplicationRunner {
         LoggingUtil.logTime(highLowPricesCacheService::initHighLowPricesCache, "initialized high low prices cache");
         LoggingUtil.logTime(dailyPricesService::initDailyPricesCache, "initialized daily prices cache");
         LoggingUtil.logTime(dailyPricesJSONService::initDailyJSONPricesCache, "initialized daily JSON prices cache");
+        LoggingUtil.logTime(dailyPricesService::initPreMarketDailyPricesCache, "initialized pre-market daily prices cache");
     }
 }
