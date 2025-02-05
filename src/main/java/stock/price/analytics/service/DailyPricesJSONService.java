@@ -224,4 +224,9 @@ public class DailyPricesJSONService {
             log.error("trading date missing from json file for ticker {}", e.getMessage());
         }
     }
+
+    public void initDailyJSONPricesCache() {
+        LocalDate tradingDateNow = tradingDateNow();
+        dailyPricesJSONCacheService.initDailyJSONPricesCache(dailyPricesJSONRepository.findByDateBetween(tradingDateNow.minusDays(7), tradingDateNow));
+    }
 }

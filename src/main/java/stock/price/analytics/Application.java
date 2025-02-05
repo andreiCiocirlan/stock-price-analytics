@@ -20,8 +20,8 @@ public class Application implements ApplicationRunner {
     private final StockService stockService;
     private final HigherTimeframePricesCacheService higherTimeframePricesCacheService;
     private final HighLowPricesCacheService highLowPricesCacheService;
-    private final DailyPricesCacheService dailyPricesCacheService;
-    private final DailyPricesJSONCacheService dailyPricesJSONCacheService;
+    private final DailyPricesService dailyPricesService;
+    private final DailyPricesJSONService dailyPricesJSONService;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -34,7 +34,7 @@ public class Application implements ApplicationRunner {
         LoggingUtil.logTime(higherTimeframePricesCacheService::initHigherTimeframePricesCache, "initialized higher-timeframe prices cache");
         LoggingUtil.logTime(stockService::initStocksCache, "initialized xtb stocks cache");
         LoggingUtil.logTime(highLowPricesCacheService::initHighLowPricesCache, "initialized high low prices cache");
-        LoggingUtil.logTime(dailyPricesCacheService::initDailyPricesCache, "initialized daily prices cache");
-        LoggingUtil.logTime(dailyPricesJSONCacheService::initDailyJSONPricesCache, "initialized daily JSON prices cache");
+        LoggingUtil.logTime(dailyPricesService::initDailyPricesCache, "initialized daily prices cache");
+        LoggingUtil.logTime(dailyPricesJSONService::initDailyJSONPricesCache, "initialized daily JSON prices cache");
     }
 }
