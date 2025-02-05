@@ -33,7 +33,7 @@ public class PriceMilestoneService {
 
     private Optional<PriceMilestone> getPriceMilestone(String milestone) {
         try {
-            return PriceMilestone.valueOf(milestone) == PriceMilestone.NONE ? Optional.empty() : Optional.of(PriceMilestone.valueOf(milestone)); // Return null for NONE
+            return PriceMilestone.valueOf(milestone) == PriceMilestone.NONE ? Optional.empty() : Optional.of(PriceMilestone.valueOf(milestone));
         } catch (IllegalArgumentException e) {
             return Optional.empty(); // Not a valid PriceMilestone
         }
@@ -41,7 +41,7 @@ public class PriceMilestoneService {
 
     private Optional<PreMarketPriceMilestone> getPreMarketPriceMilestone(String milestone) {
         try {
-            return PreMarketPriceMilestone.valueOf(milestone) == PreMarketPriceMilestone.NONE ? Optional.empty() : Optional.of(PreMarketPriceMilestone.valueOf(milestone)); // Return null for NONE
+            return PreMarketPriceMilestone.valueOf(milestone) == PreMarketPriceMilestone.NONE ? Optional.empty() : Optional.of(PreMarketPriceMilestone.valueOf(milestone));
         } catch (IllegalArgumentException e) {
             return Optional.empty(); // Not a valid PreMarketPriceMilestone
         }
