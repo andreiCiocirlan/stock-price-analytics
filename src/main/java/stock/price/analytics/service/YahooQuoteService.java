@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static stock.price.analytics.model.stocks.enums.MarketState.REGULAR;
 import static stock.price.analytics.util.Constants.MAX_TICKER_COUNT_PRINT;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
@@ -57,7 +58,7 @@ public class YahooQuoteService {
     public List<DailyPrice> dailyPricesImport() {
         int maxTickersPerRequest = 1700;
         List<DailyPrice> dailyImportedPrices = new ArrayList<>();
-        List<DailyPrice> latestPrices = dailyPricesService.dailyPricesCache();
+        List<DailyPrice> latestPrices = dailyPricesService.dailyPricesCache(REGULAR);
         List<String> tickersNotImported = new ArrayList<>(latestPrices.stream().map(DailyPrice::getTicker).toList());
 
         int start = 0;

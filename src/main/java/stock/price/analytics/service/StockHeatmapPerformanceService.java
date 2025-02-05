@@ -5,18 +5,19 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.controller.dto.StockPerformanceDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.stocks.Stock;
-import stock.price.analytics.model.stocks.enums.MarketState;
 
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
 
 @Service
 @RequiredArgsConstructor
 public class StockHeatmapPerformanceService {
 
     private final StockService stockService;
-    private final DailyPricesCacheService dailyPricesCacheService;
+    private final DailyPricesService dailyPricesService;
 
     private static void addPreMarketPriceOrStockPrice(Stock stock, StockTimeframe timeFrame, Map<String, StockPerformanceDTO> preMarketMap, List<StockPerformanceDTO> result) {
         String ticker = stock.getTicker();
@@ -27,7 +28,7 @@ public class StockHeatmapPerformanceService {
     }
 
     public List<StockPerformanceDTO> stockPerformanceFor(StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, Double cfdMargin, List<String> tickers) {
-        Map<String, StockPerformanceDTO> preMarketMap = dailyPricesCacheService.dailyPricesCache(MarketState.PRE).stream()
+        Map<String, StockPerformanceDTO> preMarketMap = dailyPricesService.dailyPricesCache(PRE).stream()
                 .filter(dp -> tickers.contains(dp.getTicker()))
                 .map(dp -> new StockPerformanceDTO(dp.getTicker(), dp.getPerformance()))
                 .collect(Collectors.toMap(StockPerformanceDTO::ticker, dto -> dto));
