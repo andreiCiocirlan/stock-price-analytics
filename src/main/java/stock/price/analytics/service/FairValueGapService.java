@@ -52,9 +52,9 @@ public class FairValueGapService {
         currentFVGsByCompositeId.forEach((compositeKey, fvg) -> {
             if (!dbFVGsByCompositeId.containsKey(compositeKey)) {
                 newFVGsFound.add(new FairValueGap(fvg.getTicker(), fvg.getTimeframe(), fvg.getDate(), fvg.getType(), fvg.getStatus(), fvg.getLow(),  fvg.getHigh()));
-                log.info("New {} fvg : {}", timeframe, fvg);
             }
         });
+        log.info("Found {} new {} FVGs for: {}", newFVGsFound.size(), timeframe, newFVGsFound.stream().map(FairValueGap::getTicker).toList());
 
         return newFVGsFound;
     }
@@ -80,9 +80,9 @@ public class FairValueGapService {
             if (!currentFVGsByCompositeId.containsKey(compositeKey)) {
                 fvg.setStatus(FvgStatus.CLOSED);
                 closedFVGsFound.add(fvg);
-                log.info("Closed {} fvg : {}", timeframe, fvg);
             }
         });
+        log.info("Closed {} {} FVGs for: {}", closedFVGsFound.size(), timeframe, closedFVGsFound.stream().map(FairValueGap::getTicker).toList());
 
         return closedFVGsFound;
     }
