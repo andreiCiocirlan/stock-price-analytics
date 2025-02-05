@@ -71,7 +71,7 @@ public class YahooQuoteClient {
         return cookieValue;
     }
 
-    public String getCrumb() {
+    private String getCrumb() {
         if (!CRUMB_COOKIE.isBlank()) {
             return CRUMB_COOKIE;
         }
