@@ -13,7 +13,6 @@ public class DailyPricesJSONCacheService {
 
     private final DailyPricesJSONCache dailyPricesJSONCache;
 
-    // add last 7 trading days in  cache for good measure
     protected void initDailyJSONPricesCache(List<DailyPricesJSON> latestDailyPricesJSON) {
         dailyPricesJSONCache.addDailyJSONPrices(latestDailyPricesJSON);
     }
