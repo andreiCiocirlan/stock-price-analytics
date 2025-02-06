@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/stock-performance-heatmap")
 @RestController
 @RequiredArgsConstructor
-public class StockHeatmapUpdateController {
+public class StockHeatmapRefreshController {
 
     private volatile boolean dataUpdated = false;
 
     // same cron timings as YahooPricesScheduler, but 10 seconds later to account for request finishing
-    @Scheduled(cron = "${cron.expression.stocks.heatmap}", zone = "${cron.expression.timezone}")
+    @Scheduled(cron = "${cron.expression.stocks.heatmap.refresh}", zone = "${cron.expression.timezone}")
     public void updateDataFlag() {
         dataUpdated = true;
     }
