@@ -11,10 +11,7 @@ import stock.price.analytics.cache.HigherTimeframePricesCache;
 import stock.price.analytics.controller.dto.CandleWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
-import stock.price.analytics.repository.prices.MonthlyPricesRepository;
-import stock.price.analytics.repository.prices.PricesRepository;
-import stock.price.analytics.repository.prices.WeeklyPricesRepository;
-import stock.price.analytics.repository.prices.YearlyPricesRepository;
+import stock.price.analytics.repository.prices.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -39,6 +36,7 @@ public class PricesService {
     private final PricesRepository pricesRepository;
     private final WeeklyPricesRepository weeklyPricesRepository;
     private final MonthlyPricesRepository monthlyPricesRepository;
+    private final QuarterlyPricesRepository quarterlyPricesRepository;
     private final YearlyPricesRepository yearlyPricesRepository;
     private final HigherTimeframePricesCache higherTimeframePricesCache;
 
@@ -145,13 +143,13 @@ public class PricesService {
         List<QuarterlyPrice> previousQuarterlyPrices;
         if (cacheTickers.isEmpty()) {
             log.info("Fetching PreviousTwoQuarterlyPrices from database for {} tickers", tickers.size());
-            previousQuarterlyPrices = pricesRepository.findPreviousThreeQuarterlyPricesForTickers(tickers);
+            previousQuarterlyPrices = quarterlyPricesRepository.findPreviousThreeQuarterlyPricesForTickers(tickers);
             higherTimeframePricesCache.addQuarterlyPrices(previousQuarterlyPrices);
         } else if (cacheTickers.containsAll(tickers)) {
             previousQuarterlyPrices = higherTimeframePricesCache.quarterlyPricesFor(tickers);
         } else { // partial match
             tickers.removeAll(cacheTickers);
-            previousQuarterlyPrices = pricesRepository.findPreviousThreeQuarterlyPricesForTickers(tickers);
+            previousQuarterlyPrices = quarterlyPricesRepository.findPreviousThreeQuarterlyPricesForTickers(tickers);
             higherTimeframePricesCache.addQuarterlyPrices(previousQuarterlyPrices);
             log.info("previousQuarterlyPrices partial match for {} tickers", tickers.size());
             cacheTickers.addAll(tickers);

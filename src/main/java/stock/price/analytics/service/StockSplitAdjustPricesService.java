@@ -21,13 +21,14 @@ public class StockSplitAdjustPricesService {
     private final DailyPricesRepository dailyPricesRepository;
     private final WeeklyPricesRepository weeklyPricesRepository;
     private final MonthlyPricesRepository monthlyPricesRepository;
+    private final QuarterlyPricesRepository quarterlyPricesRepository;
     private final YearlyPricesRepository yearlyPricesRepository;
 
     public void adjustPricesFor(String ticker, LocalDate stockSplitDate, double priceMultiplier) {
         List<DailyPrice> dailyPricesToUpdate = dailyPricesRepository.findByTickerAndDateLessThan(ticker, stockSplitDate);
         List<WeeklyPrice> weeklyPricesToUpdate = weeklyPricesRepository.findWeeklyByTickerAndStartDateBefore(ticker, stockSplitDate.with(previousOrSame(DayOfWeek.MONDAY)));
         List<MonthlyPrice> monthlyPricesToUpdate = monthlyPricesRepository.findMonthlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfMonth()));
-        List<QuarterlyPrice> quarterlyPricesToUpdate = pricesRepository.findQuarterlyByTickerAndStartDateBefore(ticker, LocalDate.of(stockSplitDate.getYear(), stockSplitDate.getMonth().firstMonthOfQuarter().getValue(), 1));
+        List<QuarterlyPrice> quarterlyPricesToUpdate = quarterlyPricesRepository.findQuarterlyByTickerAndStartDateBefore(ticker, LocalDate.of(stockSplitDate.getYear(), stockSplitDate.getMonth().firstMonthOfQuarter().getValue(), 1));
         List<YearlyPrice> yearlyPricesToUpdate = yearlyPricesRepository.findYearlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfYear()));
 
         dailyPricesToUpdate.forEach(dailyPrice -> updatePrices(dailyPrice, priceMultiplier));
@@ -36,11 +37,11 @@ public class StockSplitAdjustPricesService {
         quarterlyPricesToUpdate.forEach(quarterlyPrices -> updatePrices(quarterlyPrices, priceMultiplier));
         yearlyPricesToUpdate.forEach(yearlyPrices -> updatePrices(yearlyPrices, priceMultiplier));
 
-        partitionDataAndSave(dailyPricesToUpdate, pricesRepository);
-        partitionDataAndSave(weeklyPricesToUpdate, pricesRepository);
-        partitionDataAndSave(monthlyPricesToUpdate, pricesRepository);
-        partitionDataAndSave(quarterlyPricesToUpdate, pricesRepository);
-        partitionDataAndSave(yearlyPricesToUpdate, pricesRepository);
+        partitionDataAndSave(dailyPricesToUpdate, dailyPricesRepository);
+        partitionDataAndSave(weeklyPricesToUpdate, weeklyPricesRepository);
+        partitionDataAndSave(monthlyPricesToUpdate, monthlyPricesRepository);
+        partitionDataAndSave(quarterlyPricesToUpdate, quarterlyPricesRepository);
+        partitionDataAndSave(yearlyPricesToUpdate, yearlyPricesRepository);
     }
 
     public List<? extends AbstractPrice> adjustPricesForDateAndTimeframe(String ticker, LocalDate date, double priceMultiplier, StockTimeframe timeframe, String ohlc) {
@@ -48,7 +49,7 @@ public class StockSplitAdjustPricesService {
             case DAILY -> dailyPricesRepository.findByTickerAndDate(ticker, date);
             case WEEKLY -> weeklyPricesRepository.findWeeklyByTickerAndStartDate(ticker, date);
             case MONTHLY -> monthlyPricesRepository.findMonthlyByTickerAndStartDate(ticker, date);
-            case QUARTERLY -> pricesRepository.findQuarterlyByTickerAndStartDate(ticker, date);
+            case QUARTERLY -> quarterlyPricesRepository.findQuarterlyByTickerAndStartDate(ticker, date);
             case YEARLY -> yearlyPricesRepository.findYearlyByTickerAndStartDate(ticker, date);
         };
 
