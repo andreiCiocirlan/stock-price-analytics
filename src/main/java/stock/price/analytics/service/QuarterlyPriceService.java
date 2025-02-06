@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
+import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +45,7 @@ public class QuarterlyPriceService {
                 )
         );
 
-        partitionDataAndSave(quarterlyPrices, quarterlyPricesRepository);
+        partitionDataAndSaveWithLogTime(quarterlyPrices, quarterlyPricesRepository, "saved " + quarterlyPrices.size() + " quarterly prices");
         quarterlyPricesRepository.quarterlyPricesUpdatePerformance();
     }
 
