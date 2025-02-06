@@ -2,7 +2,7 @@ package stock.price.analytics.cache;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import stock.price.analytics.model.prices.enums.PriceMilestone;
+import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.stocks.Stock;
 
@@ -18,21 +18,21 @@ public class PriceMilestoneCache {
     private final StocksCache stocksCache;
     private final HighLowPricesCache highLowPricesCache;
 
-    public List<String> findTickersForMilestone(PriceMilestone priceMilestone, double cfdMargin) {
-        Map<String, HighLowForPeriod> hlPricesCache = highLowPricesCache.cacheForMilestone(priceMilestone)
+    public List<String> findTickersForMilestone(PricePerformanceMilestone pricePerformanceMilestone, double cfdMargin) {
+        Map<String, HighLowForPeriod> hlPricesCache = highLowPricesCache.cacheForMilestone(pricePerformanceMilestone)
                 .stream()
                 .collect(Collectors.toMap(HighLowForPeriod::getTicker, p -> p));
         Collection<Stock> stocksList = stocksCache.getStocksMap().values();
 
         return stocksList.stream()
                 .filter(stock -> stock.getCfdMargin() == cfdMargin)
-                .filter(stock -> priceWithinMilestone(stock, hlPricesCache.get(stock.getTicker()), priceMilestone))
+                .filter(stock -> priceWithinPerformanceMilestone(stock, hlPricesCache.get(stock.getTicker()), pricePerformanceMilestone))
                 .map(Stock::getTicker)
                 .toList();
     }
 
-    private boolean priceWithinMilestone(Stock s, HighLowForPeriod highLowForPeriod, PriceMilestone priceMilestone) {
-        return switch (priceMilestone) {
+    private boolean priceWithinPerformanceMilestone(Stock s, HighLowForPeriod highLowForPeriod, PricePerformanceMilestone pricePerformanceMilestone) {
+        return switch (pricePerformanceMilestone) {
             case NEW_52W_HIGH, NEW_ALL_TIME_HIGH, NEW_4W_HIGH -> s.getWeeklyHigh() > highLowForPeriod.getHigh();
             case NEW_52W_LOW, NEW_4W_LOW, NEW_ALL_TIME_LOW -> s.getWeeklyLow() < highLowForPeriod.getLow();
             case HIGH_52W_95, HIGH_4W_95, HIGH_ALL_TIME_95 ->

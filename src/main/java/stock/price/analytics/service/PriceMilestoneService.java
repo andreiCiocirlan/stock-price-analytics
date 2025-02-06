@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.PreMarketPriceMilestoneCache;
 import stock.price.analytics.cache.PriceMilestoneCache;
 import stock.price.analytics.model.prices.enums.PreMarketPriceMilestone;
-import stock.price.analytics.model.prices.enums.PriceMilestone;
+import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +20,7 @@ public class PriceMilestoneService {
 
     public List<String> findTickersForMilestone(String priceMilestone, double cfdMargin) {
         List<String> tickers = new ArrayList<>();
-        Optional<PriceMilestone> priceMilestoneEnum = getPriceMilestone(priceMilestone);
+        Optional<PricePerformanceMilestone> priceMilestoneEnum = getPricePerformanceMilestone(priceMilestone);
         Optional<PreMarketPriceMilestone> preMarketMilestoneEnum = getPreMarketPriceMilestone(priceMilestone);
 
         if (priceMilestoneEnum.isPresent())
@@ -30,9 +30,9 @@ public class PriceMilestoneService {
         return tickers;
     }
 
-    private Optional<PriceMilestone> getPriceMilestone(String milestone) {
+    private Optional<PricePerformanceMilestone> getPricePerformanceMilestone(String milestone) {
         try {
-            return PriceMilestone.valueOf(milestone) == PriceMilestone.NONE ? Optional.empty() : Optional.of(PriceMilestone.valueOf(milestone));
+            return PricePerformanceMilestone.valueOf(milestone) == PricePerformanceMilestone.NONE ? Optional.empty() : Optional.of(PricePerformanceMilestone.valueOf(milestone));
         } catch (IllegalArgumentException e) {
             return Optional.empty(); // Not a valid PriceMilestone
         }
@@ -47,7 +47,7 @@ public class PriceMilestoneService {
     }
 
     public boolean isNoneMilestone(String milestone) {
-        return getPriceMilestone(milestone).isEmpty() && getPreMarketPriceMilestone(milestone).isEmpty();
+        return getPricePerformanceMilestone(milestone).isEmpty() && getPreMarketPriceMilestone(milestone).isEmpty();
     }
 
 }

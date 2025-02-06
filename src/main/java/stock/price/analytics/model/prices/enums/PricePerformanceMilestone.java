@@ -1,6 +1,6 @@
 package stock.price.analytics.model.prices.enums;
 
-public enum PriceMilestone {
+public enum PricePerformanceMilestone {
     NEW_52W_HIGH,
     NEW_4W_HIGH,
     NEW_ALL_TIME_HIGH,

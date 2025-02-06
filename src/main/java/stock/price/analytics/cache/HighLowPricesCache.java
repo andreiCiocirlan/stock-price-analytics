@@ -3,7 +3,7 @@ package stock.price.analytics.cache;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
-import stock.price.analytics.model.prices.enums.PriceMilestone;
+import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
 import stock.price.analytics.model.prices.highlow.HighLow4w;
 import stock.price.analytics.model.prices.highlow.HighLow52Week;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
@@ -104,8 +104,8 @@ public class HighLowPricesCache {
         };
     }
 
-    public List<? extends HighLowForPeriod> cacheForMilestone(PriceMilestone priceMilestone) {
-        return switch (priceMilestone) {
+    public List<? extends HighLowForPeriod> cacheForMilestone(PricePerformanceMilestone pricePerformanceMilestone) {
+        return switch (pricePerformanceMilestone) {
             case HIGH_4W_95, LOW_4W_95 -> new ArrayList<>(highLow4wMap.values());
             case NEW_4W_HIGH, NEW_4W_LOW -> new ArrayList<>(prevWeekHighLow4wMap.values());
             case HIGH_52W_95, LOW_52W_95 -> new ArrayList<>(highLow52wMap.values());
