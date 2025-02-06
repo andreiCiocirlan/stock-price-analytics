@@ -151,4 +151,21 @@ public class StockService {
     public LocalDate findLastUpdate() {
         return stockRepository.findLastUpdate();
     }
+
+    public void updateStockDailyPricesFor(String ticker) {
+        stockRepository.updateStockDailyPricesFor(ticker);
+    }
+
+    public void updateStockHigherTimeframePricesFor(String ticker) {
+        stockRepository.updateStockWeeklyPricesFor(ticker);
+        stockRepository.updateStockMonthlyPricesFor(ticker);
+        stockRepository.updateStockQuarterlyPricesFor(ticker);
+        stockRepository.updateStockYearlyPricesFor(ticker);
+    }
+
+    public void updateHighLowForPeriodPrices(String ticker) {
+        stockRepository.updateHighLow4wPricesFor(ticker);
+        stockRepository.updateHighLow52wPricesFor(ticker);
+        stockRepository.updateHighestLowestPricesFor(ticker);
+    }
 }

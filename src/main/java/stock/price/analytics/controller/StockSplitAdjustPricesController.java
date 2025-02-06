@@ -12,13 +12,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
-import stock.price.analytics.service.FairValueGapService;
-import stock.price.analytics.service.HighLowForPeriodService;
-import stock.price.analytics.service.PricesService;
-import stock.price.analytics.service.StockSplitAdjustPricesService;
+import stock.price.analytics.service.*;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+
+import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 @RestController
 @Validated
@@ -30,6 +31,7 @@ public class StockSplitAdjustPricesController {
     private final PricesService pricesService;
     private final HighLowForPeriodService highLowForPeriodService;
     private final FairValueGapService fairValueGapService;
+    private final StockService stockService;
 
     @PostMapping("/adjust-prices")
     @Transactional
@@ -40,6 +42,15 @@ public class StockSplitAdjustPricesController {
         pricesService.updateAllHigherTimeframesPricesForTickers(stockSplitDate, STR."'\{ticker}'");
         highLowForPeriodService.saveAllHistoricalHighLowPrices(List.of(ticker), stockSplitDate);
         fairValueGapService.updateFVGPricesForStockSplit(ticker, stockSplitDate, priceMultiplier);
+
+        // stockSplitDate within the last_updated week
+        if (stockSplitDate.isAfter(tradingDateNow().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)))) {
+            stockService.updateStockHigherTimeframePricesFor(ticker);
+            stockService.updateHighLowForPeriodPrices(ticker);
+            if (stockSplitDate.isEqual(tradingDateNow())) {
+                stockService.updateStockDailyPricesFor(ticker);
+            }
+        }
     }
 
     @PostMapping("/adjust-prices-for-date")
