@@ -1,6 +1,7 @@
 package stock.price.analytics.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.PreMarketPriceMilestoneCache;
 import stock.price.analytics.cache.PriceMilestoneCache;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PriceMilestoneService {
@@ -34,6 +36,7 @@ public class PriceMilestoneService {
         try {
             return PricePerformanceMilestone.valueOf(milestone) == PricePerformanceMilestone.NONE ? Optional.empty() : Optional.of(PricePerformanceMilestone.valueOf(milestone));
         } catch (IllegalArgumentException e) {
+            log.error("Invalid PriceMilestone {} error: {}", milestone, e.getMessage());
             return Optional.empty(); // Not a valid PriceMilestone
         }
     }
@@ -42,6 +45,7 @@ public class PriceMilestoneService {
         try {
             return PreMarketPriceMilestone.valueOf(milestone) == PreMarketPriceMilestone.NONE ? Optional.empty() : Optional.of(PreMarketPriceMilestone.valueOf(milestone));
         } catch (IllegalArgumentException e) {
+            log.error("Invalid PreMarketPriceMilestone {} error: {}", milestone, e.getMessage());
             return Optional.empty(); // Not a valid PreMarketPriceMilestone
         }
     }
