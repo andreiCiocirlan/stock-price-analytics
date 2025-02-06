@@ -27,7 +27,7 @@ function showHidePreMarketOptions() {
 
     // Get current time in New York
     const now = new Date();
-    const nyTimeString = now.toLocaleString("en-US", { timeZone: "America/New_York" });
+    const nyTimeString = now.toLocaleString('en-US', { timeZone: 'America/New_York' });
     const nyTime = new Date(nyTimeString);
     const day = nyTime.getDay(); // 0 (Sun) - 6 (Sat)
     const hour = nyTime.getHours();
