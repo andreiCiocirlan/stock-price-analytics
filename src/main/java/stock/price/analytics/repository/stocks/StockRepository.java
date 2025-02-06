@@ -181,4 +181,92 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
 
     @Query("SELECT MAX(s.lastUpdated) FROM Stock s")
     LocalDate findLastUpdate();
+
+    @Modifying
+    @Query(value = """
+            UPDATE stocks
+                SET d_open = dp.open, d_close = dp.close, d_low = dp.low,d_high = dp.high, d_performance = dp.performance
+                FROM daily_prices dp
+                WHERE dp.ticker = stocks.ticker
+                  AND dp.ticker = :ticker
+                  AND dp.date = (select last_updated FROM stocks WHERE ticker = :ticker)
+            """, nativeQuery = true)
+    void updateStockDailyPricesFor(String ticker);
+
+    @Modifying
+    @Query(value = """
+            UPDATE stocks
+                SET w_open = dp.open, w_close = dp.close, w_low = dp.low,w_high = dp.high, w_performance = dp.performance
+                FROM weekly_prices dp
+                WHERE dp.ticker = stocks.ticker
+                  AND dp.ticker = :ticker
+                  AND dp.start_date = (SELECT date_trunc('WEEK', last_updated) FROM stocks WHERE ticker = :ticker)
+            """, nativeQuery = true)
+    void updateStockWeeklyPricesFor(String ticker);
+
+    @Modifying
+    @Query(value = """
+            UPDATE stocks
+                SET m_open = dp.open, m_close = dp.close, m_low = dp.low,m_high = dp.high, m_performance = dp.performance
+                FROM monthly_prices dp
+                WHERE dp.ticker = stocks.ticker
+                  AND dp.ticker = :ticker
+                  AND dp.start_date = (SELECT date_trunc('MONTH', last_updated) FROM stocks WHERE ticker = :ticker)
+            """, nativeQuery = true)
+    void updateStockMonthlyPricesFor(String ticker);
+
+    @Modifying
+    @Query(value = """
+            UPDATE stocks
+                SET q_open = dp.open, q_close = dp.close, q_low = dp.low,q_high = dp.high, q_performance = dp.performance
+                FROM quarterly_prices dp
+                WHERE dp.ticker = stocks.ticker
+                  AND dp.ticker = :ticker
+                  AND dp.start_date = (SELECT date_trunc('QUARTER', last_updated) FROM stocks WHERE ticker = :ticker)
+            """, nativeQuery = true)
+    void updateStockQuarterlyPricesFor(String ticker);
+
+    @Modifying
+    @Query(value = """
+            UPDATE stocks
+                SET y_open = dp.open, y_close = dp.close, y_low = dp.low,y_high = dp.high, y_performance = dp.performance
+                FROM yearly_prices dp
+                WHERE dp.ticker = stocks.ticker
+                  AND dp.ticker = :ticker
+                  AND dp.start_date = (SELECT date_trunc('YEAR', last_updated) FROM stocks WHERE ticker = :ticker)
+            """, nativeQuery = true)
+    void updateStockYearlyPricesFor(String ticker);
+
+    @Modifying
+    @Query(value = """
+            UPDATE stocks
+                SET high52w = dp.high, low52w = dp.low
+                FROM high_low52w dp
+                WHERE dp.ticker = stocks.ticker
+                  AND dp.ticker = :ticker
+                  AND dp.start_date = (SELECT date_trunc('WEEK', last_updated) FROM stocks WHERE ticker = :ticker)
+            """, nativeQuery = true)
+    void updateHighLow52wPricesFor(String ticker);
+
+    @Modifying
+    @Query(value = """
+            UPDATE stocks
+                SET high4w = dp.high, low4w = dp.low
+                FROM high_low4w dp
+                WHERE dp.ticker = stocks.ticker
+                  AND dp.ticker = :ticker
+                  AND dp.start_date = (SELECT date_trunc('WEEK', last_updated) FROM stocks WHERE ticker = :ticker)
+            """, nativeQuery = true)
+    void updateHighLow4wPricesFor(String ticker);
+
+    @Modifying
+    @Query(value = """
+            UPDATE stocks
+                SET highest = dp.high, lowest = dp.low
+                FROM highest_lowest dp
+                WHERE dp.ticker = stocks.ticker
+                  AND dp.ticker = :ticker
+                  AND dp.start_date = (SELECT date_trunc('WEEK', last_updated) FROM stocks WHERE ticker = :ticker)
+            """, nativeQuery = true)
+    void updateHighestLowestPricesFor(String ticker);
 }
