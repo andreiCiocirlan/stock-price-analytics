@@ -7,6 +7,7 @@ import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.prices.MonthlyPricesRepository;
 import stock.price.analytics.repository.prices.PricesRepository;
 import stock.price.analytics.repository.prices.WeeklyPricesRepository;
+import stock.price.analytics.repository.prices.YearlyPricesRepository;
 import stock.price.analytics.repository.stocks.StockRepository;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class HigherTimeframePricesCacheService {
     private final StockRepository stockRepository;
     private final WeeklyPricesRepository weeklyPricesRepository;
     private final MonthlyPricesRepository monthlyPricesRepository;
+    private final YearlyPricesRepository yearlyPricesRepository;
     private final PricesRepository pricesRepository;
 
     public void initHigherTimeframePricesCache() {
@@ -27,7 +29,7 @@ public class HigherTimeframePricesCacheService {
         higherTimeframePricesCache.addWeeklyPrices(weeklyPricesRepository.findPreviousThreeWeeklyPricesForTickers(tickers));
         higherTimeframePricesCache.addMonthlyPrices(monthlyPricesRepository.findPreviousThreeMonthlyPricesForTickers(tickers));
         higherTimeframePricesCache.addQuarterlyPrices(pricesRepository.findPreviousThreeQuarterlyPricesForTickers(tickers));
-        higherTimeframePricesCache.addYearlyPrices(pricesRepository.findPreviousThreeYearlyPricesForTickers(tickers));
+        higherTimeframePricesCache.addYearlyPrices(yearlyPricesRepository.findPreviousThreeYearlyPricesForTickers(tickers));
     }
 
 }
