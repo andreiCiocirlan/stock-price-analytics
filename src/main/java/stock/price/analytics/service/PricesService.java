@@ -11,6 +11,7 @@ import stock.price.analytics.cache.HigherTimeframePricesCache;
 import stock.price.analytics.controller.dto.CandleWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
+import stock.price.analytics.repository.prices.MonthlyPricesRepository;
 import stock.price.analytics.repository.prices.PricesRepository;
 import stock.price.analytics.repository.prices.WeeklyPricesRepository;
 
@@ -35,6 +36,7 @@ public class PricesService {
     private final EntityManager entityManager;
 
     private final PricesRepository pricesRepository;
+    private final MonthlyPricesRepository monthlyPricesRepository;
     private final WeeklyPricesRepository weeklyPricesRepository;
     private final HigherTimeframePricesCache higherTimeframePricesCache;
 
@@ -115,13 +117,13 @@ public class PricesService {
         List<MonthlyPrice> previousMonthlyPrices;
         if (cacheTickers.isEmpty()) {
             log.info("Fetching PreviousTwoMonthlyPrices from database for {} tickers", tickers.size());
-            previousMonthlyPrices = pricesRepository.findPreviousThreeMonthlyPricesForTickers(tickers);
+            previousMonthlyPrices = monthlyPricesRepository.findPreviousThreeMonthlyPricesForTickers(tickers);
             higherTimeframePricesCache.addMonthlyPrices(previousMonthlyPrices);
         } else if (cacheTickers.containsAll(tickers)) {
             previousMonthlyPrices = higherTimeframePricesCache.monthlyPricesFor(tickers);
         } else { // partial match
             tickers.removeAll(cacheTickers);
-            previousMonthlyPrices = pricesRepository.findPreviousThreeMonthlyPricesForTickers(tickers);
+            previousMonthlyPrices = monthlyPricesRepository.findPreviousThreeMonthlyPricesForTickers(tickers);
             higherTimeframePricesCache.addMonthlyPrices(previousMonthlyPrices);
             log.info("previousMonthlyPrices partial match for {} tickers", tickers.size());
             cacheTickers.addAll(tickers);

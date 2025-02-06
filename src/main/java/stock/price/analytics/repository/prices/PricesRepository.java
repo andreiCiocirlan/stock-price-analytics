@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
-import stock.price.analytics.model.prices.ohlc.MonthlyPrice;
 import stock.price.analytics.model.prices.ohlc.QuarterlyPrice;
 import stock.price.analytics.model.prices.ohlc.YearlyPrice;
 
@@ -15,21 +14,6 @@ import java.util.List;
 
 @Repository
 public interface PricesRepository extends JpaRepository<AbstractPrice, Long> {
-
-    @Query(value = """
-                SELECT *
-                FROM monthly_prices
-                WHERE start_date BETWEEN (DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '2 month') AND CURRENT_DATE
-                AND ticker in (:tickers)
-                ORDER BY ticker, start_date DESC
-            """, nativeQuery = true)
-    List<MonthlyPrice> findPreviousThreeMonthlyPricesForTickers(@Param("tickers") List<String> tickers);
-
-    @Query("SELECT m FROM MonthlyPrice m WHERE m.ticker = :ticker AND m.startDate < :date")
-    List<MonthlyPrice> findMonthlyByTickerAndStartDateBefore(String ticker, LocalDate date);
-
-    @Query("SELECT m FROM MonthlyPrice m WHERE m.ticker = :ticker AND m.startDate = :date")
-    List<MonthlyPrice> findMonthlyByTickerAndStartDate(String ticker, LocalDate date);
 
     @Query(value = """
                 SELECT *

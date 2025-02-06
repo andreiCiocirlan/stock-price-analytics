@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.repository.prices.DailyPricesRepository;
+import stock.price.analytics.repository.prices.MonthlyPricesRepository;
 import stock.price.analytics.repository.prices.PricesRepository;
 import stock.price.analytics.repository.prices.WeeklyPricesRepository;
 
@@ -20,13 +21,14 @@ import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partiti
 public class StockSplitAdjustPricesService {
 
     private final PricesRepository pricesRepository;
+    private final MonthlyPricesRepository monthlyPricesRepository;
     private final DailyPricesRepository dailyPricesRepository;
     private final WeeklyPricesRepository weeklyPricesRepository;
 
     public void adjustPricesFor(String ticker, LocalDate stockSplitDate, double priceMultiplier) {
         List<DailyPrice> dailyPricesToUpdate = dailyPricesRepository.findByTickerAndDateLessThan(ticker, stockSplitDate);
         List<WeeklyPrice> weeklyPricesToUpdate = weeklyPricesRepository.findWeeklyByTickerAndStartDateBefore(ticker, stockSplitDate.with(previousOrSame(DayOfWeek.MONDAY)));
-        List<MonthlyPrice> monthlyPricesToUpdate = pricesRepository.findMonthlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfMonth()));
+        List<MonthlyPrice> monthlyPricesToUpdate = monthlyPricesRepository.findMonthlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfMonth()));
         List<QuarterlyPrice> quarterlyPricesToUpdate = pricesRepository.findQuarterlyByTickerAndStartDateBefore(ticker, LocalDate.of(stockSplitDate.getYear(), stockSplitDate.getMonth().firstMonthOfQuarter().getValue(), 1));
         List<YearlyPrice> yearlyPricesToUpdate = pricesRepository.findYearlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfYear()));
 
@@ -47,7 +49,7 @@ public class StockSplitAdjustPricesService {
         List<? extends AbstractPrice> pricesToUpdate = switch (timeframe) {
             case DAILY -> dailyPricesRepository.findByTickerAndDate(ticker, date);
             case WEEKLY -> weeklyPricesRepository.findWeeklyByTickerAndStartDate(ticker, date);
-            case MONTHLY -> pricesRepository.findMonthlyByTickerAndStartDate(ticker, date);
+            case MONTHLY -> monthlyPricesRepository.findMonthlyByTickerAndStartDate(ticker, date);
             case QUARTERLY -> pricesRepository.findQuarterlyByTickerAndStartDate(ticker, date);
             case YEARLY -> pricesRepository.findYearlyByTickerAndStartDate(ticker, date);
         };
