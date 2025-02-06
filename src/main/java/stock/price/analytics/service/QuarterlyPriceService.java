@@ -28,19 +28,15 @@ public class QuarterlyPriceService {
     public void saveAllQuarterlyPrices() {
         List<MonthlyPrice> monthlyPrices = pricesRepository.findAllMonthlyPrices();
 
-        Map<String, Map<String, List<MonthlyPrice>>> groupedByTickerAndQuarter =
+        Map<String, Map<String, List<MonthlyPrice>>> monthlyPricesByTickerAndQuarter =
                 monthlyPrices.stream()
                         .collect(Collectors.groupingBy(
                                 MonthlyPrice::getTicker,
-                                Collectors.groupingBy(price -> {
-                                    int year = price.getStartDate().getYear();
-                                    int quarter = (price.getStartDate().getMonthValue() - 1) / 3 + 1;
-                                    return year + "-Q" + quarter; // Format as "YYYY-QX"
-                                })
+                                Collectors.groupingBy(QuarterlyPriceService::compositeKeyFrom)
                         ));
 
         List<QuarterlyPrice> quarterlyPrices = new ArrayList<>();
-        groupedByTickerAndQuarter.forEach(
+        monthlyPricesByTickerAndQuarter.forEach(
                 (_, quarterlyData) -> quarterlyData.forEach(
                         (_, prices) -> {
                             List<MonthlyPrice> monthlyPricesSortedChronologically = prices.stream().sorted(Comparator.comparing(MonthlyPrice::getStartDate)).toList();
@@ -51,6 +47,12 @@ public class QuarterlyPriceService {
 
         partitionDataAndSave(quarterlyPrices, pricesRepository);
         pricesRepository.quarterlyPricesUpdatePerformance();
+    }
+
+    private static String compositeKeyFrom(MonthlyPrice price) {
+        int year = price.getStartDate().getYear();
+        int quarter = (price.getStartDate().getMonthValue() - 1) / 3 + 1;
+        return year + "-Q" + quarter;
     }
 
     private QuarterlyPrice quarterlyPricesFrom(List<MonthlyPrice> monthlyPrices) {
