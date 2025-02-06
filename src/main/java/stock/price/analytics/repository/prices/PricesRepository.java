@@ -4,7 +4,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import stock.price.analytics.model.prices.ohlc.*;
+import stock.price.analytics.model.prices.ohlc.AbstractPrice;
+import stock.price.analytics.model.prices.ohlc.MonthlyPrice;
+import stock.price.analytics.model.prices.ohlc.QuarterlyPrice;
+import stock.price.analytics.model.prices.ohlc.YearlyPrice;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -12,21 +15,6 @@ import java.util.List;
 
 @Repository
 public interface PricesRepository extends JpaRepository<AbstractPrice, Long> {
-
-    @Query(value = """
-                SELECT *
-                FROM weekly_prices
-                WHERE start_date BETWEEN (DATE_TRUNC('week', CURRENT_DATE) - INTERVAL '2 week') AND CURRENT_DATE
-                AND ticker in (:tickers)
-                ORDER BY ticker, start_date DESC
-            """, nativeQuery = true)
-    List<WeeklyPrice> findPreviousThreeWeeklyPricesForTickers(@Param("tickers") List<String> tickers);
-
-    @Query("SELECT w FROM WeeklyPrice w WHERE w.ticker = :ticker AND w.startDate < :date")
-    List<WeeklyPrice> findWeeklyByTickerAndStartDateBefore(String ticker, LocalDate date);
-
-    @Query("SELECT w FROM WeeklyPrice w WHERE w.ticker = :ticker AND w.startDate = :date")
-    List<WeeklyPrice> findWeeklyByTickerAndStartDate(String ticker, LocalDate date);
 
     @Query(value = """
                 SELECT *

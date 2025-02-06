@@ -12,6 +12,7 @@ import stock.price.analytics.controller.dto.CandleWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.repository.prices.PricesRepository;
+import stock.price.analytics.repository.prices.WeeklyPricesRepository;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -34,6 +35,7 @@ public class PricesService {
     private final EntityManager entityManager;
 
     private final PricesRepository pricesRepository;
+    private final WeeklyPricesRepository weeklyPricesRepository;
     private final HigherTimeframePricesCache higherTimeframePricesCache;
 
     public List<CandleWithDateDTO> findFor(String ticker, StockTimeframe timeframe) {
@@ -87,13 +89,13 @@ public class PricesService {
         List<WeeklyPrice> previousWeeklyPrices;
         if (cacheTickers.isEmpty()) {
             log.info("Fetching PreviousTwoWeeklyPrices from database for {} tickers", tickers.size());
-            previousWeeklyPrices = pricesRepository.findPreviousThreeWeeklyPricesForTickers(tickers);
+            previousWeeklyPrices = weeklyPricesRepository.findPreviousThreeWeeklyPricesForTickers(tickers);
             higherTimeframePricesCache.addWeeklyPrices(previousWeeklyPrices);
         } else if (cacheTickers.containsAll(tickers)) {
             previousWeeklyPrices = higherTimeframePricesCache.weeklyPricesFor(tickers);
         } else { // partial match
             tickers.removeAll(cacheTickers);
-            previousWeeklyPrices = pricesRepository.findPreviousThreeWeeklyPricesForTickers(tickers);
+            previousWeeklyPrices = weeklyPricesRepository.findPreviousThreeWeeklyPricesForTickers(tickers);
             higherTimeframePricesCache.addWeeklyPrices(previousWeeklyPrices);
             log.info("previousWeeklyPrices partial match for {} tickers", tickers.size());
             cacheTickers.addAll(tickers);
