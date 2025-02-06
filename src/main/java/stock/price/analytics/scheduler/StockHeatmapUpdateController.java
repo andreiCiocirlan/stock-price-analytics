@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("/stock-heatmap")
+@RequestMapping("/stock-performance-heatmap")
 @RestController
 @RequiredArgsConstructor
 public class StockHeatmapUpdateController {
@@ -20,7 +20,7 @@ public class StockHeatmapUpdateController {
         dataUpdated = true;
     }
 
-    @GetMapping("/refresh")
+    @GetMapping("/refresh-ui")
     public ResponseEntity<Boolean> checkForUpdates() {
         boolean updated = dataUpdated;
         dataUpdated = false; // Reset flag after checking

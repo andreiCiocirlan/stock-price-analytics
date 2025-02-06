@@ -10,7 +10,7 @@ function onloadFunction() {
 
 function pollForHeatmapUpdates() {
     setInterval(() => {
-        fetch('/stock-heatmap/refresh')
+        fetch('/stock-performance-heatmap/refresh-ui')
             .then(response => response.json())
             .then(isUpdated => {
                 if (isUpdated) {
