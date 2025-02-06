@@ -13,10 +13,6 @@ import java.util.List;
 @Repository
 public interface PricesRepository extends JpaRepository<AbstractPrice, Long> {
 
-    List<DailyPrice> findByTickerAndDateLessThan(String ticker, LocalDate date);
-
-    List<DailyPrice> findByTickerAndDate(String ticker, LocalDate date);
-
     @Query(value = """
                 SELECT *
                 FROM weekly_prices

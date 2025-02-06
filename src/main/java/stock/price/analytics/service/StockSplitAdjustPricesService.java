@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
+import stock.price.analytics.repository.prices.DailyPricesRepository;
 import stock.price.analytics.repository.prices.PricesRepository;
 
 import java.time.DayOfWeek;
@@ -18,9 +19,10 @@ import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partiti
 public class StockSplitAdjustPricesService {
 
     private final PricesRepository pricesRepository;
+    private final DailyPricesRepository dailyPricesRepository;
 
     public void adjustPricesFor(String ticker, LocalDate stockSplitDate, double priceMultiplier) {
-        List<DailyPrice> dailyPricesToUpdate = pricesRepository.findByTickerAndDateLessThan(ticker, stockSplitDate);
+        List<DailyPrice> dailyPricesToUpdate = dailyPricesRepository.findByTickerAndDateLessThan(ticker, stockSplitDate);
         List<WeeklyPrice> weeklyPricesToUpdate = pricesRepository.findWeeklyByTickerAndStartDateBefore(ticker, stockSplitDate.with(previousOrSame(DayOfWeek.MONDAY)));
         List<MonthlyPrice> monthlyPricesToUpdate = pricesRepository.findMonthlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfMonth()));
         List<QuarterlyPrice> quarterlyPricesToUpdate = pricesRepository.findQuarterlyByTickerAndStartDateBefore(ticker, LocalDate.of(stockSplitDate.getYear(), stockSplitDate.getMonth().firstMonthOfQuarter().getValue(), 1));
@@ -41,7 +43,7 @@ public class StockSplitAdjustPricesService {
 
     public List<? extends AbstractPrice> adjustPricesForDateAndTimeframe(String ticker, LocalDate date, double priceMultiplier, StockTimeframe timeframe, String ohlc) {
         List<? extends AbstractPrice> pricesToUpdate = switch (timeframe) {
-            case DAILY -> pricesRepository.findByTickerAndDate(ticker, date);
+            case DAILY -> dailyPricesRepository.findByTickerAndDate(ticker, date);
             case WEEKLY -> pricesRepository.findWeeklyByTickerAndStartDate(ticker, date);
             case MONTHLY -> pricesRepository.findMonthlyByTickerAndStartDate(ticker, date);
             case QUARTERLY -> pricesRepository.findQuarterlyByTickerAndStartDate(ticker, date);
