@@ -38,8 +38,4 @@ public class PricesController {
         pricesService.updateHigherTimeframesPricesFor(date, timeframes, tickersQueryParam);
     }
 
-    @PostMapping("/save-quarterly-prices")
-    public void saveAllQuarterlyPrices() {
-        quarterlyPriceService.saveAllQuarterlyPrices();
-    }
 }
