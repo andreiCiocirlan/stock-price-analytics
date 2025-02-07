@@ -9,9 +9,7 @@ import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.repository.fvg.FVGRepository;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
@@ -44,6 +42,7 @@ public class FairValueGapService {
     }
 
     public List<FairValueGap> findNewFVGsFor(StockTimeframe timeframe) {
+        Set<String> newFvgTickers = new HashSet<>();
         List<FairValueGap> newFVGsFound = new ArrayList<>();
         List<FairValueGap> currentFVGs = findAllByTimeframe(timeframe);
 
@@ -52,9 +51,10 @@ public class FairValueGapService {
         currentFVGsByCompositeId.forEach((compositeKey, fvg) -> {
             if (!dbFVGsByCompositeId.containsKey(compositeKey)) {
                 newFVGsFound.add(new FairValueGap(fvg.getTicker(), fvg.getTimeframe(), fvg.getDate(), fvg.getType(), fvg.getStatus(), fvg.getLow(),  fvg.getHigh()));
+                newFvgTickers.add(fvg.getTicker());
             }
         });
-        log.info("Found {} new {} FVGs for: {}", newFVGsFound.size(), timeframe, newFVGsFound.stream().map(FairValueGap::getTicker).toList());
+        log.info("Found {} new {} FVGs for: {}", newFvgTickers.size(), timeframe, newFvgTickers);
 
         return newFVGsFound;
     }
@@ -70,6 +70,7 @@ public class FairValueGapService {
     }
 
     public List<FairValueGap> findClosedFVGsFor(StockTimeframe timeframe) {
+        Set<String> closedFvgTickers = new HashSet<>();
         List<FairValueGap> closedFVGsFound = new ArrayList<>();
         List<FairValueGap> currentFVGs = findAllByTimeframe(timeframe);
 
@@ -80,9 +81,10 @@ public class FairValueGapService {
             if (!currentFVGsByCompositeId.containsKey(compositeKey)) {
                 fvg.setStatus(FvgStatus.CLOSED);
                 closedFVGsFound.add(fvg);
+                closedFvgTickers.add(fvg.getTicker());
             }
         });
-        log.info("Closed {} {} FVGs for: {}", closedFVGsFound.size(), timeframe, closedFVGsFound.stream().map(FairValueGap::getTicker).toList());
+        log.info("Closed {} {} FVGs for: {}", closedFvgTickers.size(), timeframe, closedFvgTickers);
 
         return closedFVGsFound;
     }
