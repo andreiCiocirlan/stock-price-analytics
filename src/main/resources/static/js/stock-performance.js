@@ -99,7 +99,6 @@ function updatePricesIntraday() {
 }
 
 function updateStockPerformanceChart(timeFrame) {
-    const urlParams = new URLSearchParams(window.location.search);
     const numRows = document.getElementById('numRows').value || 5;
     const numCols = document.getElementById('numCols').value || 5;
     const positivePerfFirst = document.getElementById('positivePerfFirst').checked || false;
