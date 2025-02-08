@@ -88,7 +88,6 @@ public class FairValueGapService {
     }
 
     public List<FairValueGap> findClosedFVGsFor(StockTimeframe timeframe) {
-        Set<String> closedFvgTickers = new HashSet<>();
         List<FairValueGap> closedFVGsFound = new ArrayList<>();
         List<FairValueGap> currentFVGs = findAllByTimeframe(timeframe);
 
@@ -99,10 +98,8 @@ public class FairValueGapService {
             if (!currentFVGsByCompositeId.containsKey(compositeKey)) {
                 fvg.setStatus(FvgStatus.CLOSED);
                 closedFVGsFound.add(fvg);
-                closedFvgTickers.add(fvg.getTicker());
             }
         });
-        log.info("Closed {} {} FVGs for: {}", closedFvgTickers.size(), timeframe, closedFvgTickers);
 
         return closedFVGsFound;
     }
