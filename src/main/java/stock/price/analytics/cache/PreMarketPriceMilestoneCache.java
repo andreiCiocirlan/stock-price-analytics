@@ -27,7 +27,7 @@ public class PreMarketPriceMilestoneCache {
         Collection<Stock> stocksList = stocksCache.getStocksMap().values();
 
         return stocksList.stream()
-                .filter(stock -> cfdMargins.contains(stock.getCfdMargin()))
+                .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
                 .filter(stock -> preMarketPricesCache.containsKey(stock.getTicker()))
                 .filter(stock -> priceWithinMilestone(stock, preMarketPricesCache.get(stock.getTicker()), milestone))
                 .map(Stock::getTicker)

@@ -25,7 +25,7 @@ public class PriceMilestoneCache {
         Collection<Stock> stocksList = stocksCache.getStocksMap().values();
 
         return stocksList.stream()
-                .filter(stock -> cfdMargins.contains(stock.getCfdMargin()))
+                .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
                 .filter(stock -> priceWithinPerformanceMilestone(stock, hlPricesCache.get(stock.getTicker()), pricePerformanceMilestone))
                 .map(Stock::getTicker)
                 .toList();
