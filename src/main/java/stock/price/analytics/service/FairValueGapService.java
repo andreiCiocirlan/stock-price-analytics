@@ -21,13 +21,31 @@ public class FairValueGapService {
 
     private final FVGRepository fvgRepository;
 
-    private List<FairValueGap> findAllByTimeframe(StockTimeframe timeframe) {
+    private List<FairValueGap> findNewByTimeframe(StockTimeframe timeframe) {
+        LocalDate date = switch (timeframe) {
+            case DAILY -> LocalDate.now().minusWeeks(1);
+            case WEEKLY -> LocalDate.now().minusWeeks(3);
+            case MONTHLY -> LocalDate.now().minusMonths(3);
+            case QUARTERLY -> LocalDate.now().minusMonths(9);
+            case YEARLY -> LocalDate.now().minusYears(3);
+        };
         return switch (timeframe) {
-            case DAILY -> fvgRepository.findAllDailyFVGs();
-            case WEEKLY -> fvgRepository.findAllWeeklyFVGs();
-            case MONTHLY -> fvgRepository.findAllMonthlyFVGs();
-            case QUARTERLY -> fvgRepository.findAllQuarterlyFVGs();
-            case YEARLY -> fvgRepository.findAllYearlyFVGs();
+            case DAILY -> fvgRepository.findAllDailyFVGsAfter(date);
+            case WEEKLY -> fvgRepository.findAllWeeklyFVGsAfter(date);
+            case MONTHLY -> fvgRepository.findAllMonthlyFVGsAfter(date);
+            case QUARTERLY -> fvgRepository.findAllQuarterlyFVGsAfter(date);
+            case YEARLY -> fvgRepository.findAllYearlyFVGsAfter(date);
+        };
+    }
+
+    private List<FairValueGap> findAllByTimeframe(StockTimeframe timeframe) {
+        LocalDate longTimeAgo = LocalDate.of(1950, 1, 1);
+        return switch (timeframe) {
+            case DAILY -> fvgRepository.findAllDailyFVGsAfter(LocalDate.now().minusYears(3));
+            case WEEKLY -> fvgRepository.findAllWeeklyFVGsAfter(longTimeAgo);
+            case MONTHLY -> fvgRepository.findAllMonthlyFVGsAfter(longTimeAgo);
+            case QUARTERLY -> fvgRepository.findAllQuarterlyFVGsAfter(longTimeAgo);
+            case YEARLY -> fvgRepository.findAllYearlyFVGsAfter(longTimeAgo);
         };
     }
 
@@ -44,7 +62,7 @@ public class FairValueGapService {
     public List<FairValueGap> findNewFVGsFor(StockTimeframe timeframe) {
         Set<String> newFvgTickers = new HashSet<>();
         List<FairValueGap> newFVGsFound = new ArrayList<>();
-        List<FairValueGap> currentFVGs = findAllByTimeframe(timeframe);
+        List<FairValueGap> currentFVGs = findNewByTimeframe(timeframe);
 
         Map<String, FairValueGap> dbFVGsByCompositeId = fvgRepository.findByTimeframeAndStatusOpen(timeframe.name()).stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
         Map<String, FairValueGap> currentFVGsByCompositeId = currentFVGs.stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));

@@ -27,6 +27,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                     open, high, low, close,
                     ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY start_date) AS rn
                 FROM yearly_prices
+                WHERE start_date >= :date
             ),
             fvg_candidates AS (
                 SELECT a.ticker,
@@ -75,7 +76,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                 )
             order by ticker, fvg.date2 desc;
             """, nativeQuery = true)
-    List<FairValueGap> findAllYearlyFVGs();
+    List<FairValueGap> findAllYearlyFVGsAfter(LocalDate date);
 
     @Query(value = """
             WITH price_data AS (
@@ -85,6 +86,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                     open, high, low, close,
                     ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY start_date) AS rn
                 FROM quarterly_prices
+                WHERE start_date >= :date
             ),
             fvg_candidates AS (
                 SELECT a.ticker,
@@ -133,7 +135,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                 )
             order by ticker, fvg.date2 desc;
             """, nativeQuery = true)
-    List<FairValueGap> findAllQuarterlyFVGs();
+    List<FairValueGap> findAllQuarterlyFVGsAfter(LocalDate date);
 
     @Query(value = """
             WITH price_data AS (
@@ -143,6 +145,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                     open, high, low, close,
                     ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY start_date) AS rn
                 FROM monthly_prices
+                WHERE start_date >= :date
             ),
             fvg_candidates AS (
                 SELECT a.ticker,
@@ -191,7 +194,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                 )
             order by ticker, fvg.date2 desc;
             """, nativeQuery = true)
-    List<FairValueGap> findAllMonthlyFVGs();
+    List<FairValueGap> findAllMonthlyFVGsAfter(LocalDate date);
 
     @Query(value = """
             WITH price_data AS (
@@ -201,6 +204,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                     open, high, low, close,
                     ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY start_date) AS rn
                 FROM weekly_prices
+                WHERE start_date >= :date
             ),
             fvg_candidates AS (
                 SELECT a.ticker,
@@ -249,7 +253,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                 )
             order by ticker, fvg.date2 desc;
             """, nativeQuery = true)
-    List<FairValueGap> findAllWeeklyFVGs();
+    List<FairValueGap> findAllWeeklyFVGsAfter(LocalDate date);
 
     @Query(value = """
             WITH price_data AS (
@@ -259,7 +263,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                     open, high, low, close,
                     ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY date) AS rn
                 FROM daily_prices
-                WHERE date >= CURRENT_DATE - INTERVAL '3 year'
+                WHERE date >= :date
             ),
             fvg_candidates AS (
                 SELECT a.ticker,
@@ -308,7 +312,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                 )
             order by ticker, fvg.date2 desc;
             """, nativeQuery = true)
-    List<FairValueGap> findAllDailyFVGs();
+    List<FairValueGap> findAllDailyFVGsAfter(LocalDate date);
 
     @Modifying
     @Transactional
