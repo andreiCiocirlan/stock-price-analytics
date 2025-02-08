@@ -32,17 +32,17 @@ public class StockHeatmapPerformanceController {
     public List<StockPerformanceDTO> getStockPerformance(@RequestParam(required = false, value = "timeFrame") String timeFrame,
                                                          @RequestParam(required = false, value = "positivePerfFirst") Boolean positivePerfFirst,
                                                          @RequestParam(required = false, value = "limit") Integer limit,
-                                                         @RequestParam(required = false, value = "cfdMargin") Double cfdMargin,
+                                                         @RequestParam(required = false, value = "cfdMargin") List<Double> cfdMargins,
                                                          @RequestParam(required = false, value = "priceMilestone") String priceMilestone) {
         StockTimeframe stockTimeframe = ("undefined".equals(timeFrame)) ? StockTimeframe.MONTHLY : StockTimeframe.valueOf(timeFrame);
         List<String> tickers = Collections.emptyList();
         if (priceMilestone != null && !priceMilestoneService.isNoneMilestone(priceMilestone)) {
-            tickers = priceMilestoneService.findTickersForMilestone(priceMilestone, List.of(cfdMargin));
+            tickers = priceMilestoneService.findTickersForMilestone(priceMilestone, cfdMargins);
             if (tickers.isEmpty()) {
                 return Collections.emptyList();
             }
         }
-        return stockHeatmapPerformanceService.stockPerformanceFor(stockTimeframe, positivePerfFirst, limit, List.of(cfdMargin), tickers);
+        return stockHeatmapPerformanceService.stockPerformanceFor(stockTimeframe, positivePerfFirst, limit, cfdMargins, tickers);
     }
 
 }

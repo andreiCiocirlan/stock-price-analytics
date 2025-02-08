@@ -43,6 +43,28 @@ body, html {
     }
 }
 
+#cfdMargin {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+#cfdMargin .btn {
+    background-color: #171b26;
+    color: white;
+    padding: 2px 5px;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    margin-right: 2px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.select-item #cfdMargin .btn.active {
+    background-color: #0062cc;
+    font-weight: bold;
+}
+
 .select-item {
     display: flex;
     flex-direction: column;

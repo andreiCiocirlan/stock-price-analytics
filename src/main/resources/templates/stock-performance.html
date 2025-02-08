@@ -34,13 +34,14 @@
                 </div>
                 <div class="select-item m-2">
                     <label for="cfdMargin">CFD</label>
-                    <select class="form-control" id="cfdMargin" onchange="dispatchTimeFrameChangeEvent()">
-                        <option value="0">1:1</option>
-                        <option value="0.2" selected>5:1</option>
-                        <option value="0.25">4:1</option>
-                        <option value="0.33">3:1</option>
-                        <option value="0.5">2:1</option>
-                    </select>
+                    <div id="cfdMargin">
+                        <button value="0.2" class="btn active">5x</button>
+                        <button value="0.25" class="btn">4x</button>
+                        <button value="0.33" class="btn">3x</button>
+                        <button value="0.5" class="btn">2x</button>
+                        <button value="0" class="btn">1x</button>
+                        <input type="hidden" id="cfdMarginValues" name="cfdMargin" value="0.2">
+                    </div>
                 </div>
                 <div class="select-item m-2">
                     <label for="priceMilestone">Milestone</label>

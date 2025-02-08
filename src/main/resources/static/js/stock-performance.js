@@ -102,7 +102,7 @@ function updateStockPerformanceChart(timeFrame) {
     const numRows = document.getElementById('numRows').value || 5;
     const numCols = document.getElementById('numCols').value || 5;
     const positivePerfFirst = document.getElementById('positivePerfFirst').checked || false;
-    const cfdMargin = document.getElementById('cfdMargin');
+    const cfdMarginValues = document.getElementById('cfdMarginValues').value.split(',');
     const priceMilestone = document.getElementById('priceMilestone');
 
     if (timeFrame == undefined) {
@@ -110,9 +110,10 @@ function updateStockPerformanceChart(timeFrame) {
     }
     const limit = numRows * numCols;
     url = `/stock-performance-json?timeFrame=${timeFrame}&positivePerfFirst=${positivePerfFirst}&limit=${limit}`;
-    if (cfdMargin) {
-        url += '&cfdMargin=' + cfdMargin.value;
-    }
+
+    // set cfdMargins from multi-select
+    cfdMarginValues.forEach(margin => { url += '&cfdMargin=' + margin; });
+
     if (priceMilestone) {
         url += '&priceMilestone=' + priceMilestone.value;
     }
@@ -195,6 +196,53 @@ function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, 
         }]
     });
 }
+
+// cfdMargin init and multi-select logic
+document.addEventListener('DOMContentLoaded', function() {
+    const cfdMarginDiv = document.getElementById('cfdMargin');
+    const buttons = cfdMarginDiv.querySelectorAll('.btn');
+    const hiddenInput = document.getElementById('cfdMarginValues');
+    let selectedValues = hiddenInput.value ? hiddenInput.value.split(',') : []; // Initialize as array
+
+    // Function to update the hidden input
+    function updateHiddenInput() {
+        hiddenInput.value = selectedValues.join(',');
+    }
+
+    // Add click event listeners to the buttons
+    buttons.forEach(button => {
+        button.addEventListener('click', function() {
+            const value = this.value;
+
+            // Check if the button is already active
+            if (this.classList.contains('active')) {
+                // Remove the value from the selectedValues array
+                const index = selectedValues.indexOf(value);
+                if (index > -1) {
+                    selectedValues.splice(index, 1);
+                }
+                this.classList.remove('active');
+            } else {
+                // Add the value to the selectedValues array
+                selectedValues.push(value);
+                this.classList.add('active');
+            }
+
+            // Update the hidden input field
+            updateHiddenInput();
+            dispatchTimeFrameChangeEvent(selectedValues);
+        });
+    });
+
+    // Initialize active buttons on load
+    buttons.forEach(button => {
+        if (selectedValues.includes(button.value)) {
+            button.classList.add('active');
+        }
+    });
+
+     dispatchTimeFrameChangeEvent(selectedValues);
+});
 
 // Call the function to determine the selected timeframe
 const selectedTimeFrame = determineSelectedTimeFrame();
