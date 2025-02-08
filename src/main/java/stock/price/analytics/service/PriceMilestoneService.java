@@ -24,14 +24,14 @@ public class PriceMilestoneService {
     private final PreMarketPriceMilestoneCache preMarketPriceMilestoneCache;
 
     public List<String> findTickersForMilestone(String priceMilestone, List<Double> cfdMargins) {
-        List<String> tickers = new ArrayList<>();
-        Optional<PricePerformanceMilestone> priceMilestoneEnum = parseEnumWithNoneValue(priceMilestone, PricePerformanceMilestone.class);
-        Optional<PreMarketPriceMilestone> preMarketMilestoneEnum = parseEnumWithNoneValue(priceMilestone, PreMarketPriceMilestone.class);
-
-        if (priceMilestoneEnum.isPresent())
-            tickers = priceMilestoneCache.findTickersForMilestone(priceMilestoneEnum.get(), cfdMargins);
-        else if (preMarketMilestoneEnum.isPresent())
-            tickers = preMarketPriceMilestoneCache.findTickersForPreMarketMilestone(preMarketMilestoneEnum.get(), cfdMargins);
+        final List<String> tickers = new ArrayList<>();
+        Optional<PricePerformanceMilestone> pricePerformanceMilestone = parseEnumWithNoneValue(priceMilestone, PricePerformanceMilestone.class);
+        if (pricePerformanceMilestone.isPresent()) {
+            tickers.addAll(priceMilestoneCache.findTickersForMilestone(pricePerformanceMilestone.get(), cfdMargins));
+        } else {
+            parseEnumWithNoneValue(priceMilestone, PreMarketPriceMilestone.class)
+                    .ifPresent(milestone -> tickers.addAll(preMarketPriceMilestoneCache.findTickersForPreMarketMilestone(milestone, cfdMargins)));
+        }
         return tickers;
     }
 
