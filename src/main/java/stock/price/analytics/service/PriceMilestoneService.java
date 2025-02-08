@@ -51,7 +51,7 @@ public class PriceMilestoneService {
     }
 
     public boolean isNoneMilestone(String milestone) {
-        return getPricePerformanceMilestone(milestone).isEmpty() && getPreMarketPriceMilestone(milestone).isEmpty();
+        return milestone != null && getPricePerformanceMilestone(milestone).isEmpty() && getPreMarketPriceMilestone(milestone).isEmpty();
     }
 
 }
