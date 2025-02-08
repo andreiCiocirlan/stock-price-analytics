@@ -9,6 +9,8 @@ import stock.price.analytics.service.FairValueGapService;
 
 import java.util.List;
 
+import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
+
 @RequestMapping("/fvg")
 @RestController
 @RequiredArgsConstructor
@@ -31,7 +33,7 @@ public class FairValueGapController {
     @GetMapping("/find-closed")
     @ResponseStatus(HttpStatus.OK)
     public List<FairValueGap> findClosedVsGsFor(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
-        return fairValueGapService.findClosedFVGsFor(timeframe);
+        return logTimeAndReturn(() -> fairValueGapService.findClosedFVGsFor(timeframe), "Found " + timeframe + " CLOSED FVGs");
     }
 
     @PutMapping("/update-closed")

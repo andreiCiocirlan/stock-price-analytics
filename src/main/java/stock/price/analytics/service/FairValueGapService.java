@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
 
 @Slf4j
@@ -80,10 +81,12 @@ public class FairValueGapService {
     public void updateClosedFVGsFor(StockTimeframe timeframe) {
         if (timeframe == null) { // update closed for all timeframes
             for (StockTimeframe stockTimeframe : StockTimeframe.values()) {
-                partitionDataAndSaveWithLogTime(findClosedFVGsFor(stockTimeframe), fvgRepository, "updated closed FVGs for " + stockTimeframe);
+                List<FairValueGap> closedFVGs = logTimeAndReturn(() -> findClosedFVGsFor(stockTimeframe), "Found " + stockTimeframe + " CLOSED FVGs");
+                partitionDataAndSaveWithLogTime(closedFVGs, fvgRepository, "updated closed FVGs for " + stockTimeframe);
             }
         } else {
-            partitionDataAndSaveWithLogTime(findClosedFVGsFor(timeframe), fvgRepository, "updated closed FVGs for " + timeframe);
+            List<FairValueGap> closedFVGs = logTimeAndReturn(() -> findClosedFVGsFor(timeframe), "Found " + timeframe + " CLOSED FVGs");
+            partitionDataAndSaveWithLogTime(closedFVGs, fvgRepository, "updated closed FVGs for " + timeframe);
         }
     }
 
