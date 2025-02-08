@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static stock.price.analytics.util.EnumParser.isNoneEnum;
+import static stock.price.analytics.util.EnumParser.parseEnumWithNoneValue;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -22,8 +25,8 @@ public class PriceMilestoneService {
 
     public List<String> findTickersForMilestone(String priceMilestone, List<Double> cfdMargins) {
         List<String> tickers = new ArrayList<>();
-        Optional<PricePerformanceMilestone> priceMilestoneEnum = getPricePerformanceMilestone(priceMilestone);
-        Optional<PreMarketPriceMilestone> preMarketMilestoneEnum = getPreMarketPriceMilestone(priceMilestone);
+        Optional<PricePerformanceMilestone> priceMilestoneEnum = parseEnumWithNoneValue(priceMilestone, PricePerformanceMilestone.class);
+        Optional<PreMarketPriceMilestone> preMarketMilestoneEnum = parseEnumWithNoneValue(priceMilestone, PreMarketPriceMilestone.class);
 
         if (priceMilestoneEnum.isPresent())
             tickers = priceMilestoneCache.findTickersForMilestone(priceMilestoneEnum.get(), cfdMargins);
@@ -32,26 +35,8 @@ public class PriceMilestoneService {
         return tickers;
     }
 
-    private Optional<PricePerformanceMilestone> getPricePerformanceMilestone(String milestone) {
-        try {
-            return PricePerformanceMilestone.valueOf(milestone) == PricePerformanceMilestone.NONE ? Optional.empty() : Optional.of(PricePerformanceMilestone.valueOf(milestone));
-        } catch (IllegalArgumentException e) {
-            log.error("Invalid PriceMilestone {} error: {}", milestone, e.getMessage());
-            return Optional.empty(); // Not a valid PriceMilestone
-        }
-    }
-
-    private Optional<PreMarketPriceMilestone> getPreMarketPriceMilestone(String milestone) {
-        try {
-            return PreMarketPriceMilestone.valueOf(milestone) == PreMarketPriceMilestone.NONE ? Optional.empty() : Optional.of(PreMarketPriceMilestone.valueOf(milestone));
-        } catch (IllegalArgumentException e) {
-            log.error("Invalid PreMarketPriceMilestone {} error: {}", milestone, e.getMessage());
-            return Optional.empty(); // Not a valid PreMarketPriceMilestone
-        }
-    }
-
     public boolean isNoneMilestone(String milestone) {
-        return milestone != null && getPricePerformanceMilestone(milestone).isEmpty() && getPreMarketPriceMilestone(milestone).isEmpty();
+        return isNoneEnum(milestone, PricePerformanceMilestone.class) && isNoneEnum(milestone, PreMarketPriceMilestone.class);
     }
 
 }
