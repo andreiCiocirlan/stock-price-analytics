@@ -20,15 +20,15 @@ public class PriceMilestoneService {
     private final PriceMilestoneCache priceMilestoneCache;
     private final PreMarketPriceMilestoneCache preMarketPriceMilestoneCache;
 
-    public List<String> findTickersForMilestone(String priceMilestone, double cfdMargin) {
+    public List<String> findTickersForMilestone(String priceMilestone, List<Double> cfdMargins) {
         List<String> tickers = new ArrayList<>();
         Optional<PricePerformanceMilestone> priceMilestoneEnum = getPricePerformanceMilestone(priceMilestone);
         Optional<PreMarketPriceMilestone> preMarketMilestoneEnum = getPreMarketPriceMilestone(priceMilestone);
 
         if (priceMilestoneEnum.isPresent())
-            tickers = priceMilestoneCache.findTickersForMilestone(priceMilestoneEnum.get(), cfdMargin);
+            tickers = priceMilestoneCache.findTickersForMilestone(priceMilestoneEnum.get(), cfdMargins);
         else if (preMarketMilestoneEnum.isPresent())
-            tickers = preMarketPriceMilestoneCache.findTickersForPreMarketMilestone(preMarketMilestoneEnum.get(), cfdMargin);
+            tickers = preMarketPriceMilestoneCache.findTickersForPreMarketMilestone(preMarketMilestoneEnum.get(), cfdMargins);
         return tickers;
     }
 

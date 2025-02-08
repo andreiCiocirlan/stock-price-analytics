@@ -37,12 +37,12 @@ public class StockHeatmapPerformanceController {
         StockTimeframe stockTimeframe = ("undefined".equals(timeFrame)) ? StockTimeframe.MONTHLY : StockTimeframe.valueOf(timeFrame);
         List<String> tickers = Collections.emptyList();
         if (priceMilestone != null && !priceMilestoneService.isNoneMilestone(priceMilestone)) {
-            tickers = priceMilestoneService.findTickersForMilestone(priceMilestone, cfdMargin);
+            tickers = priceMilestoneService.findTickersForMilestone(priceMilestone, List.of(cfdMargin));
             if (tickers.isEmpty()) {
                 return Collections.emptyList();
             }
         }
-        return stockHeatmapPerformanceService.stockPerformanceFor(stockTimeframe, positivePerfFirst, limit, cfdMargin, tickers);
+        return stockHeatmapPerformanceService.stockPerformanceFor(stockTimeframe, positivePerfFirst, limit, List.of(cfdMargin), tickers);
     }
 
 }

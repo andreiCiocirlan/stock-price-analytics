@@ -20,14 +20,14 @@ public class PreMarketPriceMilestoneCache {
     private final StocksCache stocksCache;
     private final DailyPricesCache dailyPricesCache;
 
-    public List<String> findTickersForPreMarketMilestone(PreMarketPriceMilestone milestone, double cfdMargin) {
+    public List<String> findTickersForPreMarketMilestone(PreMarketPriceMilestone milestone, List<Double> cfdMargins) {
         Map<String, DailyPrice> preMarketPricesCache = dailyPricesCache.dailyPrices(PRE)
                 .stream()
                 .collect(Collectors.toMap(DailyPrice::getTicker, p -> p));
         Collection<Stock> stocksList = stocksCache.getStocksMap().values();
 
         return stocksList.stream()
-                .filter(stock -> stock.getCfdMargin() == cfdMargin)
+                .filter(stock -> cfdMargins.contains(stock.getCfdMargin()))
                 .filter(stock -> preMarketPricesCache.containsKey(stock.getTicker()))
                 .filter(stock -> priceWithinMilestone(stock, preMarketPricesCache.get(stock.getTicker()), milestone))
                 .map(Stock::getTicker)

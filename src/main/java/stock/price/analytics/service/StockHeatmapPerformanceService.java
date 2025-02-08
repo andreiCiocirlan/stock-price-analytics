@@ -27,7 +27,7 @@ public class StockHeatmapPerformanceService {
         result.add(Objects.requireNonNullElseGet(preMarketPrice, () -> new StockPerformanceDTO(ticker, stock.performanceFor(timeFrame))));
     }
 
-    public List<StockPerformanceDTO> stockPerformanceFor(StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, Double cfdMargin, List<String> tickers) {
+    public List<StockPerformanceDTO> stockPerformanceFor(StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, List<Double> cfdMargins, List<String> tickers) {
         Map<String, StockPerformanceDTO> preMarketMap = dailyPricesService.dailyPricesCache(PRE).stream()
                 .filter(dp -> tickers.contains(dp.getTicker()))
                 .map(dp -> new StockPerformanceDTO(dp.getTicker(), dp.getPerformance()))
@@ -35,7 +35,7 @@ public class StockHeatmapPerformanceService {
 
         List<StockPerformanceDTO> result = new ArrayList<>();
         stockService.stocksCacheMap().values().stream()
-                .filter(stockFilterPredicate(tickers, cfdMargin))
+                .filter(stockFilterPredicate(tickers, cfdMargins))
                 .forEach(stock -> addPreMarketPriceOrStockPrice(stock, timeFrame, preMarketMap, result)); // pre-market price takes precedence
 
         List<StockPerformanceDTO> performanceDTOs = result.stream()
@@ -56,8 +56,8 @@ public class StockHeatmapPerformanceService {
         return performanceDTOs;
     }
 
-    private Predicate<? super Stock> stockFilterPredicate(List<String> tickers, Double cfdMargin) {
-        return stock -> (cfdMargin == null || stock.getCfdMargin() == cfdMargin) &&
+    private Predicate<? super Stock> stockFilterPredicate(List<String> tickers, List<Double> cfdMargins) {
+        return stock -> (cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin())) &&
                 (tickers.isEmpty() || tickers.contains(stock.getTicker()));
     }
 

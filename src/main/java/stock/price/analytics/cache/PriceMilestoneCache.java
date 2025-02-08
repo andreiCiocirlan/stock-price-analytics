@@ -18,14 +18,14 @@ public class PriceMilestoneCache {
     private final StocksCache stocksCache;
     private final HighLowPricesCache highLowPricesCache;
 
-    public List<String> findTickersForMilestone(PricePerformanceMilestone pricePerformanceMilestone, double cfdMargin) {
+    public List<String> findTickersForMilestone(PricePerformanceMilestone pricePerformanceMilestone, List<Double> cfdMargins) {
         Map<String, HighLowForPeriod> hlPricesCache = highLowPricesCache.cacheForMilestone(pricePerformanceMilestone)
                 .stream()
                 .collect(Collectors.toMap(HighLowForPeriod::getTicker, p -> p));
         Collection<Stock> stocksList = stocksCache.getStocksMap().values();
 
         return stocksList.stream()
-                .filter(stock -> stock.getCfdMargin() == cfdMargin)
+                .filter(stock -> cfdMargins.contains(stock.getCfdMargin()))
                 .filter(stock -> priceWithinPerformanceMilestone(stock, hlPricesCache.get(stock.getTicker()), pricePerformanceMilestone))
                 .map(Stock::getTicker)
                 .toList();
