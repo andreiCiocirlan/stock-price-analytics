@@ -22,8 +22,15 @@ public class HigherTimeframePricesCache {
     private final Map<String, YearlyPrice> yearlyPricesByTickerAndDate = new HashMap<>();
 
     public void addWeeklyPrices(List<WeeklyPrice> weeklyPrices) {
+        weeklyPrices.forEach(price -> {
+            weeklyPricesWithPrevCloseByTickerAndDate.merge(
+                    createKey(price.getTicker(), price.getStartDate()),
+                    price,
+                    (_, newPrice) -> newPrice // Logic to keep the latest price
+            );
+        });
         weeklyPrices.forEach(price ->
-                this.weeklyPricesByTickerAndDate.merge(
+                weeklyPricesByTickerAndDate.merge(
                         createKey(price.getTicker(), price.getStartDate()),
                         price,
                         (_, newPrice) -> newPrice // Logic to keep the latest price
@@ -33,7 +40,7 @@ public class HigherTimeframePricesCache {
 
     public void addMonthlyPrices(List<MonthlyPrice> monthlyPrices) {
         monthlyPrices.forEach(price ->
-                this.monthlyPricesByTickerAndDate.merge(
+                monthlyPricesByTickerAndDate.merge(
                         createKey(price.getTicker(), price.getStartDate()),
                         price,
                         (_, newPrice) -> newPrice // Logic to keep the latest price
@@ -43,7 +50,7 @@ public class HigherTimeframePricesCache {
 
     public void addQuarterlyPrices(List<QuarterlyPrice> quarterlyPrices) {
         quarterlyPrices.forEach(price ->
-                this.quarterlyPricesByTickerAndDate.merge(
+                quarterlyPricesByTickerAndDate.merge(
                         createKey(price.getTicker(), price.getStartDate()),
                         price,
                         (_, newPrice) -> newPrice // Logic to keep the latest price
@@ -53,7 +60,7 @@ public class HigherTimeframePricesCache {
 
     public void addYearlyPrices(List<YearlyPrice> yearlyPrices) {
         yearlyPrices.forEach(price ->
-                this.yearlyPricesByTickerAndDate.merge(
+                yearlyPricesByTickerAndDate.merge(
                         createKey(price.getTicker(), price.getStartDate()),
                         price,
                         (_, newPrice) -> newPrice // Logic to keep the latest price
