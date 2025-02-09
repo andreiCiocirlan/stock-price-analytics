@@ -43,9 +43,11 @@ public class FairValueGap implements PriceEntity {
     @Column(name = "status")
     private FvgStatus status;
 
+    @Setter
     @Column(name = "low")
     private double low;
 
+    @Setter
     @Column(name = "high")
     private double high;
 
