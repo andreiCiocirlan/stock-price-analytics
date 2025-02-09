@@ -27,23 +27,22 @@ public class MonthlyPrice extends AbstractPrice {
     @Column(name = "start_date")
     private LocalDate startDate;
 
-    public MonthlyPrice(String ticker, LocalDate startDate, LocalDate endDate, CandleOHLC candleOHLC) {
+    public MonthlyPrice(String ticker, LocalDate date, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
-        this.startDate = startDate.with(TemporalAdjusters.firstDayOfMonth());
-        this.endDate = endDate;
+        setStartDateFrom(date);
+        setEndDateFrom(date);
     }
 
-    public MonthlyPrice(String ticker, LocalDate startDate, LocalDate endDate, double performance, CandleOHLC candleOHLC) {
+    public MonthlyPrice(String ticker, LocalDate date, double performance, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
-        this.startDate = startDate.with(TemporalAdjusters.firstDayOfMonth());
-        this.endDate = endDate;
+        setStartDateFrom(date);
+        setEndDateFrom(date);
         this.setPerformance(performance);
     }
 
     public static MonthlyPrice newFrom(DailyPrice dailyPrices, double previousClose) {
         return new MonthlyPrice(
                 dailyPrices.getTicker(),
-                dailyPrices.getDate(),
                 dailyPrices.getDate(),
                 performanceFrom(dailyPrices, previousClose),
                 new CandleOHLC(dailyPrices.getOpen(), dailyPrices.getHigh(), dailyPrices.getLow(), dailyPrices.getClose()));
@@ -52,6 +51,16 @@ public class MonthlyPrice extends AbstractPrice {
     @Override
     public StockTimeframe getTimeframe() {
         return StockTimeframe.MONTHLY;
+    }
+
+    @Override
+    public void setStartDateFrom(LocalDate date) {
+        startDate = date.with(TemporalAdjusters.firstDayOfMonth());
+    }
+
+    @Override
+    public void setEndDateFrom(LocalDate date) {
+        endDate = date.with(TemporalAdjusters.lastDayOfMonth());
     }
 
     @Override

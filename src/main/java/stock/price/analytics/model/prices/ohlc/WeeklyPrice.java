@@ -28,23 +28,22 @@ public class WeeklyPrice extends AbstractPrice {
     @Column(name = "start_date")
     private LocalDate startDate;
 
-    public WeeklyPrice(String ticker, LocalDate startDate, LocalDate endDate, CandleOHLC candleOHLC) {
+    public WeeklyPrice(String ticker, LocalDate date, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
-        this.startDate = startDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-        this.endDate = endDate;
+        setStartDateFrom(date);
+        setEndDateFrom(date);
     }
 
-    public WeeklyPrice(String ticker, LocalDate startDate, LocalDate endDate, double performance, CandleOHLC candleOHLC) {
+    public WeeklyPrice(String ticker, LocalDate date, double performance, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
-        this.startDate = startDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-        this.endDate = endDate;
+        setStartDateFrom(date);
+        setEndDateFrom(date);
         this.setPerformance(performance);
     }
 
     public static WeeklyPrice newFrom(DailyPrice dailyPrices, double previousClose) {
         return new WeeklyPrice(
                 dailyPrices.getTicker(),
-                dailyPrices.getDate(),
                 dailyPrices.getDate(),
                 performanceFrom(dailyPrices, previousClose),
                 new CandleOHLC(dailyPrices.getOpen(), dailyPrices.getHigh(), dailyPrices.getLow(), dailyPrices.getClose()));
@@ -53,6 +52,16 @@ public class WeeklyPrice extends AbstractPrice {
     @Override
     public StockTimeframe getTimeframe() {
         return StockTimeframe.WEEKLY;
+    }
+
+    @Override
+    public void setStartDateFrom(LocalDate date) {
+        startDate = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+    }
+
+    @Override
+    public void setEndDateFrom(LocalDate date) {
+        endDate = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
     }
 
     @Override

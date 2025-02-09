@@ -66,7 +66,6 @@ public class PricesUtil {
         DailyPrice lastInChronologicalOrder = pricesGroupedByTimeFrame.getLast();
         String ticker = firstInChronologicalOrder.getTicker();
         LocalDate startDate = firstInChronologicalOrder.getDate();
-        LocalDate endDate = lastInChronologicalOrder.getDate();
         double open = firstInChronologicalOrder.getOpen();
         double close = lastInChronologicalOrder.getClose();
         double high = pricesGroupedByTimeFrame.stream()
@@ -80,10 +79,10 @@ public class PricesUtil {
 
         CandleOHLC candleOHLC = new CandleOHLC(open, high, low, close);
         return switch (stockTimeframe) {
-            case WEEKLY -> new WeeklyPrice(ticker, startDate, endDate, candleOHLC);
-            case MONTHLY -> new MonthlyPrice(ticker, startDate, endDate, candleOHLC);
-            case QUARTERLY -> new QuarterlyPrice(ticker, startDate, endDate, candleOHLC);
-            case YEARLY -> new YearlyPrice(ticker, startDate, endDate, candleOHLC);
+            case WEEKLY -> new WeeklyPrice(ticker, startDate, candleOHLC);
+            case MONTHLY -> new MonthlyPrice(ticker, startDate, candleOHLC);
+            case QUARTERLY -> new QuarterlyPrice(ticker, startDate, candleOHLC);
+            case YEARLY -> new YearlyPrice(ticker, startDate, candleOHLC);
             case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
         };
     }

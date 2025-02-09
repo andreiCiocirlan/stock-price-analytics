@@ -27,23 +27,22 @@ public class QuarterlyPrice extends AbstractPrice {
     @Column(name = "start_date")
     private LocalDate startDate;
 
-    public QuarterlyPrice(String ticker, LocalDate startDate, LocalDate endDate, CandleOHLC candleOHLC) {
+    public QuarterlyPrice(String ticker, LocalDate date, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
-        this.startDate = LocalDate.of(startDate.getYear(), startDate.getMonth().firstMonthOfQuarter().getValue(), 1);
-        this.endDate = endDate.with(TemporalAdjusters.lastDayOfMonth());
+        setStartDateFrom(date);
+        setEndDateFrom(date);
     }
 
-    public QuarterlyPrice(String ticker, LocalDate startDate, LocalDate endDate, double performance, CandleOHLC candleOHLC) {
+    public QuarterlyPrice(String ticker, LocalDate date, double performance, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
-        this.startDate = LocalDate.of(startDate.getYear(), startDate.getMonth().firstMonthOfQuarter().getValue(), 1);
-        this.endDate = endDate;
+        setStartDateFrom(date);
+        setEndDateFrom(date);
         this.setPerformance(performance);
     }
 
     public static QuarterlyPrice newFrom(DailyPrice dailyPrices, double previousClose) {
         return new QuarterlyPrice(
                 dailyPrices.getTicker(),
-                dailyPrices.getDate(),
                 dailyPrices.getDate(),
                 performanceFrom(dailyPrices, previousClose),
                 new CandleOHLC(dailyPrices.getOpen(), dailyPrices.getHigh(), dailyPrices.getLow(), dailyPrices.getClose()));
@@ -52,6 +51,21 @@ public class QuarterlyPrice extends AbstractPrice {
     @Override
     public StockTimeframe getTimeframe() {
         return StockTimeframe.QUARTERLY;
+    }
+
+    @Override
+    public void setStartDateFrom(LocalDate date) {
+        startDate = LocalDate.of(date.getYear(), date.getMonth().firstMonthOfQuarter().getValue(), 1);
+    }
+
+    @Override
+    public void setEndDateFrom(LocalDate date) {
+        int firstMonthOfQuarter = date.getMonth().firstMonthOfQuarter().getValue();
+
+        LocalDate firstDayOfQuarter = LocalDate.of(date.getYear(), firstMonthOfQuarter, 1);
+
+        // Calculate last day of that quarter by adding 2 months and getting last day
+        endDate = firstDayOfQuarter.plusMonths(2).with(TemporalAdjusters.lastDayOfMonth());
     }
 
     @Override

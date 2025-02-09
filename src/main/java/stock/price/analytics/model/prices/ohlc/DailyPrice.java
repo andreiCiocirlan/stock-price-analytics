@@ -70,6 +70,16 @@ public class DailyPrice extends AbstractPrice {
     }
 
     @Override
+    public void setStartDateFrom(LocalDate date) {
+        throw new IllegalStateException("Unexpected setEndDateFrom in DailyPrice");
+    }
+
+    @Override
+    public void setEndDateFrom(LocalDate date) {
+        throw new IllegalStateException("Unexpected setEndDateFrom in DailyPrice");
+    }
+
+    @Override
     public String toString() {
         return STR."Daily_OHLC {  date=\{date} \{super.toString()}";
     }

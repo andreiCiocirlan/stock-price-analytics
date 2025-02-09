@@ -50,6 +50,8 @@ public abstract class AbstractPrice implements PriceEntity {
 
     public abstract LocalDate getStartDate();
     public abstract LocalDate getEndDate();
+    public abstract void setStartDateFrom(LocalDate date);
+    public abstract void setEndDateFrom(LocalDate date);
     public abstract StockTimeframe getTimeframe();
 
     public AbstractPrice convertFrom(DailyPrice dailyPrice, Double previousClose) {

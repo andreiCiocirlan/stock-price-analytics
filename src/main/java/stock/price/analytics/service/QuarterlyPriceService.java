@@ -60,13 +60,12 @@ public class QuarterlyPriceService {
 
         String ticker = monthlyPrices.getFirst().getTicker();
         LocalDate quarterStartDate = monthlyPrices.getFirst().getStartDate().with(TemporalAdjusters.firstDayOfMonth());
-        LocalDate quarterEndDate = monthlyPrices.getLast().getEndDate().with(TemporalAdjusters.lastDayOfMonth());
 
         double open = monthlyPrices.getFirst().getOpen();
         double close = monthlyPrices.getLast().getClose();
         double high = monthlyPrices.stream().mapToDouble(MonthlyPrice::getHigh).max().orElse(0);
         double low = monthlyPrices.stream().mapToDouble(MonthlyPrice::getLow).min().orElse(0);
 
-        return new QuarterlyPrice(ticker, quarterStartDate, quarterEndDate, new CandleOHLC(open, high, low, close));
+        return new QuarterlyPrice(ticker, quarterStartDate, new CandleOHLC(open, high, low, close));
     }
 }
