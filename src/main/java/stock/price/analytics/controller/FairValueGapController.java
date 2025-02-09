@@ -30,15 +30,15 @@ public class FairValueGapController {
         fairValueGapService.findNewFVGsAndSaveFor(timeframe);
     }
 
-    @GetMapping("/find-closed")
+    @GetMapping("/find-update-high-low-and-closed")
     @ResponseStatus(HttpStatus.OK)
-    public List<FairValueGap> findClosedFVGsFor(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
-        return logTimeAndReturn(() -> fairValueGapService.findClosedFVGsFor(timeframe), "Found " + timeframe + " CLOSED FVGs");
+    public List<FairValueGap> findUpdatedFVGsHighLowAndClosedFor(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
+        return logTimeAndReturn(() -> fairValueGapService.findUpdatedFVGsHighLowAndClosedFor(timeframe), "Found " + timeframe + " FVGs to Update");
     }
 
-    @PutMapping("/update-closed")
+    @PutMapping("/update-high-low-and-closed")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateClosedFVGsFor(@RequestParam(value = "timeframe", required = false) StockTimeframe timeframe) {
-        fairValueGapService.updateClosedFVGsFor(timeframe);
+    public void updateFVGsHighLowAndClosedFor(@RequestParam(value = "timeframe", required = false) StockTimeframe timeframe) {
+        fairValueGapService.updateFVGsHighLowAndClosedFor(timeframe);
     }
 }

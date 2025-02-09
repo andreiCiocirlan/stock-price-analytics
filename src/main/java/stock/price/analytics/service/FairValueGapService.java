@@ -78,33 +78,41 @@ public class FairValueGapService {
         return newFVGsFound;
     }
 
-    public void updateClosedFVGsFor(StockTimeframe timeframe) {
+    public void updateFVGsHighLowAndClosedFor(StockTimeframe timeframe) {
         if (timeframe == null) { // update closed for all timeframes
             for (StockTimeframe stockTimeframe : StockTimeframe.values()) {
-                List<FairValueGap> closedFVGs = logTimeAndReturn(() -> findClosedFVGsFor(stockTimeframe), "Found " + stockTimeframe + " CLOSED FVGs");
-                partitionDataAndSaveWithLogTime(closedFVGs, fvgRepository, "updated closed FVGs for " + stockTimeframe);
+                List<FairValueGap> updatedFVGs = logTimeAndReturn(() -> findUpdatedFVGsHighLowAndClosedFor(stockTimeframe), "Found " + stockTimeframe + " FVGs to be updated");
+                partitionDataAndSaveWithLogTime(updatedFVGs, fvgRepository, "updated " + updatedFVGs.size() + " FVGs for " + stockTimeframe);
             }
         } else {
-            List<FairValueGap> closedFVGs = logTimeAndReturn(() -> findClosedFVGsFor(timeframe), "Found " + timeframe + " CLOSED FVGs");
-            partitionDataAndSaveWithLogTime(closedFVGs, fvgRepository, "updated closed FVGs for " + timeframe);
+            List<FairValueGap> updatedFVGs = logTimeAndReturn(() -> findUpdatedFVGsHighLowAndClosedFor(timeframe), "Found " + timeframe + " FVGs to be updated");
+            partitionDataAndSaveWithLogTime(updatedFVGs, fvgRepository, "updated " + updatedFVGs.size() + " FVGs for " + timeframe);
         }
     }
 
-    public List<FairValueGap> findClosedFVGsFor(StockTimeframe timeframe) {
-        List<FairValueGap> closedFVGsFound = new ArrayList<>();
+    public List<FairValueGap> findUpdatedFVGsHighLowAndClosedFor(StockTimeframe timeframe) {
+        List<FairValueGap> updatedFVGs = new ArrayList<>();
         List<FairValueGap> currentFVGs = findAllByTimeframe(timeframe);
 
         Map<String, FairValueGap> dbFVGsByCompositeId = fvgRepository.findByTimeframeAndStatusOpen(timeframe.name()).stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
         Map<String, FairValueGap> currentFVGsByCompositeId = currentFVGs.stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
 
         dbFVGsByCompositeId.forEach((compositeKey, fvg) -> {
-            if (!currentFVGsByCompositeId.containsKey(compositeKey)) {
+            if (!currentFVGsByCompositeId.containsKey(compositeKey)) { // FVG is CLOSED
                 fvg.setStatus(FvgStatus.CLOSED);
-                closedFVGsFound.add(fvg);
+                updatedFVGs.add(fvg);
+            } else { // update FVG high/low
+                FairValueGap currentFVG = currentFVGsByCompositeId.get(compositeKey);
+                boolean differentHighLow = currentFVG.getHigh() != fvg.getHigh() || currentFVG.getLow() != fvg.getLow();
+                if (differentHighLow) {
+                    fvg.setHigh(currentFVG.getHigh());
+                    fvg.setLow(currentFVG.getLow());
+                    updatedFVGs.add(fvg);
+                }
             }
         });
 
-        return closedFVGsFound;
+        return updatedFVGs;
     }
 
     public void updateFVGPricesForStockSplit(String ticker, LocalDate stockSplitDate, double stockSplitMultiplier) {

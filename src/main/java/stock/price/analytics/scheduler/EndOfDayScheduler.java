@@ -18,7 +18,7 @@ public class EndOfDayScheduler {
     public void updateFVGsAtEOD() {
         for (StockTimeframe timeframe : StockTimeframe.values()) {
             fairValueGapService.findNewFVGsAndSaveFor(timeframe);
-            fairValueGapService.updateClosedFVGsFor(timeframe);
+            fairValueGapService.updateFVGsHighLowAndClosedFor(timeframe);
         }
     }
 
