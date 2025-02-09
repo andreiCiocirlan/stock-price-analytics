@@ -243,7 +243,6 @@ public class PricesService {
         if (isWithinSameTimeframe(dailyPriceDate, latestEndDateWMY, timeframe)) {
             double previousClose = previousTwoWMY.size() < 2 ? latestPriceWMY.getOpen() : previousTwoWMY.getLast().getClose();
             result = latestPriceWMY.convertFrom(dailyPrice, previousClose);
-            setEndDate(result, dailyPriceDate, timeframe);
         } else { // new week, month, year
             double previousClose = latestPriceWMY.getClose();
             result = createNewWMYPrice(dailyPrice, timeframe, previousClose);
@@ -269,16 +268,6 @@ public class PricesService {
             case QUARTERLY -> QuarterlyPrice.newFrom(dailyPrice, previousClose);
             case YEARLY -> YearlyPrice.newFrom(dailyPrice, previousClose);
         };
-    }
-
-    private void setEndDate(AbstractPrice result, LocalDate endDate, StockTimeframe timeframe) {
-        switch (timeframe) {
-            case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
-            case WEEKLY -> ((WeeklyPrice) result).setEndDate(endDate);
-            case MONTHLY -> ((MonthlyPrice) result).setEndDate(endDate);
-            case QUARTERLY -> ((QuarterlyPrice) result).setEndDate(endDate);
-            case YEARLY -> ((YearlyPrice) result).setEndDate(endDate);
-        }
     }
 
     @Transactional
