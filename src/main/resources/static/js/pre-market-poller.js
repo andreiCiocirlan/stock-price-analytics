@@ -1,7 +1,6 @@
 let previousVisibility = null;
 
 function updatePremarketOptionVisibility(isVisible) {
-    console.log('updatePremarketOptionVisibility');
     // Check if visibility hasn't changed
     if (previousVisibility === isVisible) return;
 
