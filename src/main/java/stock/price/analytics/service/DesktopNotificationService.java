@@ -6,12 +6,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class NotificationService {
+public class DesktopNotificationService {
 
     private final SimpMessagingTemplate template;
 
-    public void broadcastNotification(String message) {
-        this.template.convertAndSend("/topic/desktop-notifications", message);
+    public void broadcastDesktopNotification(String message) {
+        this.template.convertAndSend("/topic/desktop-notification", message);
     }
 
 }

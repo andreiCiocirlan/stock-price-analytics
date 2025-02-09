@@ -10,7 +10,7 @@ import org.springframework.stereotype.Controller;
 public class AlertController {
 
     @MessageMapping("/app/alert")
-    @SendTo("/topic/desktop-notifications")
+    @SendTo("/topic/desktop-notification")
     public String desktopNotify(String message) {
         log.info("Received Desktop Notification: {}", message);
         return message;
