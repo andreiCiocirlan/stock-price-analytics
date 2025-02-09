@@ -1,30 +1,41 @@
-function showHidePreMarketOptions() {
-    const selectElement = document.getElementById('priceMilestone');
-    const options = selectElement.options;
+let previousVisibility = null;
 
-    // Get current time in New York
-    const now = new Date();
-    const nyTimeString = now.toLocaleString('en-US', { timeZone: 'America/New_York' });
-    const nyTime = new Date(nyTimeString);
-    const day = nyTime.getDay(); // 0 (Sun) - 6 (Sat)
-    const hour = nyTime.getHours();
-    const minute = nyTime.getMinutes();
+function updatePremarketOptionVisibility(isVisible) {
+    console.log('updatePremarketOptionVisibility');
+    // Check if visibility hasn't changed
+    if (previousVisibility === isVisible) return;
 
-    // Check if it's Mon-Fri (1-5) and between 8:00 - 9:30 AM (NY time)
-    const isWeekday = day >= 1 && day <= 5;
-    const isTimeInRange = hour === 8 || (hour === 9 && minute < 30);
+    previousVisibility = isVisible;
 
-    if (!(isWeekday && isTimeInRange)) {
-        for (let i = 0; i < options.length; i++) {
-            const optionValue = options[i].value;
-            if (optionValue.startsWith('GAP_')) {
-                options[i].style.display = 'none';
-            }
+    let selectElement;
+    try {
+        selectElement = document.getElementById('priceMilestone');
+        if (!selectElement) throw new Error("Select element not found");
+    } catch (e) {
+        console.error(e);
+        return;
+    }
+
+    for (let option of selectElement.options) {
+        if (option.value.startsWith("GAP_")) {
+            option.style.display = isVisible ? "" : "none";
         }
     }
 }
 
-// Call this function every five minutes to update visibility of pre-market options.
-setInterval(showHidePreMarketOptions, 1000 * 60 * 5);
+function checkAndSetPremarketVisibility() {
+    let now = new Date();
+    let nytzString = now.toLocaleString("en-US", { timeZone: "America/New_York" });
+    let nytzDate = new Date(nytzString);
 
-window.onload = showHidePreMarketOptions;
+    // Check if within specified time frame
+    let weekday = (nytzDate.getDay() >= 1 && nytzDate.getDay() <= 5),
+        hours = ((nytzDate.getHours() === 8) || ((nytzDate.getHours() === 9 && nytzDate.getMinutes() < 30)));
+
+    updatePremarketOptionVisibility(weekday && hours);
+}
+
+// Call this function every five minutes to update visibility of pre-market options.
+setInterval(checkAndSetPremarketVisibility, 1000 * 60 * 5);
+
+window.onload = checkAndSetPremarketVisibility;
