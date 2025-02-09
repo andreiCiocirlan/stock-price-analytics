@@ -32,7 +32,7 @@ public class FairValueGapController {
 
     @GetMapping("/find-closed")
     @ResponseStatus(HttpStatus.OK)
-    public List<FairValueGap> findClosedVsGsFor(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
+    public List<FairValueGap> findClosedFVGsFor(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
         return logTimeAndReturn(() -> fairValueGapService.findClosedFVGsFor(timeframe), "Found " + timeframe + " CLOSED FVGs");
     }
 
