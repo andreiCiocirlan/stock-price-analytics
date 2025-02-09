@@ -61,7 +61,7 @@ body, html {
 }
 
 .select-item #cfdMargin .btn.active {
-    background-color: #0062cc;
+    background-color: red;
     font-weight: bold;
 }
 
