@@ -24,13 +24,12 @@ public class PreMarketScheduler {
             @Scheduled(cron = "${cron.expression.pre.market.between9and915}", zone = "${cron.expression.timezone}")
     })
     public void alertPreMarketGaps_moreThan_10Percent() {
-        List<String> preMarketTickersGapUp10Percent = priceMilestoneService.findTickersForMilestone(GAP_UP_10_PERCENT.name(), List.of(0.2, 0.25, 0.33));
-        List<String> preMarketTickersGapDown10Percent = priceMilestoneService.findTickersForMilestone(GAP_DOWN_10_PERCENT.name(), List.of(0.2, 0.25, 0.33));
-        if (!preMarketTickersGapUp10Percent.isEmpty()) {
-            desktopNotificationService.broadcastDesktopNotification(String.join(" ", GAP_UP_10_PERCENT.toString(), preMarketTickersGapUp10Percent.toString()));
-        }
-        if (!preMarketTickersGapDown10Percent.isEmpty()) {
-            desktopNotificationService.broadcastDesktopNotification(String.join(" ", GAP_DOWN_10_PERCENT.toString(), preMarketTickersGapDown10Percent.toString()));
-        }
+        priceMilestoneService.findTickersForMilestones(List.of(GAP_UP_10_PERCENT, GAP_DOWN_10_PERCENT), List.of(0.2, 0.25, 0.33))
+                .forEach(this::broadcastDesktopNotification);
+    }
+
+    private void broadcastDesktopNotification(String priceMilestone, List<String> tickers) {
+        if (!tickers.isEmpty())
+            desktopNotificationService.broadcastDesktopNotification(String.join(" ", priceMilestone, tickers.toString()));
     }
 }
