@@ -30,12 +30,12 @@ public class Application implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
-        LoggingUtil.logTime(stockRepository::updateIpoAndDelistedDates, "updated ipo/delisted dates at start-up");
         LoggingUtil.logTime(higherTimeframePricesCacheService::initHigherTimeframePricesCache, "initialized higher-timeframe prices cache");
         LoggingUtil.logTime(stockService::initStocksCache, "initialized xtb stocks cache");
         LoggingUtil.logTime(highLowPricesCacheService::initHighLowPricesCache, "initialized high low prices cache");
         LoggingUtil.logTime(dailyPricesService::initDailyPricesCache, "initialized daily prices cache");
         LoggingUtil.logTime(dailyPricesJSONService::initDailyJSONPricesCache, "initialized daily JSON prices cache");
         LoggingUtil.logTime(dailyPricesService::initPreMarketDailyPricesCache, "initialized pre-market daily prices cache");
+        LoggingUtil.logTime(stockRepository::updateIpoAndDelistedDates, "updated ipo/delisted dates at start-up");
     }
 }
