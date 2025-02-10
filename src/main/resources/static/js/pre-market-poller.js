@@ -34,7 +34,7 @@ function checkAndSetPremarketVisibility() {
     updatePremarketOptionVisibility(weekday && hours);
 }
 
-// Call this function every five minutes to update visibility of pre-market options.
-setInterval(checkAndSetPremarketVisibility, 1000 * 60 * 5);
+// Call this function every minute to update visibility of pre-market options.
+setInterval(checkAndSetPremarketVisibility, 1000 * 60 * 1);
 
 window.onload = checkAndSetPremarketVisibility;
