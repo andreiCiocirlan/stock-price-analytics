@@ -2,6 +2,7 @@ package stock.price.analytics.scheduler;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.annotation.Schedules;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.service.DesktopNotificationService;
 import stock.price.analytics.service.PriceMilestoneService;
@@ -18,7 +19,10 @@ public class PreMarketScheduler {
     private final PriceMilestoneService priceMilestoneService;
     private final DesktopNotificationService desktopNotificationService;
 
-    @Scheduled(cron = "${cron.expression.pre.market}", zone = "${cron.expression.timezone}")
+    @Schedules({
+            @Scheduled(cron = "${cron.expression.pre.market.between8and9}", zone = "${cron.expression.timezone}"),
+            @Scheduled(cron = "${cron.expression.pre.market.between9and915}", zone = "${cron.expression.timezone}")
+    })
     public void alertPreMarketGaps_moreThan_10Percent() {
         List<String> preMarketTickersGapUp10Percent = priceMilestoneService.findTickersForMilestone(GAP_UP_10_PERCENT.name(), List.of(0.2, 0.25, 0.33));
         List<String> preMarketTickersGapDown10Percent = priceMilestoneService.findTickersForMilestone(GAP_DOWN_10_PERCENT.name(), List.of(0.2, 0.25, 0.33));
