@@ -17,6 +17,7 @@ public class YahooPricesImportScheduler {
     public static final String HTTP_LOCALHOST = "http://localhost:";
     public static final String YAHOO_PRICES_IMPORT_ENDPOINT = "/yahoo-prices/import";
     public static final String INTRADAY_LOG_PREFIX = "INTRADAY";
+    public static final String PREMARKET_LOG_PREFIX = "PRE-MARKET";
 
     private final RestTemplate restTemplate;
     @Value("${server.port}")
@@ -32,6 +33,18 @@ public class YahooPricesImportScheduler {
     @Scheduled(cron = "${cron.expression.yahoo.quotes.intraday.between10and17}", zone = "${cron.expression.timezone}")
     public void getYahooPricesIntradayBetween10and17() {
         callYahooPricesImport(INTRADAY_LOG_PREFIX);
+    }
+
+    // executed at 8:00, 8:15, 8:30, 8:45 NY time (pre-market)
+    @Scheduled(cron = "${cron.expression.yahoo.quotes.pre.market.between8and9}", zone = "${cron.expression.timezone}")
+    public void preMarketCallYahooQuoteBetween8And9() {
+        callYahooPricesImport(PREMARKET_LOG_PREFIX);
+    }
+
+    // executed at 9:00, 9:15 NY time (pre-market)
+    @Scheduled(cron = "${cron.expression.yahoo.quotes.pre.market.between9and915}", zone = "${cron.expression.timezone}")
+    public void preMarketCallYahooQuoteAPIBetween9And915() {
+        callYahooPricesImport(PREMARKET_LOG_PREFIX);
     }
 
     private void callYahooPricesImport(String logPrefix) {
