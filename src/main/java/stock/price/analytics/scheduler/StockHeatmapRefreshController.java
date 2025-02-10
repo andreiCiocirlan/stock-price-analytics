@@ -14,9 +14,13 @@ public class StockHeatmapRefreshController {
 
     private volatile boolean dataUpdated = false;
 
-    // same cron timings as YahooPricesScheduler, but 10 seconds later to account for request finishing
-    @Scheduled(cron = "${cron.expression.stocks.heatmap.refresh}", zone = "${cron.expression.timezone}")
-    public void updateDataFlag() {
+    @Scheduled(cron = "${cron.expression.stocks.heatmap.refresh.intraday.at935}", zone = "${cron.expression.timezone}")
+    public void updateDataFlagIntradayAt935() {
+        dataUpdated = true;
+    }
+
+    @Scheduled(cron = "${cron.expression.stocks.heatmap.refresh.intraday.between10and17}", zone = "${cron.expression.timezone}")
+    public void updateDataFlagIntradayBetween10and17() {
         dataUpdated = true;
     }
 

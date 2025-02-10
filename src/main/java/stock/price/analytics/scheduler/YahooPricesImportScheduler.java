@@ -3,32 +3,40 @@ package stock.price.analytics.scheduler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import stock.price.analytics.model.prices.ohlc.DailyPrice;
 
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class YahooPricesImportScheduler {
 
-    @Value("${server.port}")
-    private int serverPort;
+    public static final String HTTP_LOCALHOST = "http://localhost:";
+    public static final String YAHOO_PRICES_IMPORT_ENDPOINT = "/yahoo-prices/import";
+    public static final String INTRADAY_LOG_PREFIX = "INTRADAY";
 
     private final RestTemplate restTemplate;
+    @Value("${server.port}")
+    private String serverPort;
 
-    // Get Yahoo-API prices at 5 minutes past every hour from 9 AM to 4 PM (NY time) MON to FRI
-    @Scheduled(cron = "${cron.expression.intraday.yahoo.quotes}", zone = "${cron.expression.timezone}")
-    public void getYahooPrices() {
-        String url = "http://localhost:" + serverPort + "/yahoo-prices/import"; // Use the injected port
-        ResponseEntity<List<DailyPrice>> response = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
-        log.info("Intraday Yahoo Prices Scheduler imported: {} daily prices", Objects.requireNonNull(response.getBody()).size());
+    // executed at 9:35 NY time (5 minutes after market open)
+    @Scheduled(cron = "${cron.expression.yahoo.quotes.intraday.at935}", zone = "${cron.expression.timezone}")
+    public void getYahooPricesIntradayAt935() {
+        callYahooPricesImport(INTRADAY_LOG_PREFIX);
     }
+
+    // executed at 5 and 35 minutes past the hour between 10-17 NY time (intraday)
+    @Scheduled(cron = "${cron.expression.yahoo.quotes.intraday.between10and17}", zone = "${cron.expression.timezone}")
+    public void getYahooPricesIntradayBetween10and17() {
+        callYahooPricesImport(INTRADAY_LOG_PREFIX);
+    }
+
+    private void callYahooPricesImport(String logPrefix) {
+        restTemplate.getForObject(String.join("", HTTP_LOCALHOST, serverPort, YAHOO_PRICES_IMPORT_ENDPOINT), List.class);
+        log.info(logPrefix + " Yahoo Prices Scheduler imported prices successfully");
+    }
+
 }
