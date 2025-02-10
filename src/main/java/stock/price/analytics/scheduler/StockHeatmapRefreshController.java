@@ -3,6 +3,7 @@ package stock.price.analytics.scheduler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.annotation.Schedules;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,13 +15,13 @@ public class StockHeatmapRefreshController {
 
     private volatile boolean dataUpdated = false;
 
-    @Scheduled(cron = "${cron.expression.stocks.heatmap.refresh.intraday.at935}", zone = "${cron.expression.timezone}")
-    public void updateDataFlagIntradayAt935() {
-        dataUpdated = true;
-    }
-
-    @Scheduled(cron = "${cron.expression.stocks.heatmap.refresh.intraday.between10and17}", zone = "${cron.expression.timezone}")
-    public void updateDataFlagIntradayBetween10and17() {
+    @Schedules({
+            @Scheduled(cron = "${cron.expression.stocks.heatmap.refresh.intraday.at935}", zone = "${cron.expression.timezone}"),
+            @Scheduled(cron = "${cron.expression.yahoo.quotes.intraday.between10and17}", zone = "${cron.expression.timezone}"),
+            @Scheduled(cron = "${cron.expression.stocks.heatmap.refresh.pre.market.between8and9}", zone = "${cron.expression.timezone}"),
+            @Scheduled(cron = "${cron.expression.stocks.heatmap.refresh.pre.market.between9and915}", zone = "${cron.expression.timezone}")
+    })
+    public void updateDataFlag() {
         dataUpdated = true;
     }
 
