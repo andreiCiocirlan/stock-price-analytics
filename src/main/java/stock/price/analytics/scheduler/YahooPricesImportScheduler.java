@@ -25,25 +25,25 @@ public class YahooPricesImportScheduler {
 
     // executed at 9:35 NY time (5 minutes after market open)
     @Scheduled(cron = "${cron.expression.yahoo.quotes.intraday.at935}", zone = "${cron.expression.timezone}")
-    public void getYahooPricesIntradayAt935() {
+    public void yahooPricesIntradayAt935() {
         callYahooPricesImport(INTRADAY_LOG_PREFIX);
     }
 
     // executed at 5 and 35 minutes past the hour between 10-17 NY time (intraday)
     @Scheduled(cron = "${cron.expression.yahoo.quotes.intraday.between10and17}", zone = "${cron.expression.timezone}")
-    public void getYahooPricesIntradayBetween10and17() {
+    public void yahooPricesIntradayBetween10and17() {
         callYahooPricesImport(INTRADAY_LOG_PREFIX);
     }
 
     // executed at 8:00, 8:15, 8:30, 8:45 NY time (pre-market)
     @Scheduled(cron = "${cron.expression.yahoo.quotes.pre.market.between8and9}", zone = "${cron.expression.timezone}")
-    public void preMarketCallYahooQuoteBetween8And9() {
+    public void yahooPricesPreMarketBetween8And9() {
         callYahooPricesImport(PREMARKET_LOG_PREFIX);
     }
 
     // executed at 9:00, 9:15 NY time (pre-market)
     @Scheduled(cron = "${cron.expression.yahoo.quotes.pre.market.between9and915}", zone = "${cron.expression.timezone}")
-    public void preMarketCallYahooQuoteAPIBetween9And915() {
+    public void yahooPricesPreMarketBetween9And915() {
         callYahooPricesImport(PREMARKET_LOG_PREFIX);
     }
 
