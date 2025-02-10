@@ -17,7 +17,7 @@ import java.util.Objects;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class IntradayYahooPricesScheduler {
+public class YahooPricesImportScheduler {
 
     @Value("${server.port}")
     private int serverPort;
