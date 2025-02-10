@@ -25,7 +25,7 @@ public class YahooPricesScheduler {
     private final RestTemplate restTemplate;
 
     // Get Yahoo-API prices at 5 minutes past every hour from 9 AM to 4 PM (NY time) MON to FRI
-    @Scheduled(cron = "${cron.expression.yahoo.quotes}", zone = "${cron.expression.timezone}")
+    @Scheduled(cron = "${cron.expression.intraday.yahoo.quotes}", zone = "${cron.expression.timezone}")
     public void getYahooPrices() {
         String url = "http://localhost:" + serverPort + "/yahoo-prices/import"; // Use the injected port
         ResponseEntity<List<DailyPrice>> response = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
