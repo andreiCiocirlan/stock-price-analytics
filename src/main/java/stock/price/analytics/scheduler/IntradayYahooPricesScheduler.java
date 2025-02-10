@@ -17,7 +17,7 @@ import java.util.Objects;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class YahooPricesScheduler {
+public class IntradayYahooPricesScheduler {
 
     @Value("${server.port}")
     private int serverPort;
@@ -29,6 +29,6 @@ public class YahooPricesScheduler {
     public void getYahooPrices() {
         String url = "http://localhost:" + serverPort + "/yahoo-prices/import"; // Use the injected port
         ResponseEntity<List<DailyPrice>> response = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
-        log.info("Yahoo Prices Scheduler imported: {} daily prices", Objects.requireNonNull(response.getBody()).size());
+        log.info("Intraday Yahoo Prices Scheduler imported: {} daily prices", Objects.requireNonNull(response.getBody()).size());
     }
 }
