@@ -30,5 +30,5 @@ public enum PreMarketPriceMilestone {
         public String toString() {
             return "None";
         }
-    };
+    }
 }
