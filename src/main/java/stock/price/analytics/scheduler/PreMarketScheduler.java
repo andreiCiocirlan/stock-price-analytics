@@ -25,11 +25,10 @@ public class PreMarketScheduler {
     })
     public void alertPreMarketGaps_moreThan_10Percent() {
         priceMilestoneService.findTickersForMilestones(List.of(GAP_UP_10_PERCENT, GAP_DOWN_10_PERCENT), List.of(0.2, 0.25, 0.33))
-                .forEach(this::broadcastDesktopNotification);
+                .forEach((priceMilestone, tickers) -> {
+                    if (!tickers.isEmpty())
+                        desktopNotificationService.broadcastDesktopNotification(String.join(" ", priceMilestone, tickers.toString()));
+                });
     }
 
-    private void broadcastDesktopNotification(String priceMilestone, List<String> tickers) {
-        if (!tickers.isEmpty())
-            desktopNotificationService.broadcastDesktopNotification(String.join(" ", priceMilestone, tickers.toString()));
-    }
 }
