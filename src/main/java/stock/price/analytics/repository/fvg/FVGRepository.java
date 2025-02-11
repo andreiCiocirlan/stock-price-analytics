@@ -56,12 +56,28 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
             	fvg.date2 as date,
                 fvg.type,
                 CASE
-                    WHEN low1 > high3 THEN low1
-                    WHEN high1 < low3 THEN high1
-                END AS low,
+                    WHEN fvg.type = 'BULLISH' THEN
+                        CASE
+                            WHEN low1 > high3 THEN low1
+                            WHEN high1 < low3 THEN high1
+                        END
+                    ELSE
+                        CASE
+                            WHEN low1 > high3 THEN high3
+                            WHEN high1 < low3 THEN low3
+                        END
+                END AS LOW,
                 CASE
-                    WHEN low1 > high3 THEN high3
-                    WHEN high1 < low3 THEN low3
+                    WHEN fvg.type = 'BULLISH' THEN
+                        CASE
+                            WHEN low1 > high3 THEN high3
+                            WHEN high1 < low3 THEN low3
+                        END
+                    ELSE
+                        CASE
+                            WHEN low1 > high3 THEN low1
+                            WHEN high1 < low3 THEN high1
+                        END
                 END AS high
             FROM identified_fvgs fvg
             WHERE
@@ -115,12 +131,28 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
             	fvg.date2 as date,
                 fvg.type,
                 CASE
-                    WHEN low1 > high3 THEN low1
-                    WHEN high1 < low3 THEN high1
-                END AS low,
+                    WHEN fvg.type = 'BULLISH' THEN
+                        CASE
+                            WHEN low1 > high3 THEN low1
+                            WHEN high1 < low3 THEN high1
+                        END
+                    ELSE
+                        CASE
+                            WHEN low1 > high3 THEN high3
+                            WHEN high1 < low3 THEN low3
+                        END
+                END AS LOW,
                 CASE
-                    WHEN low1 > high3 THEN high3
-                    WHEN high1 < low3 THEN low3
+                    WHEN fvg.type = 'BULLISH' THEN
+                        CASE
+                            WHEN low1 > high3 THEN high3
+                            WHEN high1 < low3 THEN low3
+                        END
+                    ELSE
+                        CASE
+                            WHEN low1 > high3 THEN low1
+                            WHEN high1 < low3 THEN high1
+                        END
                 END AS high
             FROM identified_fvgs fvg
             WHERE
@@ -174,12 +206,28 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
             	fvg.date2 as date,
                 fvg.type,
                 CASE
-                    WHEN low1 > high3 THEN low1
-                    WHEN high1 < low3 THEN high1
-                END AS low,
+                    WHEN fvg.type = 'BULLISH' THEN
+                        CASE
+                            WHEN low1 > high3 THEN low1
+                            WHEN high1 < low3 THEN high1
+                        END
+                    ELSE
+                        CASE
+                            WHEN low1 > high3 THEN high3
+                            WHEN high1 < low3 THEN low3
+                        END
+                END AS LOW,
                 CASE
-                    WHEN low1 > high3 THEN high3
-                    WHEN high1 < low3 THEN low3
+                    WHEN fvg.type = 'BULLISH' THEN
+                        CASE
+                            WHEN low1 > high3 THEN high3
+                            WHEN high1 < low3 THEN low3
+                        END
+                    ELSE
+                        CASE
+                            WHEN low1 > high3 THEN low1
+                            WHEN high1 < low3 THEN high1
+                        END
                 END AS high
             FROM identified_fvgs fvg
             WHERE
@@ -233,12 +281,28 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
             	fvg.date2 as date,
                 fvg.type,
                 CASE
-                    WHEN low1 > high3 THEN low1
-                    WHEN high1 < low3 THEN high1
-                END AS low,
+                    WHEN fvg.type = 'BULLISH' THEN
+                        CASE
+                            WHEN low1 > high3 THEN low1
+                            WHEN high1 < low3 THEN high1
+                        END
+                    ELSE
+                        CASE
+                            WHEN low1 > high3 THEN high3
+                            WHEN high1 < low3 THEN low3
+                        END
+                END AS LOW,
                 CASE
-                    WHEN low1 > high3 THEN high3
-                    WHEN high1 < low3 THEN low3
+                    WHEN fvg.type = 'BULLISH' THEN
+                        CASE
+                            WHEN low1 > high3 THEN high3
+                            WHEN high1 < low3 THEN low3
+                        END
+                    ELSE
+                        CASE
+                            WHEN low1 > high3 THEN low1
+                            WHEN high1 < low3 THEN high1
+                        END
                 END AS high
             FROM identified_fvgs fvg
             WHERE
@@ -292,12 +356,28 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
             	fvg.date2 as date,
                 fvg.type,
                 CASE
-                    WHEN low1 > high3 THEN low1
-                    WHEN high1 < low3 THEN high1
-                END AS low,
+                    WHEN fvg.type = 'BULLISH' THEN
+                        CASE
+                            WHEN low1 > high3 THEN low1
+                            WHEN high1 < low3 THEN high1
+                        END
+                    ELSE
+                        CASE
+                            WHEN low1 > high3 THEN high3
+                            WHEN high1 < low3 THEN low3
+                        END
+                END AS LOW,
                 CASE
-                    WHEN low1 > high3 THEN high3
-                    WHEN high1 < low3 THEN low3
+                    WHEN fvg.type = 'BULLISH' THEN
+                        CASE
+                            WHEN low1 > high3 THEN high3
+                            WHEN high1 < low3 THEN low3
+                        END
+                    ELSE
+                        CASE
+                            WHEN low1 > high3 THEN low1
+                            WHEN high1 < low3 THEN high1
+                        END
                 END AS high
             FROM identified_fvgs fvg
             WHERE
