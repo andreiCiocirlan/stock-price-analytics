@@ -57,4 +57,27 @@ public interface FVGTaggedRepository extends JpaRepository<FairValueGap, Long> {
             """, nativeQuery = true)
     List<FairValueGap> findWeeklyTaggedFVGsBullish95thPercentile52wLow(@Param("cfdMargins") List<Double> cfdMargins);
 
+    @Query(value = """
+            SELECT fvg.*
+            FROM stocks s
+            JOIN fvg on fvg.ticker = s.ticker AND fvg.status = 'OPEN' AND fvg.timeframe = 'WEEKLY' and fvg.type = 'BEARISH'
+            WHERE
+                    s.cfd_margin in :cfdMargins
+                AND s.low4w <> s.high4w AND (1 - (1 - ((s.w_close - s.low4w) / (s.high4w - s.low4w)))) > 0.95
+                AND (s.w_high between fvg.low AND fvg.high OR s.w_low between fvg.low AND fvg.high)
+            """, nativeQuery = true)
+    List<FairValueGap> findWeeklyTaggedFVGsBearish95thPercentile4wHigh(@Param("cfdMargins") List<Double> cfdMargins);
+
+    @Query(value = """
+            SELECT fvg.*
+            FROM stocks s
+            JOIN fvg on fvg.ticker = s.ticker AND fvg.status = 'OPEN' AND fvg.timeframe = 'WEEKLY' and fvg.type = 'BULLISH'
+            WHERE
+                    s.cfd_margin in :cfdMargins
+            	AND s.low4w <> s.high4w AND (1 - (s.w_close - s.low4w) / (s.high4w - s.low4w)) > 0.95
+                AND fvg.date < date_trunc('WEEK', s.last_updated) - INTERVAL '1 week'
+                AND (s.w_high between fvg.low AND fvg.high OR s.w_low between fvg.low AND fvg.high)
+            """, nativeQuery = true)
+    List<FairValueGap> findWeeklyTaggedFVGsBullish95thPercentile4wLow(@Param("cfdMargins") List<Double> cfdMargins);
+
 }
