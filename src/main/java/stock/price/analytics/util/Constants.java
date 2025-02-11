@@ -11,7 +11,7 @@ public class Constants {
     public static final String BEARISH_FVG_95TH_PERCENTILE_4W = "Bearish FVG 95% 4w:";
     public static final String BEARISH_FVG_95TH_PERCENTILE_52W = "Bearish FVG 95% 52w:";
     public static final String BEARISH_FVG_95TH_PERCENTILE_ATH = "Bearish FVG 95% ATH:";
-    public static final String BULLISH_FVG_95TH_PERCENTILE_4W = "Bearish FVG 95% 4w:";
-    public static final String BULLISH_FVG_95TH_PERCENTILE_52W = "Bearish FVG 95% 52w:";
-    public static final String BULLISH_FVG_95TH_PERCENTILE_ATH = "Bearish FVG 95% ATH:";
+    public static final String BULLISH_FVG_95TH_PERCENTILE_4W = "Bullish FVG 95% 4w:";
+    public static final String BULLISH_FVG_95TH_PERCENTILE_52W = "Bullish FVG 95% 52w:";
+    public static final String BULLISH_FVG_95TH_PERCENTILE_ATH = "Bullish FVG 95% ATH:";
 }
