@@ -231,7 +231,4 @@ public class DailyPricesJSONService {
         dailyPricesJSONCacheService.initDailyJSONPricesCache(dailyPricesJSONRepository.findByDateBetween(tradingDateNow.minusDays(7), tradingDateNow));
     }
 
-    public List<DailyPricesJSON> dailyPricesJSONCache() {
-        return dailyPricesJSONCacheService.dailyPricesJSONCache();
-    }
 }
