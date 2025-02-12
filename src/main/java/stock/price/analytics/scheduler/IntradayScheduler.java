@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
-import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.service.DesktopNotificationService;
 import stock.price.analytics.service.FVGTaggedService;
 import stock.price.analytics.service.FairValueGapService;
@@ -24,10 +23,7 @@ public class IntradayScheduler {
 
     @Scheduled(cron = "${cron.expression.intraday.fvg.update}", zone = "${cron.expression.timezone}")
     public void updateFVGsAtIntraday() {
-        for (StockTimeframe timeframe : StockTimeframe.values()) {
-            fairValueGapService.findNewFVGsAndSaveFor(timeframe);
-            fairValueGapService.updateFVGsHighLowAndClosedFor(timeframe);
-        }
+        fairValueGapService.saveNewFVGsAndUpdateHighLowAndClosed();
     }
 
     @Scheduled(cron = "${cron.expression.intraday.fvg.tagged.95th.percentile.4w}", zone = "${cron.expression.timezone}")
