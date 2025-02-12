@@ -13,7 +13,7 @@ public class EndOfDayScheduler {
     private final FairValueGapService fairValueGapService;
 
     // At the end of the trading day adjust FVGs (INSERT new FVGs found, CLOSE FVGs if no longer OPEN)
-    @Scheduled(cron = "${cron.expression.post.market.fvg}", zone = "${cron.expression.timezone}")
+    @Scheduled(cron = "${cron.post.market.fvg}", zone = "${cron.timezone}")
     public void updateFVGsAtEOD() {
         fairValueGapService.saveNewFVGsAndUpdateHighLowAndClosed();
     }

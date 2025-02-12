@@ -21,22 +21,22 @@ public class IntradayScheduler {
     private final FVGTaggedService fvgTaggedService;
     private final DesktopNotificationService desktopNotificationService;
 
-    @Scheduled(cron = "${cron.expression.intraday.fvg.update}", zone = "${cron.expression.timezone}")
+    @Scheduled(cron = "${cron.intraday.fvg.update}", zone = "${cron.timezone}")
     public void updateFVGsAtIntraday() {
         fairValueGapService.saveNewFVGsAndUpdateHighLowAndClosed();
     }
 
-    @Scheduled(cron = "${cron.expression.intraday.fvg.tagged.95th.percentile.4w}", zone = "${cron.expression.timezone}")
+    @Scheduled(cron = "${cron.intraday.fvg.tagged.95th.percentile.4w}", zone = "${cron.timezone}")
     public void alertFVGsTagged95thPercentile4w() {
         alertFVGsTaggedBy(List.of(HIGH_4W_95, LOW_4W_95));
     }
 
-    @Scheduled(cron = "${cron.expression.intraday.fvg.tagged.95th.percentile.52w}", zone = "${cron.expression.timezone}")
+    @Scheduled(cron = "${cron.intraday.fvg.tagged.95th.percentile.52w}", zone = "${cron.timezone}")
     public void alertFVGsTagged95thPercentile52w() {
         alertFVGsTaggedBy(List.of(HIGH_52W_95, LOW_52W_95));
     }
 
-    @Scheduled(cron = "${cron.expression.intraday.fvg.tagged.95th.percentile.ath}", zone = "${cron.expression.timezone}")
+    @Scheduled(cron = "${cron.intraday.fvg.tagged.95th.percentile.ath}", zone = "${cron.timezone}")
     public void alertFVGsTagged95thPercentileATH() {
         alertFVGsTaggedBy(List.of(HIGH_ALL_TIME_95, LOW_ALL_TIME_95));
     }
