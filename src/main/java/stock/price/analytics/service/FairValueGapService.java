@@ -115,6 +115,13 @@ public class FairValueGapService {
         return updatedFVGs;
     }
 
+    public void saveNewFVGsAndUpdateHighLowAndClosed() {
+        for (StockTimeframe timeframe : StockTimeframe.values()) {
+            findNewFVGsAndSaveFor(timeframe);
+            updateFVGsHighLowAndClosedFor(timeframe);
+        }
+    }
+
     public void updateFVGPricesForStockSplit(String ticker, LocalDate stockSplitDate, double stockSplitMultiplier) {
         int updatedRows = fvgRepository.updateFVGPricesForStockSplit(ticker, stockSplitDate, stockSplitMultiplier);
         log.warn("updated {} FVG rows for {} and stockSplitDate {}", updatedRows, ticker, stockSplitDate);
