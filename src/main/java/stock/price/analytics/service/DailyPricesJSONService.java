@@ -176,7 +176,7 @@ public class DailyPricesJSONService {
         String key = dailyPriceJson.getCompositeId();
         if (recentJsonPricesById.containsKey(key)) {
             DailyPricesJSON found = recentJsonPricesById.get(key);
-            if (dailyPriceJson.getPreMarketPrice() != 0d || found.differentPrices(dailyPriceJson)) { // compare OHLC, performance
+            if (dailyPriceJson.getPreMarketPrice() != 0d || found.differentPrices(dailyPriceJson)) { // compare OHLC, performance, or if pre-market price
                 dailyJSONPrices.add(found.updateFrom(dailyPriceJson));
             } else {
                 sameDailyPrices.add(ticker);
