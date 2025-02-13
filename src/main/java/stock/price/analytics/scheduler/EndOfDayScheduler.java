@@ -17,7 +17,7 @@ public class EndOfDayScheduler {
     // At the end of the trading day check if any stock discrepancies are found
     @Scheduled(cron = "${cron.post.market.fvg}", zone = "${cron.timezone}")
     public void findAllStockDiscrepanciesAtEOD() {
-        if (stockDiscrepanciesService.findAllStockDiscrepancies().isEmpty()) {
+        if (!stockDiscrepanciesService.findAllStockDiscrepancies().isEmpty()) {
             desktopNotificationService.broadcastDesktopNotification("Discrepancies found, check logs!");
         }
     }
