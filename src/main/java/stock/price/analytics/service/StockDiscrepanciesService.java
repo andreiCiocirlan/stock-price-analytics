@@ -20,7 +20,7 @@ public class StockDiscrepanciesService {
     public String findHighLowAndOpeningPriceDiscrepancies() {
         Map<String, Supplier<List<Stock>>> discrepancyMethods = Map.of(
                 "52-week High/Low", stockDiscrepanciesRepository::findStocksWithHighLow52wDiscrepancy,
-                "4-week High/Low", stockDiscrepanciesRepository::findStocksWithHighLow52wDiscrepancy,
+                "4-week High/Low", stockDiscrepanciesRepository::findStocksWithHighLow4wDiscrepancy,
                 "Highest Lowest", stockDiscrepanciesRepository::findStocksWithHighestLowestDiscrepancy,
                 "Weekly Opening", stockDiscrepanciesRepository::findStocksWithWeeklyOpeningDiscrepancy,
                 "Monthly Opening", stockDiscrepanciesRepository::findStocksWithMonthlyOpeningDiscrepancy,
