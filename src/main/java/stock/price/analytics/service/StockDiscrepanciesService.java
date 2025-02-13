@@ -18,14 +18,23 @@ public class StockDiscrepanciesService {
 
     private final StockDiscrepanciesRepository stockDiscrepanciesRepository;
 
-    public void findStocksHighLowsOrHTFDiscrepancies() {
-        List<Object[]> stocksHighLowsOrHTFDiscrepancies = stockDiscrepanciesRepository.findStocksHighLowsOrHTFDiscrepancies();
-        if (!stocksHighLowsOrHTFDiscrepancies.isEmpty()) {
-            log.warn("Stocks HighLowForPeriod or HTF discrepancy {}", stocksHighLowsOrHTFDiscrepancies);
-        }
+    public List<String> findAllStockDiscrepancies() {
+        List<String> stocksWithDiscrepancies = findStocksHighLowsOrHTFDiscrepancies();
+        stocksWithDiscrepancies.addAll(findHighLowAndOpeningPriceDiscrepancies());
+        return stocksWithDiscrepancies;
     }
 
-    public void findHighLowAndOpeningPriceDiscrepancies() {
+    private List<String> findStocksHighLowsOrHTFDiscrepancies() {
+        List<String> stocksWithDiscrepancies = new ArrayList<>();
+        List<Object[]> stocksHighLowsOrHTFDiscrepancies = stockDiscrepanciesRepository.findStocksHighLowsOrHTFDiscrepancies();
+        if (!stocksHighLowsOrHTFDiscrepancies.isEmpty()) {
+            stocksHighLowsOrHTFDiscrepancies.forEach(resultRow -> logDiscrepancyAndAddToList(String.valueOf(resultRow[0]), String.valueOf(resultRow[1]), stocksWithDiscrepancies));
+        }
+        return stocksWithDiscrepancies;
+    }
+
+    private List<String> findHighLowAndOpeningPriceDiscrepancies() {
+        List<String> stocksWithDiscrepancies = new ArrayList<>();
         Map<String, Supplier<List<Stock>>> discrepancyMethods = Map.of(
                 "52-week High/Low", stockDiscrepanciesRepository::findStocksWithHighLow52wDiscrepancy,
                 "4-week High/Low", stockDiscrepanciesRepository::findStocksWithHighLow4wDiscrepancy,
@@ -36,11 +45,16 @@ public class StockDiscrepanciesService {
                 "Yearly Opening", stockDiscrepanciesRepository::findStocksWithYearlyOpeningDiscrepancy
         );
 
-        discrepancyMethods.forEach((name, supplier) ->
-                supplier.get().stream()
-                        .findFirst()
-                        .ifPresent(_ -> log.warn("Found discrepancy in {}", name))
-        );
+        discrepancyMethods.forEach((discrepancyType, stockDiscrepancies) ->
+                stockDiscrepancies.get().forEach(stock -> logDiscrepancyAndAddToList(stock.getTicker(), discrepancyType, stocksWithDiscrepancies)));
+
+        return stocksWithDiscrepancies;
+    }
+
+    private void logDiscrepancyAndAddToList(String ticker, String name, List<String> discrepanciesFound) {
+        String stockDiscrepancy = String.format("%s with %s discrepancy", ticker, name);
+        discrepanciesFound.add(stockDiscrepancy);
+        log.warn("{}", stockDiscrepancy);
     }
 
 }

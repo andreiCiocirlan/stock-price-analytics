@@ -19,10 +19,8 @@ public class StockDiscrepanciesController {
     private final StockDiscrepanciesService stockDiscrepanciesService;
 
     @GetMapping("/find-all")
-    public String findAllDiscrepancies() {
-        stockDiscrepanciesService.findHighLowAndOpeningPriceDiscrepancies();
-        stockDiscrepanciesService.findStocksHighLowsOrHTFDiscrepancies();
-        return "Find all discrepancies check completed";
+    public List<String> findAllDiscrepancies() {
+        return stockDiscrepanciesService.findAllStockDiscrepancies();
     }
 
     @GetMapping("/high-low-for-period")
