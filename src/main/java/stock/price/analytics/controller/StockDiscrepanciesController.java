@@ -20,12 +20,9 @@ public class StockDiscrepanciesController {
 
     @GetMapping("/find-all")
     public String findAllDiscrepancies() {
-        return stockDiscrepanciesService.findHighLowAndOpeningPriceDiscrepancies();
-    }
-
-    @GetMapping("/find-any")
-    public List<Object[]> findStocksHighLowsOrHTFDiscrepancies() {
-        return stockDiscrepanciesRepository.findStocksHighLowsOrHTFDiscrepancies();
+        stockDiscrepanciesService.findHighLowAndOpeningPriceDiscrepancies();
+        stockDiscrepanciesService.findStocksHighLowsOrHTFDiscrepancies();
+        return "Find all discrepancies check completed";
     }
 
     @GetMapping("/high-low-for-period")

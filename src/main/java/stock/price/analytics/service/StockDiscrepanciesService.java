@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.stocks.StockDiscrepanciesRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -17,7 +18,14 @@ public class StockDiscrepanciesService {
 
     private final StockDiscrepanciesRepository stockDiscrepanciesRepository;
 
-    public String findHighLowAndOpeningPriceDiscrepancies() {
+    public void findStocksHighLowsOrHTFDiscrepancies() {
+        List<Object[]> stocksHighLowsOrHTFDiscrepancies = stockDiscrepanciesRepository.findStocksHighLowsOrHTFDiscrepancies();
+        if (!stocksHighLowsOrHTFDiscrepancies.isEmpty()) {
+            log.warn("Stocks HighLowForPeriod or HTF discrepancy {}", stocksHighLowsOrHTFDiscrepancies);
+        }
+    }
+
+    public void findHighLowAndOpeningPriceDiscrepancies() {
         Map<String, Supplier<List<Stock>>> discrepancyMethods = Map.of(
                 "52-week High/Low", stockDiscrepanciesRepository::findStocksWithHighLow52wDiscrepancy,
                 "4-week High/Low", stockDiscrepanciesRepository::findStocksWithHighLow4wDiscrepancy,
@@ -31,22 +39,8 @@ public class StockDiscrepanciesService {
         discrepancyMethods.forEach((name, supplier) ->
                 supplier.get().stream()
                         .findFirst()
-                        .ifPresent(_ -> log.warn("Found discrepancies in: {}", name))
+                        .ifPresent(_ -> log.warn("Found discrepancy in {}", name))
         );
-        boolean discrepanciesFound = discrepancyMethods.entrySet().stream()
-                .anyMatch(entry -> !entry.getValue().get().isEmpty());
-
-        StringBuilder discrepancyMessageBuilder = new StringBuilder();
-        if (discrepanciesFound) {
-            discrepancyMethods.forEach((name, supplier) ->
-                    supplier.get().stream()
-                            .findFirst()
-                            .ifPresent(_ -> discrepancyMessageBuilder.append("Found discrepancies in: ").append(name).append("\n"))
-            );
-            return "The following discrepancies were found:\n" + discrepancyMessageBuilder.toString().trim();
-        } else {
-            return "No discrepancies found.";
-        }
     }
 
 }
