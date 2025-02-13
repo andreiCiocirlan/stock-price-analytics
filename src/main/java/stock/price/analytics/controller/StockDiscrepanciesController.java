@@ -6,6 +6,7 @@ import stock.price.analytics.model.prices.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.stocks.StockDiscrepanciesRepository;
+import stock.price.analytics.service.StockDiscrepanciesService;
 
 import java.util.List;
 
@@ -15,6 +16,12 @@ import java.util.List;
 public class StockDiscrepanciesController {
 
     private final StockDiscrepanciesRepository stockDiscrepanciesRepository;
+    private final StockDiscrepanciesService stockDiscrepanciesService;
+
+    @GetMapping("/find-all")
+    public String findAllDiscrepancies() {
+        return stockDiscrepanciesService.findHighLowAndOpeningPriceDiscrepancies();
+    }
 
     @GetMapping("/find-any")
     public List<Object[]> findStocksHighLowsOrHTFDiscrepancies() {
