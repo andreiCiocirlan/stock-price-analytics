@@ -41,8 +41,12 @@ public class PreMarketPriceMilestoneCache {
             case GAP_DOWN -> preMarketPrice.getClose() < s.getDailyClose();
             case GAP_UP_10_PERCENT -> preMarketPrice.getClose() > s.getDailyClose() * 1.10;
             case GAP_DOWN_10_PERCENT -> preMarketPrice.getClose() < s.getDailyClose() * 0.90;
-            // previous day performance < -0.5% && pre-market GAP UP more than 3%
-            case GAP_UP_AND_GO -> s.getDailyPerformance() < -0.5d && preMarketPrice.getClose() > s.getDailyClose() * (1 + MIN_GAP_AND_GO_PERCENTAGE);
+            // pre-market GAP UP more than 4%
+            case GAP_UP_AND_GO -> preMarketPrice.getClose() > s.getDailyClose() * (1 + MIN_GAP_AND_GO_PERCENTAGE);
+            // pre-market GAP DOWN more than 4%
+            case GAP_DOWN_AND_GO -> preMarketPrice.getClose() < s.getDailyClose() * (1 - MIN_GAP_AND_GO_PERCENTAGE);
+            // previous day performance < -2% && pre-market GAP UP more than 3%
+            case KICKING_CANDLE_UP -> s.getDailyPerformance() < -2.0d && preMarketPrice.getClose() > s.getDailyClose() * (1 + MIN_GAP_AND_GO_PERCENTAGE);
             // previous day performance > 0.5% && pre-market GAP DOWN more than 3%
             case GAP_DOWN_AND_GO -> s.getDailyPerformance() > 0.5d && preMarketPrice.getClose() < s.getDailyClose() * (1 - MIN_GAP_AND_GO_PERCENTAGE);
             case NONE -> throw new IllegalStateException("Unexpected value NONE");
