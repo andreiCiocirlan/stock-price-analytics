@@ -16,6 +16,7 @@ public class DailyPricesCache {
 
     private final Map<String, DailyPrice> preMarketDailyPricesByTicker = new HashMap<>();
     private final Map<String, DailyPrice> dailyPricesByTicker = new HashMap<>();
+    private final Map<String, DailyPrice> previousDayPricesByTicker = new HashMap<>();
 
     public void addDailyPrices(List<DailyPrice> dailyPrices, MarketState marketState) {
         if (PRE == marketState) {
@@ -55,6 +56,14 @@ public class DailyPricesCache {
             return new ArrayList<>(preMarketDailyPricesByTicker.values());
         }
         return new ArrayList<>(dailyPricesByTicker.values());
+    }
+
+    public void addPreviousDayPrices(List<DailyPrice> previousDayPrices) {
+        previousDayPrices.forEach(price -> previousDayPricesByTicker.put(price.getTicker(), price));
+    }
+
+    public List<DailyPrice> previousDailyPrices() {
+        return new ArrayList<>(previousDayPricesByTicker.values());
     }
 
 }

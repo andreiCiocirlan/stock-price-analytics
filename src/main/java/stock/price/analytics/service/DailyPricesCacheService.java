@@ -27,6 +27,9 @@ public class DailyPricesCacheService {
     protected void initDailyPricesCache(List<DailyPrice> latestDailyPrices) {
         dailyPricesCache.addDailyPrices(latestDailyPrices, REGULAR);
     }
+    protected void initPreviousDayPricesCache(List<DailyPrice> previousDayPrices) {
+        dailyPricesCache.addPreviousDayPrices(previousDayPrices);
+    }
 
     protected void initPreMarketDailyPricesCache() {
         Map<String, List<DailyPricesJSON>> dailyPricesJSONByTicker = dailyPricesJSONCache.getDailyPricesJSONByTicker().values().stream()
@@ -50,6 +53,10 @@ public class DailyPricesCacheService {
 
     protected List<DailyPrice> dailyPricesCache(MarketState marketState) {
         return dailyPricesCache.dailyPrices(marketState);
+    }
+
+    protected List<DailyPrice> previousDailyPrices() {
+        return dailyPricesCache.previousDailyPrices();
     }
 
     protected void addPreMarketDailyPricesInCache(List<DailyPrice> preMarketDailyPrices) {
