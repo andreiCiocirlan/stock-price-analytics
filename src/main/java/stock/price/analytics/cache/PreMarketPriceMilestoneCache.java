@@ -17,6 +17,7 @@ import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
 @RequiredArgsConstructor
 public class PreMarketPriceMilestoneCache {
 
+    private static final Double MIN_GAP_AND_GO_PERCENTAGE = 0.03d;
     private final StocksCache stocksCache;
     private final DailyPricesCache dailyPricesCache;
 
@@ -40,6 +41,10 @@ public class PreMarketPriceMilestoneCache {
             case GAP_DOWN -> preMarketPrice.getClose() < s.getDailyClose();
             case GAP_UP_10_PERCENT -> preMarketPrice.getClose() > s.getDailyClose() * 1.10;
             case GAP_DOWN_10_PERCENT -> preMarketPrice.getClose() < s.getDailyClose() * 0.90;
+            // previous day performance < -0.5% && pre-market GAP UP more than 3%
+            case GAP_UP_AND_GO -> s.getDailyPerformance() < -0.5d && preMarketPrice.getClose() > s.getDailyClose() * (1 + MIN_GAP_AND_GO_PERCENTAGE);
+            // previous day performance > 0.5% && pre-market GAP DOWN more than 3%
+            case GAP_DOWN_AND_GO -> s.getDailyPerformance() > 0.5d && preMarketPrice.getClose() < s.getDailyClose() * (1 - MIN_GAP_AND_GO_PERCENTAGE);
             case NONE -> throw new IllegalStateException("Unexpected value NONE");
         };
     }
