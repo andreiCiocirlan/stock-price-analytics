@@ -24,14 +24,14 @@ public interface DailyPricesRepository extends JpaRepository<DailyPrice, Long> {
 
     @Query(value = """
             WITH latest_prices AS (
-                SELECT ticker, MAX(date) AS max_date
+                SELECT *,
+                       ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY date DESC) AS row_num
                 FROM daily_prices
-                WHERE date >= CURRENT_DATE - interval '5 days'
-                GROUP BY ticker
+                WHERE date >= CURRENT_DATE - interval '7 days'
             )
-            SELECT dp.*
-            FROM daily_prices dp
-            JOIN latest_prices lp ON dp.ticker = lp.ticker AND dp.date = lp.max_date
+            SELECT id, open, high, low, close, ticker, date, performance
+            FROM latest_prices
+            WHERE row_num <= 2;
             """, nativeQuery = true)
     List<DailyPrice> findLatestDailyPrices();
 
