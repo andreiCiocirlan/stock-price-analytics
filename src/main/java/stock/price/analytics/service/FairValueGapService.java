@@ -1,5 +1,6 @@
 package stock.price.analytics.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -78,6 +79,7 @@ public class FairValueGapService {
         return newFVGsFound;
     }
 
+    @Transactional
     public void updateFVGsHighLowAndClosedFor(StockTimeframe timeframe) {
         if (timeframe == null) { // update closed for all timeframes
             for (StockTimeframe stockTimeframe : StockTimeframe.values()) {
