@@ -33,7 +33,7 @@ public interface DailyPricesRepository extends JpaRepository<DailyPrice, Long> {
             FROM latest_prices
             WHERE row_num <= 2;
             """, nativeQuery = true)
-    List<DailyPrice> findLatestDailyPrices();
+    List<DailyPrice> findLatestTwoDailyPrices();
 
     List<DailyPrice> findByTickerAndDateLessThan(String ticker, LocalDate date);
 

@@ -22,7 +22,7 @@ public class DailyPricesService {
         List<DailyPrice> latestPrices = new ArrayList<>();
         List<DailyPrice> previousDayPrices = new ArrayList<>();
 
-        dailyPricesRepository.findLatestDailyPrices().stream()
+        dailyPricesRepository.findLatestTwoDailyPrices().stream()
                 .sorted(Comparator.comparing(DailyPrice::getDate).reversed())
                 .collect(Collectors.groupingBy(DailyPrice::getTicker))
                 .forEach((_, dailyPrices) -> {
