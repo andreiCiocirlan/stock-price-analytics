@@ -54,6 +54,10 @@ public class DailyPricesService {
         return dailyPricesCacheService.dailyPricesCache(marketState);
     }
 
+    public List<DailyPrice> previousDailyPrices() {
+        return dailyPricesCacheService.previousDailyPrices();
+    }
+
     public List<DailyPrice> addDailyPricesInCacheAndReturn(List<DailyPrice> dailyPrices) {
         return dailyPricesCacheService.addDailyPricesInCacheAndReturn(dailyPrices);
     }
