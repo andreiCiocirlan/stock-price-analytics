@@ -25,6 +25,12 @@ public enum PreMarketPriceMilestone {
             return "Pre-Market: Down more than 10%";
         }
     },
+    GAP_AND_GO {
+        @Override
+        public String toString() {
+            return "Pre-Market: Gap & Go";
+        }
+    },
     NONE {
         @Override
         public String toString() {
