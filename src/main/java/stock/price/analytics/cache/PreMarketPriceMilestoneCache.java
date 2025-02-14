@@ -37,6 +37,10 @@ public class PreMarketPriceMilestoneCache {
 
     private boolean priceWithinMilestone(Stock s, DailyPrice preMarketPrice, PreMarketPriceMilestone milestone) {
         return switch (milestone) {
+            // previous day DOWN more than 1% && pre-market GAP UP more than 4%
+            case KICKING_CANDLE_UP -> s.getDailyPerformance() < -1.0d && preMarketPrice.getClose() > s.getDailyClose() * (1 + MIN_GAP_AND_GO_PERCENTAGE);
+            // previous day UP more than 1% && pre-market GAP DOWN more than 4%
+            case KICKING_CANDLE_DOWN -> s.getDailyPerformance() > 1.0d && preMarketPrice.getClose() < s.getDailyClose() * (1 - MIN_GAP_AND_GO_PERCENTAGE);
             case GAP_UP -> preMarketPrice.getClose() > s.getDailyClose();
             case GAP_DOWN -> preMarketPrice.getClose() < s.getDailyClose();
             case GAP_UP_10_PERCENT -> preMarketPrice.getClose() > s.getDailyClose() * 1.10;
