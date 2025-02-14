@@ -23,7 +23,7 @@ public class PreMarketScheduler {
             @Scheduled(cron = "${cron.pre.market.between9and915}", zone = "${cron.timezone}")
     })
     public void alertPreMarketGaps_moreThan_10Percent() {
-        priceMilestoneService.findTickersForMilestones(List.of(GAP_UP_AND_GO, GAP_DOWN_AND_GO, GAP_UP_10_PERCENT, GAP_DOWN_10_PERCENT), List.of(0.2, 0.25, 0.33))
+        priceMilestoneService.findTickersForMilestones(List.of(KICKING_CANDLE_UP, KICKING_CANDLE_DOWN, GAP_UP_AND_GO, GAP_DOWN_AND_GO), List.of(0.2, 0.25, 0.33))
                 .forEach((priceMilestone, tickers) -> {
                     if (!tickers.isEmpty())
                         desktopNotificationService.broadcastDesktopNotification(String.join(" ", priceMilestone, tickers.toString()));
