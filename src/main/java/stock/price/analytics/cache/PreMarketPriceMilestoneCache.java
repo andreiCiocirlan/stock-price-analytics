@@ -34,12 +34,12 @@ public class PreMarketPriceMilestoneCache {
                 .toList();
     }
 
-    private boolean priceWithinMilestone(Stock s, DailyPrice dailyPrice, PreMarketPriceMilestone milestone) {
+    private boolean priceWithinMilestone(Stock s, DailyPrice preMarketPrice, PreMarketPriceMilestone milestone) {
         return switch (milestone) {
-            case GAP_UP -> dailyPrice.getClose() > s.getDailyClose();
-            case GAP_DOWN -> dailyPrice.getClose() < s.getDailyClose();
-            case GAP_UP_10_PERCENT -> dailyPrice.getClose() > s.getDailyClose() * 1.10;
-            case GAP_DOWN_10_PERCENT -> dailyPrice.getClose() < s.getDailyClose() * 0.90;
+            case GAP_UP -> preMarketPrice.getClose() > s.getDailyClose();
+            case GAP_DOWN -> preMarketPrice.getClose() < s.getDailyClose();
+            case GAP_UP_10_PERCENT -> preMarketPrice.getClose() > s.getDailyClose() * 1.10;
+            case GAP_DOWN_10_PERCENT -> preMarketPrice.getClose() < s.getDailyClose() * 0.90;
             case NONE -> throw new IllegalStateException("Unexpected value NONE");
         };
     }
