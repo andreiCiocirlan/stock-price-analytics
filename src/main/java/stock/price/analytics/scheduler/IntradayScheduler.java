@@ -56,7 +56,7 @@ public class IntradayScheduler {
             case HIGH_ALL_TIME_95 -> BEARISH_FVG_95TH_PERCENTILE_ATH;
             case LOW_52W_95 -> BULLISH_FVG_95TH_PERCENTILE_52W;
             case LOW_4W_95 -> BULLISH_FVG_95TH_PERCENTILE_4W;
-            case LOW_ALL_TIME_95 -> BULLISH_FVG_95TH_PERCENTILE_ATH;
+            case LOW_ALL_TIME_95 -> BULLISH_FVG_95TH_PERCENTILE_ATL;
         };
     }
 
