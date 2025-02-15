@@ -1,6 +1,8 @@
 package stock.price.analytics.model.prices.enums;
 
-public enum PreMarketPriceMilestone {
+import java.util.List;
+
+public enum PreMarketPriceMilestone implements PriceMiestone {
     GAP_UP {
         @Override
         public String toString() {
