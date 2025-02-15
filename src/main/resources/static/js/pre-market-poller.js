@@ -14,12 +14,11 @@ function updatePremarketOptionVisibility(isVisible) {
         console.error(e);
         return;
     }
+    const preMarketOptions = selectElement.querySelectorAll('.pre-market-option');
 
-    for (let option of selectElement.options) {
-        if (option.value.startsWith("GAP_")) {
-            option.style.display = isVisible ? "" : "none";
-        }
-    }
+    preMarketOptions.forEach(option => {
+        option.style.display = isVisible ? "" : "none";
+    });
 }
 
 function checkAndSetPremarketVisibility() {
