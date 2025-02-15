@@ -78,19 +78,6 @@ public class FairValueGap implements PriceEntity {
         this.high = high;
     }
 
-    public FairValueGap(String ticker, StockTimeframe timeframe, LocalDate date, FvgType type, FvgStatus status, double low, double high, Double unfilledLow1, Double unfilledHigh1, Double unfilledLow2, Double unfilledHigh2) {
-        this.ticker = ticker;
-        this.timeframe = timeframe;
-        this.date = date;
-        this.type = type;
-        this.status = status;
-        this.low = low;
-        this.high = high;
-        this.unfilledLow1 = unfilledLow1;
-        this.unfilledHigh1 = unfilledHigh1;
-        this.unfilledLow2 = unfilledLow2;
-        this.unfilledHigh2 = unfilledHigh2;
-    }
 
     public String compositeId() {
         return getTicker() + "_" + getTimeframe() + "_" + date.format(DateTimeFormatter.ISO_LOCAL_DATE);
