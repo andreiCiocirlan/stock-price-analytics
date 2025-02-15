@@ -70,7 +70,10 @@ public class FairValueGapService {
         Map<String, FairValueGap> currentFVGsByCompositeId = currentFVGs.stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
         currentFVGsByCompositeId.forEach((compositeKey, fvg) -> {
             if (!dbFVGsByCompositeId.containsKey(compositeKey)) {
-                newFVGsFound.add(new FairValueGap(fvg.getTicker(), fvg.getTimeframe(), fvg.getDate(), fvg.getType(), fvg.getStatus(), fvg.getLow(), fvg.getHigh()));
+                FairValueGap newFVG = new FairValueGap(fvg.getTicker(), fvg.getTimeframe(), fvg.getDate(), fvg.getType(), fvg.getStatus(), fvg.getLow(), fvg.getHigh());
+                newFVG.setUnfilledLow1(fvg.getLow());
+                newFVG.setUnfilledHigh1(fvg.getHigh());
+                newFVGsFound.add(newFVG);
                 newFvgTickers.add(fvg.getTicker());
             }
         });
