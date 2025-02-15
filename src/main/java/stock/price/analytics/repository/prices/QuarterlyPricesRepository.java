@@ -3,7 +3,6 @@ package stock.price.analytics.repository.prices;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import stock.price.analytics.model.prices.ohlc.MonthlyPrice;
 import stock.price.analytics.model.prices.ohlc.QuarterlyPrice;
 
 import java.time.LocalDate;
@@ -26,13 +25,6 @@ public interface QuarterlyPricesRepository extends JpaRepository<QuarterlyPrice,
 
     @Query("SELECT q FROM QuarterlyPrice q WHERE q.ticker = :ticker AND q.startDate = :date")
     List<QuarterlyPrice> findQuarterlyByTickerAndStartDate(String ticker, LocalDate date);
-
-    @Query(value = """
-                SELECT *
-                FROM monthly_prices
-                ORDER BY start_date desc
-            """, nativeQuery = true)
-    List<MonthlyPrice> findAllMonthlyPrices();
 
     @Modifying
     @Query(value = """
