@@ -7,9 +7,8 @@ import org.springframework.stereotype.Component;
 import stock.price.analytics.service.DesktopNotificationService;
 import stock.price.analytics.service.PriceMilestoneService;
 
-import java.util.List;
-
 import static stock.price.analytics.model.prices.enums.PreMarketPriceMilestone.preMarketSchedulerValues;
+import static stock.price.analytics.util.Constants.CFD_MARGINS_5X_4X_3X;
 
 @Component
 @RequiredArgsConstructor
@@ -23,7 +22,7 @@ public class PreMarketScheduler {
             @Scheduled(cron = "${cron.pre.market.between9and915}", zone = "${cron.timezone}")
     })
     public void alertPreMarketGaps_moreThan_10Percent() {
-        priceMilestoneService.findTickersForMilestones(preMarketSchedulerValues(), List.of(0.2, 0.25, 0.33))
+        priceMilestoneService.findTickersForMilestones(preMarketSchedulerValues(), CFD_MARGINS_5X_4X_3X)
                 .forEach((priceMilestone, tickers) -> {
                     if (!tickers.isEmpty())
                         desktopNotificationService.broadcastDesktopNotification(String.join(" ", priceMilestone, tickers.toString()));
