@@ -5,12 +5,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.service.DesktopNotificationService;
+import stock.price.analytics.service.FairValueGapService;
 import stock.price.analytics.service.StockDiscrepanciesService;
 
 @Component
 @RequiredArgsConstructor
 public class EndOfDayScheduler {
 
+    private final FairValueGapService fairValueGapService;
     private final StockDiscrepanciesService stockDiscrepanciesService;
     private final DesktopNotificationService desktopNotificationService;
 
@@ -18,7 +20,10 @@ public class EndOfDayScheduler {
     @Scheduled(cron = "${cron.post.market.fvg}", zone = "${cron.timezone}")
     public void findAllStockDiscrepanciesAtEOD() {
         if (!stockDiscrepanciesService.findAllStockDiscrepancies().isEmpty()) {
-            desktopNotificationService.broadcastDesktopNotification("Discrepancies found, check logs!");
+            desktopNotificationService.broadcastDesktopNotification("Stock Discrepancies found, check logs!");
+        }
+        if (!fairValueGapService.findFvgDateDiscrepancies().isEmpty()) {
+            desktopNotificationService.broadcastDesktopNotification("FVG Date discrepancies found, check logs!");
         }
     }
 

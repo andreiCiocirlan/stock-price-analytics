@@ -128,4 +128,8 @@ public class FairValueGapService {
         int updatedRows = fvgRepository.updateFVGPricesForStockSplit(ticker, stockSplitDate, stockSplitMultiplier);
         log.warn("updated {} FVG rows for {} and stockSplitDate {}", updatedRows, ticker, stockSplitDate);
     }
+
+    public List<Object[]> findFvgDateDiscrepancies() {
+        return fvgRepository.findFvgDateDiscrepancies();
+    }
 }
