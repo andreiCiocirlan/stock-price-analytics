@@ -78,7 +78,11 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                             WHEN low1 > high3 THEN low1
                             WHEN high1 < low3 THEN high1
                         END
-                END AS high
+                END AS high,
+                null as unfilled_low1,
+                null as unfilled_high1,
+                null as unfilled_low2,
+                null as unfilled_high2
             FROM identified_fvgs fvg
             WHERE
                 NOT EXISTS (
@@ -153,7 +157,11 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                             WHEN low1 > high3 THEN low1
                             WHEN high1 < low3 THEN high1
                         END
-                END AS high
+                END AS high,
+                null as unfilled_low1,
+                null as unfilled_high1,
+                null as unfilled_low2,
+                null as unfilled_high2
             FROM identified_fvgs fvg
             WHERE
                 NOT EXISTS (
@@ -228,7 +236,11 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                             WHEN low1 > high3 THEN low1
                             WHEN high1 < low3 THEN high1
                         END
-                END AS high
+                END AS high,
+                null as unfilled_low1,
+                null as unfilled_high1,
+                null as unfilled_low2,
+                null as unfilled_high2
             FROM identified_fvgs fvg
             WHERE
                 NOT EXISTS (
@@ -303,7 +315,11 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                             WHEN low1 > high3 THEN low1
                             WHEN high1 < low3 THEN high1
                         END
-                END AS high
+                END AS high,
+                null as unfilled_low1,
+                null as unfilled_high1,
+                null as unfilled_low2,
+                null as unfilled_high2
             FROM identified_fvgs fvg
             WHERE
                 NOT EXISTS (
@@ -378,7 +394,11 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                             WHEN low1 > high3 THEN low1
                             WHEN high1 < low3 THEN high1
                         END
-                END AS high
+                END AS high,
+                null as unfilled_low1,
+                null as unfilled_high1,
+                null as unfilled_low2,
+                null as unfilled_high2
             FROM identified_fvgs fvg
             WHERE
                 NOT EXISTS (

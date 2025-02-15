@@ -51,6 +51,23 @@ public class FairValueGap implements PriceEntity {
     @Column(name = "high")
     private double high;
 
+    // Track unfilled portions
+    @Setter
+    @Column(name = "unfilled_low1")
+    private Double unfilledLow1;
+
+    @Setter
+    @Column(name = "unfilled_high1")
+    private Double unfilledHigh1;
+
+    @Setter
+    @Column(name = "unfilled_low2")
+    private Double unfilledLow2;
+
+    @Setter
+    @Column(name = "unfilled_high2")
+    private Double unfilledHigh2;
+
     public FairValueGap(String ticker, StockTimeframe timeframe, LocalDate date, FvgType type, FvgStatus status, double low, double high) {
         this.ticker = ticker;
         this.timeframe = timeframe;
@@ -59,6 +76,20 @@ public class FairValueGap implements PriceEntity {
         this.status = status;
         this.low = low;
         this.high = high;
+    }
+
+    public FairValueGap(String ticker, StockTimeframe timeframe, LocalDate date, FvgType type, FvgStatus status, double low, double high, Double unfilledLow1, Double unfilledHigh1, Double unfilledLow2, Double unfilledHigh2) {
+        this.ticker = ticker;
+        this.timeframe = timeframe;
+        this.date = date;
+        this.type = type;
+        this.status = status;
+        this.low = low;
+        this.high = high;
+        this.unfilledLow1 = unfilledLow1;
+        this.unfilledHigh1 = unfilledHigh1;
+        this.unfilledLow2 = unfilledLow2;
+        this.unfilledHigh2 = unfilledHigh2;
     }
 
     public String compositeId() {
