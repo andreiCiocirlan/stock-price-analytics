@@ -9,7 +9,7 @@ import stock.price.analytics.service.PriceMilestoneService;
 
 import java.util.List;
 
-import static stock.price.analytics.model.prices.enums.PreMarketPriceMilestone.*;
+import static stock.price.analytics.model.prices.enums.PreMarketPriceMilestone.preMarketSchedulerValues;
 
 @Component
 @RequiredArgsConstructor
@@ -23,7 +23,7 @@ public class PreMarketScheduler {
             @Scheduled(cron = "${cron.pre.market.between9and915}", zone = "${cron.timezone}")
     })
     public void alertPreMarketGaps_moreThan_10Percent() {
-        priceMilestoneService.findTickersForMilestones(List.of(KICKING_CANDLE_UP, KICKING_CANDLE_DOWN, GAP_UP_AND_GO, GAP_DOWN_AND_GO), List.of(0.2, 0.25, 0.33))
+        priceMilestoneService.findTickersForMilestones(preMarketSchedulerValues(), List.of(0.2, 0.25, 0.33))
                 .forEach((priceMilestone, tickers) -> {
                     if (!tickers.isEmpty())
                         desktopNotificationService.broadcastDesktopNotification(String.join(" ", priceMilestone, tickers.toString()));

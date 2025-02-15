@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.PreMarketPriceMilestoneCache;
 import stock.price.analytics.cache.PriceMilestoneCache;
 import stock.price.analytics.model.prices.enums.PreMarketPriceMilestone;
+import stock.price.analytics.model.prices.enums.PriceMiestone;
 import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
 
 import java.util.*;
@@ -21,9 +22,9 @@ public class PriceMilestoneService {
     private final PriceMilestoneCache priceMilestoneCache;
     private final PreMarketPriceMilestoneCache preMarketPriceMilestoneCache;
 
-    public Map<String, List<String>> findTickersForMilestones(List<Enum<? extends Enum<?>>> priceMilestones, List<Double> cfdMargins) {
+    public Map<String, List<String>> findTickersForMilestones(List<PriceMiestone> priceMilestones, List<Double> cfdMargins) {
         Map<String, List<String>> tickersByPriceMilestones = new HashMap<>();
-        for (Enum<? extends Enum<?>> priceMilestone : priceMilestones) {
+        for (PriceMiestone priceMilestone : priceMilestones) {
             tickersByPriceMilestones.put(priceMilestone.toString(), findTickersForMilestone(priceMilestone.name(), cfdMargins));
         }
         return tickersByPriceMilestones;

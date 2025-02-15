@@ -56,5 +56,9 @@ public enum PreMarketPriceMilestone implements PriceMiestone {
         public String toString() {
             return "None";
         }
+    };
+
+    public static List<PriceMiestone> preMarketSchedulerValues() {
+        return List.of(KICKING_CANDLE_UP, KICKING_CANDLE_DOWN, GAP_UP_AND_GO, GAP_DOWN_AND_GO);
     }
 }
