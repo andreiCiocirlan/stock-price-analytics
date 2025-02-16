@@ -35,9 +35,10 @@ public class FairValueGapService {
     @Transactional
     public void updateUnfilledGapsHighLowAndStatusBy(StockTimeframe timeframe) {
         Map<String, List<AbstractPrice>> pricesByTicker = (switch (timeframe) {
-            case DAILY -> dailyPricesRepository.findByDateBetween(DAILY_FVG_MIN_DATE, LocalDate.now())
-                    .stream().sorted(Comparator.comparing(DailyPrice::getDate)).toList();
-            case WEEKLY -> weeklyPricesRepository.findAll();
+            case DAILY -> dailyPricesRepository.findByDateBetween(DAILY_FVG_MIN_DATE, LocalDate.now()).stream()
+                    .sorted(Comparator.comparing(DailyPrice::getDate)).toList();
+            case WEEKLY -> weeklyPricesRepository.findAll().stream()
+                    .sorted(Comparator.comparing(WeeklyPrice::getStartDate)).toList();
             case MONTHLY -> monthlyPricesRepository.findAll().stream()
                     .sorted(Comparator.comparing(MonthlyPrice::getStartDate)).toList();
             case QUARTERLY -> quarterlyPricesRepository.findAll().stream()
