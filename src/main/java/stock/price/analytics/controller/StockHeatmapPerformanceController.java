@@ -11,7 +11,6 @@ import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.service.PriceMilestoneService;
 import stock.price.analytics.service.StockHeatmapPerformanceService;
 
-import java.util.Collections;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
