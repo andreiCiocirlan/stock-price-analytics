@@ -3,6 +3,7 @@ package stock.price.analytics.model.fvg;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 import stock.price.analytics.model.prices.PriceEntity;
 import stock.price.analytics.model.prices.enums.FvgStatus;
@@ -11,6 +12,7 @@ import stock.price.analytics.model.prices.enums.StockTimeframe;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 @Getter
 @Entity
@@ -68,6 +70,21 @@ public class FairValueGap implements PriceEntity {
     @Column(name = "unfilled_high2")
     private Double unfilledHigh2;
 
+    public FairValueGap(@NonNull FairValueGap fvg) {
+        this.id = fvg.getId();
+        this.ticker = fvg.getTicker();
+        this.timeframe = fvg.getTimeframe();
+        this.date = fvg.getDate();
+        this.type = fvg.getType();
+        this.status = fvg.getStatus();
+        this.low = fvg.getLow();
+        this.high = fvg.getHigh();
+        this.unfilledLow1 = fvg.getUnfilledLow1();
+        this.unfilledHigh1 = fvg.getUnfilledHigh1();
+        this.unfilledLow2 = fvg.getUnfilledLow2();
+        this.unfilledHigh2 = fvg.getUnfilledHigh2();
+    }
+
     public FairValueGap(String ticker, StockTimeframe timeframe, LocalDate date, FvgType type, FvgStatus status, double low, double high) {
         this.ticker = ticker;
         this.timeframe = timeframe;
@@ -81,6 +98,29 @@ public class FairValueGap implements PriceEntity {
 
     public String compositeId() {
         return getTicker() + "_" + getTimeframe() + "_" + date.format(DateTimeFormatter.ISO_LOCAL_DATE);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FairValueGap that = (FairValueGap) o;
+        return Double.compare(low, that.low) == 0 &&
+               Double.compare(high, that.high) == 0 &&
+               Objects.equals(ticker, that.ticker) &&
+               timeframe == that.timeframe &&
+               Objects.equals(date, that.date) &&
+               type == that.type &&
+               status == that.status &&
+               Objects.equals(unfilledLow1, that.unfilledLow1) &&
+               Objects.equals(unfilledHigh1, that.unfilledHigh1) &&
+               Objects.equals(unfilledLow2, that.unfilledLow2) &&
+               Objects.equals(unfilledHigh2, that.unfilledHigh2);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getTicker(), getTimeframe(), getDate(), getType(), getStatus(), getLow(), getHigh(), getUnfilledLow1(), getUnfilledHigh1(), getUnfilledLow2(), getUnfilledHigh2());
     }
 
     @Override
