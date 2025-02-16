@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.model.fvg.FairValueGap;
 import stock.price.analytics.model.prices.enums.FvgStatus;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.model.prices.ohlc.*;
+import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.repository.fvg.FVGRepository;
 import stock.price.analytics.repository.prices.*;
 
@@ -35,17 +35,14 @@ public class FairValueGapService {
     @Transactional
     public void updateUnfilledGapsHighLowAndStatusBy(StockTimeframe timeframe) {
         Map<String, List<AbstractPrice>> pricesByTicker = (switch (timeframe) {
-            case DAILY -> dailyPricesRepository.findByDateBetween(DAILY_FVG_MIN_DATE, LocalDate.now()).stream()
-                    .sorted(Comparator.comparing(DailyPrice::getDate)).toList();
-            case WEEKLY -> weeklyPricesRepository.findAll().stream()
-                    .sorted(Comparator.comparing(WeeklyPrice::getStartDate)).toList();
-            case MONTHLY -> monthlyPricesRepository.findAll().stream()
-                    .sorted(Comparator.comparing(MonthlyPrice::getStartDate)).toList();
-            case QUARTERLY -> quarterlyPricesRepository.findAll().stream()
-                    .sorted(Comparator.comparing(QuarterlyPrice::getStartDate)).toList();
-            case YEARLY -> yearlyPricesRepository.findAll().stream()
-                    .sorted(Comparator.comparing(YearlyPrice::getStartDate)).toList();
-        }).stream().collect(Collectors.groupingBy(AbstractPrice::getTicker));
+            case DAILY -> dailyPricesRepository.findByDateBetween(DAILY_FVG_MIN_DATE, LocalDate.now());
+            case WEEKLY -> weeklyPricesRepository.findAll();
+            case MONTHLY -> monthlyPricesRepository.findAll();
+            case QUARTERLY -> quarterlyPricesRepository.findAll();
+            case YEARLY -> yearlyPricesRepository.findAll();
+        }).stream()
+                .sorted(Comparator.comparing(AbstractPrice::getStartDate))
+                .collect(Collectors.groupingBy(AbstractPrice::getTicker));
 
         List<FairValueGap> fvgsToUpdate = fvgRepository.findByTimeframe(timeframe);
         logTime(() -> fvgsToUpdate.parallelStream().forEachOrdered(fvg -> updateUnfilledGapsHighLowAndStatus(fvg, pricesByTicker.get(fvg.getTicker()))), "updated unfilled gaps high & low & status for " + fvgsToUpdate.size() + " FVGs");
