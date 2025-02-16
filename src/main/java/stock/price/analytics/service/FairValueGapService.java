@@ -23,6 +23,17 @@ public class FairValueGapService {
 
     private final FVGRepository fvgRepository;
 
+    public void initUnfilledGapsHighLow1AndSave(StockTimeframe timeframe) {
+        List<FairValueGap> fvgsToUpdate = fvgRepository.findByTimeframe(timeframe);
+        fvgsToUpdate.parallelStream().forEachOrdered(fvg -> {
+            if (fvg.getStatus() == FvgStatus.OPEN && fvg.getUnfilledLow1() == null) {
+                fvg.setUnfilledLow1(fvg.getLow());
+                fvg.setUnfilledHigh1(fvg.getHigh());
+            }
+        });
+        partitionDataAndSaveWithLogTime(fvgsToUpdate, fvgRepository, "saved " + fvgsToUpdate.size() + " unfilled high-low1 for OPEN FVGs");
+    }
+
     private List<FairValueGap> findNewByTimeframe(StockTimeframe timeframe) {
         LocalDate date = switch (timeframe) {
             case DAILY -> LocalDate.now().minusWeeks(1);
