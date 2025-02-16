@@ -61,6 +61,16 @@ public class PricesService {
                 .toList();
     }
 
+    public Set<String> cacheTickersFor(StockTimeframe timeframe) {
+        return (switch (timeframe) {
+            case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
+            case WEEKLY -> higherTimeframePricesCache.getWeeklyPricesByTickerAndDate();
+            case MONTHLY -> higherTimeframePricesCache.getMonthlyPricesByTickerAndDate();
+            case QUARTERLY -> higherTimeframePricesCache.getQuarterlyPricesByTickerAndDate();
+            case YEARLY -> higherTimeframePricesCache.getYearlyPricesByTickerAndDate();
+        }).keySet().stream().map(key -> key.split("_")[0]).collect(Collectors.toSet());
+    }
+
     public List<CandleWithDateDTO> findFor(String ticker, StockTimeframe timeframe) {
         String tableNameOHLC = timeframe.dbTableOHLC();
         String orderByIdField = timeframe == DAILY ? "date" : "start_date";
@@ -118,7 +128,7 @@ public class PricesService {
     }
 
     private List<WeeklyPrice> getPreviousTwoWeeklyPrices(List<String> tickers) {
-        Set<String> cacheTickers = higherTimeframePricesCache.weeklyPricesTickers();
+        Set<String> cacheTickers = cacheTickersFor(WEEKLY);
         List<WeeklyPrice> previousWeeklyPrices;
         if (cacheTickers.isEmpty()) {
             log.info("Fetching PreviousTwoWeeklyPrices from database for {} tickers", tickers.size());
@@ -144,7 +154,7 @@ public class PricesService {
     }
 
     private List<MonthlyPrice> getPreviousTwoMonthlyPrices(List<String> tickers) {
-        Set<String> cacheTickers = higherTimeframePricesCache.monthlyPricesTickers();
+        Set<String> cacheTickers = cacheTickersFor(MONTHLY);
         List<MonthlyPrice> previousMonthlyPrices;
         if (cacheTickers.isEmpty()) {
             log.info("Fetching PreviousTwoMonthlyPrices from database for {} tickers", tickers.size());
@@ -170,7 +180,7 @@ public class PricesService {
     }
 
     private List<QuarterlyPrice> getPreviousTwoQuarterlyPrices(List<String> tickers) {
-        Set<String> cacheTickers = higherTimeframePricesCache.quarterlyPricesTickers();
+        Set<String> cacheTickers = cacheTickersFor(QUARTERLY);
         List<QuarterlyPrice> previousQuarterlyPrices;
         if (cacheTickers.isEmpty()) {
             log.info("Fetching PreviousTwoQuarterlyPrices from database for {} tickers", tickers.size());
@@ -196,7 +206,7 @@ public class PricesService {
     }
 
     private List<YearlyPrice> getPreviousTwoYearlyPrices(List<String> tickers) {
-        Set<String> cacheTickers = higherTimeframePricesCache.yearlyPricesTickers();
+        Set<String> cacheTickers = cacheTickersFor(YEARLY);
         List<YearlyPrice> previousYearlyPrices;
         if (cacheTickers.isEmpty()) {
             log.info("Fetching PreviousTwoYearlyPrices from database for {} tickers", tickers.size());

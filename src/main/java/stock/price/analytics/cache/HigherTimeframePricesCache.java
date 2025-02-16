@@ -179,22 +179,6 @@ public class HigherTimeframePricesCache {
                 .collect(Collectors.toList());
     }
 
-    public Set<String> weeklyPricesTickers() {
-        return weeklyPricesByTickerAndDate.keySet().stream().map(key -> key.split("_")[0]).collect(Collectors.toSet());
-    }
-
-    public Set<String> monthlyPricesTickers() {
-        return monthlyPricesByTickerAndDate.keySet().stream().map(key -> key.split("_")[0]).collect(Collectors.toSet());
-    }
-
-    public Set<String> quarterlyPricesTickers() {
-        return quarterlyPricesByTickerAndDate.keySet().stream().map(key -> key.split("_")[0]).collect(Collectors.toSet());
-    }
-
-    public Set<String> yearlyPricesTickers() {
-        return yearlyPricesByTickerAndDate.keySet().stream().map(key -> key.split("_")[0]).collect(Collectors.toSet());
-    }
-
     private String createKey(String ticker, LocalDate startDate) {
         return ticker + "_" + startDate;
     }
