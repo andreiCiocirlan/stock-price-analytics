@@ -48,7 +48,7 @@ public class FairValueGapService {
 
         List<FairValueGap> fvgsToUpdate = fvgRepository.findByTimeframe(timeframe);
         logTime(() -> fvgsToUpdate.parallelStream().forEachOrdered(fvg -> updateUnfilledGapsHighLowAndStatus(fvg, pricesByTicker.get(fvg.getTicker()))), "updated unfilled gaps high & low & status for " + fvgsToUpdate.size() + " FVGs");
-        partitionDataAndSaveWithLogTime(fvgsToUpdate, fvgRepository, "saved FVGs");
+        partitionDataAndSaveWithLogTime(fvgsToUpdate, fvgRepository, "saved " + fvgsToUpdate.size() + " FVGs");
     }
 
     private void updateUnfilledGapsHighLowAndStatus(FairValueGap fvg, List<AbstractPrice> pricesForTicker) {
