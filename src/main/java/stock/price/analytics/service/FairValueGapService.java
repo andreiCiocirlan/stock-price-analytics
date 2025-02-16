@@ -187,10 +187,10 @@ public class FairValueGapService {
     public List<FairValueGap> findNewFVGsFor(StockTimeframe timeframe) {
         Set<String> newFvgTickers = new HashSet<>();
         List<FairValueGap> newFVGsFound = new ArrayList<>();
-        List<FairValueGap> currentFVGs = findRecentByTimeframe(timeframe);
+        List<FairValueGap> recentFVGs = findRecentByTimeframe(timeframe);
 
         Map<String, FairValueGap> dbFVGsByCompositeId = fvgRepository.findByTimeframeAndStatusOpen(timeframe.name()).stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
-        Map<String, FairValueGap> currentFVGsByCompositeId = currentFVGs.stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
+        Map<String, FairValueGap> currentFVGsByCompositeId = recentFVGs.stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
         currentFVGsByCompositeId.forEach((compositeKey, fvg) -> {
             if (!dbFVGsByCompositeId.containsKey(compositeKey)) {
                 FairValueGap newFVG = new FairValueGap(fvg.getTicker(), fvg.getTimeframe(), fvg.getDate(), fvg.getType(), fvg.getStatus(), fvg.getLow(), fvg.getHigh());
