@@ -235,7 +235,7 @@ public class FairValueGapService {
                 newFvgTickers.add(fvg.getTicker());
             }
         });
-        log.info("Found {} new {} FVGs for: {}", newFvgTickers.size(), timeframe, newFvgTickers);
+        log.info("Found {} new {} FVGs for: {}", newFVGsFound.size(), timeframe, newFvgTickers);
 
         return newFVGsFound;
     }
