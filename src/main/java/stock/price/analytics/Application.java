@@ -9,7 +9,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import stock.price.analytics.repository.stocks.StockRepository;
 import stock.price.analytics.service.*;
-import stock.price.analytics.util.LoggingUtil;
+
+import static stock.price.analytics.util.LoggingUtil.logTime;
 
 @RequiredArgsConstructor
 @SpringBootApplication
@@ -30,12 +31,12 @@ public class Application implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
-        LoggingUtil.logTime(higherTimeframePricesCacheService::initHigherTimeframePricesCache, "initialized higher-timeframe prices cache");
-        LoggingUtil.logTime(stockService::initStocksCache, "initialized xtb stocks cache");
-        LoggingUtil.logTime(highLowPricesCacheService::initHighLowPricesCache, "initialized high low prices cache");
-        LoggingUtil.logTime(dailyPricesService::initLatestTwoDaysPricesCache, "initialized latest two days prices cache");
-        LoggingUtil.logTime(dailyPricesJSONService::initDailyJSONPricesCache, "initialized daily JSON prices cache");
-        LoggingUtil.logTime(dailyPricesService::initPreMarketDailyPricesCache, "initialized pre-market daily prices cache");
-        LoggingUtil.logTime(stockRepository::updateIpoAndDelistedDates, "updated ipo/delisted dates at start-up");
+        logTime(higherTimeframePricesCacheService::initHigherTimeframePricesCache, "initialized higher-timeframe prices cache");
+        logTime(stockService::initStocksCache, "initialized xtb stocks cache");
+        logTime(highLowPricesCacheService::initHighLowPricesCache, "initialized high low prices cache");
+        logTime(dailyPricesService::initLatestTwoDaysPricesCache, "initialized latest two days prices cache");
+        logTime(dailyPricesJSONService::initDailyJSONPricesCache, "initialized daily JSON prices cache");
+        logTime(dailyPricesService::initPreMarketDailyPricesCache, "initialized pre-market daily prices cache");
+        logTime(stockRepository::updateIpoAndDelistedDates, "updated ipo/delisted dates at start-up");
     }
 }
