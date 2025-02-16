@@ -14,6 +14,8 @@ import stock.price.analytics.service.StockHeatmapPerformanceService;
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.Collections.emptyList;
+
 @Controller
 @RequiredArgsConstructor
 public class StockHeatmapPerformanceController {
@@ -35,11 +37,11 @@ public class StockHeatmapPerformanceController {
                                                          @RequestParam(required = false, value = "cfdMargin") List<Double> cfdMargins,
                                                          @RequestParam(required = false, value = "priceMilestone") String priceMilestone) {
         StockTimeframe stockTimeframe = ("undefined".equals(timeFrame)) ? StockTimeframe.MONTHLY : StockTimeframe.valueOf(timeFrame);
-        List<String> tickers = Collections.emptyList();
+        List<String> tickers = emptyList();
         if (!priceMilestoneService.isNoneMilestone(priceMilestone)) {
             tickers = priceMilestoneService.findTickersForMilestone(priceMilestone, cfdMargins);
             if (tickers.isEmpty()) {
-                return Collections.emptyList();
+                return emptyList();
             }
         }
         return stockHeatmapPerformanceService.stockPerformanceFor(stockTimeframe, positivePerfFirst, limit, cfdMargins, tickers);
