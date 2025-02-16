@@ -5,16 +5,11 @@ import stock.price.analytics.cache.model.MonthlyPriceWithPrevClose;
 import stock.price.analytics.cache.model.QuarterlyPriceWithPrevClose;
 import stock.price.analytics.cache.model.WeeklyPriceWithPrevClose;
 import stock.price.analytics.cache.model.YearlyPriceWithPrevClose;
-import stock.price.analytics.model.prices.ohlc.MonthlyPrice;
-import stock.price.analytics.model.prices.ohlc.QuarterlyPrice;
-import stock.price.analytics.model.prices.ohlc.WeeklyPrice;
-import stock.price.analytics.model.prices.ohlc.YearlyPrice;
+import stock.price.analytics.model.prices.enums.StockTimeframe;
+import stock.price.analytics.model.prices.ohlc.*;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -181,6 +176,22 @@ public class HigherTimeframePricesCache {
                                 .filter(entry -> entry.getKey().startsWith(ticker + "_"))
                                 .map(Map.Entry::getValue))
                 .collect(Collectors.toList());
+    }
+
+    public List<AbstractPrice> currentPricesFor(StockTimeframe timeframe) {
+        List<AbstractPrice> htfPricesUpdated = new ArrayList<>(switch (timeframe) {
+            case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
+            case WEEKLY -> new ArrayList<>(weeklyPricesByTickerAndDate.values());
+            case MONTHLY -> new ArrayList<>(monthlyPricesByTickerAndDate.values());
+            case QUARTERLY -> new ArrayList<>(quarterlyPricesByTickerAndDate.values());
+            case YEARLY -> new ArrayList<>(yearlyPricesByTickerAndDate.values());
+        });
+
+        return htfPricesUpdated.stream()
+                .collect(Collectors.groupingBy(AbstractPrice::getTicker))
+                .values().stream()
+                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(AbstractPrice::getStartDate).reversed()).limit(1))
+                .toList();
     }
 
     public Set<String> weeklyPricesTickers() {
