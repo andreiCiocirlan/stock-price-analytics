@@ -9,13 +9,11 @@ import stock.price.analytics.model.prices.enums.FvgStatus;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.repository.fvg.FVGRepository;
-import stock.price.analytics.repository.prices.*;
 
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static stock.price.analytics.util.Constants.DAILY_FVG_MIN_DATE;
 import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
@@ -26,21 +24,11 @@ import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partiti
 public class FairValueGapService {
 
     private final FVGRepository fvgRepository;
-    private final DailyPricesRepository dailyPricesRepository;
-    private final WeeklyPricesRepository weeklyPricesRepository;
-    private final MonthlyPricesRepository monthlyPricesRepository;
-    private final QuarterlyPricesRepository quarterlyPricesRepository;
-    private final YearlyPricesRepository yearlyPricesRepository;
+    private final PricesService pricesService;
 
     @Transactional
     public void updateUnfilledGapsHighLowAndStatusBy(StockTimeframe timeframe) {
-        Map<String, List<AbstractPrice>> pricesByTicker = (switch (timeframe) {
-            case DAILY -> dailyPricesRepository.findByDateBetween(DAILY_FVG_MIN_DATE, LocalDate.now());
-            case WEEKLY -> weeklyPricesRepository.findAll();
-            case MONTHLY -> monthlyPricesRepository.findAll();
-            case QUARTERLY -> quarterlyPricesRepository.findAll();
-            case YEARLY -> yearlyPricesRepository.findAll();
-        }).stream()
+        Map<String, List<AbstractPrice>> pricesByTicker = pricesService.findAllPricesFor(timeframe).stream()
                 .sorted(Comparator.comparing(AbstractPrice::getStartDate))
                 .collect(Collectors.groupingBy(AbstractPrice::getTicker));
 
