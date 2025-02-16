@@ -165,19 +165,12 @@ public class FairValueGapService {
     }
 
     private List<FairValueGap> findNewByTimeframe(StockTimeframe timeframe) {
-        LocalDate date = switch (timeframe) {
-            case DAILY -> LocalDate.now().minusWeeks(1);
-            case WEEKLY -> LocalDate.now().minusWeeks(3);
-            case MONTHLY -> LocalDate.now().minusMonths(3);
-            case QUARTERLY -> LocalDate.now().minusMonths(9);
-            case YEARLY -> LocalDate.now().minusYears(3);
-        };
         return switch (timeframe) {
-            case DAILY -> fvgRepository.findAllDailyFVGsAfter(date);
-            case WEEKLY -> fvgRepository.findAllWeeklyFVGsAfter(date);
-            case MONTHLY -> fvgRepository.findAllMonthlyFVGsAfter(date);
-            case QUARTERLY -> fvgRepository.findAllQuarterlyFVGsAfter(date);
-            case YEARLY -> fvgRepository.findAllYearlyFVGsAfter(date);
+            case DAILY -> fvgRepository.findAllDailyFVGsAfter(LocalDate.now().minusWeeks(1));
+            case WEEKLY -> fvgRepository.findAllWeeklyFVGsAfter(LocalDate.now().minusWeeks(3));
+            case MONTHLY -> fvgRepository.findAllMonthlyFVGsAfter(LocalDate.now().minusMonths(3));
+            case QUARTERLY -> fvgRepository.findAllQuarterlyFVGsAfter(LocalDate.now().minusMonths(9));
+            case YEARLY -> fvgRepository.findAllYearlyFVGsAfter(LocalDate.now().minusYears(3));
         };
     }
 
