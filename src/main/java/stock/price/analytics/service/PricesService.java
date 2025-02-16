@@ -19,6 +19,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
+import static stock.price.analytics.util.Constants.DAILY_FVG_MIN_DATE;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveNoLogging;
@@ -34,6 +35,7 @@ public class PricesService {
     private final EntityManager entityManager;
 
     private final PricesRepository pricesRepository;
+    private final DailyPricesRepository dailyPricesRepository;
     private final WeeklyPricesRepository weeklyPricesRepository;
     private final MonthlyPricesRepository monthlyPricesRepository;
     private final QuarterlyPricesRepository quarterlyPricesRepository;
@@ -52,6 +54,16 @@ public class PricesService {
         List<CandleWithDateDTO> candles = (List<CandleWithDateDTO>) nativeQuery.getResultList();
 
         return candles;
+    }
+
+    public List<? extends AbstractPrice> findAllPricesFor(StockTimeframe timeframe) {
+        return switch (timeframe) {
+            case DAILY -> dailyPricesRepository.findByDateBetween(DAILY_FVG_MIN_DATE, LocalDate.now());
+            case WEEKLY -> weeklyPricesRepository.findAll();
+            case MONTHLY -> monthlyPricesRepository.findAll();
+            case QUARTERLY -> quarterlyPricesRepository.findAll();
+            case YEARLY -> yearlyPricesRepository.findAll();
+        };
     }
 
     public List<AbstractPrice> updatePricesForHigherTimeframes(List<DailyPrice> importedDailyPrices) {
