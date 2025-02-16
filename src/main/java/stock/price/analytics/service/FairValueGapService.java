@@ -33,11 +33,19 @@ public class FairValueGapService {
                 .collect(Collectors.groupingBy(AbstractPrice::getTicker));
 
         List<FairValueGap> fvgsToUpdate = fvgRepository.findByTimeframe(timeframe);
-        logTime(() -> fvgsToUpdate.parallelStream().forEachOrdered(fvg -> updateUnfilledGapsHighLowAndStatus(fvg, pricesByTicker.get(fvg.getTicker()))), "updated unfilled gaps high & low & status for " + fvgsToUpdate.size() + " FVGs");
-        partitionDataAndSaveWithLogTime(fvgsToUpdate, fvgRepository, "saved " + fvgsToUpdate.size() + " FVGs");
+        List<FairValueGap> modifiedFvgs = new ArrayList<>();
+        logTime(() -> fvgsToUpdate.parallelStream().forEachOrdered(fvg -> {
+            if (updateUnfilledGapsHighLowAndStatus(fvg, pricesByTicker.get(fvg.getTicker()))) {
+                modifiedFvgs.add(fvg);
+            }
+        }), "updated unfilled gaps high & low & status for " + fvgsToUpdate.size() + " FVGs");
+        partitionDataAndSaveWithLogTime(modifiedFvgs, fvgRepository, "saved " + modifiedFvgs.size() + " FVGs");
     }
 
-    private void updateUnfilledGapsHighLowAndStatus(FairValueGap fvg, List<AbstractPrice> pricesForTicker) {
+    private boolean updateUnfilledGapsHighLowAndStatus(FairValueGap fvg, List<AbstractPrice> pricesForTicker) {
+        // copy original state and compare at the end
+        FairValueGap originalFVG = new FairValueGap(fvg);
+
         // Initialize unfilled portions if they are null (first time processing)
         if (fvg.getStatus() == FvgStatus.OPEN && fvg.getUnfilledLow1() == null) {
             fvg.setUnfilledLow1(fvg.getLow());
@@ -142,6 +150,7 @@ public class FairValueGapService {
                 break; // Move to the next FVG
             }
         }
+        return !originalFVG.equals(fvg);
     }
 
     public void initUnfilledGapsHighLow1AndSave(StockTimeframe timeframe) {
