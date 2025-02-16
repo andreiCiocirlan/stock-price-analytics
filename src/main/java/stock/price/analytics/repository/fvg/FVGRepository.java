@@ -91,10 +91,10 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                 NOT EXISTS (
                     SELECT 1
                     FROM price_data next_wmy
-                    WHERE next_wmy.wmy_date > fvg.date3 AND next_wmy.ticker = fvg.ticker
+                    WHERE next_wmy.wmy_date >= fvg.date3 AND next_wmy.ticker = fvg.ticker
                       AND (
-                          (fvg.type = 'BULLISH' AND next_wmy.low < fvg.high1)
-                          OR (fvg.type = 'BEARISH' AND next_wmy.high > fvg.low1)
+                          (fvg.type = 'BULLISH' AND next_wmy.low <= fvg.high1)
+                          OR (fvg.type = 'BEARISH' AND next_wmy.high >= fvg.low1)
                       )
                 )
             order by ticker, fvg.date2 desc;
@@ -170,10 +170,10 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                 NOT EXISTS (
                     SELECT 1
                     FROM price_data next_wmy
-                    WHERE next_wmy.wmy_date > fvg.date3 AND next_wmy.ticker = fvg.ticker
+                    WHERE next_wmy.wmy_date >= fvg.date3 AND next_wmy.ticker = fvg.ticker
                       AND (
-                          (fvg.type = 'BULLISH' AND next_wmy.low < fvg.high1)
-                          OR (fvg.type = 'BEARISH' AND next_wmy.high > fvg.low1)
+                          (fvg.type = 'BULLISH' AND next_wmy.low <= fvg.high1)
+                          OR (fvg.type = 'BEARISH' AND next_wmy.high >= fvg.low1)
                       )
                 )
             order by ticker, fvg.date2 desc;
@@ -249,10 +249,10 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                 NOT EXISTS (
                     SELECT 1
                     FROM price_data next_wmy
-                    WHERE next_wmy.wmy_date > fvg.date3 AND next_wmy.ticker = fvg.ticker
+                    WHERE next_wmy.wmy_date >= fvg.date3 AND next_wmy.ticker = fvg.ticker
                       AND (
-                          (fvg.type = 'BULLISH' AND next_wmy.low < fvg.high1)
-                          OR (fvg.type = 'BEARISH' AND next_wmy.high > fvg.low1)
+                          (fvg.type = 'BULLISH' AND next_wmy.low <= fvg.high1)
+                          OR (fvg.type = 'BEARISH' AND next_wmy.high >= fvg.low1)
                       )
                 )
             order by ticker, fvg.date2 desc;
@@ -328,10 +328,10 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                 NOT EXISTS (
                     SELECT 1
                     FROM price_data next_wmy
-                    WHERE next_wmy.wmy_date > fvg.date3 AND next_wmy.ticker = fvg.ticker
+                    WHERE next_wmy.wmy_date >= fvg.date3 AND next_wmy.ticker = fvg.ticker
                       AND (
-                          (fvg.type = 'BULLISH' AND next_wmy.low < fvg.high1)
-                          OR (fvg.type = 'BEARISH' AND next_wmy.high > fvg.low1)
+                          (fvg.type = 'BULLISH' AND next_wmy.low <= fvg.high1)
+                          OR (fvg.type = 'BEARISH' AND next_wmy.high >= fvg.low1)
                       )
                 )
             order by ticker, fvg.date2 desc;
@@ -407,10 +407,10 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                 NOT EXISTS (
                     SELECT 1
                     FROM price_data next_wmy
-                    WHERE next_wmy.wmy_date > fvg.date3 AND next_wmy.ticker = fvg.ticker
+                    WHERE next_wmy.wmy_date >= fvg.date3 AND next_wmy.ticker = fvg.ticker
                       AND (
-                          (fvg.type = 'BULLISH' AND next_wmy.low < fvg.high1)
-                          OR (fvg.type = 'BEARISH' AND next_wmy.high > fvg.low1)
+                          (fvg.type = 'BULLISH' AND next_wmy.low <= fvg.high1)
+                          OR (fvg.type = 'BEARISH' AND next_wmy.high >= fvg.low1)
                       )
                 )
             order by ticker, fvg.date2 desc;
