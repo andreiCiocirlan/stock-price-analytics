@@ -146,7 +146,7 @@ public class FairValueGapService {
             // *** Check if both unfilled portions are filled ***
             if (fvg.getUnfilledLow1() == null && fvg.getUnfilledHigh1() == null && fvg.getUnfilledLow2() == null && fvg.getUnfilledHigh2() == null) {
                 fvg.setStatus(FvgStatus.CLOSED);
-                log.info("FVG {} completely filled", fvg.getId());
+                log.info("FVG {} {} {} {} completely filled", fvg.getId(), fvg.getTicker(), fvg.getDate(), fvg.getTimeframe());
                 break; // Move to the next FVG
             }
         }
