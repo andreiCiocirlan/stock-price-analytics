@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import stock.price.analytics.cache.DailyPricesCache;
 import stock.price.analytics.cache.HigherTimeframePricesCache;
 import stock.price.analytics.controller.dto.CandleWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
@@ -19,6 +20,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
+import static stock.price.analytics.model.stocks.enums.MarketState.REGULAR;
 import static stock.price.analytics.util.Constants.DAILY_FVG_MIN_DATE;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
@@ -41,6 +43,23 @@ public class PricesService {
     private final QuarterlyPricesRepository quarterlyPricesRepository;
     private final YearlyPricesRepository yearlyPricesRepository;
     private final HigherTimeframePricesCache higherTimeframePricesCache;
+    private final DailyPricesCache dailyPricesCache;
+
+    public List<AbstractPrice> currentCachePricesFor(StockTimeframe timeframe) {
+        List<AbstractPrice> htfPricesUpdated = new ArrayList<>(switch (timeframe) {
+            case DAILY -> new ArrayList<>(dailyPricesCache.dailyPrices(REGULAR));
+            case WEEKLY -> new ArrayList<>(higherTimeframePricesCache.getWeeklyPricesByTickerAndDate().values());
+            case MONTHLY -> new ArrayList<>(higherTimeframePricesCache.getMonthlyPricesByTickerAndDate().values());
+            case QUARTERLY -> new ArrayList<>(higherTimeframePricesCache.getQuarterlyPricesByTickerAndDate().values());
+            case YEARLY -> new ArrayList<>(higherTimeframePricesCache.getYearlyPricesByTickerAndDate().values());
+        });
+
+        return htfPricesUpdated.stream()
+                .collect(Collectors.groupingBy(AbstractPrice::getTicker))
+                .values().stream()
+                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(AbstractPrice::getStartDate).reversed()).limit(1))
+                .toList();
+    }
 
     public List<CandleWithDateDTO> findFor(String ticker, StockTimeframe timeframe) {
         String tableNameOHLC = timeframe.dbTableOHLC();
