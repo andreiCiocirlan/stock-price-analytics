@@ -19,13 +19,6 @@ public class FairValueGapController {
 
     private final FairValueGapService fairValueGapService;
 
-    @Transactional
-    @PostMapping("/update-unfilled-gaps-hl-and-status")
-    @ResponseStatus(HttpStatus.CREATED)
-    public void updateUnfilledGapsHighLowAndStatusBy(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
-        fairValueGapService.updateUnfilledGapsHighLowAndStatusBy(timeframe);
-    }
-
     @GetMapping("/find-new")
     @ResponseStatus(HttpStatus.OK)
     public List<FairValueGap> findNewFVGsFor(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
@@ -54,5 +47,11 @@ public class FairValueGapController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void initUnfilledGapsHighLow1(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
         fairValueGapService.initUnfilledGapsHighLow1AndSave(timeframe);
+    }
+
+    @PutMapping("/update-unfilled-gaps-hl-and-status")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateUnfilledGapsHighLowAndStatusBy(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
+        fairValueGapService.updateUnfilledGapsHighLowAndStatusBy(timeframe);
     }
 }
