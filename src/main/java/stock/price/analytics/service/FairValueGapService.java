@@ -164,24 +164,13 @@ public class FairValueGapService {
         partitionDataAndSaveWithLogTime(fvgsToUpdate, fvgRepository, "saved " + fvgsToUpdate.size() + " unfilled high-low1 for OPEN FVGs");
     }
 
-    private List<FairValueGap> findNewByTimeframe(StockTimeframe timeframe) {
+    private List<FairValueGap> findRecentByTimeframe(StockTimeframe timeframe) {
         return switch (timeframe) {
             case DAILY -> fvgRepository.findAllDailyFVGsAfter(LocalDate.now().minusWeeks(1));
             case WEEKLY -> fvgRepository.findAllWeeklyFVGsAfter(LocalDate.now().minusWeeks(3));
             case MONTHLY -> fvgRepository.findAllMonthlyFVGsAfter(LocalDate.now().minusMonths(3));
             case QUARTERLY -> fvgRepository.findAllQuarterlyFVGsAfter(LocalDate.now().minusMonths(9));
             case YEARLY -> fvgRepository.findAllYearlyFVGsAfter(LocalDate.now().minusYears(3));
-        };
-    }
-
-    private List<FairValueGap> findAllByTimeframe(StockTimeframe timeframe) {
-        LocalDate longTimeAgo = LocalDate.of(1950, 1, 1);
-        return switch (timeframe) {
-            case DAILY -> fvgRepository.findAllDailyFVGsAfter(LocalDate.now().minusYears(3));
-            case WEEKLY -> fvgRepository.findAllWeeklyFVGsAfter(longTimeAgo);
-            case MONTHLY -> fvgRepository.findAllMonthlyFVGsAfter(longTimeAgo);
-            case QUARTERLY -> fvgRepository.findAllQuarterlyFVGsAfter(longTimeAgo);
-            case YEARLY -> fvgRepository.findAllYearlyFVGsAfter(longTimeAgo);
         };
     }
 
@@ -198,7 +187,7 @@ public class FairValueGapService {
     public List<FairValueGap> findNewFVGsFor(StockTimeframe timeframe) {
         Set<String> newFvgTickers = new HashSet<>();
         List<FairValueGap> newFVGsFound = new ArrayList<>();
-        List<FairValueGap> currentFVGs = findNewByTimeframe(timeframe);
+        List<FairValueGap> currentFVGs = findRecentByTimeframe(timeframe);
 
         Map<String, FairValueGap> dbFVGsByCompositeId = fvgRepository.findByTimeframeAndStatusOpen(timeframe.name()).stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
         Map<String, FairValueGap> currentFVGsByCompositeId = currentFVGs.stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
@@ -230,28 +219,39 @@ public class FairValueGapService {
     }
 
     public List<FairValueGap> findUpdatedFVGsHighLowAndClosedFor(StockTimeframe timeframe) {
-        List<FairValueGap> updatedFVGs = new ArrayList<>();
-        List<FairValueGap> currentFVGs = findAllByTimeframe(timeframe);
+        Map<String, FairValueGap> updatedFVGsByCompositeId = new HashMap<>();
+        List<FairValueGap> recentFVGs = findRecentByTimeframe(timeframe); // existing recent FVGs (to update high-low)
 
         Map<String, FairValueGap> dbFVGsByCompositeId = fvgRepository.findByTimeframeAndStatusOpen(timeframe.name()).stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
-        Map<String, FairValueGap> currentFVGsByCompositeId = currentFVGs.stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
+        Map<String, List<AbstractPrice>> pricesByTicker = pricesService.currentCachePricesFor(timeframe).stream().collect(Collectors.groupingBy(AbstractPrice::getTicker));
 
-        dbFVGsByCompositeId.forEach((compositeKey, fvg) -> {
-            if (!currentFVGsByCompositeId.containsKey(compositeKey)) { // FVG is CLOSED
-                fvg.setStatus(FvgStatus.CLOSED);
-                updatedFVGs.add(fvg);
-            } else { // update FVG high/low
-                FairValueGap currentFVG = currentFVGsByCompositeId.get(compositeKey);
-                boolean differentHighLow = currentFVG.getHigh() != fvg.getHigh() || currentFVG.getLow() != fvg.getLow();
+        Map<String, FairValueGap> currentFVGsByCompositeId = recentFVGs.stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
+        currentFVGsByCompositeId.forEach((compositeKey, fvg) -> {
+            if (dbFVGsByCompositeId.containsKey(compositeKey)) { // check for high-low updates of existing FVGs
+                FairValueGap dbFVG = dbFVGsByCompositeId.get(compositeKey);
+                boolean differentHighLow = dbFVG.getHigh() != fvg.getHigh() || dbFVG.getLow() != fvg.getLow();
                 if (differentHighLow) {
-                    fvg.setHigh(currentFVG.getHigh());
-                    fvg.setLow(currentFVG.getLow());
-                    updatedFVGs.add(fvg);
+                    log.info("updated high-low {} ", compositeKey);
+                    dbFVG.setHigh(fvg.getHigh());
+                    dbFVG.setLow(fvg.getLow());
+                    updatedFVGsByCompositeId.put(compositeKey, dbFVG);
                 }
             }
         });
 
-        return updatedFVGs;
+        updatedFVGsByCompositeId.forEach((compositeKey, fvg) -> {
+            if (pricesByTicker.containsKey(fvg.getTicker()) && updateUnfilledGapsHighLowAndStatus(fvg, pricesByTicker.get(fvg.getTicker()))) {
+                updatedFVGsByCompositeId.put(compositeKey, fvg); // replace with updated FVG
+            }
+        });
+
+        dbFVGsByCompositeId.forEach((compositeKey, fvg) -> {
+            if (!updatedFVGsByCompositeId.containsKey(compositeKey) && pricesByTicker.containsKey(fvg.getTicker()) && updateUnfilledGapsHighLowAndStatus(fvg, pricesByTicker.get(fvg.getTicker()))) {
+                updatedFVGsByCompositeId.put(compositeKey, fvg);
+            }
+        });
+
+        return new ArrayList<>(updatedFVGsByCompositeId.values());
     }
 
     public void saveNewFVGsAndUpdateHighLowAndClosed() {
