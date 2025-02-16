@@ -1,5 +1,6 @@
 package stock.price.analytics.controller;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,13 @@ import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
 public class FairValueGapController {
 
     private final FairValueGapService fairValueGapService;
+
+    @Transactional
+    @PostMapping("/update-unfilled-gaps-hl-and-status")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void updateUnfilledGapsHighLowAndStatusBy(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
+        fairValueGapService.updateUnfilledGapsHighLowAndStatusBy(timeframe);
+    }
 
     @GetMapping("/find-new")
     @ResponseStatus(HttpStatus.OK)
