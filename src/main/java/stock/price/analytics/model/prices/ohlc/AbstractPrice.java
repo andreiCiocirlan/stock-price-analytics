@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import stock.price.analytics.model.fvg.FairValueGap;
 import stock.price.analytics.model.prices.PriceEntity;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 
@@ -73,6 +74,17 @@ public abstract class AbstractPrice implements PriceEntity {
             performance = Math.round((((currentClose - currentOpen) / currentOpen) * 100) * 100) / 100.0;
         }
         return performance;
+    }
+
+    // Check if the price date is immediately after the FVG date based on the timeframe
+    public boolean isImmediatelyAfter(FairValueGap fvg) {
+        return (switch (this.getTimeframe()) {
+            case DAILY -> this.getStartDate().minusDays(1);
+            case WEEKLY -> this.getStartDate().minusWeeks(1);
+            case MONTHLY -> this.getStartDate().minusMonths(1);
+            case QUARTERLY -> this.getStartDate().minusMonths(3);
+            case YEARLY -> this.getStartDate().minusYears(1);
+        }).isEqual(fvg.getDate());
     }
 
     @Override
