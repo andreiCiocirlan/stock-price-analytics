@@ -244,6 +244,10 @@ public class PricesService {
         };
     }
 
+    public List<Object[]> findWeeklyOpeningPriceDiscrepancies() {
+        return pricesRepository.findWeeklyOpeningPriceDiscrepancies();
+    }
+
     @Transactional
     public void updateAllHigherTimeframesPricesForTickers(LocalDate date, String tickers) {
         updateHigherTimeframesPricesFor(date, higherTimeframes(), tickers);
