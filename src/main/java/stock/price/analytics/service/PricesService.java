@@ -103,10 +103,10 @@ public class PricesService {
         List<String> tickers = new ArrayList<>(importedDailyPrices.stream().map(DailyPrice::getTicker).toList());
 
         // Fetch previous prices for each timeframe
-        List<WeeklyPrice> previousTwoWeeklyPrices = getPreviousTwoWeeklyPrices(tickers);
-        List<MonthlyPrice> previousTwoMonthlyPrices = getPreviousTwoMonthlyPrices(tickers);
-        List<QuarterlyPrice> previousTwoQuarterlyPrices = getPreviousTwoQuarterlyPrices(tickers);
-        List<YearlyPrice> previousTwoYearlyPrices = getPreviousTwoYearlyPrices(tickers);
+        List<WeeklyPrice> previousTwoWeeklyPrices = getPreviousTwoWeeklyPrices(tickers, WEEKLY);
+        List<MonthlyPrice> previousTwoMonthlyPrices = getPreviousTwoMonthlyPrices(tickers, MONTHLY);
+        List<QuarterlyPrice> previousTwoQuarterlyPrices = getPreviousTwoQuarterlyPrices(tickers, QUARTERLY);
+        List<YearlyPrice> previousTwoYearlyPrices = getPreviousTwoYearlyPrices(tickers, YEARLY);
 
         // Update prices for each timeframe and return (used for stocks cache update)
         List<AbstractPrice> htfPricesUpdated = new ArrayList<>();
@@ -128,22 +128,22 @@ public class PricesService {
     }
 
     @SuppressWarnings("unchecked")
-    private List<WeeklyPrice> getPreviousTwoWeeklyPrices(List<String> tickers) {
-        Set<String> cacheTickers = cacheTickersFor(WEEKLY);
+    private List<WeeklyPrice> getPreviousTwoWeeklyPrices(List<String> tickers, StockTimeframe timeframe) {
+        Set<String> cacheTickers = cacheTickersFor(timeframe);
         List<WeeklyPrice> previousWeeklyPrices;
         if (cacheTickers.isEmpty()) {
-            log.info("Fetching PreviousTwoWeeklyPrices from database for {} tickers", tickers.size());
+            log.info("Fetching Previous Two {} Prices from database for {} tickers", timeframe.name(), tickers.size());
             previousWeeklyPrices = weeklyPricesRepository.findPreviousThreeWeeklyPricesForTickers(tickers);
             higherTimeframePricesCache.addPrices(previousWeeklyPrices);
         } else if (cacheTickers.containsAll(tickers)) {
-            previousWeeklyPrices = (List<WeeklyPrice>) higherTimeframePricesCache.pricesFor(tickers, WEEKLY);
+            previousWeeklyPrices = (List<WeeklyPrice>) higherTimeframePricesCache.pricesFor(tickers, timeframe);
         } else { // partial match
             tickers.removeAll(cacheTickers);
             previousWeeklyPrices = weeklyPricesRepository.findPreviousThreeWeeklyPricesForTickers(tickers);
             higherTimeframePricesCache.addPrices(previousWeeklyPrices);
-            log.info("previousWeeklyPrices partial match for {} tickers", tickers.size());
+            log.info("previous {} Prices partial match for {} tickers", timeframe.name(), tickers.size());
             cacheTickers.addAll(tickers);
-            previousWeeklyPrices = (List<WeeklyPrice>) higherTimeframePricesCache.pricesFor(cacheTickers.stream().toList(), WEEKLY);
+            previousWeeklyPrices = (List<WeeklyPrice>) higherTimeframePricesCache.pricesFor(cacheTickers.stream().toList(), timeframe);
         }
 
         return previousWeeklyPrices
@@ -155,22 +155,22 @@ public class PricesService {
     }
 
     @SuppressWarnings("unchecked")
-    private List<MonthlyPrice> getPreviousTwoMonthlyPrices(List<String> tickers) {
-        Set<String> cacheTickers = cacheTickersFor(MONTHLY);
+    private List<MonthlyPrice> getPreviousTwoMonthlyPrices(List<String> tickers, StockTimeframe timeframe) {
+        Set<String> cacheTickers = cacheTickersFor(timeframe);
         List<MonthlyPrice> previousMonthlyPrices;
         if (cacheTickers.isEmpty()) {
-            log.info("Fetching PreviousTwoMonthlyPrices from database for {} tickers", tickers.size());
+            log.info("Fetching Previous Two {} Prices from database for {} tickers", timeframe.name(), tickers.size());
             previousMonthlyPrices = monthlyPricesRepository.findPreviousThreeMonthlyPricesForTickers(tickers);
             higherTimeframePricesCache.addPrices(previousMonthlyPrices);
         } else if (cacheTickers.containsAll(tickers)) {
-            previousMonthlyPrices = (List<MonthlyPrice>) higherTimeframePricesCache.pricesFor(tickers, MONTHLY);
+            previousMonthlyPrices = (List<MonthlyPrice>) higherTimeframePricesCache.pricesFor(tickers, timeframe);
         } else { // partial match
             tickers.removeAll(cacheTickers);
             previousMonthlyPrices = monthlyPricesRepository.findPreviousThreeMonthlyPricesForTickers(tickers);
             higherTimeframePricesCache.addPrices(previousMonthlyPrices);
-            log.info("previousMonthlyPrices partial match for {} tickers", tickers.size());
+            log.info("previous {} Prices partial match for {} tickers", timeframe.name(), tickers.size());
             cacheTickers.addAll(tickers);
-            previousMonthlyPrices = (List<MonthlyPrice>) higherTimeframePricesCache.pricesFor(cacheTickers.stream().toList(), MONTHLY);
+            previousMonthlyPrices = (List<MonthlyPrice>) higherTimeframePricesCache.pricesFor(cacheTickers.stream().toList(), timeframe);
         }
 
         return previousMonthlyPrices
@@ -182,22 +182,22 @@ public class PricesService {
     }
 
     @SuppressWarnings("unchecked")
-    private List<QuarterlyPrice> getPreviousTwoQuarterlyPrices(List<String> tickers) {
-        Set<String> cacheTickers = cacheTickersFor(QUARTERLY);
+    private List<QuarterlyPrice> getPreviousTwoQuarterlyPrices(List<String> tickers, StockTimeframe timeframe) {
+        Set<String> cacheTickers = cacheTickersFor(timeframe);
         List<QuarterlyPrice> previousQuarterlyPrices;
         if (cacheTickers.isEmpty()) {
-            log.info("Fetching PreviousTwoQuarterlyPrices from database for {} tickers", tickers.size());
+            log.info("Fetching Previous Two {} Prices from database for {} tickers", timeframe.name(), tickers.size());
             previousQuarterlyPrices = quarterlyPricesRepository.findPreviousThreeQuarterlyPricesForTickers(tickers);
             higherTimeframePricesCache.addPrices(previousQuarterlyPrices);
         } else if (cacheTickers.containsAll(tickers)) {
-            previousQuarterlyPrices = (List<QuarterlyPrice>) higherTimeframePricesCache.pricesFor(tickers, QUARTERLY);
+            previousQuarterlyPrices = (List<QuarterlyPrice>) higherTimeframePricesCache.pricesFor(tickers, timeframe);
         } else { // partial match
             tickers.removeAll(cacheTickers);
             previousQuarterlyPrices = quarterlyPricesRepository.findPreviousThreeQuarterlyPricesForTickers(tickers);
             higherTimeframePricesCache.addPrices(previousQuarterlyPrices);
-            log.info("previousQuarterlyPrices partial match for {} tickers", tickers.size());
+            log.info("previous {} Prices partial match for {} tickers", timeframe.name(), tickers.size());
             cacheTickers.addAll(tickers);
-            previousQuarterlyPrices = (List<QuarterlyPrice>) higherTimeframePricesCache.pricesFor(cacheTickers.stream().toList(), QUARTERLY);
+            previousQuarterlyPrices = (List<QuarterlyPrice>) higherTimeframePricesCache.pricesFor(cacheTickers.stream().toList(), timeframe);
         }
 
         return previousQuarterlyPrices
@@ -209,22 +209,22 @@ public class PricesService {
     }
 
     @SuppressWarnings("unchecked")
-    private List<YearlyPrice> getPreviousTwoYearlyPrices(List<String> tickers) {
-        Set<String> cacheTickers = cacheTickersFor(YEARLY);
+    private List<YearlyPrice> getPreviousTwoYearlyPrices(List<String> tickers, StockTimeframe timeframe) {
+        Set<String> cacheTickers = cacheTickersFor(timeframe);
         List<YearlyPrice> previousYearlyPrices;
         if (cacheTickers.isEmpty()) {
-            log.info("Fetching PreviousTwoYearlyPrices from database for {} tickers", tickers.size());
+            log.info("Fetching Previous Two {} Prices from database for {} tickers", timeframe.name(), tickers.size());
             previousYearlyPrices = yearlyPricesRepository.findPreviousThreeYearlyPricesForTickers(tickers);
             higherTimeframePricesCache.addPrices(previousYearlyPrices);
         } else if (cacheTickers.containsAll(tickers)) {
-            previousYearlyPrices = (List<YearlyPrice>) higherTimeframePricesCache.pricesFor(tickers, YEARLY);
+            previousYearlyPrices = (List<YearlyPrice>) higherTimeframePricesCache.pricesFor(tickers, timeframe);
         } else { // partial match
             tickers.removeAll(cacheTickers);
             previousYearlyPrices = yearlyPricesRepository.findPreviousThreeYearlyPricesForTickers(tickers);
             higherTimeframePricesCache.addPrices(previousYearlyPrices);
-            log.info("previousYearlyPrices partial match for {} tickers", tickers.size());
+            log.info("previous {} Prices partial match for {} tickers", timeframe.name(), tickers.size());
             cacheTickers.addAll(tickers);
-            previousYearlyPrices = (List<YearlyPrice>) higherTimeframePricesCache.pricesFor(cacheTickers.stream().toList(), YEARLY);
+            previousYearlyPrices = (List<YearlyPrice>) higherTimeframePricesCache.pricesFor(cacheTickers.stream().toList(), timeframe);
         }
 
         return previousYearlyPrices
