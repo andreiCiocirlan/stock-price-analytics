@@ -6,7 +6,6 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import stock.price.analytics.repository.stocks.StockRepository;
 import stock.price.analytics.service.*;
 
@@ -14,7 +13,6 @@ import static stock.price.analytics.util.LoggingUtil.logTime;
 
 @RequiredArgsConstructor
 @SpringBootApplication
-@EnableScheduling
 public class Application implements ApplicationRunner {
 
     private final StockRepository stockRepository;
