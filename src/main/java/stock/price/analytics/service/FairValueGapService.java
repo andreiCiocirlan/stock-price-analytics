@@ -234,6 +234,10 @@ public class FairValueGapService {
                     log.info("updated high-low {} ", compositeKey);
                     dbFVG.setHigh(fvg.getHigh());
                     dbFVG.setLow(fvg.getLow());
+                    if (dbFVG.getUnfilledHigh2() == null && dbFVG.getUnfilledLow2() == null) {
+                        dbFVG.setUnfilledHigh1(dbFVG.getHigh());
+                        dbFVG.setUnfilledLow1(dbFVG.getLow());
+                    }
                     updatedFVGsByCompositeId.put(compositeKey, dbFVG);
                 }
             }
