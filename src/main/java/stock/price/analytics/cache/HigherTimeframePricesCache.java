@@ -6,6 +6,7 @@ import stock.price.analytics.cache.model.MonthlyPriceWithPrevClose;
 import stock.price.analytics.cache.model.QuarterlyPriceWithPrevClose;
 import stock.price.analytics.cache.model.WeeklyPriceWithPrevClose;
 import stock.price.analytics.cache.model.YearlyPriceWithPrevClose;
+import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
 
 import java.time.LocalDate;
@@ -122,39 +123,23 @@ public class HigherTimeframePricesCache {
         });
     }
 
-    public List<WeeklyPrice> weeklyPricesFor(List<String> tickers) {
+    public List<? extends AbstractPrice> pricesFor(List<String> tickers, StockTimeframe timeframe) {
         return tickers.stream()
-                .flatMap(ticker ->
-                        weeklyPricesByTickerAndDate.entrySet().stream()
-                                .filter(entry -> entry.getKey().startsWith(ticker + "_"))
-                                .map(Map.Entry::getValue))
-                .collect(Collectors.toList());
-    }
-
-    public List<MonthlyPrice> monthlyPricesFor(List<String> tickers) {
-        return tickers.stream()
-                .flatMap(ticker ->
-                        monthlyPricesByTickerAndDate.entrySet().stream()
-                                .filter(entry -> entry.getKey().startsWith(ticker + "_"))
-                                .map(Map.Entry::getValue))
-                .collect(Collectors.toList());
-    }
-
-    public List<QuarterlyPrice> quarterlyPricesFor(List<String> tickers) {
-        return tickers.stream()
-                .flatMap(ticker ->
-                        quarterlyPricesByTickerAndDate.entrySet().stream()
-                                .filter(entry -> entry.getKey().startsWith(ticker + "_"))
-                                .map(Map.Entry::getValue))
-                .collect(Collectors.toList());
-    }
-
-    public List<YearlyPrice> yearlyPricesFor(List<String> tickers) {
-        return tickers.stream()
-                .flatMap(ticker ->
-                        yearlyPricesByTickerAndDate.entrySet().stream()
-                                .filter(entry -> entry.getKey().startsWith(ticker + "_"))
-                                .map(Map.Entry::getValue))
+                .flatMap(ticker -> switch (timeframe) {
+                    case WEEKLY -> weeklyPricesByTickerAndDate.entrySet().stream()
+                            .filter(entry -> entry.getKey().startsWith(ticker + "_"))
+                            .map(Map.Entry::getValue);
+                    case MONTHLY -> monthlyPricesByTickerAndDate.entrySet().stream()
+                            .filter(entry -> entry.getKey().startsWith(ticker + "_"))
+                            .map(Map.Entry::getValue);
+                    case QUARTERLY -> quarterlyPricesByTickerAndDate.entrySet().stream()
+                            .filter(entry -> entry.getKey().startsWith(ticker + "_"))
+                            .map(Map.Entry::getValue);
+                    case YEARLY -> yearlyPricesByTickerAndDate.entrySet().stream()
+                            .filter(entry -> entry.getKey().startsWith(ticker + "_"))
+                            .map(Map.Entry::getValue);
+                    default -> throw new IllegalArgumentException("Unexpected timeframe: " + timeframe);
+                })
                 .collect(Collectors.toList());
     }
 
