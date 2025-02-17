@@ -109,10 +109,14 @@ public class HigherTimeframePricesCache {
 
         prices.forEach(price -> {
             switch (prices.getFirst().getTimeframe()) {
-                case WEEKLY -> weeklyPricesByTickerAndDate.put(createKey(price.getTicker(), price.getStartDate()), (WeeklyPrice) price);
-                case MONTHLY -> monthlyPricesByTickerAndDate.put(createKey(price.getTicker(), price.getStartDate()), (MonthlyPrice) price);
-                case QUARTERLY -> quarterlyPricesByTickerAndDate.put(createKey(price.getTicker(), price.getStartDate()), (QuarterlyPrice) price);
-                case YEARLY -> yearlyPricesByTickerAndDate.put(createKey(price.getTicker(), price.getStartDate()), (YearlyPrice) price);
+                case WEEKLY ->
+                        weeklyPricesByTickerAndDate.put(createKey(price.getTicker(), price.getStartDate()), (WeeklyPrice) price);
+                case MONTHLY ->
+                        monthlyPricesByTickerAndDate.put(createKey(price.getTicker(), price.getStartDate()), (MonthlyPrice) price);
+                case QUARTERLY ->
+                        quarterlyPricesByTickerAndDate.put(createKey(price.getTicker(), price.getStartDate()), (QuarterlyPrice) price);
+                case YEARLY ->
+                        yearlyPricesByTickerAndDate.put(createKey(price.getTicker(), price.getStartDate()), (YearlyPrice) price);
                 case DAILY -> throw new IllegalStateException("Unexpected timeframe: DAILY");
             }
         });
