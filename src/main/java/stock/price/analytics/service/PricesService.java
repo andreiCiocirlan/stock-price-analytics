@@ -119,10 +119,10 @@ public class PricesService {
         htfPricesUpdated.addAll(quarterlyPrices);
         htfPricesUpdated.addAll(yearlyPrices);
 
-        higherTimeframePricesCache.addWeeklyPrices(weeklyPrices);
-        higherTimeframePricesCache.addMonthlyPrices(monthlyPrices);
-        higherTimeframePricesCache.addQuarterlyPrices(quarterlyPrices);
-        higherTimeframePricesCache.addYearlyPrices(yearlyPrices);
+        higherTimeframePricesCache.addPrices(weeklyPrices);
+        higherTimeframePricesCache.addPrices(monthlyPrices);
+        higherTimeframePricesCache.addPrices(quarterlyPrices);
+        higherTimeframePricesCache.addPrices(yearlyPrices);
 
         return htfPricesUpdated;
     }
@@ -133,13 +133,13 @@ public class PricesService {
         if (cacheTickers.isEmpty()) {
             log.info("Fetching PreviousTwoWeeklyPrices from database for {} tickers", tickers.size());
             previousWeeklyPrices = weeklyPricesRepository.findPreviousThreeWeeklyPricesForTickers(tickers);
-            higherTimeframePricesCache.addWeeklyPrices(previousWeeklyPrices);
+            higherTimeframePricesCache.addPrices(previousWeeklyPrices);
         } else if (cacheTickers.containsAll(tickers)) {
             previousWeeklyPrices = higherTimeframePricesCache.weeklyPricesFor(tickers);
         } else { // partial match
             tickers.removeAll(cacheTickers);
             previousWeeklyPrices = weeklyPricesRepository.findPreviousThreeWeeklyPricesForTickers(tickers);
-            higherTimeframePricesCache.addWeeklyPrices(previousWeeklyPrices);
+            higherTimeframePricesCache.addPrices(previousWeeklyPrices);
             log.info("previousWeeklyPrices partial match for {} tickers", tickers.size());
             cacheTickers.addAll(tickers);
             previousWeeklyPrices = higherTimeframePricesCache.weeklyPricesFor(cacheTickers.stream().toList());
@@ -159,13 +159,13 @@ public class PricesService {
         if (cacheTickers.isEmpty()) {
             log.info("Fetching PreviousTwoMonthlyPrices from database for {} tickers", tickers.size());
             previousMonthlyPrices = monthlyPricesRepository.findPreviousThreeMonthlyPricesForTickers(tickers);
-            higherTimeframePricesCache.addMonthlyPrices(previousMonthlyPrices);
+            higherTimeframePricesCache.addPrices(previousMonthlyPrices);
         } else if (cacheTickers.containsAll(tickers)) {
             previousMonthlyPrices = higherTimeframePricesCache.monthlyPricesFor(tickers);
         } else { // partial match
             tickers.removeAll(cacheTickers);
             previousMonthlyPrices = monthlyPricesRepository.findPreviousThreeMonthlyPricesForTickers(tickers);
-            higherTimeframePricesCache.addMonthlyPrices(previousMonthlyPrices);
+            higherTimeframePricesCache.addPrices(previousMonthlyPrices);
             log.info("previousMonthlyPrices partial match for {} tickers", tickers.size());
             cacheTickers.addAll(tickers);
             previousMonthlyPrices = higherTimeframePricesCache.monthlyPricesFor(cacheTickers.stream().toList());
@@ -185,13 +185,13 @@ public class PricesService {
         if (cacheTickers.isEmpty()) {
             log.info("Fetching PreviousTwoQuarterlyPrices from database for {} tickers", tickers.size());
             previousQuarterlyPrices = quarterlyPricesRepository.findPreviousThreeQuarterlyPricesForTickers(tickers);
-            higherTimeframePricesCache.addQuarterlyPrices(previousQuarterlyPrices);
+            higherTimeframePricesCache.addPrices(previousQuarterlyPrices);
         } else if (cacheTickers.containsAll(tickers)) {
             previousQuarterlyPrices = higherTimeframePricesCache.quarterlyPricesFor(tickers);
         } else { // partial match
             tickers.removeAll(cacheTickers);
             previousQuarterlyPrices = quarterlyPricesRepository.findPreviousThreeQuarterlyPricesForTickers(tickers);
-            higherTimeframePricesCache.addQuarterlyPrices(previousQuarterlyPrices);
+            higherTimeframePricesCache.addPrices(previousQuarterlyPrices);
             log.info("previousQuarterlyPrices partial match for {} tickers", tickers.size());
             cacheTickers.addAll(tickers);
             previousQuarterlyPrices = higherTimeframePricesCache.quarterlyPricesFor(cacheTickers.stream().toList());
@@ -211,13 +211,13 @@ public class PricesService {
         if (cacheTickers.isEmpty()) {
             log.info("Fetching PreviousTwoYearlyPrices from database for {} tickers", tickers.size());
             previousYearlyPrices = yearlyPricesRepository.findPreviousThreeYearlyPricesForTickers(tickers);
-            higherTimeframePricesCache.addYearlyPrices(previousYearlyPrices);
+            higherTimeframePricesCache.addPrices(previousYearlyPrices);
         } else if (cacheTickers.containsAll(tickers)) {
             previousYearlyPrices = higherTimeframePricesCache.yearlyPricesFor(tickers);
         } else { // partial match
             tickers.removeAll(cacheTickers);
             previousYearlyPrices = yearlyPricesRepository.findPreviousThreeYearlyPricesForTickers(tickers);
-            higherTimeframePricesCache.addYearlyPrices(previousYearlyPrices);
+            higherTimeframePricesCache.addPrices(previousYearlyPrices);
             log.info("previousYearlyPrices partial match for {} tickers", tickers.size());
             cacheTickers.addAll(tickers);
             previousYearlyPrices = higherTimeframePricesCache.yearlyPricesFor(cacheTickers.stream().toList());

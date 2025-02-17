@@ -9,7 +9,9 @@ import stock.price.analytics.cache.model.YearlyPriceWithPrevClose;
 import stock.price.analytics.model.prices.ohlc.*;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -102,45 +104,18 @@ public class HigherTimeframePricesCache {
                 .collect(Collectors.toList());
     }
 
+    public void addPrices(List<? extends AbstractPrice> prices) {
+        if (prices == null || prices.isEmpty()) return; // Handle null or empty list case to avoid exceptions
 
-    public void addWeeklyPrices(List<WeeklyPrice> weeklyPrices) {
-        weeklyPrices.forEach(price ->
-                weeklyPricesByTickerAndDate.merge(
-                        createKey(price.getTicker(), price.getStartDate()),
-                        price,
-                        (_, newPrice) -> newPrice // Logic to keep the latest price
-                )
-        );
-    }
-
-    public void addMonthlyPrices(List<MonthlyPrice> monthlyPrices) {
-        monthlyPrices.forEach(price ->
-                monthlyPricesByTickerAndDate.merge(
-                        createKey(price.getTicker(), price.getStartDate()),
-                        price,
-                        (_, newPrice) -> newPrice // Logic to keep the latest price
-                )
-        );
-    }
-
-    public void addQuarterlyPrices(List<QuarterlyPrice> quarterlyPrices) {
-        quarterlyPrices.forEach(price ->
-                quarterlyPricesByTickerAndDate.merge(
-                        createKey(price.getTicker(), price.getStartDate()),
-                        price,
-                        (_, newPrice) -> newPrice // Logic to keep the latest price
-                )
-        );
-    }
-
-    public void addYearlyPrices(List<YearlyPrice> yearlyPrices) {
-        yearlyPrices.forEach(price ->
-                yearlyPricesByTickerAndDate.merge(
-                        createKey(price.getTicker(), price.getStartDate()),
-                        price,
-                        (_, newPrice) -> newPrice // Logic to keep the latest price
-                )
-        );
+        prices.forEach(price -> {
+            switch (prices.getFirst().getTimeframe()) {
+                case WEEKLY -> weeklyPricesByTickerAndDate.put(createKey(price.getTicker(), price.getStartDate()), (WeeklyPrice) price);
+                case MONTHLY -> monthlyPricesByTickerAndDate.put(createKey(price.getTicker(), price.getStartDate()), (MonthlyPrice) price);
+                case QUARTERLY -> quarterlyPricesByTickerAndDate.put(createKey(price.getTicker(), price.getStartDate()), (QuarterlyPrice) price);
+                case YEARLY -> yearlyPricesByTickerAndDate.put(createKey(price.getTicker(), price.getStartDate()), (YearlyPrice) price);
+                case DAILY -> throw new IllegalStateException("Unexpected timeframe: DAILY");
+            }
+        });
     }
 
     public List<WeeklyPrice> weeklyPricesFor(List<String> tickers) {
