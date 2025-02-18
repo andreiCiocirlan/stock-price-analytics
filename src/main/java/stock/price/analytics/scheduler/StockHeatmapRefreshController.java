@@ -17,7 +17,8 @@ public class StockHeatmapRefreshController {
 
     @Schedules({
             @Scheduled(cron = "${cron.stocks.heatmap.refresh.intraday.at935}", zone = "${cron.timezone}"),
-            @Scheduled(cron = "${cron.stocks.heatmap.refresh.intraday.between10and17}", zone = "${cron.timezone}"),
+            @Scheduled(cron = "${cron.stocks.heatmap.refresh.intraday.between10and16}", zone = "${cron.timezone}"),
+            @Scheduled(cron = "${cron.stocks.heatmap.refresh.intraday.between16and17}", zone = "${cron.timezone}"),
             @Scheduled(cron = "${cron.stocks.heatmap.refresh.pre.market.between8and9}", zone = "${cron.timezone}"),
             @Scheduled(cron = "${cron.stocks.heatmap.refresh.pre.market.between9and915}", zone = "${cron.timezone}")
     })

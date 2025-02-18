@@ -28,7 +28,8 @@ public class YahooPricesImportScheduler {
     // executed at 5 and 35 minutes past the hour between 10-17 NY time (intraday)
     @Schedules({
             @Scheduled(cron = "${cron.yahoo.quotes.intraday.at935}", zone = "${cron.timezone}"),
-            @Scheduled(cron = "${cron.yahoo.quotes.intraday.between10and17}", zone = "${cron.timezone}")
+            @Scheduled(cron = "${cron.yahoo.quotes.intraday.between10and16}", zone = "${cron.timezone}"),
+            @Scheduled(cron = "${cron.yahoo.quotes.intraday.between16and17}", zone = "${cron.timezone}")
     })
     public void yahooPricesIntraday() {
         callYahooPricesImport(INTRADAY_LOG_PREFIX);
