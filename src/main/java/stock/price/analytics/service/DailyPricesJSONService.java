@@ -176,9 +176,12 @@ public class DailyPricesJSONService {
         String key = dailyPriceJson.getCompositeId();
         if (recentJsonPricesById.containsKey(key)) {
             DailyPricesJSON dbDailyPriceJSON = recentJsonPricesById.get(key);
-            if (dailyPriceJson.getRegularMarketDayLow() > dbDailyPriceJSON.getRegularMarketDayLow() || dailyPriceJson.getRegularMarketDayHigh() < dbDailyPriceJSON.getRegularMarketDayHigh()) {
-                log.warn("Inconsistent high-low for {}", dailyPriceJson.getCompositeId());
-                return; // imported low cannot be greater than stored low, imported high cannot be smaller than stored high
+            if (dailyPriceJson.getRegularMarketDayHigh() < dbDailyPriceJSON.getRegularMarketDayHigh()) {
+                log.warn("{} inconsistent imported high {} vs stored {}", dailyPriceJson.getCompositeId(), dailyPriceJson.getRegularMarketDayHigh(), dbDailyPriceJSON.getRegularMarketDayHigh());
+                return; // imported high cannot be smaller than stored high
+            } else if (dailyPriceJson.getRegularMarketDayLow() > dbDailyPriceJSON.getRegularMarketDayLow()) {
+                log.warn("{} inconsistent imported low {} vs stored {}", dailyPriceJson.getCompositeId(), dailyPriceJson.getRegularMarketDayLow(), dbDailyPriceJSON.getRegularMarketDayLow());
+                return; // imported low cannot be greater than stored low
             }
             if (dailyPriceJson.getPreMarketPrice() != 0d || dbDailyPriceJSON.differentPrices(dailyPriceJson)) { // compare OHLC, performance, or if pre-market price
                 dailyJSONPrices.add(dbDailyPriceJSON.updateFrom(dailyPriceJson));
