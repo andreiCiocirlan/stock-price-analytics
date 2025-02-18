@@ -175,9 +175,13 @@ public class DailyPricesJSONService {
     private void compareAndAddToList(DailyPricesJSON dailyPriceJson, Map<String, DailyPricesJSON> recentJsonPricesById, List<DailyPricesJSON> dailyJSONPrices, List<String> sameDailyPrices, String ticker) {
         String key = dailyPriceJson.getCompositeId();
         if (recentJsonPricesById.containsKey(key)) {
-            DailyPricesJSON found = recentJsonPricesById.get(key);
-            if (dailyPriceJson.getPreMarketPrice() != 0d || found.differentPrices(dailyPriceJson)) { // compare OHLC, performance, or if pre-market price
-                dailyJSONPrices.add(found.updateFrom(dailyPriceJson));
+            DailyPricesJSON dbDailyPriceJSON = recentJsonPricesById.get(key);
+            if (dailyPriceJson.getRegularMarketDayLow() > dbDailyPriceJSON.getRegularMarketDayLow() || dailyPriceJson.getRegularMarketDayHigh() < dbDailyPriceJSON.getRegularMarketDayHigh()) {
+                log.warn("Inconsistent high-low for {}", dailyPriceJson.getCompositeId());
+                return; // imported low cannot be greater than stored low, imported high cannot be smaller than stored high
+            }
+            if (dailyPriceJson.getPreMarketPrice() != 0d || dbDailyPriceJSON.differentPrices(dailyPriceJson)) { // compare OHLC, performance, or if pre-market price
+                dailyJSONPrices.add(dbDailyPriceJSON.updateFrom(dailyPriceJson));
             } else {
                 sameDailyPrices.add(ticker);
             }
