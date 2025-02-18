@@ -30,6 +30,9 @@ public class EndOfDayScheduler {
         if (!pricesService.findWeeklyOpeningPriceDiscrepancies().isEmpty()) {
             desktopNotificationService.broadcastDesktopNotification("Weekly opening price discrepancies found, check logs!");
         }
+        if (!pricesService.findWeeklyHighLowPriceDiscrepancies().isEmpty()) {
+            desktopNotificationService.broadcastDesktopNotification("Weekly High-Low price discrepancies found, check logs!");
+        }
     }
 
 }
