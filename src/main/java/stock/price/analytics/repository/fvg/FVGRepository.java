@@ -18,9 +18,9 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
     List<FairValueGap> findByTimeframe(StockTimeframe timeframe);
 
     @Query(value = """
-            SELECT * FROM fvg WHERE timeframe = :timeframe AND status = 'OPEN';
+            SELECT * FROM fvg WHERE timeframe = :timeframe;
             """, nativeQuery = true)
-    List<FairValueGap> findByTimeframeAndStatusOpen(@Param(value = "timeframe") String timeframe);
+    List<FairValueGap> findByTimeframe(@Param(value = "timeframe") String timeframe);
 
     @Query(value = """
             WITH price_data AS (
