@@ -20,7 +20,7 @@ public interface PricesRepository extends JpaRepository<AbstractPrice, Long> {
                     ROW_NUMBER() OVER (PARTITION BY ticker, DATE_TRUNC('week', date) ORDER BY date) AS rn
                 FROM
                     daily_prices
-                WHERE date between '2022-01-01' and CURRENT_DATE
+                WHERE date >= date_trunc('week', CURRENT_DATE)
             ),
             m_daily as (
                 SELECT ticker, week_start, open
