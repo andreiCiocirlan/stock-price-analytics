@@ -175,11 +175,11 @@ public class FairValueGapService {
     }
 
     public void findNewFVGsAndSaveFor(StockTimeframe timeframe) {
-        if (timeframe == null) { // find new FVGs and save for all timeframes
-            for (StockTimeframe stockTimeframe : StockTimeframe.values()) {
-                partitionDataAndSaveWithLogTime(findNewFVGsFor(stockTimeframe), fvgRepository, "saved new FVGs for " + stockTimeframe);
-            }
-        } else {
+        partitionDataAndSaveWithLogTime(findNewFVGsFor(timeframe), fvgRepository, "saved new FVGs for " + timeframe);
+    }
+
+    public void findNewFVGsAndSaveForAllTimeframes() {
+        for (StockTimeframe timeframe : StockTimeframe.values()) {
             partitionDataAndSaveWithLogTime(findNewFVGsFor(timeframe), fvgRepository, "saved new FVGs for " + timeframe);
         }
     }

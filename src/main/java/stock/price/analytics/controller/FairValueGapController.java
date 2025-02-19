@@ -27,7 +27,11 @@ public class FairValueGapController {
     @PostMapping("/find-new-and-save")
     @ResponseStatus(HttpStatus.CREATED)
     public void findNewFVGsAndSaveFor(@RequestParam(value = "timeframe", required = false) StockTimeframe timeframe) {
-        fairValueGapService.findNewFVGsAndSaveFor(timeframe);
+        if (timeframe == null) { // find new FVGs and save for all timeframes
+            fairValueGapService.findNewFVGsAndSaveForAllTimeframes();
+        } else {
+            fairValueGapService.findNewFVGsAndSaveFor(timeframe);
+        }
     }
 
     @PostMapping("/save-new-and-update-hl-and-closed")
