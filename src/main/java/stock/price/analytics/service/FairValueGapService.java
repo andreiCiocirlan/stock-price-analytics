@@ -260,8 +260,13 @@ public class FairValueGapService {
         return new ArrayList<>(updatedFVGsByCompositeId.values());
     }
 
-    public void saveNewFVGsAndUpdateHighLowAndClosed() {
-        for (StockTimeframe timeframe : StockTimeframe.values()) {
+    public void saveNewFVGsAndUpdateHighLowAndClosed(StockTimeframe timeframe) {
+        if (timeframe == null) { // save new and update for all timeframes
+            for (StockTimeframe stockTimeframe : StockTimeframe.values()) {
+                findNewFVGsAndSaveFor(stockTimeframe);
+                updateFVGsHighLowAndClosedFor(stockTimeframe);
+            }
+        } else {
             findNewFVGsAndSaveFor(timeframe);
             updateFVGsHighLowAndClosedFor(timeframe);
         }

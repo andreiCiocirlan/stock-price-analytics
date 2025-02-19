@@ -23,7 +23,7 @@ public class IntradayScheduler {
 
     @Scheduled(cron = "${cron.intraday.fvg.update}", zone = "${cron.timezone}")
     public void updateFVGsAtIntraday() {
-        fairValueGapService.saveNewFVGsAndUpdateHighLowAndClosed();
+        fairValueGapService.saveNewFVGsAndUpdateHighLowAndClosed(null);
     }
 
     @Scheduled(cron = "${cron.intraday.fvg.tagged.95th.percentile.4w}", zone = "${cron.timezone}")
