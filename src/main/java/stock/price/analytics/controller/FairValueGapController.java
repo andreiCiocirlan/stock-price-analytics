@@ -56,12 +56,6 @@ public class FairValueGapController {
         fairValueGapService.updateFVGsHighLowAndClosedFor(timeframe);
     }
 
-    @PutMapping("/init-unfilled-gaps-hl1")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void initUnfilledGapsHighLow1(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
-        fairValueGapService.initUnfilledGapsHighLow1AndSave(timeframe);
-    }
-
     @PutMapping("/update-unfilled-gaps-hl-and-status")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateUnfilledGapsHighLowAndStatusBy(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
