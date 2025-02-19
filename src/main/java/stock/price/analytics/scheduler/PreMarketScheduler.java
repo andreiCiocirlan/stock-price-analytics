@@ -18,8 +18,8 @@ public class PreMarketScheduler {
     private final DesktopNotificationService desktopNotificationService;
 
     @Schedules({
-            @Scheduled(cron = "${cron.pre.market.between8and9}", zone = "${cron.timezone}"),
-            @Scheduled(cron = "${cron.pre.market.between9and915}", zone = "${cron.timezone}")
+            @Scheduled(cron = "${cron.pre.market.alert.between8and9}", zone = "${cron.timezone}"),
+            @Scheduled(cron = "${cron.pre.market.alert.between9and915}", zone = "${cron.timezone}")
     })
     public void alertPreMarketGaps_moreThan_10Percent() {
         priceMilestoneService.findTickersForMilestones(preMarketSchedulerValues(), CFD_MARGINS_5X_4X_3X)
