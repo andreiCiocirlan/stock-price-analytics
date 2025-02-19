@@ -33,7 +33,11 @@ public class FairValueGapController {
     @PostMapping("/save-new-and-update-hl-and-closed")
     @ResponseStatus(HttpStatus.CREATED)
     public void saveNewFVGsAndUpdateHighLowAndClosed(@RequestParam(value = "timeframe", required = false) StockTimeframe timeframe) {
-        fairValueGapService.saveNewFVGsAndUpdateHighLowAndClosed(timeframe);
+        if (timeframe == null) { // save new and update for all timeframes
+            fairValueGapService.saveNewFVGsAndUpdateHighLowAndClosedAllTimeframes();
+        } else {
+            fairValueGapService.saveNewFVGsAndUpdateHighLowAndClosedFor(timeframe);
+        }
     }
 
     @GetMapping("/find-update-high-low-and-closed")
