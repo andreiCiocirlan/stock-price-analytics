@@ -251,8 +251,7 @@ public class FairValueGapService {
 
      public void saveNewFVGsAndUpdateHighLowAndClosedAllTimeframes() {
         for (StockTimeframe timeframe : StockTimeframe.values()) {
-            findNewFVGsAndSaveFor(timeframe);
-            updateFVGsHighLowAndClosedFor(timeframe);
+            saveNewFVGsAndUpdateHighLowAndClosedFor(timeframe);
         }
     }
 
