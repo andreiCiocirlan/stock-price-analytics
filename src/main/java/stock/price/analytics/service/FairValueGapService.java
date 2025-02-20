@@ -205,7 +205,7 @@ public class FairValueGapService {
 
     @Transactional
     public void updateFVGsHighLowAndClosedFor(StockTimeframe timeframe) {
-        List<FairValueGap> updatedFVGs = logTimeAndReturn(() -> findUpdatedFVGsHighLowAndClosedFor(timeframe), "Found " + timeframe + " FVGs to be updated");
+        List<FairValueGap> updatedFVGs = logTimeAndReturn(() -> findUpdatedFVGsHighLowAndClosedFor(timeframe), "Searching " + timeframe + " FVGs to be updated");
         if (!updatedFVGs.isEmpty()) {
             partitionDataAndSaveWithLogTime(updatedFVGs, fvgRepository, "updated " + updatedFVGs.size() + " FVGs for " + timeframe);
         }
