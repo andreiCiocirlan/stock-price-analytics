@@ -60,9 +60,4 @@ public class FairValueGapController {
         }
     }
 
-    @PutMapping("/update-unfilled-gaps-hl-and-status")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateUnfilledGapsHighLowAndStatusBy(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
-        fairValueGapService.updateUnfilledGapsHighLowAndStatusBy(timeframe);
-    }
 }
