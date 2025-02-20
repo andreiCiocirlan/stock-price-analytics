@@ -164,7 +164,10 @@ public class FairValueGapService {
     }
 
     public void findNewFVGsAndSaveFor(StockTimeframe timeframe) {
-        partitionDataAndSaveWithLogTime(findNewFVGsFor(timeframe), fvgRepository, "saved new FVGs for " + timeframe);
+        List<FairValueGap> newFVGs = logTimeAndReturn(() -> findNewFVGsFor(timeframe), "searching new " + timeframe + " FVGs");
+        if (!newFVGs.isEmpty()) {
+            partitionDataAndSaveWithLogTime(newFVGs, fvgRepository, "saved new FVGs for " + timeframe);
+        }
     }
 
     public void findNewFVGsAndSaveForAllTimeframes() {
@@ -191,6 +194,8 @@ public class FairValueGapService {
         });
         if (!newFVGsFound.isEmpty()) {
             log.info("Found {} new {} FVGs for: {}", newFVGsFound.size(), timeframe, newFvgTickers);
+        } else {
+            log.info("Found 0 new {} FVGs", timeframe);
         }
 
         return newFVGsFound;
