@@ -195,16 +195,16 @@ public class FairValueGapService {
     }
 
     @Transactional
-    public void updateFVGsHighLowAndClosedFor(StockTimeframe timeframe) {
-        if (timeframe == null) { // update closed for all timeframes
-            for (StockTimeframe stockTimeframe : StockTimeframe.values()) {
-                List<FairValueGap> updatedFVGs = logTimeAndReturn(() -> findUpdatedFVGsHighLowAndClosedFor(stockTimeframe), "Found " + stockTimeframe + " FVGs to be updated");
-                partitionDataAndSaveWithLogTime(updatedFVGs, fvgRepository, "updated " + updatedFVGs.size() + " FVGs for " + stockTimeframe);
-            }
-        } else {
-            List<FairValueGap> updatedFVGs = logTimeAndReturn(() -> findUpdatedFVGsHighLowAndClosedFor(timeframe), "Found " + timeframe + " FVGs to be updated");
-            partitionDataAndSaveWithLogTime(updatedFVGs, fvgRepository, "updated " + updatedFVGs.size() + " FVGs for " + timeframe);
+    public void updateFVGsHighLowAndClosedForAllTimeframes() {
+        for (StockTimeframe timeframe : StockTimeframe.values()) {
+            updateFVGsHighLowAndClosedFor(timeframe);
         }
+    }
+
+    @Transactional
+    public void updateFVGsHighLowAndClosedFor(StockTimeframe timeframe) {
+        List<FairValueGap> updatedFVGs = logTimeAndReturn(() -> findUpdatedFVGsHighLowAndClosedFor(timeframe), "Found " + timeframe + " FVGs to be updated");
+        partitionDataAndSaveWithLogTime(updatedFVGs, fvgRepository, "updated " + updatedFVGs.size() + " FVGs for " + timeframe);
     }
 
     public List<FairValueGap> findUpdatedFVGsHighLowAndClosedFor(StockTimeframe timeframe) {

@@ -53,7 +53,11 @@ public class FairValueGapController {
     @PutMapping("/update-high-low-and-closed")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void updateFVGsHighLowAndClosedFor(@RequestParam(value = "timeframe", required = false) StockTimeframe timeframe) {
-        fairValueGapService.updateFVGsHighLowAndClosedFor(timeframe);
+        if (timeframe == null) { // update closed for all timeframes
+            fairValueGapService.updateFVGsHighLowAndClosedForAllTimeframes();
+        } else {
+            fairValueGapService.updateFVGsHighLowAndClosedFor(timeframe);
+        }
     }
 
     @PutMapping("/update-unfilled-gaps-hl-and-status")
