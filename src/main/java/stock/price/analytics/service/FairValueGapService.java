@@ -232,7 +232,10 @@ public class FairValueGapService {
                 }
             }
         });
-        log.info("updated high-low for recent {} FVGs : {} ", timeframe, updatedHighLowTickers);
+
+        if (!updatedHighLowTickers.isEmpty()) {
+            log.info("updated high-low for recent {} FVGs : {} ", timeframe, updatedHighLowTickers);
+        }
 
         updatedFVGsByCompositeId.forEach((compositeKey, fvg) -> {
             if (pricesByTicker.containsKey(fvg.getTicker()) && updateUnfilledGapsHighLowAndStatus(fvg, pricesByTicker.get(fvg.getTicker()))) {
