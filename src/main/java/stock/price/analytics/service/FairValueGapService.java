@@ -169,7 +169,7 @@ public class FairValueGapService {
 
     public void findNewFVGsAndSaveForAllTimeframes() {
         for (StockTimeframe timeframe : StockTimeframe.values()) {
-            partitionDataAndSaveWithLogTime(findNewFVGsFor(timeframe), fvgRepository, "saved new FVGs for " + timeframe);
+            findNewFVGsAndSaveFor(timeframe);
         }
     }
 
