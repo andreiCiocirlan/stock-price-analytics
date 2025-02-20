@@ -206,7 +206,9 @@ public class FairValueGapService {
     @Transactional
     public void updateFVGsHighLowAndClosedFor(StockTimeframe timeframe) {
         List<FairValueGap> updatedFVGs = logTimeAndReturn(() -> findUpdatedFVGsHighLowAndClosedFor(timeframe), "Found " + timeframe + " FVGs to be updated");
-        partitionDataAndSaveWithLogTime(updatedFVGs, fvgRepository, "updated " + updatedFVGs.size() + " FVGs for " + timeframe);
+        if (!updatedFVGs.isEmpty()) {
+            partitionDataAndSaveWithLogTime(updatedFVGs, fvgRepository, "updated " + updatedFVGs.size() + " FVGs for " + timeframe);
+        }
     }
 
     public List<FairValueGap> findUpdatedFVGsHighLowAndClosedFor(StockTimeframe timeframe) {
@@ -250,6 +252,10 @@ public class FairValueGapService {
                 updatedFVGsByCompositeId.put(compositeKey, fvg);
             }
         });
+
+        if (updatedFVGsByCompositeId.values().isEmpty()) {
+            log.info("Found 0 {} FVGs to be updated", timeframe);
+        }
 
         return new ArrayList<>(updatedFVGsByCompositeId.values());
     }
