@@ -28,11 +28,7 @@ public class IntradayScheduler {
 
     @Scheduled(cron = "${cron.intraday.fvg.tagged.95th.percentile}", zone = "${cron.timezone}")
     public void alertFVGsTagged95thPercentile() {
-        alertFVGsTaggedBy(List.of(HIGH_4W_95, LOW_4W_95, HIGH_52W_95, LOW_52W_95, HIGH_ALL_TIME_95, LOW_ALL_TIME_95));
-    }
-
-    private void alertFVGsTaggedBy(List<PricePerformanceMilestone> pricePerformanceMilestones) {
-        for (PricePerformanceMilestone priceMilestone : pricePerformanceMilestones) {
+        for (PricePerformanceMilestone priceMilestone : List.of(HIGH_4W_95, LOW_4W_95, HIGH_52W_95, LOW_52W_95, HIGH_ALL_TIME_95, LOW_ALL_TIME_95)) {
             desktopNotificationService.broadcastDesktopNotification(alertPrefixFrom(priceMilestone) + fvgTaggedService.findWeeklyTaggedFVGsBy(priceMilestone, CFD_MARGINS_5X_4X));
         }
     }
