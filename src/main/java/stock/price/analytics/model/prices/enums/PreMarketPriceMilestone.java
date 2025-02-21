@@ -2,7 +2,7 @@ package stock.price.analytics.model.prices.enums;
 
 import java.util.List;
 
-public enum PreMarketPriceMilestone implements PriceMiestone {
+public enum PreMarketPriceMilestone implements PriceMilestone {
     GAP_UP {
         @Override
         public String toString() {
@@ -58,7 +58,7 @@ public enum PreMarketPriceMilestone implements PriceMiestone {
         }
     };
 
-    public static List<PriceMiestone> preMarketSchedulerValues() {
+    public static List<PriceMilestone> preMarketSchedulerValues() {
         return List.of(KICKING_CANDLE_UP, KICKING_CANDLE_DOWN, GAP_UP_AND_GO, GAP_DOWN_AND_GO, GAP_UP_10_PERCENT, GAP_DOWN_10_PERCENT);
     }
 }

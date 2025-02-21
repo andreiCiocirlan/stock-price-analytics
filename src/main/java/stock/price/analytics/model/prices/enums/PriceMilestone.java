@@ -1,5 +1,5 @@
 package stock.price.analytics.model.prices.enums;
 
-public interface PriceMiestone {
+public interface PriceMilestone {
     String name();
 }
