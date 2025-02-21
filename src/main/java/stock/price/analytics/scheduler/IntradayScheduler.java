@@ -26,19 +26,9 @@ public class IntradayScheduler {
         fairValueGapService.saveNewFVGsAndUpdateHighLowAndClosedAllTimeframes();
     }
 
-    @Scheduled(cron = "${cron.intraday.fvg.tagged.95th.percentile.4w}", zone = "${cron.timezone}")
-    public void alertFVGsTagged95thPercentile4w() {
-        alertFVGsTaggedBy(List.of(HIGH_4W_95, LOW_4W_95));
-    }
-
-    @Scheduled(cron = "${cron.intraday.fvg.tagged.95th.percentile.52w}", zone = "${cron.timezone}")
-    public void alertFVGsTagged95thPercentile52w() {
-        alertFVGsTaggedBy(List.of(HIGH_52W_95, LOW_52W_95));
-    }
-
-    @Scheduled(cron = "${cron.intraday.fvg.tagged.95th.percentile.ath}", zone = "${cron.timezone}")
-    public void alertFVGsTagged95thPercentileATH() {
-        alertFVGsTaggedBy(List.of(HIGH_ALL_TIME_95, LOW_ALL_TIME_95));
+    @Scheduled(cron = "${cron.intraday.fvg.tagged.95th.percentile}", zone = "${cron.timezone}")
+    public void alertFVGsTagged95thPercentile() {
+        alertFVGsTaggedBy(List.of(HIGH_4W_95, LOW_4W_95, HIGH_52W_95, LOW_52W_95, HIGH_ALL_TIME_95, LOW_ALL_TIME_95));
     }
 
     private void alertFVGsTaggedBy(List<PricePerformanceMilestone> pricePerformanceMilestones) {
