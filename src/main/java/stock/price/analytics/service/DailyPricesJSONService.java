@@ -30,6 +30,8 @@ import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 @RequiredArgsConstructor
 public class DailyPricesJSONService {
 
+    private static final List<String> inconsistentHighs = new ArrayList<>();
+    private static final List<String> inconsistentLows = new ArrayList<>();
     private final DailyPricesJSONCacheService dailyPricesJSONCacheService;
     private final DailyPricesService dailyPricesService;
     private final DailyPricesJSONRepository dailyPricesJSONRepository;
@@ -84,6 +86,8 @@ public class DailyPricesJSONService {
             }
             compareAndAddToList(dailyPriceJson, recentJsonPricesById, dailyJSONPrices, sameDailyPrices, ticker);
         }
+
+        logInconsistentHighLowImportedPrices();
 
         if (!sameDailyPrices.isEmpty()) {
             log.warn("same {} daily prices as in DB", sameDailyPrices.size());
@@ -177,10 +181,10 @@ public class DailyPricesJSONService {
         if (recentJsonPricesById.containsKey(key)) {
             DailyPricesJSON dbDailyPriceJSON = recentJsonPricesById.get(key);
             if (dailyPriceJson.getRegularMarketDayHigh() < dbDailyPriceJSON.getRegularMarketDayHigh()) {
-                log.warn("{} inconsistent imported high {} vs stored {}", dailyPriceJson.getCompositeId(), dailyPriceJson.getRegularMarketDayHigh(), dbDailyPriceJSON.getRegularMarketDayHigh());
+                inconsistentLows.add(dailyPriceJson.getSymbol());
                 return; // imported high cannot be smaller than stored high
             } else if (dailyPriceJson.getRegularMarketDayLow() > dbDailyPriceJSON.getRegularMarketDayLow()) {
-                log.warn("{} inconsistent imported low {} vs stored {}", dailyPriceJson.getCompositeId(), dailyPriceJson.getRegularMarketDayLow(), dbDailyPriceJSON.getRegularMarketDayLow());
+                inconsistentHighs.add(dailyPriceJson.getSymbol());
                 return; // imported low cannot be greater than stored low
             }
             if (dailyPriceJson.getPreMarketPrice() != 0d || dbDailyPriceJSON.differentPrices(dailyPriceJson)) { // compare OHLC, performance, or if pre-market price
@@ -238,4 +242,12 @@ public class DailyPricesJSONService {
         dailyPricesJSONCacheService.initDailyJSONPricesCache(dailyPricesJSONRepository.findByDateBetween(tradingDateNow.minusDays(7), tradingDateNow));
     }
 
+    private void logInconsistentHighLowImportedPrices() {
+        if (!inconsistentHighs.isEmpty()) {
+            log.warn("Inconsistent imported highs for {}", inconsistentHighs);
+        }
+        if (!inconsistentLows.isEmpty()) {
+            log.warn("Inconsistent imported lows for {}", inconsistentLows);
+        }
+    }
 }
