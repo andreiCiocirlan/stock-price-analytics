@@ -110,4 +110,14 @@ public enum StockTimeframe {
 
         return timeframes.stream().toList();
     }
+
+    public String stockPrefix() {
+        return switch (this) {
+            case DAILY -> "d_";
+            case WEEKLY -> "w_";
+            case MONTHLY -> "m_";
+            case QUARTERLY -> "q_";
+            case YEARLY -> "y_";
+        };
+    }
 }
