@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.MutablePair;
 import org.springframework.format.annotation.DateTimeFormat;
 import stock.price.analytics.model.prices.PriceEntity;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
@@ -44,8 +45,9 @@ public abstract class HighLowForPeriod implements PriceEntity {
         this.endDate = endDate;
     }
 
-    public boolean newHighLow(DailyPrice dailyPriceImported) {
+    public MutablePair<Boolean, Boolean> newHighLowOrEqual(DailyPrice dailyPriceImported) {
         boolean newHighLowFound = false;
+        boolean equalHighLowFound = false;
 
         startDate = dailyPriceImported.getDate().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         endDate = dailyPriceImported.getDate().with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
@@ -53,16 +55,16 @@ public abstract class HighLowForPeriod implements PriceEntity {
             this.setHigh(dailyPriceImported.getHigh());
             newHighLowFound = true;
         } else if (dailyPriceImported.getClose() == this.getHigh()) {
-            log.info("Equal {} high for {}: {}", getHighLowPeriod(), dailyPriceImported.getTicker(), dailyPriceImported.getClose());
+            equalHighLowFound = true;
         }
         if (dailyPriceImported.getLow() < this.getLow()) {
             this.setLow(dailyPriceImported.getLow());
             newHighLowFound = true;
         } else if (dailyPriceImported.getClose() == this.getLow()) {
-            log.info("Equal {} low for {}: {}", getHighLowPeriod(), dailyPriceImported.getTicker(), dailyPriceImported.getClose());
+            equalHighLowFound = true;
         }
 
-        return newHighLowFound;
+        return new MutablePair<>(newHighLowFound, equalHighLowFound);
     }
 
     public abstract void setLow(double low);

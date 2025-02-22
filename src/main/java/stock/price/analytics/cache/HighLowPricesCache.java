@@ -1,6 +1,7 @@
 package stock.price.analytics.cache;
 
 import lombok.Getter;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
@@ -24,6 +25,8 @@ public class HighLowPricesCache {
     private final Map<String, HighestLowestPrices> prevWeekHighestLowestMap = new HashMap<>();
     @Getter
     private final Map<HighLowPeriod, Set<String>> dailyNewHighLowsByHLPeriod = new HashMap<>();
+    @Getter
+    private final Map<HighLowPeriod, Set<String>> dailyEqualHighLowsByHLPeriod = new HashMap<>();
 
     public void addPrevWeekHighLowPrices(List<? extends HighLowForPeriod> prevWeekHighLowPrices, HighLowPeriod highLowPeriod) {
         switch (highLowPeriod) {
@@ -81,19 +84,25 @@ public class HighLowPricesCache {
             case HIGH_LOW_52W -> highLow52wMap;
             case HIGH_LOW_ALL_TIME -> highestLowestMap;
         };
-        List<? extends HighLowForPeriod> updatedHighLowPrices = tickers.stream()
+        return tickers.stream()
                 .flatMap(ticker -> highLowPrices.entrySet().stream()
                         .filter(entry -> entry.getKey().equals(ticker))
                         .map(Map.Entry::getValue)
-                        .filter(hlp -> hlp.newHighLow(dailyPricesByTicker.get(ticker))) // the method also assigns new high/low price not just return true/false
+                        .filter(hlp -> isNewHighLowOrEqualFor(ticker, hlp, dailyPricesByTicker))
                 ).collect(Collectors.toList());
+    }
 
-        // add new highs and lows for 4w, 52w, all-time into cache (to be printed on-demand)
-        for (HighLowForPeriod newHighLowPrice : updatedHighLowPrices) {
-            dailyNewHighLowsByHLPeriod.computeIfAbsent(newHighLowPrice.getHighLowPeriod(), _ -> new HashSet<>()).add(newHighLowPrice.getTicker());
+    private boolean isNewHighLowOrEqualFor(String ticker, HighLowForPeriod hlp, Map<String, DailyPrice> dailyPricesByTicker) {
+        Pair<Boolean, Boolean> newHighLowOrEqual = hlp.newHighLowOrEqual(dailyPricesByTicker.get(ticker)); // this also assigns new high/low price not just return true/false
+        boolean isNewHighLow = newHighLowOrEqual.getLeft();
+        boolean isEqualHighLow = newHighLowOrEqual.getRight();
+        if (isNewHighLow) {
+            dailyNewHighLowsByHLPeriod.computeIfAbsent(hlp.getHighLowPeriod(), _ -> new HashSet<>()).add(hlp.getTicker());
         }
-
-        return updatedHighLowPrices;
+        if (isEqualHighLow) {
+            dailyEqualHighLowsByHLPeriod.computeIfAbsent(hlp.getHighLowPeriod(), _ -> new HashSet<>()).add(hlp.getTicker());
+        }
+        return isNewHighLow;
     }
 
     public List<? extends HighLowForPeriod> cacheForHighLowPeriod(HighLowPeriod highLowPeriod) {
