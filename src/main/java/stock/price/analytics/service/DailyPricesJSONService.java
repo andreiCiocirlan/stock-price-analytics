@@ -176,25 +176,25 @@ public class DailyPricesJSONService {
         return dailyJSONPrices;
     }
 
-    private void compareAndAddToList(DailyPricesJSON dailyPriceJson, Map<String, DailyPricesJSON> recentJsonPricesById, List<DailyPricesJSON> dailyJSONPrices, List<String> sameDailyPrices, String ticker) {
-        String key = dailyPriceJson.getCompositeId();
+    private void compareAndAddToList(DailyPricesJSON importedDailyPriceJSON, Map<String, DailyPricesJSON> recentJsonPricesById, List<DailyPricesJSON> dailyJSONPrices, List<String> sameDailyPrices, String ticker) {
+        String key = importedDailyPriceJSON.getCompositeId();
         if (recentJsonPricesById.containsKey(key)) {
-            DailyPricesJSON dbDailyPriceJSON = recentJsonPricesById.get(key);
-            if (dailyPriceJson.getRegularMarketDayHigh() < dbDailyPriceJSON.getRegularMarketDayHigh()) {
-                inconsistentLows.add(dailyPriceJson.getSymbol());
-                dailyPriceJson.setRegularMarketDayHigh(dbDailyPriceJSON.getRegularMarketDayHigh());
+            DailyPricesJSON storedDailyPriceJSON = recentJsonPricesById.get(key);
+            if (importedDailyPriceJSON.getRegularMarketDayHigh() < storedDailyPriceJSON.getRegularMarketDayHigh()) {
+                inconsistentLows.add(importedDailyPriceJSON.getSymbol());
+                importedDailyPriceJSON.setRegularMarketDayHigh(storedDailyPriceJSON.getRegularMarketDayHigh());
             }
-            if (dailyPriceJson.getRegularMarketDayLow() > dbDailyPriceJSON.getRegularMarketDayLow()) {
-                inconsistentHighs.add(dailyPriceJson.getSymbol());
-                dailyPriceJson.setRegularMarketDayLow(dbDailyPriceJSON.getRegularMarketDayLow());
+            if (importedDailyPriceJSON.getRegularMarketDayLow() > storedDailyPriceJSON.getRegularMarketDayLow()) {
+                inconsistentHighs.add(importedDailyPriceJSON.getSymbol());
+                importedDailyPriceJSON.setRegularMarketDayLow(storedDailyPriceJSON.getRegularMarketDayLow());
             }
-            if (dailyPriceJson.getPreMarketPrice() != 0d || dbDailyPriceJSON.differentPrices(dailyPriceJson)) { // compare OHLC, performance, or if pre-market price
-                dailyJSONPrices.add(dbDailyPriceJSON.updateFrom(dailyPriceJson));
+            if (importedDailyPriceJSON.getPreMarketPrice() != 0d || storedDailyPriceJSON.differentPrices(importedDailyPriceJSON)) { // compare OHLC, performance, or if pre-market price
+                dailyJSONPrices.add(storedDailyPriceJSON.updateFrom(importedDailyPriceJSON));
             } else {
                 sameDailyPrices.add(ticker);
             }
         } else {
-            dailyJSONPrices.add(dailyPriceJson);
+            dailyJSONPrices.add(importedDailyPriceJSON);
         }
     }
 
