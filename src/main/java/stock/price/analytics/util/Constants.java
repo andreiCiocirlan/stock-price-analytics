@@ -11,12 +11,9 @@ public class Constants {
     public static final String TIMEFRAME_PATTERN = "^(DAILY|WEEKLY|MONTHLY|YEARLY)$";
     public static final String HIGHER_TIMEFRAMES_PATTERN = "^[WMQYwmqy]{1,4}$";
     public static final int MAX_TICKER_COUNT_PRINT = 100;
-    public static final String BEARISH_FVG_95TH_PERCENTILE_4W = "Bearish FVG 95% 4w:";
-    public static final String BEARISH_FVG_95TH_PERCENTILE_52W = "Bearish FVG 95% 52w:";
-    public static final String BEARISH_FVG_95TH_PERCENTILE_ATH = "Bearish FVG 95% ATH:";
-    public static final String BULLISH_FVG_95TH_PERCENTILE_4W = "Bullish FVG 95% 4w:";
-    public static final String BULLISH_FVG_95TH_PERCENTILE_52W = "Bullish FVG 95% 52w:";
-    public static final String BULLISH_FVG_95TH_PERCENTILE_ATL = "Bullish FVG 95% ATL:";
+    public static final String FVG_95TH_PERCENTILE_4W = "95% 4w";
+    public static final String FVG_95TH_PERCENTILE_52W = "95% 52w";
+    public static final String FVG_95TH_PERCENTILE_ALL_TIME = "95% All-Time";
     public static final LocalDate DAILY_FVG_MIN_DATE = LocalDate.of(2022, 1, 31);
     public static final List<Double> CFD_MARGINS_5X = List.of(0.2);
     public static final List<Double> CFD_MARGINS_5X_4X = List.of(0.2, 0.25);
