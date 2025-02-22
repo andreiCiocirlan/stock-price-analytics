@@ -24,14 +24,14 @@ public class DailyPricesCacheService {
     private final DailyPricesCache dailyPricesCache;
     private final DailyPricesJSONCache dailyPricesJSONCache;
 
-    protected void initDailyPricesCache(List<DailyPrice> latestDailyPrices) {
+    void initDailyPricesCache(List<DailyPrice> latestDailyPrices) {
         dailyPricesCache.addDailyPrices(latestDailyPrices, REGULAR);
     }
-    protected void initPreviousDayPricesCache(List<DailyPrice> previousDayPrices) {
+    void initPreviousDayPricesCache(List<DailyPrice> previousDayPrices) {
         dailyPricesCache.addPreviousDayPrices(previousDayPrices);
     }
 
-    protected void initPreMarketDailyPricesCache() {
+    void initPreMarketDailyPricesCache() {
         Map<String, List<DailyPricesJSON>> dailyPricesJSONByTicker = dailyPricesJSONCache.getDailyPricesJSONByTicker().values().stream()
                 .sorted(Comparator.comparing(DailyPricesJSON::getDate).reversed()) // order by date desc
                 .collect(Collectors.groupingBy(DailyPricesJSON::getSymbol));
@@ -47,19 +47,19 @@ public class DailyPricesCacheService {
         addPreMarketDailyPricesInCache(latestPreMarketDailyPrices);
     }
 
-    protected List<DailyPrice> addDailyPricesInCacheAndReturn(List<DailyPrice> dailyPrices) {
+    List<DailyPrice> addDailyPricesInCacheAndReturn(List<DailyPrice> dailyPrices) {
         return dailyPricesCache.addDailyPricesInCacheAndReturn(dailyPrices);
     }
 
-    protected List<DailyPrice> dailyPricesCache(MarketState marketState) {
+    List<DailyPrice> dailyPricesCache(MarketState marketState) {
         return dailyPricesCache.dailyPrices(marketState);
     }
 
-    protected List<DailyPrice> previousDailyPrices() {
+    List<DailyPrice> previousDailyPrices() {
         return dailyPricesCache.previousDailyPrices();
     }
 
-    protected void addPreMarketDailyPricesInCache(List<DailyPrice> preMarketDailyPrices) {
+    void addPreMarketDailyPricesInCache(List<DailyPrice> preMarketDailyPrices) {
         dailyPricesCache.addDailyPrices(preMarketDailyPrices, PRE);
     }
 }

@@ -13,15 +13,15 @@ public class DailyPricesJSONCacheService {
 
     private final DailyPricesJSONCache dailyPricesJSONCache;
 
-    protected void initDailyJSONPricesCache(List<DailyPricesJSON> latestDailyPricesJSON) {
+    void initDailyJSONPricesCache(List<DailyPricesJSON> latestDailyPricesJSON) {
         dailyPricesJSONCache.addDailyJSONPrices(latestDailyPricesJSON);
     }
 
-    protected List<DailyPricesJSON> addDailyPricesJSONInCacheAndReturn(List<DailyPricesJSON> dailyPricesJSON) {
+    List<DailyPricesJSON> addDailyPricesJSONInCacheAndReturn(List<DailyPricesJSON> dailyPricesJSON) {
         return dailyPricesJSONCache.addDailyPricesJSONInCacheAndReturn(dailyPricesJSON);
     }
 
-    protected List<DailyPricesJSON> dailyPricesJSONCache() {
+    List<DailyPricesJSON> dailyPricesJSONCache() {
         return dailyPricesJSONCache.getDailyPricesJSONByTicker().values().stream().toList();
     }
 
