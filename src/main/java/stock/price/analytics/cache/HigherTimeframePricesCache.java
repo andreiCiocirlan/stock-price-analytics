@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Getter
-public class HigherTimeframePricesCache {
+class HigherTimeframePricesCache {
 
     private final Map<String, WeeklyPrice> weeklyPricesByTickerAndDate = new HashMap<>();
     private final Map<String, MonthlyPrice> monthlyPricesByTickerAndDate = new HashMap<>();

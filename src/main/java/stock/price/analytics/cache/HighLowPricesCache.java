@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-public class HighLowPricesCache {
+class HighLowPricesCache {
 
     private final Map<String, HighLow4w> highLow4wMap = new HashMap<>();
     private final Map<String, HighLow52Week> highLow52wMap = new HashMap<>();

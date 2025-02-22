@@ -16,7 +16,7 @@ import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
 
 @Slf4j
 @Component
-public class DailyPricesCache {
+class DailyPricesCache {
 
     private final List<String> inconsistentLows = new ArrayList<>();
     private final List<String> inconsistentHighs = new ArrayList<>();
