@@ -48,6 +48,7 @@ public class HighLowForPeriodService {
     private final EntityManager entityManager;
     private final HighLowForPeriodRepository highLowForPeriodRepository;
     private final HighLowPricesCache highLowPricesCache;
+    private final HighLowPricesCacheService highLowPricesCacheService;
 
     @Transactional
     public void saveHighLowPricesForPeriod(StockPerformanceInterval stockPerformanceInterval) {
@@ -75,6 +76,8 @@ public class HighLowForPeriodService {
         List<String> tickers = dailyPrices.stream().map(DailyPrice::getTicker).toList();
         for (HighLowPeriod highLowPeriod : values()) {
             List<? extends HighLowForPeriod> hlPricesUpdated = highLowPricesCache.getUpdatedHighLowPricesForTickers(dailyPrices, tickers, highLowPeriod);
+            highLowPricesCacheService.logNewHighLowsForHLPeriods();
+            highLowPricesCacheService.logEqualHighLowsForHLPeriods();
             if (!hlPricesUpdated.isEmpty()) {
                 log.info("found {} new {} prices {}", hlPricesUpdated.size(), highLowPeriod, hlPricesUpdated.stream().map(HighLowForPeriod::getTicker).toList());
                 partitionDataAndSaveNoLogging(hlPricesUpdated, highLowForPeriodRepository);
