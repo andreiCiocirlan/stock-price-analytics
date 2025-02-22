@@ -182,10 +182,11 @@ public class DailyPricesJSONService {
             DailyPricesJSON dbDailyPriceJSON = recentJsonPricesById.get(key);
             if (dailyPriceJson.getRegularMarketDayHigh() < dbDailyPriceJSON.getRegularMarketDayHigh()) {
                 inconsistentLows.add(dailyPriceJson.getSymbol());
-                return; // imported high cannot be smaller than stored high
-            } else if (dailyPriceJson.getRegularMarketDayLow() > dbDailyPriceJSON.getRegularMarketDayLow()) {
+                dailyPriceJson.setRegularMarketDayHigh(dbDailyPriceJSON.getRegularMarketDayHigh());
+            }
+            if (dailyPriceJson.getRegularMarketDayLow() > dbDailyPriceJSON.getRegularMarketDayLow()) {
                 inconsistentHighs.add(dailyPriceJson.getSymbol());
-                return; // imported low cannot be greater than stored low
+                dailyPriceJson.setRegularMarketDayLow(dbDailyPriceJSON.getRegularMarketDayLow());
             }
             if (dailyPriceJson.getPreMarketPrice() != 0d || dbDailyPriceJSON.differentPrices(dailyPriceJson)) { // compare OHLC, performance, or if pre-market price
                 dailyJSONPrices.add(dbDailyPriceJSON.updateFrom(dailyPriceJson));
