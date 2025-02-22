@@ -185,11 +185,11 @@ public class DailyPricesJSONService {
         String key = importedDailyPriceJSON.getCompositeId();
         if (recentJsonPricesById.containsKey(key)) {
             DailyPricesJSON storedDailyPriceJSON = recentJsonPricesById.get(key);
-            Pair<Double, Double> highLowPair = getHighLowImportedPrices(importedDailyPriceJSON, storedDailyPriceJSON);
+            Pair<Double, Double> highLowPrices = getHighLowImportedPrices(importedDailyPriceJSON, storedDailyPriceJSON);
             if (importedDailyPriceJSON.getPreMarketPrice() != 0d || storedDailyPriceJSON.differentPrices(importedDailyPriceJSON)) { // compare OHLC, performance, or if pre-market price
                 DailyPricesJSON updatedPrice = storedDailyPriceJSON.updateFrom(importedDailyPriceJSON);
-                updatedPrice.setRegularMarketDayHigh(highLowPair.getLeft());
-                updatedPrice.setRegularMarketDayLow(highLowPair.getRight());
+                updatedPrice.setRegularMarketDayHigh(highLowPrices.getLeft());
+                updatedPrice.setRegularMarketDayLow(highLowPrices.getRight());
                 dailyJSONPrices.add(updatedPrice);
             } else {
                 sameDailyPrices.add(ticker);
