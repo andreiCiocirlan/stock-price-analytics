@@ -59,7 +59,7 @@ public class DailyPricesCacheService {
         return dailyPricesCache.previousDailyPrices();
     }
 
-    void addPreMarketDailyPricesInCache(List<DailyPrice> preMarketDailyPrices) {
+    public void addPreMarketDailyPricesInCache(List<DailyPrice> preMarketDailyPrices) {
         dailyPricesCache.addDailyPrices(preMarketDailyPrices, PRE);
     }
 }
