@@ -168,4 +168,8 @@ public class StockService {
         stockRepository.updateHighLow52wPricesFor(ticker);
         stockRepository.updateHighestLowestPricesFor(ticker);
     }
+
+    public Collection<Stock> getCachedStocks() {
+        return stocksCache.getStocksMap().values();
+    }
 }
