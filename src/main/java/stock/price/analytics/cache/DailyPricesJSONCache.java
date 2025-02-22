@@ -16,11 +16,11 @@ public class DailyPricesJSONCache {
 
     private final Map<String, DailyPricesJSON> dailyPricesJSONByTicker = new HashMap<>();
 
-    public void addDailyJSONPrices(List<DailyPricesJSON> dailyPricesJSON) {
+    void addDailyJSONPrices(List<DailyPricesJSON> dailyPricesJSON) {
         dailyPricesJSON.forEach(price -> dailyPricesJSONByTicker.put(createKey(price.getSymbol(), price.getDate()), price));
     }
 
-    public List<DailyPricesJSON> addDailyPricesJSONInCacheAndReturn(List<DailyPricesJSON> dailyPrices) {
+    List<DailyPricesJSON> addDailyPricesJSONInCacheAndReturn(List<DailyPricesJSON> dailyPrices) {
         List<DailyPricesJSON> addedPrices = new ArrayList<>();
         dailyPrices.forEach(price -> addToMap(price, addedPrices));
         return addedPrices;

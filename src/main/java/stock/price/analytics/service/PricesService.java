@@ -7,7 +7,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import stock.price.analytics.cache.DailyPricesCache;
+import stock.price.analytics.cache.DailyPricesCacheService;
 import stock.price.analytics.cache.HigherTimeframePricesCache;
 import stock.price.analytics.controller.dto.CandleWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
@@ -43,11 +43,11 @@ public class PricesService {
     private final QuarterlyPricesRepository quarterlyPricesRepository;
     private final YearlyPricesRepository yearlyPricesRepository;
     private final HigherTimeframePricesCache higherTimeframePricesCache;
-    private final DailyPricesCache dailyPricesCache;
+    private final DailyPricesCacheService dailyPricesCacheService;
 
     public List<AbstractPrice> currentCachePricesFor(StockTimeframe timeframe) {
         List<AbstractPrice> htfPricesUpdated = new ArrayList<>(switch (timeframe) {
-            case DAILY -> new ArrayList<>(dailyPricesCache.dailyPrices(REGULAR));
+            case DAILY -> new ArrayList<>(dailyPricesCacheService.dailyPricesCache(REGULAR));
             case WEEKLY -> new ArrayList<>(higherTimeframePricesCache.getWeeklyPricesByTickerAndDate().values());
             case MONTHLY -> new ArrayList<>(higherTimeframePricesCache.getMonthlyPricesByTickerAndDate().values());
             case QUARTERLY -> new ArrayList<>(higherTimeframePricesCache.getQuarterlyPricesByTickerAndDate().values());

@@ -24,7 +24,7 @@ public class DailyPricesCache {
     private final Map<String, DailyPrice> dailyPricesByTicker = new HashMap<>();
     private final Map<String, DailyPrice> previousDayPricesByTicker = new HashMap<>();
 
-    public void addDailyPrices(List<DailyPrice> dailyPrices, MarketState marketState) {
+    void addDailyPrices(List<DailyPrice> dailyPrices, MarketState marketState) {
         if (PRE == marketState) {
             dailyPrices.forEach(price -> preMarketDailyPricesByTicker.put(price.getTicker(), price));
         } else {
@@ -32,7 +32,7 @@ public class DailyPricesCache {
         }
     }
 
-    public List<DailyPrice> addDailyPricesInCacheAndReturn(List<DailyPrice> dailyPrices) {
+    List<DailyPrice> addDailyPricesInCacheAndReturn(List<DailyPrice> dailyPrices) {
         List<DailyPrice> addedPrices = new ArrayList<>();
         dailyPrices.forEach(price -> addToMap(price, addedPrices));
         logInconsistentHighLowImportedPrices();
@@ -59,18 +59,18 @@ public class DailyPricesCache {
         }
     }
 
-    public List<DailyPrice> dailyPrices(MarketState marketState) {
+    List<DailyPrice> dailyPrices(MarketState marketState) {
         if (PRE == marketState) {
             return new ArrayList<>(preMarketDailyPricesByTicker.values());
         }
         return new ArrayList<>(dailyPricesByTicker.values());
     }
 
-    public void addPreviousDayPrices(List<DailyPrice> previousDayPrices) {
+    void addPreviousDayPrices(List<DailyPrice> previousDayPrices) {
         previousDayPrices.forEach(price -> previousDayPricesByTicker.put(price.getTicker(), price));
     }
 
-    public List<DailyPrice> previousDailyPrices() {
+    List<DailyPrice> previousDailyPrices() {
         return new ArrayList<>(previousDayPricesByTicker.values());
     }
 
