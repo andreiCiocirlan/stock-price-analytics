@@ -175,6 +175,9 @@ public class DailyPricesJSONService {
                 log.warn("{}", sameDailyPrices);
             }
         }
+
+        logInconsistentHighLowImportedPrices();
+
         return dailyJSONPrices;
     }
 
