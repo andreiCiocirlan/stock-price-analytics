@@ -24,14 +24,14 @@ public class DailyPricesCacheService {
     private final DailyPricesCache dailyPricesCache;
     private final DailyPricesJSONCache dailyPricesJSONCache;
 
-    void initDailyPricesCache(List<DailyPrice> latestDailyPrices) {
+    public void initDailyPricesCache(List<DailyPrice> latestDailyPrices) {
         dailyPricesCache.addDailyPrices(latestDailyPrices, REGULAR);
     }
-    void initPreviousDayPricesCache(List<DailyPrice> previousDayPrices) {
+    public void initPreviousDayPricesCache(List<DailyPrice> previousDayPrices) {
         dailyPricesCache.addPreviousDayPrices(previousDayPrices);
     }
 
-    void initPreMarketDailyPricesCache() {
+    public void initPreMarketDailyPricesCache() {
         Map<String, List<DailyPricesJSON>> dailyPricesJSONByTicker = dailyPricesJSONCache.getDailyPricesJSONByTicker().values().stream()
                 .sorted(Comparator.comparing(DailyPricesJSON::getDate).reversed()) // order by date desc
                 .collect(Collectors.groupingBy(DailyPricesJSON::getSymbol));
@@ -47,15 +47,15 @@ public class DailyPricesCacheService {
         addPreMarketDailyPricesInCache(latestPreMarketDailyPrices);
     }
 
-    List<DailyPrice> addDailyPricesInCacheAndReturn(List<DailyPrice> dailyPrices) {
+    public List<DailyPrice> addDailyPricesInCacheAndReturn(List<DailyPrice> dailyPrices) {
         return dailyPricesCache.addDailyPricesInCacheAndReturn(dailyPrices);
     }
 
-    List<DailyPrice> dailyPricesCache(MarketState marketState) {
+    public List<DailyPrice> dailyPricesCache(MarketState marketState) {
         return dailyPricesCache.dailyPrices(marketState);
     }
 
-    List<DailyPrice> previousDailyPrices() {
+    public List<DailyPrice> previousDailyPrices() {
         return dailyPricesCache.previousDailyPrices();
     }
 
