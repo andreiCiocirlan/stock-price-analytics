@@ -100,6 +100,10 @@ public class HighLowPricesCacheService {
         }
     }
 
+    public List<? extends HighLowForPeriod> cacheForHighLowPeriod(HighLowPeriod period) {
+        return highLowPricesCache.cacheForHighLowPeriod(period);
+    }
+
     public void addHighLowPrices(List<? extends HighLowForPeriod> hlPricesUpdated, HighLowPeriod highLowPeriod) {
         highLowPricesCache.addHighLowPrices(hlPricesUpdated, highLowPeriod);
     }

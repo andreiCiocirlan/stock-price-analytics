@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import stock.price.analytics.cache.HighLowPricesCache;
 import stock.price.analytics.cache.StocksCache;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
@@ -37,7 +36,7 @@ public class StockService {
 
     private final StockRepository stockRepository;
     private final StocksCache stocksCache;
-    private final HighLowPricesCache highLowPricesCache;
+    private final HighLowPricesCacheService highLowPricesCacheService;
 
     @Transactional
     public void saveStocks() throws IOException {
@@ -104,7 +103,7 @@ public class StockService {
         Map<String, Stock> stocksMap = stocksCache.getStocksMap();
 
         for (HighLowPeriod period : HighLowPeriod.values()) {
-            List<? extends HighLowForPeriod> cache = highLowPricesCache.cacheForHighLowPeriod(period);
+            List<? extends HighLowForPeriod> cache = highLowPricesCacheService.cacheForHighLowPeriod(period);
             for (HighLowForPeriod hl : cache) {
                 Stock stock = stocksMap.get(hl.getTicker());
                 if (stock != null) { // Check if stock exists
