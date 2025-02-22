@@ -18,6 +18,7 @@ public class Constants {
     public static final String BULLISH_FVG_95TH_PERCENTILE_52W = "Bullish FVG 95% 52w:";
     public static final String BULLISH_FVG_95TH_PERCENTILE_ATL = "Bullish FVG 95% ATL:";
     public static final LocalDate DAILY_FVG_MIN_DATE = LocalDate.of(2022, 1, 31);
+    public static final List<Double> CFD_MARGINS_5X = List.of(0.2);
     public static final List<Double> CFD_MARGINS_5X_4X = List.of(0.2, 0.25);
     public static final List<Double> CFD_MARGINS_5X_4X_3X = List.of(0.2, 0.25, 0.33);
     public static final List<Double> CFD_MARGINS_5X_4X_3X_2X = List.of(0.2, 0.25, 0.33, 0.5);
