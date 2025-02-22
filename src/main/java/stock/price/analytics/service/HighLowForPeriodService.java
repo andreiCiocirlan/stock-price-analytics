@@ -74,7 +74,7 @@ public class HighLowForPeriodService {
     public void saveCurrentWeekHighLowPricesFrom(List<DailyPrice> dailyPrices) {
         List<String> tickers = dailyPrices.stream().map(DailyPrice::getTicker).toList();
         for (HighLowPeriod highLowPeriod : values()) {
-            List<? extends HighLowForPeriod> hlPricesUpdated = highLowPricesCache.updateHighLowPricesCacheFrom(dailyPrices, tickers, highLowPeriod);
+            List<? extends HighLowForPeriod> hlPricesUpdated = highLowPricesCache.getUpdatedHighLowPricesForTickers(dailyPrices, tickers, highLowPeriod);
             if (!hlPricesUpdated.isEmpty()) {
                 log.info("found {} new {} prices {}", hlPricesUpdated.size(), highLowPeriod, hlPricesUpdated.stream().map(HighLowForPeriod::getTicker).toList());
                 partitionDataAndSaveNoLogging(hlPricesUpdated, highLowForPeriodRepository);

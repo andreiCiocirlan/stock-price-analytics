@@ -77,7 +77,7 @@ public class HighLowPricesCache {
         }
     }
 
-    public List<? extends HighLowForPeriod> updateHighLowPricesCacheFrom(List<DailyPrice> dailyPrices, List<String> tickers, HighLowPeriod highLowPeriod) {
+    public List<? extends HighLowForPeriod> getUpdatedHighLowPricesForTickers(List<DailyPrice> dailyPrices, List<String> tickers, HighLowPeriod highLowPeriod) {
         Map<String, DailyPrice> dailyPricesByTicker = dailyPrices.stream().collect(Collectors.toMap(DailyPrice::getTicker, p -> p));
         Map<String, ? extends HighLowForPeriod> highLowPrices = switch (highLowPeriod) {
             case HIGH_LOW_4W -> highLow4wMap;
