@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import stock.price.analytics.controller.dto.StockPerformanceDTO;
+import stock.price.analytics.model.prices.enums.PreMarketPriceMilestone;
+import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.service.PriceMilestoneService;
 import stock.price.analytics.service.StockHeatmapPerformanceService;
@@ -14,6 +16,7 @@ import stock.price.analytics.service.StockHeatmapPerformanceService;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
+import static stock.price.analytics.util.EnumParser.isNoneEnum;
 
 @Controller
 @RequiredArgsConstructor
@@ -37,13 +40,17 @@ public class StockHeatmapPerformanceController {
                                                          @RequestParam(required = false, value = "priceMilestone") String priceMilestone) {
         StockTimeframe stockTimeframe = ("undefined".equals(timeFrame)) ? StockTimeframe.MONTHLY : StockTimeframe.valueOf(timeFrame);
         List<String> tickers = emptyList();
-        if (!priceMilestoneService.isNoneMilestone(priceMilestone)) {
+        if (!isNoneMilestone(priceMilestone)) {
             tickers = priceMilestoneService.findTickersForMilestone(priceMilestone, cfdMargins);
             if (tickers.isEmpty()) {
                 return emptyList();
             }
         }
         return stockHeatmapPerformanceService.stockPerformanceFor(stockTimeframe, positivePerfFirst, limit, cfdMargins, tickers);
+    }
+
+    private boolean isNoneMilestone(String milestone) {
+        return isNoneEnum(milestone, PricePerformanceMilestone.class) && isNoneEnum(milestone, PreMarketPriceMilestone.class);
     }
 
 }

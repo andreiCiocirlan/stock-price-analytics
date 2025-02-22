@@ -15,7 +15,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
-import static stock.price.analytics.util.EnumParser.isNoneEnum;
 import static stock.price.analytics.util.EnumParser.parseEnumWithNoneValue;
 
 @Service
@@ -104,8 +103,5 @@ public class PriceMilestoneService {
         };
     }
 
-    public boolean isNoneMilestone(String milestone) {
-        return isNoneEnum(milestone, PricePerformanceMilestone.class) && isNoneEnum(milestone, PreMarketPriceMilestone.class);
-    }
 
 }
