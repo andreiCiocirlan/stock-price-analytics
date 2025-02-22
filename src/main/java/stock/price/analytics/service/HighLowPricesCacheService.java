@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.HighLowPricesCache;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.highlow.*;
+import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.repository.prices.HighLowForPeriodRepository;
 
 import java.time.DayOfWeek;
@@ -97,6 +98,14 @@ public class HighLowPricesCacheService {
             };
             highLowPricesCache.addHighLowPrices(highLowPrices, highLowPeriod);
         }
+    }
+
+    public void addHighLowPrices(List<? extends HighLowForPeriod> hlPricesUpdated, HighLowPeriod highLowPeriod) {
+        highLowPricesCache.addHighLowPrices(hlPricesUpdated, highLowPeriod);
+    }
+
+    public List<? extends HighLowForPeriod> getUpdatedHighLowPricesForTickers(List<DailyPrice> dailyPrices, List<String> tickers, HighLowPeriod highLowPeriod) {
+        return highLowPricesCache.getUpdatedHighLowPricesForTickers(dailyPrices, tickers, highLowPeriod);
     }
 
     public List<String> getNewHighLowsForHLPeriod(HighLowPeriod highLowPeriod) {
