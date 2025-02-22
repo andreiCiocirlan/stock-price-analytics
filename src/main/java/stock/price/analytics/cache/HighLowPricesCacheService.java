@@ -116,14 +116,18 @@ public class HighLowPricesCacheService {
     public void logNewHighLowsForHLPeriods() {
         for (HighLowPeriod highLowPeriod : HighLowPeriod.values()) {
             List<String> newHighLowsForHLPeriod = getNewHighLowsForHLPeriod(highLowPeriod);
-            log.info("{} New {} : {}", newHighLowsForHLPeriod.size(), highLowPeriod, newHighLowsForHLPeriod);
+            if (!newHighLowsForHLPeriod.isEmpty()) {
+                log.info("{} New {} : {}", newHighLowsForHLPeriod.size(), highLowPeriod, newHighLowsForHLPeriod);
+            }
         }
     }
 
     public void logEqualHighLowsForHLPeriods() {
         for (HighLowPeriod highLowPeriod : HighLowPeriod.values()) {
             List<String> equalHighLowsForHLPeriod = getEqualHighLowsForHLPeriod(highLowPeriod);
-            log.info("{} New {} : {}", equalHighLowsForHLPeriod.size(), highLowPeriod, equalHighLowsForHLPeriod);
+            if (!equalHighLowsForHLPeriod.isEmpty()) {
+                log.info("{} New {} : {}", equalHighLowsForHLPeriod.size(), highLowPeriod, equalHighLowsForHLPeriod);
+            }
         }
     }
 }
