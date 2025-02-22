@@ -90,7 +90,7 @@ public class DailyPricesJSONService {
         logInconsistentHighLowImportedPrices();
 
         if (!sameDailyPrices.isEmpty()) {
-            log.warn("same {} daily prices as in DB", sameDailyPrices.size());
+            log.warn("same {} daily prices json as in DB", sameDailyPrices.size());
             if (sameDailyPrices.size() <= MAX_TICKER_COUNT_PRINT) {
                 log.warn("{}", sameDailyPrices);
             }
@@ -168,7 +168,7 @@ public class DailyPricesJSONService {
         }
 
         if (!sameDailyPrices.isEmpty()) {
-            log.warn("same {} daily prices as in DB", sameDailyPrices.size());
+            log.warn("same {} daily prices json as in DB", sameDailyPrices.size());
             if (sameDailyPrices.size() <= MAX_TICKER_COUNT_PRINT) {
                 log.warn("{}", sameDailyPrices);
             }
