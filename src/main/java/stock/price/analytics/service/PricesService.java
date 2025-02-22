@@ -76,6 +76,13 @@ public class PricesService {
         });
     }
 
+    public void initHigherTimeframePricesCache(List<String> tickers) {
+        higherTimeframePricesCacheService.addPrices(previousThreePricesFor(tickers, WEEKLY));
+        higherTimeframePricesCacheService.addPrices(previousThreePricesFor(tickers, MONTHLY));
+        higherTimeframePricesCacheService.addPrices(previousThreePricesFor(tickers, QUARTERLY));
+        higherTimeframePricesCacheService.addPrices(previousThreePricesFor(tickers, YEARLY));
+    }
+
     public List<CandleWithDateDTO> findFor(String ticker, StockTimeframe timeframe) {
         String tableNameOHLC = timeframe.dbTableOHLC();
         String orderByIdField = timeframe == DAILY ? "date" : "start_date";
