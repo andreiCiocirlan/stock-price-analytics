@@ -1,6 +1,5 @@
 package stock.price.analytics.model.prices.enums;
 
-import java.util.Collection;
 import java.util.List;
 
 public enum PricePerformanceMilestone implements PriceMilestone {
