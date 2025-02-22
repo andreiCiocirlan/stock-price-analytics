@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
+import stock.price.analytics.cache.DailyPricesJSONCacheService;
 import stock.price.analytics.model.prices.json.*;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.repository.prices.DailyPricesJSONRepository;

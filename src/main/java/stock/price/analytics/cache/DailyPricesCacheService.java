@@ -1,9 +1,7 @@
-package stock.price.analytics.service;
+package stock.price.analytics.cache;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import stock.price.analytics.cache.DailyPricesCache;
-import stock.price.analytics.cache.DailyPricesJSONCache;
 import stock.price.analytics.model.prices.json.DailyPricesJSON;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.enums.MarketState;

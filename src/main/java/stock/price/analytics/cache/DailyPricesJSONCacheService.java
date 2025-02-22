@@ -1,8 +1,7 @@
-package stock.price.analytics.service;
+package stock.price.analytics.cache;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import stock.price.analytics.cache.DailyPricesJSONCache;
 import stock.price.analytics.model.prices.json.DailyPricesJSON;
 
 import java.util.List;

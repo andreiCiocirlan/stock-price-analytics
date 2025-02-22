@@ -2,6 +2,7 @@ package stock.price.analytics.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import stock.price.analytics.cache.DailyPricesCacheService;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.enums.MarketState;
 import stock.price.analytics.repository.prices.DailyPricesRepository;
