@@ -250,5 +250,7 @@ public class DailyPricesJSONService {
         if (!inconsistentLows.isEmpty()) {
             log.warn("Inconsistent imported lows for {}", inconsistentLows);
         }
+        inconsistentHighs.clear();
+        inconsistentLows.clear();
     }
 }
