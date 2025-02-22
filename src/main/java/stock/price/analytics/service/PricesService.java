@@ -65,8 +65,9 @@ public class PricesService {
         }).keySet().stream().map(key -> key.split("_")[0]).collect(Collectors.toSet());
     }
 
-    public List<? extends AbstractPrice> previousThreePricesFor(List<String> tickers, StockTimeframe timeframe) {
-        return (switch (timeframe) {
+    @SuppressWarnings("unchecked")
+    public <T extends AbstractPrice> List<T> previousThreePricesFor(List<String> tickers, StockTimeframe timeframe) {
+        return (List<T>) (switch (timeframe) {
             case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
             case WEEKLY -> weeklyPricesRepository.findPreviousThreeWeeklyPricesForTickers(tickers);
             case MONTHLY -> monthlyPricesRepository.findPreviousThreeMonthlyPricesForTickers(tickers);
