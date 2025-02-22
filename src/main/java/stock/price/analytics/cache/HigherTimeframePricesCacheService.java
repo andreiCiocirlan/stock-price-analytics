@@ -28,7 +28,7 @@ public class HigherTimeframePricesCacheService {
         higherTimeframePricesCache.addPrices(prices);
     }
 
-    public List<? extends AbstractPrice> pricesFor(List<String> tickers, StockTimeframe timeframe) {
+    public List<? extends AbstractPrice> htfPricesFor(List<String> tickers, StockTimeframe timeframe) {
         return higherTimeframePricesCache.pricesFor(tickers, timeframe);
     }
 }

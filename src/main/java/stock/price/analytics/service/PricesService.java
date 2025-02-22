@@ -148,14 +148,14 @@ public class PricesService {
             previousPrices = previousThreePricesFor(tickers, timeframe);
             higherTimeframePricesCacheService.addPrices(previousPrices);
         } else if (cacheTickers.containsAll(tickers)) {
-            previousPrices = higherTimeframePricesCacheService.pricesFor(tickers, timeframe);
+            previousPrices = higherTimeframePricesCacheService.htfPricesFor(tickers, timeframe);
         } else { // partial match
             tickers.removeAll(cacheTickers);
             previousPrices = previousThreePricesFor(tickers, timeframe);
             higherTimeframePricesCacheService.addPrices(previousPrices);
             log.info("previous {} Prices partial match for {} tickers", timeframe.name(), tickers.size());
             cacheTickers.addAll(tickers);
-            previousPrices = higherTimeframePricesCacheService.pricesFor(cacheTickers.stream().toList(), timeframe);
+            previousPrices = higherTimeframePricesCacheService.htfPricesFor(cacheTickers.stream().toList(), timeframe);
         }
 
         return (List<T>) previousPrices
