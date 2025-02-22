@@ -1,9 +1,8 @@
-package stock.price.analytics.service;
+package stock.price.analytics.cache;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import stock.price.analytics.cache.HighLowPricesCache;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.highlow.*;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;

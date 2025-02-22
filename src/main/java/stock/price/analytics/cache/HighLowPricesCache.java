@@ -28,7 +28,7 @@ public class HighLowPricesCache {
     @Getter
     private final Map<HighLowPeriod, Set<String>> dailyEqualHighLowsByHLPeriod = new HashMap<>();
 
-    public void addPrevWeekHighLowPrices(List<? extends HighLowForPeriod> prevWeekHighLowPrices, HighLowPeriod highLowPeriod) {
+    void addPrevWeekHighLowPrices(List<? extends HighLowForPeriod> prevWeekHighLowPrices, HighLowPeriod highLowPeriod) {
         switch (highLowPeriod) {
             case HIGH_LOW_4W -> prevWeekHighLowPrices.forEach(hlPrice ->
                     prevWeekHighLow4wMap.merge(
@@ -53,7 +53,7 @@ public class HighLowPricesCache {
         }
     }
 
-    public void addHighLowPrices(List<? extends HighLowForPeriod> hlPrices, HighLowPeriod highLowPeriod) {
+    void addHighLowPrices(List<? extends HighLowForPeriod> hlPrices, HighLowPeriod highLowPeriod) {
         switch (highLowPeriod) {
             case HIGH_LOW_4W -> hlPrices.forEach(hlPrice -> highLow4wMap.merge(
                     hlPrice.getTicker(),
@@ -77,7 +77,7 @@ public class HighLowPricesCache {
         }
     }
 
-    public List<? extends HighLowForPeriod> getUpdatedHighLowPricesForTickers(List<DailyPrice> dailyPrices, List<String> tickers, HighLowPeriod highLowPeriod) {
+    List<? extends HighLowForPeriod> getUpdatedHighLowPricesForTickers(List<DailyPrice> dailyPrices, List<String> tickers, HighLowPeriod highLowPeriod) {
         Map<String, DailyPrice> dailyPricesByTicker = dailyPrices.stream().collect(Collectors.toMap(DailyPrice::getTicker, p -> p));
         Map<String, ? extends HighLowForPeriod> highLowPrices = switch (highLowPeriod) {
             case HIGH_LOW_4W -> highLow4wMap;
@@ -105,7 +105,7 @@ public class HighLowPricesCache {
         return isNewHighLow;
     }
 
-    public List<? extends HighLowForPeriod> cacheForHighLowPeriod(HighLowPeriod highLowPeriod) {
+    List<? extends HighLowForPeriod> cacheForHighLowPeriod(HighLowPeriod highLowPeriod) {
         return switch (highLowPeriod) {
             case HIGH_LOW_4W -> new ArrayList<>(highLow4wMap.values());
             case HIGH_LOW_52W -> new ArrayList<>(highLow52wMap.values());
@@ -113,7 +113,7 @@ public class HighLowPricesCache {
         };
     }
 
-    public List<? extends HighLowForPeriod> cacheForMilestone(PricePerformanceMilestone pricePerformanceMilestone) {
+    List<? extends HighLowForPeriod> cacheForMilestone(PricePerformanceMilestone pricePerformanceMilestone) {
         return switch (pricePerformanceMilestone) {
             case HIGH_4W_95, LOW_4W_95 -> new ArrayList<>(highLow4wMap.values());
             case NEW_4W_HIGH, NEW_4W_LOW -> new ArrayList<>(prevWeekHighLow4wMap.values());
