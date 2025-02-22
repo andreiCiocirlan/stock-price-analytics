@@ -1,5 +1,6 @@
 package stock.price.analytics.model.prices.enums;
 
+import java.util.Collection;
 import java.util.List;
 
 public enum PricePerformanceMilestone implements PriceMilestone {
@@ -21,4 +22,11 @@ public enum PricePerformanceMilestone implements PriceMilestone {
         return List.of(HIGH_52W_95, HIGH_4W_95, HIGH_ALL_TIME_95, LOW_52W_95, LOW_4W_95, LOW_ALL_TIME_95);
     }
 
+    public static List<PricePerformanceMilestone> high95thPercentileValues() {
+        return List.of(HIGH_52W_95, HIGH_4W_95, HIGH_ALL_TIME_95);
+    }
+
+    public static List<PricePerformanceMilestone> low95thPercentileValues() {
+        return List.of(LOW_52W_95, LOW_4W_95, LOW_ALL_TIME_95);
+    }
 }
