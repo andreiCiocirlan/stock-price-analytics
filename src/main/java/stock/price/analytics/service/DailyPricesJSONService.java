@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.model.prices.json.*;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
@@ -180,22 +182,35 @@ public class DailyPricesJSONService {
         String key = importedDailyPriceJSON.getCompositeId();
         if (recentJsonPricesById.containsKey(key)) {
             DailyPricesJSON storedDailyPriceJSON = recentJsonPricesById.get(key);
-            if (importedDailyPriceJSON.getRegularMarketDayHigh() < storedDailyPriceJSON.getRegularMarketDayHigh()) {
-                inconsistentLows.add(importedDailyPriceJSON.getSymbol());
-                importedDailyPriceJSON.setRegularMarketDayHigh(storedDailyPriceJSON.getRegularMarketDayHigh());
-            }
-            if (importedDailyPriceJSON.getRegularMarketDayLow() > storedDailyPriceJSON.getRegularMarketDayLow()) {
-                inconsistentHighs.add(importedDailyPriceJSON.getSymbol());
-                importedDailyPriceJSON.setRegularMarketDayLow(storedDailyPriceJSON.getRegularMarketDayLow());
-            }
+            Pair<Double, Double> highLowPair = getHighLowImportedPrices(importedDailyPriceJSON, storedDailyPriceJSON);
             if (importedDailyPriceJSON.getPreMarketPrice() != 0d || storedDailyPriceJSON.differentPrices(importedDailyPriceJSON)) { // compare OHLC, performance, or if pre-market price
-                dailyJSONPrices.add(storedDailyPriceJSON.updateFrom(importedDailyPriceJSON));
+                DailyPricesJSON updatedPrice = storedDailyPriceJSON.updateFrom(importedDailyPriceJSON);
+                updatedPrice.setRegularMarketDayHigh(highLowPair.getLeft());
+                updatedPrice.setRegularMarketDayLow(highLowPair.getRight());
+                dailyJSONPrices.add(updatedPrice);
             } else {
                 sameDailyPrices.add(ticker);
             }
         } else {
             dailyJSONPrices.add(importedDailyPriceJSON);
         }
+    }
+
+    // utility method to find inconsistencies between imported high-low prices and already stored prices
+    private Pair<Double, Double> getHighLowImportedPrices(DailyPricesJSON importedDailyPriceJSON, DailyPricesJSON storedDailyPriceJSON) {
+        double high = importedDailyPriceJSON.getRegularMarketDayHigh();
+        double low = importedDailyPriceJSON.getRegularMarketDayLow();
+        // abnormal -> imported high price cannot be smaller than already stored high price
+        if (importedDailyPriceJSON.getRegularMarketDayHigh() < storedDailyPriceJSON.getRegularMarketDayHigh()) {
+            inconsistentLows.add(importedDailyPriceJSON.getSymbol());
+            high = storedDailyPriceJSON.getRegularMarketDayHigh();
+        }
+        // abnormal -> imported low price cannot be greater than already stored low price
+        if (importedDailyPriceJSON.getRegularMarketDayLow() > storedDailyPriceJSON.getRegularMarketDayLow()) {
+            inconsistentHighs.add(importedDailyPriceJSON.getSymbol());
+            low = storedDailyPriceJSON.getRegularMarketDayLow();
+        }
+        return new MutablePair<>(high, low);
     }
 
     public void saveDailyPricesJSONFrom(String fileName) {

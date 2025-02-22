@@ -356,7 +356,6 @@ public class DailyPricesJSON implements PriceEntity {
 		this.regularMarketDayRange = dailyPricesJSON.getRegularMarketDayRange();
 		this.earningsTimestampEnd = dailyPricesJSON.getEarningsTimestampEnd();
 		this.epsForward = dailyPricesJSON.getEpsForward();
-		this.regularMarketDayHigh = dailyPricesJSON.getRegularMarketDayHigh();
 		this.twoHundredDayAverageChange = dailyPricesJSON.getTwoHundredDayAverageChange();
 		this.askSize = dailyPricesJSON.getAskSize();
 		this.twoHundredDayAverage = dailyPricesJSON.getTwoHundredDayAverage();
@@ -381,7 +380,6 @@ public class DailyPricesJSON implements PriceEntity {
 		this.priceHint = dailyPricesJSON.getPriceHint();
 		this.exchange = dailyPricesJSON.getExchange();
 		this.sourceInterval = dailyPricesJSON.getSourceInterval();
-		this.regularMarketDayLow = dailyPricesJSON.getRegularMarketDayLow();
 		this.region = dailyPricesJSON.getRegion();
 		this.shortName = dailyPricesJSON.getShortName();
 		this.fiftyDayAverageChangePercent = dailyPricesJSON.getFiftyDayAverageChangePercent();
