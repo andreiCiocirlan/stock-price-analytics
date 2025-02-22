@@ -29,7 +29,7 @@ public class HigherTimeframePricesCache {
     private final Map<String, QuarterlyPriceWithPrevClose> quarterlyPricesWithPrevCloseByTickerAndDate = new HashMap<>();
     private final Map<String, YearlyPriceWithPrevClose> yearlyPricesWithPrevCloseByTickerAndDate = new HashMap<>();
 
-    public void addWeeklyPriceWithPrevClose(List<WeeklyPriceWithPrevClose> weeklyPricesWithPrevClose) {
+    void addWeeklyPriceWithPrevClose(List<WeeklyPriceWithPrevClose> weeklyPricesWithPrevClose) {
         weeklyPricesWithPrevClose.forEach(price -> {
             weeklyPricesWithPrevCloseByTickerAndDate.merge(
                     createKey(price.weeklyPrice().getTicker(), price.weeklyPrice().getStartDate()),
@@ -39,7 +39,7 @@ public class HigherTimeframePricesCache {
         });
     }
 
-    public void addMonthlyPriceWithPrevClose(List<MonthlyPriceWithPrevClose> monthlyPricesWithPrevClose) {
+    void addMonthlyPriceWithPrevClose(List<MonthlyPriceWithPrevClose> monthlyPricesWithPrevClose) {
         monthlyPricesWithPrevClose.forEach(price -> {
             monthlyPricesWithPrevCloseByTickerAndDate.merge(
                     createKey(price.monthlyPrice().getTicker(), price.monthlyPrice().getStartDate()),
@@ -49,7 +49,7 @@ public class HigherTimeframePricesCache {
         });
     }
 
-    public void addQuarterlyPriceWithPrevClose(List<QuarterlyPriceWithPrevClose> quarterlyPricesWithPrevClose) {
+    void addQuarterlyPriceWithPrevClose(List<QuarterlyPriceWithPrevClose> quarterlyPricesWithPrevClose) {
         quarterlyPricesWithPrevClose.forEach(price -> {
             quarterlyPricesWithPrevCloseByTickerAndDate.merge(
                     createKey(price.quarterlyPrice().getTicker(), price.quarterlyPrice().getStartDate()),
@@ -59,7 +59,7 @@ public class HigherTimeframePricesCache {
         });
     }
 
-    public void addYearlyPriceWithPrevClose(List<YearlyPriceWithPrevClose> yearlyPricesWithPrevClose) {
+    void addYearlyPriceWithPrevClose(List<YearlyPriceWithPrevClose> yearlyPricesWithPrevClose) {
         yearlyPricesWithPrevClose.forEach(price -> {
             yearlyPricesWithPrevCloseByTickerAndDate.merge(
                     createKey(price.yearlyPrice().getTicker(), price.yearlyPrice().getStartDate()),
@@ -69,7 +69,7 @@ public class HigherTimeframePricesCache {
         });
     }
 
-    public List<WeeklyPriceWithPrevClose> weeklyPricesWithPrevCloseFor(List<String> tickers) {
+    List<WeeklyPriceWithPrevClose> weeklyPricesWithPrevCloseFor(List<String> tickers) {
         return tickers.stream()
                 .flatMap(ticker ->
                         weeklyPricesWithPrevCloseByTickerAndDate.entrySet().stream()
@@ -78,7 +78,7 @@ public class HigherTimeframePricesCache {
                 .collect(Collectors.toList());
     }
 
-    public List<MonthlyPriceWithPrevClose> monthlyPricesWithPrevCloseFor(List<String> tickers) {
+    List<MonthlyPriceWithPrevClose> monthlyPricesWithPrevCloseFor(List<String> tickers) {
         return tickers.stream()
                 .flatMap(ticker ->
                         monthlyPricesWithPrevCloseByTickerAndDate.entrySet().stream()
@@ -87,7 +87,7 @@ public class HigherTimeframePricesCache {
                 .collect(Collectors.toList());
     }
 
-    public List<QuarterlyPriceWithPrevClose> quarterlyPricesWithPrevCloseFor(List<String> tickers) {
+    List<QuarterlyPriceWithPrevClose> quarterlyPricesWithPrevCloseFor(List<String> tickers) {
         return tickers.stream()
                 .flatMap(ticker ->
                         quarterlyPricesWithPrevCloseByTickerAndDate.entrySet().stream()
@@ -96,7 +96,7 @@ public class HigherTimeframePricesCache {
                 .collect(Collectors.toList());
     }
 
-    public List<YearlyPriceWithPrevClose> yearlyPricesWithPrevCloseFor(List<String> tickers) {
+    List<YearlyPriceWithPrevClose> yearlyPricesWithPrevCloseFor(List<String> tickers) {
         return tickers.stream()
                 .flatMap(ticker ->
                         yearlyPricesWithPrevCloseByTickerAndDate.entrySet().stream()
@@ -105,7 +105,7 @@ public class HigherTimeframePricesCache {
                 .collect(Collectors.toList());
     }
 
-    public void addPrices(List<? extends AbstractPrice> prices) {
+    void addPrices(List<? extends AbstractPrice> prices) {
         if (prices == null || prices.isEmpty()) return; // Handle null or empty list case to avoid exceptions
 
         prices.forEach(price -> {
@@ -123,7 +123,7 @@ public class HigherTimeframePricesCache {
         });
     }
 
-    public List<? extends AbstractPrice> pricesFor(List<String> tickers, StockTimeframe timeframe) {
+    List<? extends AbstractPrice> pricesFor(List<String> tickers, StockTimeframe timeframe) {
         return tickers.stream()
                 .flatMap(ticker -> switch (timeframe) {
                     case WEEKLY -> weeklyPricesByTickerAndDate.entrySet().stream()

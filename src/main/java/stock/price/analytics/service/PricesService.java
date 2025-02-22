@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.DailyPricesCacheService;
-import stock.price.analytics.cache.HigherTimeframePricesCache;
+import stock.price.analytics.cache.HigherTimeframePricesCacheService;
 import stock.price.analytics.controller.dto.CandleWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
@@ -42,16 +42,13 @@ public class PricesService {
     private final MonthlyPricesRepository monthlyPricesRepository;
     private final QuarterlyPricesRepository quarterlyPricesRepository;
     private final YearlyPricesRepository yearlyPricesRepository;
-    private final HigherTimeframePricesCache higherTimeframePricesCache;
+    private final HigherTimeframePricesCacheService higherTimeframePricesCacheService;
     private final DailyPricesCacheService dailyPricesCacheService;
 
     public List<AbstractPrice> currentCachePricesFor(StockTimeframe timeframe) {
         List<AbstractPrice> htfPricesUpdated = new ArrayList<>(switch (timeframe) {
             case DAILY -> new ArrayList<>(dailyPricesCacheService.dailyPricesCache(REGULAR));
-            case WEEKLY -> new ArrayList<>(higherTimeframePricesCache.getWeeklyPricesByTickerAndDate().values());
-            case MONTHLY -> new ArrayList<>(higherTimeframePricesCache.getMonthlyPricesByTickerAndDate().values());
-            case QUARTERLY -> new ArrayList<>(higherTimeframePricesCache.getQuarterlyPricesByTickerAndDate().values());
-            case YEARLY -> new ArrayList<>(higherTimeframePricesCache.getYearlyPricesByTickerAndDate().values());
+            case WEEKLY, MONTHLY, QUARTERLY, YEARLY -> new ArrayList<>(higherTimeframePricesCacheService.getPricesByTickerAndDateFor(timeframe).values());
         });
 
         return htfPricesUpdated.stream()
@@ -64,10 +61,7 @@ public class PricesService {
     public Set<String> cacheTickersFor(StockTimeframe timeframe) {
         return (switch (timeframe) {
             case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
-            case WEEKLY -> higherTimeframePricesCache.getWeeklyPricesByTickerAndDate();
-            case MONTHLY -> higherTimeframePricesCache.getMonthlyPricesByTickerAndDate();
-            case QUARTERLY -> higherTimeframePricesCache.getQuarterlyPricesByTickerAndDate();
-            case YEARLY -> higherTimeframePricesCache.getYearlyPricesByTickerAndDate();
+            case WEEKLY, MONTHLY, QUARTERLY, YEARLY -> higherTimeframePricesCacheService.getPricesByTickerAndDateFor(timeframe);
         }).keySet().stream().map(key -> key.split("_")[0]).collect(Collectors.toSet());
     }
 
@@ -129,10 +123,10 @@ public class PricesService {
         htfPricesUpdated.addAll(quarterlyPrices);
         htfPricesUpdated.addAll(yearlyPrices);
 
-        higherTimeframePricesCache.addPrices(weeklyPrices);
-        higherTimeframePricesCache.addPrices(monthlyPrices);
-        higherTimeframePricesCache.addPrices(quarterlyPrices);
-        higherTimeframePricesCache.addPrices(yearlyPrices);
+        higherTimeframePricesCacheService.addPrices(weeklyPrices);
+        higherTimeframePricesCacheService.addPrices(monthlyPrices);
+        higherTimeframePricesCacheService.addPrices(quarterlyPrices);
+        higherTimeframePricesCacheService.addPrices(yearlyPrices);
 
         return htfPricesUpdated;
     }
@@ -144,16 +138,16 @@ public class PricesService {
         if (cacheTickers.isEmpty()) {
             log.info("Fetching Previous Two {} Prices from database for {} tickers", timeframe.name(), tickers.size());
             previousPrices = previousThreePricesFor(tickers, timeframe);
-            higherTimeframePricesCache.addPrices(previousPrices);
+            higherTimeframePricesCacheService.addPrices(previousPrices);
         } else if (cacheTickers.containsAll(tickers)) {
-            previousPrices = higherTimeframePricesCache.pricesFor(tickers, timeframe);
+            previousPrices = higherTimeframePricesCacheService.pricesFor(tickers, timeframe);
         } else { // partial match
             tickers.removeAll(cacheTickers);
             previousPrices = previousThreePricesFor(tickers, timeframe);
-            higherTimeframePricesCache.addPrices(previousPrices);
+            higherTimeframePricesCacheService.addPrices(previousPrices);
             log.info("previous {} Prices partial match for {} tickers", timeframe.name(), tickers.size());
             cacheTickers.addAll(tickers);
-            previousPrices = higherTimeframePricesCache.pricesFor(cacheTickers.stream().toList(), timeframe);
+            previousPrices = higherTimeframePricesCacheService.pricesFor(cacheTickers.stream().toList(), timeframe);
         }
 
         return (List<T>) previousPrices
