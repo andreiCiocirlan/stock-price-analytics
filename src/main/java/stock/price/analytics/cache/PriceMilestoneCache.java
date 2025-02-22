@@ -13,12 +13,12 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class PriceMilestoneCache {
+class PriceMilestoneCache {
 
     private final StocksCache stocksCache;
     private final HighLowPricesCache highLowPricesCache;
 
-    public List<String> findTickersForMilestone(PricePerformanceMilestone pricePerformanceMilestone, List<Double> cfdMargins) {
+    List<String> findTickersForMilestone(PricePerformanceMilestone pricePerformanceMilestone, List<Double> cfdMargins) {
         Map<String, HighLowForPeriod> hlPricesCache = highLowPricesCache.cacheForMilestone(pricePerformanceMilestone)
                 .stream()
                 .collect(Collectors.toMap(HighLowForPeriod::getTicker, p -> p));

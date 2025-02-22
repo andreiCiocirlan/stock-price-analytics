@@ -15,13 +15,13 @@ import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
 
 @Component
 @RequiredArgsConstructor
-public class PreMarketPriceMilestoneCache {
+class PreMarketPriceMilestoneCache {
 
     private static final Double MIN_GAP_AND_GO_PERCENTAGE = 0.04d;
     private final StocksCache stocksCache;
     private final DailyPricesCache dailyPricesCache;
 
-    public List<String> findTickersForPreMarketMilestone(PreMarketPriceMilestone milestone, List<Double> cfdMargins) {
+    List<String> findTickersForPreMarketMilestone(PreMarketPriceMilestone milestone, List<Double> cfdMargins) {
         Map<String, DailyPrice> preMarketPricesCache = dailyPricesCache.dailyPrices(PRE)
                 .stream()
                 .collect(Collectors.toMap(DailyPrice::getTicker, p -> p));

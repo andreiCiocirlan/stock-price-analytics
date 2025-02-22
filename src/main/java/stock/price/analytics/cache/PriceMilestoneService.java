@@ -1,10 +1,8 @@
-package stock.price.analytics.service;
+package stock.price.analytics.cache;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import stock.price.analytics.cache.PreMarketPriceMilestoneCache;
-import stock.price.analytics.cache.PriceMilestoneCache;
 import stock.price.analytics.model.prices.enums.PreMarketPriceMilestone;
 import stock.price.analytics.model.prices.enums.PriceMilestone;
 import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
