@@ -5,7 +5,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.annotation.Schedules;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.service.DesktopNotificationService;
-import stock.price.analytics.cache.PriceMilestoneService;
+import stock.price.analytics.service.PriceMilestoneService;
 
 import static stock.price.analytics.model.prices.enums.PreMarketPriceMilestone.preMarketSchedulerValues;
 import static stock.price.analytics.util.Constants.CFD_MARGINS_5X_4X_3X;
