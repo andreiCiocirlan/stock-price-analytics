@@ -18,8 +18,4 @@ public class StocksCache {
         stocks.forEach(s -> stocksMap.merge(s.getTicker(), s, (_, newValue) -> newValue));
     }
 
-    public List<String> tickers() {
-        return stocksMap.keySet().stream().toList();
-    }
-
 }
