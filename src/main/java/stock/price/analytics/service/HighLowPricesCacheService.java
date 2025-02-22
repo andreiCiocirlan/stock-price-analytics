@@ -24,7 +24,6 @@ import static stock.price.analytics.util.TradingDateUtil.isFirstImportMonday;
 @RequiredArgsConstructor
 public class HighLowPricesCacheService {
 
-    private final StockService stockService;
     private final HighLowPricesCache highLowPricesCache;
     private final HighLowForPeriodRepository highLowForPeriodRepository;
 
@@ -39,15 +38,10 @@ public class HighLowPricesCacheService {
         return highLowForPeriod;
     }
 
-    public void initHighLowPricesCache() {
-        LocalDate latestDailyPriceImportDate = stockService.findLastUpdate();
+    public void initHighLowPricesCache(LocalDate latestDailyPriceImportDate) {
         for (HighLowPeriod highLowPeriod : HighLowPeriod.values()) {
             initHighLowPricesCache(highLowPeriod, latestDailyPriceImportDate);
             initPrevWeekHighLowPricesCache(highLowPeriod, latestDailyPriceImportDate);
-        }
-        boolean firstImportMonday = isFirstImportMonday(latestDailyPriceImportDate);
-        if (firstImportMonday) {
-            stockService.updateHighLowForPeriodFromHLCachesAndAdjustWeekend();
         }
     }
 

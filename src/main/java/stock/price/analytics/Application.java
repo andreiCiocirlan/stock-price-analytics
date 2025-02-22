@@ -9,7 +9,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import stock.price.analytics.repository.stocks.StockRepository;
 import stock.price.analytics.service.*;
 
+import java.time.LocalDate;
+
 import static stock.price.analytics.util.LoggingUtil.logTime;
+import static stock.price.analytics.util.TradingDateUtil.isFirstImportMonday;
 
 @RequiredArgsConstructor
 @SpringBootApplication
@@ -31,7 +34,11 @@ public class Application implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         logTime(higherTimeframePricesCacheService::initHigherTimeframePricesCache, "initialized higher-timeframe prices cache");
         logTime(stockService::initStocksCache, "initialized xtb stocks cache");
-        logTime(highLowPricesCacheService::initHighLowPricesCache, "initialized high low prices cache");
+        LocalDate latestDailyPriceImportDate = stockService.findLastUpdate();
+        logTime(() -> highLowPricesCacheService.initHighLowPricesCache(latestDailyPriceImportDate), "initialized high low prices cache");
+        if (isFirstImportMonday(latestDailyPriceImportDate)) {
+            stockService.updateHighLowForPeriodFromHLCachesAndAdjustWeekend();
+        }
         logTime(dailyPricesService::initLatestTwoDaysPricesCache, "initialized latest two days prices cache");
         logTime(dailyPricesJSONService::initDailyJSONPricesCache, "initialized daily JSON prices cache");
         logTime(dailyPricesService::initPreMarketDailyPricesCache, "initialized pre-market daily prices cache");
