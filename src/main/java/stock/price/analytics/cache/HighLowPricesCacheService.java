@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
+import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
 import stock.price.analytics.model.prices.highlow.*;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.repository.prices.HighLowForPeriodRepository;
@@ -129,5 +130,9 @@ public class HighLowPricesCacheService {
                 log.info("{} New {} : {}", equalHighLowsForHLPeriod.size(), highLowPeriod, equalHighLowsForHLPeriod);
             }
         }
+    }
+
+    public List<? extends HighLowForPeriod> cacheForMilestone(PricePerformanceMilestone pricePerformanceMilestone) {
+        return highLowPricesCache.cacheForMilestone(pricePerformanceMilestone);
     }
 }
