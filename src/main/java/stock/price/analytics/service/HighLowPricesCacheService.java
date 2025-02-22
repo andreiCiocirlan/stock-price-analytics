@@ -1,6 +1,7 @@
 package stock.price.analytics.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.HighLowPricesCache;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
@@ -17,6 +18,7 @@ import static java.util.Collections.emptySet;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 import static stock.price.analytics.util.TradingDateUtil.isFirstImportMonday;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class HighLowPricesCacheService {
@@ -99,5 +101,12 @@ public class HighLowPricesCacheService {
 
     public List<String> getNewHighLowsForHLPeriod(HighLowPeriod highLowPeriod) {
         return new ArrayList<>(highLowPricesCache.getDailyNewHighLowsByHLPeriod().getOrDefault(highLowPeriod, emptySet()));
+    }
+
+    public void logNewHighLowsForHLPeriods() {
+        for (HighLowPeriod highLowPeriod : HighLowPeriod.values()) {
+            List<String> newHighLowsForHLPeriod = getNewHighLowsForHLPeriod(highLowPeriod);
+            log.info("{} New {} : {}", newHighLowsForHLPeriod.size(), highLowPeriod, newHighLowsForHLPeriod);
+        }
     }
 }
