@@ -7,10 +7,10 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import stock.price.analytics.cache.HighLowPricesCacheService;
+import stock.price.analytics.cache.HigherTimeframePricesCacheService;
 import stock.price.analytics.repository.stocks.StockRepository;
 import stock.price.analytics.service.DailyPricesJSONService;
 import stock.price.analytics.service.DailyPricesService;
-import stock.price.analytics.cache.HigherTimeframePricesCacheService;
 import stock.price.analytics.service.StockService;
 
 import java.time.LocalDate;

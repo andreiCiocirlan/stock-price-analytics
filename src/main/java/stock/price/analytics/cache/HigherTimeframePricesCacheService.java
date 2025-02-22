@@ -3,7 +3,7 @@ package stock.price.analytics.cache;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.model.prices.ohlc.*;
+import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.prices.MonthlyPricesRepository;
 import stock.price.analytics.repository.prices.QuarterlyPricesRepository;
