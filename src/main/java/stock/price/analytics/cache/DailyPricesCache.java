@@ -1,6 +1,10 @@
 package stock.price.analytics.cache;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
+import stock.price.analytics.model.prices.json.DailyPricesJSON;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.enums.MarketState;
 
@@ -11,9 +15,12 @@ import java.util.Map;
 
 import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
 
+@Slf4j
 @Component
 public class DailyPricesCache {
 
+    private final List<String> inconsistentLows = new ArrayList<>();
+    private final List<String> inconsistentHighs = new ArrayList<>();
     private final Map<String, DailyPrice> preMarketDailyPricesByTicker = new HashMap<>();
     private final Map<String, DailyPrice> dailyPricesByTicker = new HashMap<>();
     private final Map<String, DailyPrice> previousDayPricesByTicker = new HashMap<>();
@@ -29,6 +36,7 @@ public class DailyPricesCache {
     public List<DailyPrice> addDailyPricesInCacheAndReturn(List<DailyPrice> dailyPrices) {
         List<DailyPrice> addedPrices = new ArrayList<>();
         dailyPrices.forEach(price -> addToMap(price, addedPrices));
+        logInconsistentHighLowImportedPrices();
         return addedPrices;
     }
 
@@ -38,8 +46,9 @@ public class DailyPricesCache {
         if (existingPrice != null) {
             if (existingPrice.getDate().isEqual(newPrice.getDate())) { // intraday update
                 existingPrice.setOpen(newPrice.getOpen());
-                existingPrice.setHigh(newPrice.getHigh());
-                existingPrice.setLow(newPrice.getLow());
+                Pair<Double, Double> highLowPrices = getHighLowImportedPrices(newPrice, existingPrice);
+                existingPrice.setHigh(highLowPrices.getLeft());
+                existingPrice.setLow(highLowPrices.getRight());
                 existingPrice.setClose(newPrice.getClose());
                 existingPrice.setPerformance(newPrice.getPerformance());
 
@@ -64,6 +73,34 @@ public class DailyPricesCache {
 
     public List<DailyPrice> previousDailyPrices() {
         return new ArrayList<>(previousDayPricesByTicker.values());
+    }
+
+    // utility method to find inconsistencies between imported high-low prices and already stored prices
+    private Pair<Double, Double> getHighLowImportedPrices(DailyPrice importedDailyPrice, DailyPrice storedDailyPrice) {
+        double high = importedDailyPrice.getHigh();
+        double low = importedDailyPrice.getLow();
+        // abnormal -> imported high price cannot be smaller than already stored high price
+        if (importedDailyPrice.getHigh() < storedDailyPrice.getHigh()) {
+            inconsistentLows.add(importedDailyPrice.getTicker());
+            high = storedDailyPrice.getHigh();
+        }
+        // abnormal -> imported low price cannot be greater than already stored low price
+        if (importedDailyPrice.getLow() > storedDailyPrice.getLow()) {
+            inconsistentHighs.add(importedDailyPrice.getTicker());
+            low = storedDailyPrice.getLow();
+        }
+        return new MutablePair<>(high, low);
+    }
+
+    private void logInconsistentHighLowImportedPrices() {
+        if (!inconsistentHighs.isEmpty()) {
+            log.warn("Inconsistent DAILY PRICES imported highs for {}", inconsistentHighs);
+        }
+        if (!inconsistentLows.isEmpty()) {
+            log.warn("Inconsistent DAILY PRICES imported lows for {}", inconsistentLows);
+        }
+        inconsistentHighs.clear();
+        inconsistentLows.clear();
     }
 
 }
