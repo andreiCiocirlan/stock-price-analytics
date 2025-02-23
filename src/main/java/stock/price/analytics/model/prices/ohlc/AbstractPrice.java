@@ -10,6 +10,7 @@ import stock.price.analytics.model.prices.PriceEntity;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Getter
 @Setter
@@ -54,6 +55,10 @@ public abstract class AbstractPrice implements PriceEntity {
     public abstract void setStartDateFrom(LocalDate date);
     public abstract void setEndDateFrom(LocalDate date);
     public abstract StockTimeframe getTimeframe();
+
+    public String compositeId() {
+        return getTicker() + "_" + getTimeframe() + "_" + getStartDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
+    }
 
     public AbstractPrice convertFrom(DailyPrice dailyPrice, Double previousClose) {
         this.setClose(dailyPrice.getClose());
