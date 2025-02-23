@@ -29,7 +29,7 @@ class HigherTimeframePricesCache {
     private final Map<String, QuarterlyPriceWithPrevClose> quarterlyPricesWithPrevCloseByTickerAndDate = new HashMap<>();
     private final Map<String, YearlyPriceWithPrevClose> yearlyPricesWithPrevCloseByTickerAndDate = new HashMap<>();
 
-    void addWeeklyPriceWithPrevClose(List<WeeklyPriceWithPrevClose> weeklyPricesWithPrevClose) {
+    void addWeeklyPricesWithPrevClose(List<WeeklyPriceWithPrevClose> weeklyPricesWithPrevClose) {
         weeklyPricesWithPrevClose.forEach(price -> {
             weeklyPricesWithPrevCloseByTickerAndDate.merge(
                     createKey(price.weeklyPrice().getTicker(), price.weeklyPrice().getStartDate()),
@@ -39,7 +39,7 @@ class HigherTimeframePricesCache {
         });
     }
 
-    void addMonthlyPriceWithPrevClose(List<MonthlyPriceWithPrevClose> monthlyPricesWithPrevClose) {
+    void addMonthlyPricesWithPrevClose(List<MonthlyPriceWithPrevClose> monthlyPricesWithPrevClose) {
         monthlyPricesWithPrevClose.forEach(price -> {
             monthlyPricesWithPrevCloseByTickerAndDate.merge(
                     createKey(price.monthlyPrice().getTicker(), price.monthlyPrice().getStartDate()),
@@ -49,7 +49,7 @@ class HigherTimeframePricesCache {
         });
     }
 
-    void addQuarterlyPriceWithPrevClose(List<QuarterlyPriceWithPrevClose> quarterlyPricesWithPrevClose) {
+    void addQuarterlyPricesWithPrevClose(List<QuarterlyPriceWithPrevClose> quarterlyPricesWithPrevClose) {
         quarterlyPricesWithPrevClose.forEach(price -> {
             quarterlyPricesWithPrevCloseByTickerAndDate.merge(
                     createKey(price.quarterlyPrice().getTicker(), price.quarterlyPrice().getStartDate()),
@@ -59,7 +59,7 @@ class HigherTimeframePricesCache {
         });
     }
 
-    void addYearlyPriceWithPrevClose(List<YearlyPriceWithPrevClose> yearlyPricesWithPrevClose) {
+    void addYearlyPricesWithPrevClose(List<YearlyPriceWithPrevClose> yearlyPricesWithPrevClose) {
         yearlyPricesWithPrevClose.forEach(price -> {
             yearlyPricesWithPrevCloseByTickerAndDate.merge(
                     createKey(price.yearlyPrice().getTicker(), price.yearlyPrice().getStartDate()),
