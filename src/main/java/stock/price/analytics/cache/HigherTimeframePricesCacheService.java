@@ -6,6 +6,7 @@ import stock.price.analytics.cache.model.*;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -27,22 +28,26 @@ public class HigherTimeframePricesCacheService {
         };
     }
 
-    public <T extends AbstractPrice, R extends PriceWithPrevClose> List<R> priceWithPrevCloseFrom(List<T> previousThreePricesForTickers) {
+    public <T extends AbstractPrice> List<PriceWithPrevClose> pricesWithPrevCloseByTickerFrom(List<T> previousThreePricesForTickers) {
         Map<String, List<T>> previousTwoPricesByTicker = previousThreePricesForTickers
                 .stream()
                 .collect(Collectors.groupingBy(AbstractPrice::getTicker))
                 .values().stream()
                 .flatMap(prices -> prices.stream().sorted(Comparator.comparing(AbstractPrice::getStartDate).reversed()).limit(2))
                 .collect(Collectors.groupingBy(AbstractPrice::getTicker));
+        List<T> latestPrices = new ArrayList<>();
         Map<String, Double> previousCloseByTicker = previousTwoPricesByTicker.entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
-                        entry -> entry.getValue().size() > 1 ? entry.getValue().get(1).getClose()
-                                : entry.getValue().getFirst().getOpen() // if IPO week, month, quarter, year -> take opening price
+                        entry -> {
+                            latestPrices.add(entry.getValue().getFirst()); // add most recent price to list
+                            return entry.getValue().size() > 1 ? entry.getValue().get(1).getClose()
+                                    : entry.getValue().getFirst().getOpen(); // if IPO week, month, quarter, year -> take opening price
+                        }
                 ));
 
-        return previousThreePricesForTickers.stream()
-                .map(price -> (R) switch (price.getTimeframe()) {
+        return latestPrices.stream()
+                .map(price -> (PriceWithPrevClose) switch (price.getTimeframe()) {
                     case DAILY -> throw new IllegalStateException("Unexpected timeframe DAILY");
                     case WEEKLY -> new WeeklyPriceWithPrevClose((WeeklyPrice) price, previousCloseByTicker.get(price.getTicker()));
                     case MONTHLY -> new MonthlyPriceWithPrevClose((MonthlyPrice) price, previousCloseByTicker.get(price.getTicker()));
@@ -59,4 +64,13 @@ public class HigherTimeframePricesCacheService {
     public List<? extends AbstractPrice> htfPricesFor(List<String> tickers, StockTimeframe timeframe) {
         return higherTimeframePricesCache.pricesFor(tickers, timeframe);
     }
+
+    public void addPricesWithPrevClose(List<PriceWithPrevClose> pricesWithPrevClose, StockTimeframe timeframe) {
+        higherTimeframePricesCache.addPricesWithPrevClose(pricesWithPrevClose, timeframe);
+    }
+
+    public List<PriceWithPrevClose> pricesWithPrevCloseFor(List<String> tickers, StockTimeframe timeframe) {
+        return higherTimeframePricesCache.pricesWithPrevCloseFor(tickers, timeframe);
+    }
+
 }
