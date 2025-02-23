@@ -34,23 +34,23 @@ class HigherTimeframePricesCache {
                     case MONTHLY -> monthlyPricesWithPrevCloseByTickerAndDate;
                     case QUARTERLY -> quarterlyPricesWithPrevCloseByTickerAndDate;
                     case YEARLY -> yearlyPricesWithPrevCloseByTickerAndDate;
-                }).put(createKey(price.getPrice().getTicker(), price.getPrice().getStartDate()), price));
+                }).put(price.getPrice().getTicker(), price));
     }
 
     List<PriceWithPrevClose> pricesWithPrevCloseFor(List<String> tickers, StockTimeframe timeframe) {
         return tickers.stream()
                 .flatMap(ticker -> switch (timeframe) {
                     case WEEKLY -> weeklyPricesWithPrevCloseByTickerAndDate.entrySet().stream()
-                            .filter(entry -> entry.getKey().startsWith(ticker + "_"))
+                            .filter(entry -> entry.getKey().equals(ticker))
                             .map(Map.Entry::getValue);
                     case MONTHLY -> monthlyPricesWithPrevCloseByTickerAndDate.entrySet().stream()
-                            .filter(entry -> entry.getKey().startsWith(ticker + "_"))
+                            .filter(entry -> entry.getKey().equals(ticker))
                             .map(Map.Entry::getValue);
                     case QUARTERLY -> quarterlyPricesWithPrevCloseByTickerAndDate.entrySet().stream()
-                            .filter(entry -> entry.getKey().startsWith(ticker + "_"))
+                            .filter(entry -> entry.getKey().equals(ticker))
                             .map(Map.Entry::getValue);
                     case YEARLY -> yearlyPricesWithPrevCloseByTickerAndDate.entrySet().stream()
-                            .filter(entry -> entry.getKey().startsWith(ticker + "_"))
+                            .filter(entry -> entry.getKey().equals(ticker))
                             .map(Map.Entry::getValue);
                     case DAILY -> throw new IllegalArgumentException("Unexpected timeframe DAILY");
                 })
