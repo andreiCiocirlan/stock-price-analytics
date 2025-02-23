@@ -55,8 +55,8 @@ public class Stock implements PriceEntity {
     private Double dailyHigh; // Daily High
     @Column(name = "d_low")
     private Double dailyLow; // Daily Low
-    @Column(name = "d_close")
-    private Double dailyClose; // Daily Close (real-time price)
+    @Column(name = "close")
+    private Double close; // closing price (real-time price, equal for all timeframes)
     @Column(name = "d_performance")
     private Double dailyPerformance; // Daily Performance (real-time price)
 
@@ -67,8 +67,6 @@ public class Stock implements PriceEntity {
     private Double weeklyHigh; // Weekly High
     @Column(name = "w_low")
     private Double weeklyLow; // Weekly Low
-    @Column(name = "w_close")
-    private Double weeklyClose; // Weekly Close (real-time price)
     @Column(name = "w_performance")
     private Double weeklyPerformance; // Weekly Performance
 
@@ -79,8 +77,6 @@ public class Stock implements PriceEntity {
     private Double monthlyHigh; // Monthly High
     @Column(name = "m_low")
     private Double monthlyLow; // Monthly Low
-    @Column(name = "m_close")
-    private Double monthlyClose; // Monthly Close (real-time price)
     @Column(name = "m_performance")
     private Double monthlyPerformance; // Monthly Performance
 
@@ -91,8 +87,6 @@ public class Stock implements PriceEntity {
     private Double quarterlyHigh; // Quarterly High
     @Column(name = "q_low")
     private Double quarterlyLow; // Quarterly Low
-    @Column(name = "q_close")
-    private Double quarterlyClose; // Quarterly Close (real-time price)
     @Column(name = "q_performance")
     private Double quarterlyPerformance; // Quarterly Performance
 
@@ -103,8 +97,6 @@ public class Stock implements PriceEntity {
     private Double yearlyHigh; // Yearly High
     @Column(name = "y_low")
     private Double yearlyLow; // Yearly Low
-    @Column(name = "y_close")
-    private Double yearlyClose; // Yearly Close (real-time price)
     @Column(name = "y_performance")
     private Double yearlyPerformance; // Yearly Performance
 
@@ -178,7 +170,7 @@ public class Stock implements PriceEntity {
         this.setDailyOpen(dailyPrice.getOpen());
         this.setDailyHigh(dailyPrice.getHigh());
         this.setDailyLow(dailyPrice.getLow());
-        this.setDailyClose(dailyPrice.getClose());
+        this.setClose(dailyPrice.getClose());
         this.setDailyPerformance(dailyPrice.getPerformance());
         this.setLastUpdated(dailyPrice.getDate());
     }
@@ -187,7 +179,6 @@ public class Stock implements PriceEntity {
         this.setWeeklyOpen(weeklyPrice.getOpen());
         this.setWeeklyHigh(weeklyPrice.getHigh());
         this.setWeeklyLow(weeklyPrice.getLow());
-        this.setWeeklyClose(weeklyPrice.getClose());
         this.setWeeklyPerformance(weeklyPrice.getPerformance());
     }
 
@@ -195,7 +186,6 @@ public class Stock implements PriceEntity {
         this.setMonthlyOpen(monthlyPrice.getOpen());
         this.setMonthlyHigh(monthlyPrice.getHigh());
         this.setMonthlyLow(monthlyPrice.getLow());
-        this.setMonthlyClose(monthlyPrice.getClose());
         this.setMonthlyPerformance(monthlyPrice.getPerformance());
     }
 
@@ -203,7 +193,6 @@ public class Stock implements PriceEntity {
         this.setQuarterlyOpen(quarterlyPrice.getOpen());
         this.setQuarterlyHigh(quarterlyPrice.getHigh());
         this.setQuarterlyLow(quarterlyPrice.getLow());
-        this.setQuarterlyClose(quarterlyPrice.getClose());
         this.setQuarterlyPerformance(quarterlyPrice.getPerformance());
     }
 
@@ -211,7 +200,6 @@ public class Stock implements PriceEntity {
         this.setYearlyOpen(yearlyPrice.getOpen());
         this.setYearlyHigh(yearlyPrice.getHigh());
         this.setYearlyLow(yearlyPrice.getLow());
-        this.setYearlyClose(yearlyPrice.getClose());
         this.setYearlyPerformance(yearlyPrice.getPerformance());
     }
 

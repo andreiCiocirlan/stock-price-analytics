@@ -76,9 +76,9 @@ public class PriceMilestoneService {
             case NEW_52W_HIGH, NEW_ALL_TIME_HIGH, NEW_4W_HIGH -> s.getWeeklyHigh() > highLowForPeriod.getHigh();
             case NEW_52W_LOW, NEW_4W_LOW, NEW_ALL_TIME_LOW -> s.getWeeklyLow() < highLowForPeriod.getLow();
             case HIGH_52W_95, HIGH_4W_95, HIGH_ALL_TIME_95 ->
-                    highLowForPeriod.getLow() != highLowForPeriod.getHigh() && (1 - (1 - (s.getWeeklyClose() - highLowForPeriod.getLow()) / (highLowForPeriod.getHigh() - highLowForPeriod.getLow()))) > 0.95;
+                    highLowForPeriod.getLow() != highLowForPeriod.getHigh() && (1 - (1 - (s.getClose() - highLowForPeriod.getLow()) / (highLowForPeriod.getHigh() - highLowForPeriod.getLow()))) > 0.95;
             case LOW_52W_95, LOW_4W_95, LOW_ALL_TIME_95 ->
-                    highLowForPeriod.getLow() != highLowForPeriod.getHigh() && (1 - (s.getWeeklyClose() - highLowForPeriod.getLow()) / (highLowForPeriod.getHigh() - highLowForPeriod.getLow())) > 0.95;
+                    highLowForPeriod.getLow() != highLowForPeriod.getHigh() && (1 - (s.getClose() - highLowForPeriod.getLow()) / (highLowForPeriod.getHigh() - highLowForPeriod.getLow())) > 0.95;
             case NONE -> throw new IllegalStateException("Unexpected value NONE");
         };
     }
@@ -87,18 +87,18 @@ public class PriceMilestoneService {
         return switch (milestone) {
             // previous day DOWN more than 1% && pre-market GAP UP more than 4%
             case KICKING_CANDLE_UP ->
-                    s.getDailyPerformance() < -1.0d && preMarketPrice.getClose() > s.getDailyClose() * (1 + MIN_GAP_AND_GO_PERCENTAGE);
+                    s.getDailyPerformance() < -1.0d && preMarketPrice.getClose() > s.getClose() * (1 + MIN_GAP_AND_GO_PERCENTAGE);
             // previous day UP more than 1% && pre-market GAP DOWN more than 4%
             case KICKING_CANDLE_DOWN ->
-                    s.getDailyPerformance() > 1.0d && preMarketPrice.getClose() < s.getDailyClose() * (1 - MIN_GAP_AND_GO_PERCENTAGE);
-            case GAP_UP -> preMarketPrice.getClose() > s.getDailyClose();
-            case GAP_DOWN -> preMarketPrice.getClose() < s.getDailyClose();
-            case GAP_UP_10_PERCENT -> preMarketPrice.getClose() > s.getDailyClose() * 1.10;
-            case GAP_DOWN_10_PERCENT -> preMarketPrice.getClose() < s.getDailyClose() * 0.90;
+                    s.getDailyPerformance() > 1.0d && preMarketPrice.getClose() < s.getClose() * (1 - MIN_GAP_AND_GO_PERCENTAGE);
+            case GAP_UP -> preMarketPrice.getClose() > s.getClose();
+            case GAP_DOWN -> preMarketPrice.getClose() < s.getClose();
+            case GAP_UP_10_PERCENT -> preMarketPrice.getClose() > s.getClose() * 1.10;
+            case GAP_DOWN_10_PERCENT -> preMarketPrice.getClose() < s.getClose() * 0.90;
             // pre-market GAP UP more than 4%
-            case GAP_UP_AND_GO -> preMarketPrice.getClose() > s.getDailyClose() * (1 + MIN_GAP_AND_GO_PERCENTAGE);
+            case GAP_UP_AND_GO -> preMarketPrice.getClose() > s.getClose() * (1 + MIN_GAP_AND_GO_PERCENTAGE);
             // pre-market GAP DOWN more than 4%
-            case GAP_DOWN_AND_GO -> preMarketPrice.getClose() < s.getDailyClose() * (1 - MIN_GAP_AND_GO_PERCENTAGE);
+            case GAP_DOWN_AND_GO -> preMarketPrice.getClose() < s.getClose() * (1 - MIN_GAP_AND_GO_PERCENTAGE);
             case NONE -> throw new IllegalStateException("Unexpected value NONE");
         };
     }

@@ -40,9 +40,9 @@ public class FVGTaggedService {
 
         String highLowWhereClause;
         if (PricePerformanceMilestone.high95thPercentileValues().contains(pricePerformanceMilestone)) {
-            highLowWhereClause = STR."AND s.\{lowField} <> s.\{highField} AND (1 - (1 - ((s.\{prefix}close - s.\{lowField}) / (s.\{highField} - s.\{lowField})))) > 0.95";
+            highLowWhereClause = STR."AND s.\{lowField} <> s.\{highField} AND (1 - (1 - ((s.close - s.\{lowField}) / (s.\{highField} - s.\{lowField})))) > 0.95";
         } else {
-            highLowWhereClause = STR."AND s.\{lowField} <> s.\{highField} AND (1 - (s.\{prefix}close - s.\{lowField}) / (s.\{highField} - s.\{lowField})) > 0.95";
+            highLowWhereClause = STR."AND s.\{lowField} <> s.\{highField} AND (1 - (s.close - s.\{lowField}) / (s.\{highField} - s.\{lowField})) > 0.95";
         }
 
         String query = STR."""
