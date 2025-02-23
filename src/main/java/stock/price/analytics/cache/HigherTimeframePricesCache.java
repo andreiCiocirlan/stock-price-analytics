@@ -2,10 +2,7 @@ package stock.price.analytics.cache;
 
 import lombok.Getter;
 import org.springframework.stereotype.Component;
-import stock.price.analytics.cache.model.MonthlyPriceWithPrevClose;
-import stock.price.analytics.cache.model.QuarterlyPriceWithPrevClose;
-import stock.price.analytics.cache.model.WeeklyPriceWithPrevClose;
-import stock.price.analytics.cache.model.YearlyPriceWithPrevClose;
+import stock.price.analytics.cache.model.*;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
 
@@ -24,84 +21,39 @@ class HigherTimeframePricesCache {
     private final Map<String, QuarterlyPrice> quarterlyPricesByTickerAndDate = new HashMap<>();
     private final Map<String, YearlyPrice> yearlyPricesByTickerAndDate = new HashMap<>();
 
-    private final Map<String, WeeklyPriceWithPrevClose> weeklyPricesWithPrevCloseByTickerAndDate = new HashMap<>();
-    private final Map<String, MonthlyPriceWithPrevClose> monthlyPricesWithPrevCloseByTickerAndDate = new HashMap<>();
-    private final Map<String, QuarterlyPriceWithPrevClose> quarterlyPricesWithPrevCloseByTickerAndDate = new HashMap<>();
-    private final Map<String, YearlyPriceWithPrevClose> yearlyPricesWithPrevCloseByTickerAndDate = new HashMap<>();
+    private final Map<String, PriceWithPrevClose> weeklyPricesWithPrevCloseByTickerAndDate = new HashMap<>();
+    private final Map<String, PriceWithPrevClose> monthlyPricesWithPrevCloseByTickerAndDate = new HashMap<>();
+    private final Map<String, PriceWithPrevClose> quarterlyPricesWithPrevCloseByTickerAndDate = new HashMap<>();
+    private final Map<String, PriceWithPrevClose> yearlyPricesWithPrevCloseByTickerAndDate = new HashMap<>();
 
-    void addWeeklyPricesWithPrevClose(List<WeeklyPriceWithPrevClose> weeklyPricesWithPrevClose) {
-        weeklyPricesWithPrevClose.forEach(price -> {
-            weeklyPricesWithPrevCloseByTickerAndDate.merge(
-                    createKey(price.weeklyPrice().getTicker(), price.weeklyPrice().getStartDate()),
-                    price,
-                    (_, newPrice) -> newPrice // Logic to keep the latest price
-            );
-        });
+    void addPricesWithPrevClose(List<PriceWithPrevClose> pricesWithPrevClose, StockTimeframe timeframe) {
+        if (pricesWithPrevClose == null || pricesWithPrevClose.isEmpty()) return; // Handle null or empty list case to avoid exceptions
+        pricesWithPrevClose.forEach(price -> (switch (timeframe) {
+                    case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
+                    case WEEKLY -> weeklyPricesWithPrevCloseByTickerAndDate;
+                    case MONTHLY -> monthlyPricesWithPrevCloseByTickerAndDate;
+                    case QUARTERLY -> quarterlyPricesWithPrevCloseByTickerAndDate;
+                    case YEARLY -> yearlyPricesWithPrevCloseByTickerAndDate;
+                }).put(createKey(price.getPrice().getTicker(), price.getPrice().getStartDate()), price));
     }
 
-    void addMonthlyPricesWithPrevClose(List<MonthlyPriceWithPrevClose> monthlyPricesWithPrevClose) {
-        monthlyPricesWithPrevClose.forEach(price -> {
-            monthlyPricesWithPrevCloseByTickerAndDate.merge(
-                    createKey(price.monthlyPrice().getTicker(), price.monthlyPrice().getStartDate()),
-                    price,
-                    (_, newPrice) -> newPrice // Logic to keep the latest price
-            );
-        });
-    }
-
-    void addQuarterlyPricesWithPrevClose(List<QuarterlyPriceWithPrevClose> quarterlyPricesWithPrevClose) {
-        quarterlyPricesWithPrevClose.forEach(price -> {
-            quarterlyPricesWithPrevCloseByTickerAndDate.merge(
-                    createKey(price.quarterlyPrice().getTicker(), price.quarterlyPrice().getStartDate()),
-                    price,
-                    (_, newPrice) -> newPrice // Logic to keep the latest price
-            );
-        });
-    }
-
-    void addYearlyPricesWithPrevClose(List<YearlyPriceWithPrevClose> yearlyPricesWithPrevClose) {
-        yearlyPricesWithPrevClose.forEach(price -> {
-            yearlyPricesWithPrevCloseByTickerAndDate.merge(
-                    createKey(price.yearlyPrice().getTicker(), price.yearlyPrice().getStartDate()),
-                    price,
-                    (_, newPrice) -> newPrice // Logic to keep the latest price
-            );
-        });
-    }
-
-    List<WeeklyPriceWithPrevClose> weeklyPricesWithPrevCloseFor(List<String> tickers) {
+    List<PriceWithPrevClose> pricesWithPrevCloseFor(List<String> tickers, StockTimeframe timeframe) {
         return tickers.stream()
-                .flatMap(ticker ->
-                        weeklyPricesWithPrevCloseByTickerAndDate.entrySet().stream()
-                                .filter(entry -> entry.getKey().startsWith(ticker + "_"))
-                                .map(Map.Entry::getValue))
-                .collect(Collectors.toList());
-    }
-
-    List<MonthlyPriceWithPrevClose> monthlyPricesWithPrevCloseFor(List<String> tickers) {
-        return tickers.stream()
-                .flatMap(ticker ->
-                        monthlyPricesWithPrevCloseByTickerAndDate.entrySet().stream()
-                                .filter(entry -> entry.getKey().startsWith(ticker + "_"))
-                                .map(Map.Entry::getValue))
-                .collect(Collectors.toList());
-    }
-
-    List<QuarterlyPriceWithPrevClose> quarterlyPricesWithPrevCloseFor(List<String> tickers) {
-        return tickers.stream()
-                .flatMap(ticker ->
-                        quarterlyPricesWithPrevCloseByTickerAndDate.entrySet().stream()
-                                .filter(entry -> entry.getKey().startsWith(ticker + "_"))
-                                .map(Map.Entry::getValue))
-                .collect(Collectors.toList());
-    }
-
-    List<YearlyPriceWithPrevClose> yearlyPricesWithPrevCloseFor(List<String> tickers) {
-        return tickers.stream()
-                .flatMap(ticker ->
-                        yearlyPricesWithPrevCloseByTickerAndDate.entrySet().stream()
-                                .filter(entry -> entry.getKey().startsWith(ticker + "_"))
-                                .map(Map.Entry::getValue))
+                .flatMap(ticker -> switch (timeframe) {
+                    case WEEKLY -> weeklyPricesWithPrevCloseByTickerAndDate.entrySet().stream()
+                            .filter(entry -> entry.getKey().startsWith(ticker + "_"))
+                            .map(Map.Entry::getValue);
+                    case MONTHLY -> monthlyPricesWithPrevCloseByTickerAndDate.entrySet().stream()
+                            .filter(entry -> entry.getKey().startsWith(ticker + "_"))
+                            .map(Map.Entry::getValue);
+                    case QUARTERLY -> quarterlyPricesWithPrevCloseByTickerAndDate.entrySet().stream()
+                            .filter(entry -> entry.getKey().startsWith(ticker + "_"))
+                            .map(Map.Entry::getValue);
+                    case YEARLY -> yearlyPricesWithPrevCloseByTickerAndDate.entrySet().stream()
+                            .filter(entry -> entry.getKey().startsWith(ticker + "_"))
+                            .map(Map.Entry::getValue);
+                    case DAILY -> throw new IllegalArgumentException("Unexpected timeframe DAILY");
+                })
                 .collect(Collectors.toList());
     }
 
