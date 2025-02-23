@@ -5,6 +5,6 @@ import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 // Marker interface
 public interface PriceWithPrevClose {
     AbstractPrice getPrice();
-    Double previousClose();
+    double previousClose();
     String toString();
 }
