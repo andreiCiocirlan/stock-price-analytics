@@ -27,7 +27,7 @@ public class HigherTimeframePricesCacheService {
         };
     }
 
-    private <T extends AbstractPrice, R extends PriceWithPrevClose> List<R> priceWithPrevCloseFrom(List<T> previousThreePricesForTickers) {
+    public <T extends AbstractPrice, R extends PriceWithPrevClose> List<R> priceWithPrevCloseFrom(List<T> previousThreePricesForTickers) {
         Map<String, List<T>> previousTwoPricesByTicker = previousThreePricesForTickers
                 .stream()
                 .collect(Collectors.groupingBy(AbstractPrice::getTicker))
