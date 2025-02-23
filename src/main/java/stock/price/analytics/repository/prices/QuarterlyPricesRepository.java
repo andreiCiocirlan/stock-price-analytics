@@ -14,7 +14,7 @@ public interface QuarterlyPricesRepository extends JpaRepository<QuarterlyPrice,
     @Query(value = """
                 SELECT *
                 FROM quarterly_prices
-                WHERE start_date BETWEEN (DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6 month') AND CURRENT_DATE
+                WHERE start_date BETWEEN (DATE_TRUNC('quarter', CURRENT_DATE) - INTERVAL '6 month') AND CURRENT_DATE
                 AND ticker in (:tickers)
                 ORDER BY ticker, start_date DESC
             """, nativeQuery = true)
