@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
+
 @Component
 @Getter
 class HigherTimeframePricesCache {
@@ -26,34 +28,26 @@ class HigherTimeframePricesCache {
     private final Map<String, PriceWithPrevClose> quarterlyPricesWithPrevCloseByTickerAndDate = new HashMap<>();
     private final Map<String, PriceWithPrevClose> yearlyPricesWithPrevCloseByTickerAndDate = new HashMap<>();
 
+    private final Map<StockTimeframe, Map<String, PriceWithPrevClose>> pricesWithPrevCloseByTimeframe = Map.of(
+            WEEKLY, weeklyPricesWithPrevCloseByTickerAndDate,
+            MONTHLY, monthlyPricesWithPrevCloseByTickerAndDate,
+            QUARTERLY, quarterlyPricesWithPrevCloseByTickerAndDate,
+            YEARLY, yearlyPricesWithPrevCloseByTickerAndDate
+    );
+
     void addPricesWithPrevClose(List<PriceWithPrevClose> pricesWithPrevClose, StockTimeframe timeframe) {
-        if (pricesWithPrevClose == null || pricesWithPrevClose.isEmpty()) return; // Handle null or empty list case to avoid exceptions
-        pricesWithPrevClose.forEach(price -> (switch (timeframe) {
-                    case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
-                    case WEEKLY -> weeklyPricesWithPrevCloseByTickerAndDate;
-                    case MONTHLY -> monthlyPricesWithPrevCloseByTickerAndDate;
-                    case QUARTERLY -> quarterlyPricesWithPrevCloseByTickerAndDate;
-                    case YEARLY -> yearlyPricesWithPrevCloseByTickerAndDate;
-                }).put(price.getPrice().getTicker(), price));
+        if (pricesWithPrevClose == null || pricesWithPrevClose.isEmpty())
+            return; // Handle null or empty list case to avoid exceptions
+        Map<String, PriceWithPrevClose> pricesWithPrevCloseByTicker = pricesWithPrevCloseByTimeframe.get(timeframe);
+        pricesWithPrevClose.forEach(price -> pricesWithPrevCloseByTicker.put(price.getPrice().getTicker(), price));
     }
 
     List<PriceWithPrevClose> pricesWithPrevCloseFor(List<String> tickers, StockTimeframe timeframe) {
+        Map<String, PriceWithPrevClose> pricesWithPrevCloseByTicker = pricesWithPrevCloseByTimeframe.get(timeframe);
         return tickers.stream()
-                .flatMap(ticker -> switch (timeframe) {
-                    case WEEKLY -> weeklyPricesWithPrevCloseByTickerAndDate.entrySet().stream()
-                            .filter(entry -> entry.getKey().equals(ticker))
-                            .map(Map.Entry::getValue);
-                    case MONTHLY -> monthlyPricesWithPrevCloseByTickerAndDate.entrySet().stream()
-                            .filter(entry -> entry.getKey().equals(ticker))
-                            .map(Map.Entry::getValue);
-                    case QUARTERLY -> quarterlyPricesWithPrevCloseByTickerAndDate.entrySet().stream()
-                            .filter(entry -> entry.getKey().equals(ticker))
-                            .map(Map.Entry::getValue);
-                    case YEARLY -> yearlyPricesWithPrevCloseByTickerAndDate.entrySet().stream()
-                            .filter(entry -> entry.getKey().equals(ticker))
-                            .map(Map.Entry::getValue);
-                    case DAILY -> throw new IllegalArgumentException("Unexpected timeframe DAILY");
-                })
+                .flatMap(ticker -> pricesWithPrevCloseByTicker.entrySet().stream()
+                        .filter(entry -> entry.getKey().equals(ticker))
+                        .map(Map.Entry::getValue))
                 .collect(Collectors.toList());
     }
 
