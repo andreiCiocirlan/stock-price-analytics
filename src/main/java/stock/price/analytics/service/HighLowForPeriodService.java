@@ -81,8 +81,6 @@ public class HighLowForPeriodService {
                 highLowPricesCacheService.addHighLowPrices(hlPricesUpdated, highLowPeriod);
             }
         }
-        highLowPricesCacheService.logNewHighLowsForHLPeriods();
-        highLowPricesCacheService.logEqualHighLowsForHLPeriods();
     }
 
     public void saveAllHistoricalHighLowPrices(List<String> tickers, LocalDate tradingDate) {
