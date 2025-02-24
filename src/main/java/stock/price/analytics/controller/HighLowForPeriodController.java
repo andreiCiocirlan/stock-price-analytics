@@ -44,8 +44,14 @@ public class HighLowForPeriodController {
 
     @GetMapping("/daily-new-high-lows-for-hl-period")
     @ResponseStatus(HttpStatus.OK)
-    public void newDailyHighLowsForHLPeriod() {
+    public void newDailyHighLowsForHLPeriods() {
         highLowPricesCacheService.logNewHighLowsForHLPeriods();
+    }
+
+    @GetMapping("/daily-equal-high-lows-for-hl-period")
+    @ResponseStatus(HttpStatus.OK)
+    public void equalHighLowsForHLPeriods() {
+        highLowPricesCacheService.logEqualHighLowsForHLPeriods();
     }
 
 }
