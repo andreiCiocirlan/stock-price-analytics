@@ -67,4 +67,8 @@ public class HigherTimeframePricesCacheService {
         return higherTimeframePricesCache.pricesWithPrevCloseFor(tickers, timeframe);
     }
 
+    public void addPricesWithPrevCloseFrom(List<AbstractPrice> prevThreePrices) {
+        List<PriceWithPrevClose> pricesWithPrevClose = pricesWithPrevCloseByTickerFrom(prevThreePrices);
+        higherTimeframePricesCache.addPricesWithPrevClose(pricesWithPrevClose, prevThreePrices.getFirst().getTimeframe());
+    }
 }

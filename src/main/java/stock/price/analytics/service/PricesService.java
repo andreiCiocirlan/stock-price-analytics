@@ -82,10 +82,10 @@ public class PricesService {
         List<AbstractPrice> prevThreeQuarterlyPrices = previousThreePricesFor(tickers, QUARTERLY);
         List<AbstractPrice> prevThreeYearlyPrices = previousThreePricesFor(tickers, YEARLY);
 
-        higherTimeframePricesCacheService.addPricesWithPrevClose(higherTimeframePricesCacheService.pricesWithPrevCloseByTickerFrom(prevThreeWeeklyPrices));
-        higherTimeframePricesCacheService.addPricesWithPrevClose(higherTimeframePricesCacheService.pricesWithPrevCloseByTickerFrom(prevThreeMonthlyPrices));
-        higherTimeframePricesCacheService.addPricesWithPrevClose(higherTimeframePricesCacheService.pricesWithPrevCloseByTickerFrom(prevThreeQuarterlyPrices));
-        higherTimeframePricesCacheService.addPricesWithPrevClose(higherTimeframePricesCacheService.pricesWithPrevCloseByTickerFrom(prevThreeYearlyPrices));
+        higherTimeframePricesCacheService.addPricesWithPrevCloseFrom(prevThreeWeeklyPrices);
+        higherTimeframePricesCacheService.addPricesWithPrevCloseFrom(prevThreeMonthlyPrices);
+        higherTimeframePricesCacheService.addPricesWithPrevCloseFrom(prevThreeQuarterlyPrices);
+        higherTimeframePricesCacheService.addPricesWithPrevCloseFrom(prevThreeYearlyPrices);
 
         List<String> tickerList = List.of("AAPL", "F");
         higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickerList, WEEKLY).forEach(System.out::println);
