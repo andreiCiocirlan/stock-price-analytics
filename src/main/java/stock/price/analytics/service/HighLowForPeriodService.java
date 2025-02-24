@@ -75,14 +75,14 @@ public class HighLowForPeriodService {
         List<String> tickers = dailyPrices.stream().map(DailyPrice::getTicker).toList();
         for (HighLowPeriod highLowPeriod : values()) {
             List<? extends HighLowForPeriod> hlPricesUpdated = highLowPricesCacheService.getUpdatedHighLowPricesForTickers(dailyPrices, tickers, highLowPeriod);
-            highLowPricesCacheService.logNewHighLowsForHLPeriods();
-            highLowPricesCacheService.logEqualHighLowsForHLPeriods();
             if (!hlPricesUpdated.isEmpty()) {
                 log.info("found {} new {} prices {}", hlPricesUpdated.size(), highLowPeriod, hlPricesUpdated.stream().map(HighLowForPeriod::getTicker).toList());
                 partitionDataAndSaveNoLogging(hlPricesUpdated, highLowForPeriodRepository);
                 highLowPricesCacheService.addHighLowPrices(hlPricesUpdated, highLowPeriod);
             }
         }
+        highLowPricesCacheService.logNewHighLowsForHLPeriods();
+        highLowPricesCacheService.logEqualHighLowsForHLPeriods();
     }
 
     public void saveAllHistoricalHighLowPrices(List<String> tickers, LocalDate tradingDate) {
