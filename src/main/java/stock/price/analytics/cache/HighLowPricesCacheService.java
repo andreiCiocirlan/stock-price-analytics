@@ -127,7 +127,7 @@ public class HighLowPricesCacheService {
         for (HighLowPeriod highLowPeriod : HighLowPeriod.values()) {
             List<String> equalHighLowsForHLPeriod = getEqualHighLowsForHLPeriod(highLowPeriod);
             if (!equalHighLowsForHLPeriod.isEmpty()) {
-                log.info("{} New {} : {}", equalHighLowsForHLPeriod.size(), highLowPeriod, equalHighLowsForHLPeriod);
+                log.info("{} Equal {} : {}", equalHighLowsForHLPeriod.size(), highLowPeriod, equalHighLowsForHLPeriod);
             }
         }
     }
