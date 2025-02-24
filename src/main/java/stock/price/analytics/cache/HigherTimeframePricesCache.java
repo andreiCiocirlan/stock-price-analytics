@@ -1,6 +1,7 @@
 package stock.price.analytics.cache;
 
 import lombok.Getter;
+import org.aspectj.apache.bcel.generic.RET;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.cache.model.PriceWithPrevClose;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
@@ -18,10 +19,17 @@ import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
 @Getter
 class HigherTimeframePricesCache {
 
-    private final Map<String, WeeklyPrice> weeklyPricesByTickerAndDate = new HashMap<>();
-    private final Map<String, MonthlyPrice> monthlyPricesByTickerAndDate = new HashMap<>();
-    private final Map<String, QuarterlyPrice> quarterlyPricesByTickerAndDate = new HashMap<>();
-    private final Map<String, YearlyPrice> yearlyPricesByTickerAndDate = new HashMap<>();
+    private final Map<String, AbstractPrice> weeklyPricesByTickerAndDate = new HashMap<>();
+    private final Map<String, AbstractPrice> monthlyPricesByTickerAndDate = new HashMap<>();
+    private final Map<String, AbstractPrice> quarterlyPricesByTickerAndDate = new HashMap<>();
+    private final Map<String, AbstractPrice> yearlyPricesByTickerAndDate = new HashMap<>();
+
+    private final Map<StockTimeframe, Map<String, AbstractPrice>> pricesByTimeframe = Map.of(
+            WEEKLY, weeklyPricesByTickerAndDate,
+            MONTHLY, monthlyPricesByTickerAndDate,
+            QUARTERLY, quarterlyPricesByTickerAndDate,
+            YEARLY, yearlyPricesByTickerAndDate
+    );
 
     private final Map<String, PriceWithPrevClose> weeklyPricesWithPrevCloseByTickerAndDate = new HashMap<>();
     private final Map<String, PriceWithPrevClose> monthlyPricesWithPrevCloseByTickerAndDate = new HashMap<>();
@@ -55,17 +63,8 @@ class HigherTimeframePricesCache {
         if (prices == null || prices.isEmpty()) return; // Handle null or empty list case to avoid exceptions
 
         prices.forEach(price -> {
-            switch (prices.getFirst().getTimeframe()) {
-                case WEEKLY ->
-                        weeklyPricesByTickerAndDate.put(createKey(price.getTicker(), price.getStartDate()), (WeeklyPrice) price);
-                case MONTHLY ->
-                        monthlyPricesByTickerAndDate.put(createKey(price.getTicker(), price.getStartDate()), (MonthlyPrice) price);
-                case QUARTERLY ->
-                        quarterlyPricesByTickerAndDate.put(createKey(price.getTicker(), price.getStartDate()), (QuarterlyPrice) price);
-                case YEARLY ->
-                        yearlyPricesByTickerAndDate.put(createKey(price.getTicker(), price.getStartDate()), (YearlyPrice) price);
-                case DAILY -> throw new IllegalStateException("Unexpected timeframe: DAILY");
-            }
+            Map<String, AbstractPrice> pricesByTickerAndStartDate = pricesByTimeframe.get(prices.getFirst().getTimeframe());
+            pricesByTickerAndStartDate.put(createKey(price.getTicker(), price.getStartDate()), price);
         });
     }
 
