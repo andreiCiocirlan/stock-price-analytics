@@ -184,8 +184,6 @@ public class FairValueGapService {
         });
         if (!newFVGsFound.isEmpty()) {
             log.info("Found {} new {} FVGs for: {}", newFVGsFound.size(), timeframe, newFvgTickers);
-        } else {
-            log.info("Found 0 new {} FVGs", timeframe);
         }
 
         return newFVGsFound;
@@ -247,10 +245,6 @@ public class FairValueGapService {
                 updatedFVGsByCompositeId.put(compositeKey, fvg);
             }
         });
-
-        if (updatedFVGsByCompositeId.values().isEmpty()) {
-            log.info("Found 0 {} FVGs to be updated", timeframe);
-        }
 
         return new ArrayList<>(updatedFVGsByCompositeId.values());
     }
