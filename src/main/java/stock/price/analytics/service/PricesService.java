@@ -151,27 +151,29 @@ public class PricesService {
     private List<AbstractPrice> updateHTF(List<DailyPrice> importedDailyPrices) {
         List<String> tickers = new ArrayList<>(importedDailyPrices.stream().map(DailyPrice::getTicker).toList());
 
-        // Fetch previous prices for each timeframe
-        List<WeeklyPrice> previousTwoWeeklyPrices = getPreviousTwoPricesFor(tickers, WEEKLY);
-        List<MonthlyPrice> previousTwoMonthlyPrices = getPreviousTwoPricesFor(tickers, MONTHLY);
-        List<QuarterlyPrice> previousTwoQuarterlyPrices = getPreviousTwoPricesFor(tickers, QUARTERLY);
-        List<YearlyPrice> previousTwoYearlyPrices = getPreviousTwoPricesFor(tickers, YEARLY);
+        List<PriceWithPrevClose> weeklyPricesWithPrevClose = higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickers, WEEKLY);
+        List<PriceWithPrevClose> monthlyPricesWithPrevClose = higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickers, MONTHLY);
+        List<PriceWithPrevClose> quarterlyPricesWithPrevClose = higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickers, QUARTERLY);
+        List<PriceWithPrevClose> yearlyPricesWithPrevClose = higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickers, YEARLY);
 
         // Update prices for each timeframe and return (used for stocks cache update)
         List<AbstractPrice> htfPricesUpdated = new ArrayList<>();
-        List<WeeklyPrice> weeklyPrices = updateAndSavePrices(importedDailyPrices, WEEKLY, previousTwoWeeklyPrices);
-        List<MonthlyPrice> monthlyPrices = updateAndSavePrices(importedDailyPrices, MONTHLY, previousTwoMonthlyPrices);
-        List<QuarterlyPrice> quarterlyPrices = updateAndSavePrices(importedDailyPrices, QUARTERLY, previousTwoQuarterlyPrices);
-        List<YearlyPrice> yearlyPrices = updateAndSavePrices(importedDailyPrices, YEARLY, previousTwoYearlyPrices);
-        htfPricesUpdated.addAll(weeklyPrices);
-        htfPricesUpdated.addAll(monthlyPrices);
-        htfPricesUpdated.addAll(quarterlyPrices);
-        htfPricesUpdated.addAll(yearlyPrices);
+        List<PriceWithPrevClose> weeklyPricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, WEEKLY, weeklyPricesWithPrevClose);
+        List<PriceWithPrevClose> monthlyPricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, MONTHLY, monthlyPricesWithPrevClose);
+        List<PriceWithPrevClose> quarterlyPricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, QUARTERLY, quarterlyPricesWithPrevClose);
+        List<PriceWithPrevClose> yearlyPricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, YEARLY, yearlyPricesWithPrevClose);
 
-        higherTimeframePricesCacheService.addPrices(weeklyPrices);
-        higherTimeframePricesCacheService.addPrices(monthlyPrices);
-        higherTimeframePricesCacheService.addPrices(quarterlyPrices);
-        higherTimeframePricesCacheService.addPrices(yearlyPrices);
+        htfPricesUpdated.addAll(weeklyPricesWithPrevCloseUpdated.stream().map(PriceWithPrevClose::getPrice).toList());
+        htfPricesUpdated.addAll(monthlyPricesWithPrevCloseUpdated.stream().map(PriceWithPrevClose::getPrice).toList());
+        htfPricesUpdated.addAll(quarterlyPricesWithPrevCloseUpdated.stream().map(PriceWithPrevClose::getPrice).toList());
+        htfPricesUpdated.addAll(yearlyPricesWithPrevCloseUpdated.stream().map(PriceWithPrevClose::getPrice).toList());
+
+        higherTimeframePricesCacheService.addPricesWithPrevClose(weeklyPricesWithPrevCloseUpdated);
+        higherTimeframePricesCacheService.addPricesWithPrevClose(monthlyPricesWithPrevCloseUpdated);
+        higherTimeframePricesCacheService.addPricesWithPrevClose(quarterlyPricesWithPrevCloseUpdated);
+        higherTimeframePricesCacheService.addPricesWithPrevClose(yearlyPricesWithPrevCloseUpdated);
+
+        partitionDataAndSaveNoLogging(htfPricesUpdated, pricesRepository);
 
         return htfPricesUpdated;
     }
@@ -204,17 +206,38 @@ public class PricesService {
     }
 
 
-    @SuppressWarnings("unchecked")
-    private <T extends AbstractPrice> List<T> updateAndSavePrices(List<DailyPrice> importedDailyPrices,
+    private List<PriceWithPrevClose> updateAndSavePrices(List<DailyPrice> importedDailyPrices,
                                                                   StockTimeframe timeframe,
-                                                                  List<T> previousPrices) {
-        Map<String, List<AbstractPrice>> previousPricesByTicker = previousPrices.stream()
-                .collect(Collectors.groupingBy(AbstractPrice::getTicker, Collectors.mapping(p -> (AbstractPrice) p, Collectors.toList())));
+                                                                  List<PriceWithPrevClose> pricesWithPrevClose) {
+        List<PriceWithPrevClose> result = new ArrayList<>();
+        Map<String, PriceWithPrevClose> pricesWithPrevCloseByTicker = pricesWithPrevClose.stream()
+                .collect(Collectors.toMap(priceWithPrevClose -> priceWithPrevClose.getPrice().getTicker(), p -> p));
+        for (DailyPrice importedDailyPrice : importedDailyPrices) {
+            String ticker = importedDailyPrice.getTicker();
+            PriceWithPrevClose priceWithPrevClose = pricesWithPrevCloseByTicker.get(ticker);
+            AbstractPrice price = priceWithPrevClose.getPrice();
+            LocalDate latestEndDateWMQY = price.getEndDate(); // latest cached w,m,q,y end_date per ticker
+            if (isWithinSameTimeframe(importedDailyPrice.getDate(), latestEndDateWMQY, timeframe)) {
+                price.convertFrom(importedDailyPrice, priceWithPrevClose.previousClose());
+                result.add(priceWithPrevClose);
+            } else { // new week, month, quarter, year
+                result.add(newPriceWithPrevCloseFrom(importedDailyPrice, timeframe, price.getClose()));
+            }
+        }
 
-        List<AbstractPrice> updatedPrices = updatePricesAndPerformance(importedDailyPrices, timeframe, previousPricesByTicker);
-        partitionDataAndSaveNoLogging(updatedPrices, pricesRepository);
+        return result;
+    }
 
-        return (List<T>) updatedPrices;
+    private PriceWithPrevClose newPriceWithPrevCloseFrom(DailyPrice importedDailyPrice, StockTimeframe timeframe, double previousClose) {
+        AbstractPrice price = createNewWMYPrice(importedDailyPrice, timeframe, previousClose);
+
+        return switch (timeframe) {
+            case DAILY -> throw new IllegalStateException("Unexpected timeframe DAILY");
+            case WEEKLY -> new WeeklyPriceWithPrevClose((WeeklyPrice) price, previousClose);
+            case MONTHLY -> new MonthlyPriceWithPrevClose((MonthlyPrice) price, previousClose);
+            case QUARTERLY -> new QuarterlyPriceWithPrevClose((QuarterlyPrice) price, previousClose);
+            case YEARLY -> new YearlyPriceWithPrevClose((YearlyPrice) price, previousClose);
+        };
     }
 
     private List<AbstractPrice> updatePricesAndPerformance(List<DailyPrice> dailyPrices, StockTimeframe timeframe, Map<String, List<AbstractPrice>> previousTwoWMYPricesByTicker) {
