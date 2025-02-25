@@ -31,16 +31,16 @@ class HigherTimeframePricesCache {
             YEARLY, yearlyPricesByTickerAndDate
     );
 
-    private final Map<String, PriceWithPrevClose> weeklyPricesWithPrevCloseByTickerAndDate = new HashMap<>();
-    private final Map<String, PriceWithPrevClose> monthlyPricesWithPrevCloseByTickerAndDate = new HashMap<>();
-    private final Map<String, PriceWithPrevClose> quarterlyPricesWithPrevCloseByTickerAndDate = new HashMap<>();
-    private final Map<String, PriceWithPrevClose> yearlyPricesWithPrevCloseByTickerAndDate = new HashMap<>();
+    private final Map<String, PriceWithPrevClose> weeklyPricesWithPrevCloseByTicker = new HashMap<>();
+    private final Map<String, PriceWithPrevClose> monthlyPricesWithPrevCloseByTicker = new HashMap<>();
+    private final Map<String, PriceWithPrevClose> quarterlyPricesWithPrevCloseByTicker = new HashMap<>();
+    private final Map<String, PriceWithPrevClose> yearlyPricesWithPrevCloseByTicker = new HashMap<>();
 
     private final Map<StockTimeframe, Map<String, PriceWithPrevClose>> pricesWithPrevCloseByTimeframe = Map.of(
-            WEEKLY, weeklyPricesWithPrevCloseByTickerAndDate,
-            MONTHLY, monthlyPricesWithPrevCloseByTickerAndDate,
-            QUARTERLY, quarterlyPricesWithPrevCloseByTickerAndDate,
-            YEARLY, yearlyPricesWithPrevCloseByTickerAndDate
+            WEEKLY, weeklyPricesWithPrevCloseByTicker,
+            MONTHLY, monthlyPricesWithPrevCloseByTicker,
+            QUARTERLY, quarterlyPricesWithPrevCloseByTicker,
+            YEARLY, yearlyPricesWithPrevCloseByTicker
     );
 
     void addPricesWithPrevClose(List<PriceWithPrevClose> pricesWithPrevClose, StockTimeframe timeframe) {
