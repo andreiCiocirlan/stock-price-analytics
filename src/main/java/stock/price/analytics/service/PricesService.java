@@ -17,7 +17,10 @@ import stock.price.analytics.repository.prices.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -58,13 +61,6 @@ public class PricesService {
                 .values().stream()
                 .flatMap(prices -> prices.stream().sorted(Comparator.comparing(AbstractPrice::getStartDate).reversed()).limit(1))
                 .toList();
-    }
-
-    public Set<String> cacheTickersFor(StockTimeframe timeframe) {
-        return (switch (timeframe) {
-            case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
-            case WEEKLY, MONTHLY, QUARTERLY, YEARLY -> higherTimeframePricesCacheService.getPricesByTickerAndDateFor(timeframe);
-        }).keySet().stream().map(key -> key.split("_")[0]).collect(Collectors.toSet());
     }
 
     @SuppressWarnings("unchecked")
@@ -178,33 +174,6 @@ public class PricesService {
         return htfPricesUpdated;
     }
 
-    @SuppressWarnings("unchecked")
-    private <T extends AbstractPrice> List<T> getPreviousTwoPricesFor(List<String> tickers, StockTimeframe timeframe) {
-        Set<String> cacheTickers = cacheTickersFor(timeframe);
-        List<? extends AbstractPrice> previousPrices;
-        if (cacheTickers.isEmpty()) {
-            log.info("Fetching Previous Two {} Prices from database for {} tickers", timeframe.name(), tickers.size());
-            previousPrices = previousThreePricesFor(tickers, timeframe);
-            higherTimeframePricesCacheService.addPrices(previousPrices);
-        } else if (cacheTickers.containsAll(tickers)) {
-            previousPrices = higherTimeframePricesCacheService.htfPricesFor(tickers, timeframe);
-        } else { // partial match
-            tickers.removeAll(cacheTickers);
-            previousPrices = previousThreePricesFor(tickers, timeframe);
-            higherTimeframePricesCacheService.addPrices(previousPrices);
-            log.info("previous {} Prices partial match for {} tickers", timeframe.name(), tickers.size());
-            cacheTickers.addAll(tickers);
-            previousPrices = higherTimeframePricesCacheService.htfPricesFor(cacheTickers.stream().toList(), timeframe);
-        }
-
-        return (List<T>) previousPrices
-                .stream()
-                .collect(Collectors.groupingBy(AbstractPrice::getTicker))
-                .values().stream()
-                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(AbstractPrice::getStartDate).reversed()).limit(2))
-                .toList();
-    }
-
 
     private List<PriceWithPrevClose> updateAndSavePrices(List<DailyPrice> importedDailyPrices,
                                                                   StockTimeframe timeframe,
@@ -238,52 +207,6 @@ public class PricesService {
             case QUARTERLY -> new QuarterlyPriceWithPrevClose((QuarterlyPrice) price, previousClose);
             case YEARLY -> new YearlyPriceWithPrevClose((YearlyPrice) price, previousClose);
         };
-    }
-
-    private List<AbstractPrice> updatePricesAndPerformance(List<DailyPrice> dailyPrices, StockTimeframe timeframe, Map<String, List<AbstractPrice>> previousTwoWMYPricesByTicker) {
-        List<AbstractPrice> wmyPrices = new ArrayList<>();
-        for (DailyPrice dailyPrice : dailyPrices) {
-            String ticker = dailyPrice.getTicker();
-            if (previousTwoWMYPricesByTicker.containsKey(ticker)) {
-                wmyPrices.add(wmyPriceUpdatedFrom(previousTwoWMYPricesByTicker.get(ticker), dailyPrice, timeframe));
-            } else { // IPO first day, create new weekly, monthly, yearly
-                wmyPrices.add(createNewWMYPrice(dailyPrice, timeframe, dailyPrice.getOpen()));
-            }
-        }
-        return wmyPrices;
-    }
-
-    private AbstractPrice wmyPriceUpdatedFrom(List<AbstractPrice> previousTwoWMY, DailyPrice dailyPrice, StockTimeframe timeframe) {
-        AbstractPrice result;
-        AbstractPrice latestPriceWMY = previousTwoWMY.getFirst();
-        LocalDate latestEndDateWMY = latestPriceWMY.getEndDate();
-        LocalDate dailyPriceDate = dailyPrice.getDate();
-        if (latestEndDateWMY.equals(dailyPriceDate)) { // already imported (intraday update prices, performance)
-            // check for IPO week, month, year by size < 2
-            double previousClose = previousTwoWMY.size() < 2 ? latestPriceWMY.getOpen() : previousTwoWMY.getLast().getClose();
-            result = latestPriceWMY.convertFrom(dailyPrice, previousClose);
-        } else {
-            result = switch (timeframe) {
-                case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
-                case WEEKLY, MONTHLY, QUARTERLY, YEARLY ->
-                        updateOrCreateWMYPrice(previousTwoWMY, dailyPrice, latestEndDateWMY, timeframe);
-            };
-        }
-        return result;
-    }
-
-    private AbstractPrice updateOrCreateWMYPrice(List<AbstractPrice> previousTwoWMY, DailyPrice dailyPrice, LocalDate latestEndDateWMY, StockTimeframe timeframe) {
-        AbstractPrice result;
-        LocalDate dailyPriceDate = dailyPrice.getDate();
-        AbstractPrice latestPriceWMY = previousTwoWMY.getFirst();
-        if (isWithinSameTimeframe(dailyPriceDate, latestEndDateWMY, timeframe)) {
-            double previousClose = previousTwoWMY.size() < 2 ? latestPriceWMY.getOpen() : previousTwoWMY.getLast().getClose();
-            result = latestPriceWMY.convertFrom(dailyPrice, previousClose);
-        } else { // new week, month, year
-            double previousClose = latestPriceWMY.getClose();
-            result = createNewWMYPrice(dailyPrice, timeframe, previousClose);
-        }
-        return result;
     }
 
     private boolean isWithinSameTimeframe(LocalDate date, LocalDate latestEndDateWMY, StockTimeframe timeframe) {
