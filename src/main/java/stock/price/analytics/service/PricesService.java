@@ -229,7 +229,7 @@ public class PricesService {
     }
 
     private PriceWithPrevClose newPriceWithPrevCloseFrom(DailyPrice importedDailyPrice, StockTimeframe timeframe, double previousClose) {
-        AbstractPrice price = createNewWMYPrice(importedDailyPrice, timeframe, previousClose);
+        AbstractPrice price = createNewHTFPrice(importedDailyPrice, timeframe, previousClose);
 
         return switch (timeframe) {
             case DAILY -> throw new IllegalStateException("Unexpected timeframe DAILY");
@@ -296,7 +296,7 @@ public class PricesService {
         };
     }
 
-    private AbstractPrice createNewWMYPrice(DailyPrice dailyPrice, StockTimeframe timeframe, double previousClose) {
+    private AbstractPrice createNewHTFPrice(DailyPrice dailyPrice, StockTimeframe timeframe, double previousClose) {
         return switch (timeframe) {
             case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
             case WEEKLY -> WeeklyPrice.newFrom(dailyPrice, previousClose);
