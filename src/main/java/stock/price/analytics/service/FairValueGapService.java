@@ -207,8 +207,6 @@ public class FairValueGapService {
     public List<FairValueGap> findUpdatedFVGsHighLowAndClosedFor(StockTimeframe timeframe) {
         Map<String, FairValueGap> updatedFVGsByCompositeId = new HashMap<>();
         List<FairValueGap> recentFVGs = findRecentByTimeframe(timeframe); // existing recent FVGs (to update high-low)
-        Set<String> updatedHighLowTickers = new HashSet<>();
-
         Map<String, FairValueGap> dbFVGsByCompositeId = fvgRepository.findByTimeframe(timeframe.name()).stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
         Map<String, List<AbstractPrice>> pricesByTicker = pricesService.currentCachePricesFor(timeframe).stream().collect(Collectors.groupingBy(AbstractPrice::getTicker));
 
@@ -218,7 +216,6 @@ public class FairValueGapService {
                 FairValueGap dbFVG = dbFVGsByCompositeId.get(compositeKey);
                 boolean differentHighLow = dbFVG.getHigh() != fvg.getHigh() || dbFVG.getLow() != fvg.getLow();
                 if (differentHighLow) {
-                    updatedHighLowTickers.add(fvg.getTicker());
                     dbFVG.setHigh(fvg.getHigh());
                     dbFVG.setLow(fvg.getLow());
                     if (dbFVG.getUnfilledHigh2() == null && dbFVG.getUnfilledLow2() == null) {
@@ -229,10 +226,6 @@ public class FairValueGapService {
                 }
             }
         });
-
-        if (!updatedHighLowTickers.isEmpty()) {
-            log.info("updated high-low for recent {} FVGs : {} ", timeframe, updatedHighLowTickers);
-        }
 
         updatedFVGsByCompositeId.forEach((compositeKey, fvg) -> {
             if (pricesByTicker.containsKey(fvg.getTicker()) && updateUnfilledGapsHighLowAndStatus(fvg, pricesByTicker.get(fvg.getTicker()))) {
