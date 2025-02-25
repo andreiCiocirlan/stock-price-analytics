@@ -30,6 +30,7 @@ public class FairValueGapService {
 
     private final FVGRepository fvgRepository;
     private final PricesService pricesService;
+    private final FVGTaggedService fvgTaggedService;
 
     private boolean updateUnfilledGapsHighLowAndStatus(FairValueGap fvg, List<AbstractPrice> pricesForTicker) {
         // copy original state and compare at the end
@@ -272,6 +273,19 @@ public class FairValueGapService {
 
     public List<Object[]> findFvgDateDiscrepancies() {
         return fvgRepository.findFvgDateDiscrepancies();
+    }
+
+    public void alertFVGsTagged95thPercentile(List<Double> cfdMargins) {
+        String cfdMargins54 = cfdMargins.stream().map(cfdMargin -> STR."'\{cfdMargin}'").collect(Collectors.joining(", "));
+        for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
+            for (PricePerformanceMilestone priceMilestone : milestones95thPercentile()) {
+                for (FvgType fvgType : FvgType.values()) {
+                    String fvgLabel = fvgLabelFrom(priceMilestone, fvgType, timeframe);
+                    Set<String> fvgTaggedTickers = fvgTaggedService.findTickersFVGsTaggedFor(timeframe, fvgType, priceMilestone, cfdMargins54);
+                    log.warn("{}", fvgLabel + fvgTaggedTickers);
+                }
+            }
+        }
     }
 
     public String fvgLabelFrom(PricePerformanceMilestone pricePerformanceMilestone, FvgType fvgType, StockTimeframe stockTimeframe) {
