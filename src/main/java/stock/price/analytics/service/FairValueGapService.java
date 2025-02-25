@@ -275,7 +275,7 @@ public class FairValueGapService {
         return fvgRepository.findFvgDateDiscrepancies();
     }
 
-    public void alertFVGsTagged95thPercentile(List<Double> cfdMargins) {
+    public void logFVGsTagged95thPercentile(List<Double> cfdMargins) {
         String cfdMargins54 = cfdMargins.stream().map(cfdMargin -> STR."'\{cfdMargin}'").collect(Collectors.joining(", "));
         for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
             for (PricePerformanceMilestone priceMilestone : milestones95thPercentile()) {
