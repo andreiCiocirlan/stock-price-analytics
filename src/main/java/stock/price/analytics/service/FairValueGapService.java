@@ -21,7 +21,7 @@ import static stock.price.analytics.model.prices.enums.FvgType.BULLISH;
 import static stock.price.analytics.model.prices.enums.PricePerformanceMilestone.*;
 import static stock.price.analytics.util.Constants.*;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
-import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
+import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveNoLogging;
 
 @Slf4j
 @Service
@@ -156,7 +156,7 @@ public class FairValueGapService {
     public void findNewFVGsAndSaveFor(StockTimeframe timeframe) {
         List<FairValueGap> newFVGs = logTimeAndReturn(() -> findNewFVGsFor(timeframe), "searching new " + timeframe + " FVGs");
         if (!newFVGs.isEmpty()) {
-            partitionDataAndSaveWithLogTime(newFVGs, fvgRepository, "saved new FVGs for " + timeframe);
+            partitionDataAndSaveNoLogging(newFVGs, fvgRepository);
         }
     }
 
@@ -202,7 +202,7 @@ public class FairValueGapService {
     public void updateFVGsHighLowAndClosedFor(StockTimeframe timeframe) {
         List<FairValueGap> updatedFVGs = logTimeAndReturn(() -> findUpdatedFVGsHighLowAndClosedFor(timeframe), "Searching " + timeframe + " FVGs to be updated");
         if (!updatedFVGs.isEmpty()) {
-            partitionDataAndSaveWithLogTime(updatedFVGs, fvgRepository, "updated " + updatedFVGs.size() + " FVGs for " + timeframe);
+            partitionDataAndSaveNoLogging(updatedFVGs, fvgRepository);
         }
     }
 
