@@ -158,7 +158,9 @@ public class StockService {
                 stocksDelisted.add(stock);
             }
         }
-        partitionDataAndSave(stocksDelisted, stockRepository);
+        if (!stocksDelisted.isEmpty()) {
+            partitionDataAndSave(stocksDelisted, stockRepository);
+        }
     }
 
     public LocalDate findLastUpdate() {
