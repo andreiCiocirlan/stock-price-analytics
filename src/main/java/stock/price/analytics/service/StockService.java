@@ -149,7 +149,10 @@ public class StockService {
     }
 
     public LocalDate findLastUpdate() {
-        return stockRepository.findLastUpdate();
+        return stocksCache.getStocksMap().values().stream()
+                .max(Comparator.comparing(Stock::getLastUpdated))
+                .map(Stock::getLastUpdated)
+                .orElseThrow();
     }
 
     public void updateStockDailyPricesFor(String ticker) {

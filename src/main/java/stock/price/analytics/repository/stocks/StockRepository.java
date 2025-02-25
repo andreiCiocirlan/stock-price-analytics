@@ -179,9 +179,6 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
 
     List<Stock> findByXtbStockTrueAndDelistedDateIsNull();
 
-    @Query("SELECT MAX(s.lastUpdated) FROM Stock s")
-    LocalDate findLastUpdate();
-
     @Modifying
     @Query(value = """
             UPDATE stocks
