@@ -49,6 +49,5 @@ public class Application implements ApplicationRunner {
         logTime(dailyPricesService::initLatestTwoDaysPricesCache, "initialized latest two days prices cache");
         logTime(dailyPricesJSONService::initDailyJSONPricesCache, "initialized daily JSON prices cache");
         logTime(dailyPricesService::initPreMarketDailyPricesCache, "initialized pre-market daily prices cache");
-        logTime(stockRepository::updateIpoAndDelistedDates, "updated ipo/delisted dates at start-up");
     }
 }

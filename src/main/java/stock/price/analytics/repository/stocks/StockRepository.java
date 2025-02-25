@@ -72,22 +72,6 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
 
     @Modifying
     @Query(value = """
-            UPDATE stocks s
-            SET delisted_date = (
-              SELECT MAX(dp.date)
-              FROM daily_prices dp
-              WHERE dp.ticker = s.ticker
-              HAVING MAX(dp.date) < CURRENT_DATE - INTERVAL '10 day'
-            ), ipo_date = (
-              SELECT MIN(dp.date)
-              FROM daily_prices dp
-              WHERE dp.ticker = s.ticker
-            )
-            """, nativeQuery = true)
-    void updateIpoAndDelistedDates();
-
-    @Modifying
-    @Query(value = """
             WITH stocksToUpdate AS (
             	SELECT ticker
             	FROM stocks
