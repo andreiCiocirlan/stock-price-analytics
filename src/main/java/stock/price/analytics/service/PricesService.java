@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.DailyPricesCacheService;
 import stock.price.analytics.cache.HigherTimeframePricesCacheService;
+import stock.price.analytics.cache.model.*;
 import stock.price.analytics.controller.dto.CandleWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
@@ -17,6 +18,7 @@ import stock.price.analytics.repository.prices.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
@@ -87,21 +89,35 @@ public class PricesService {
         higherTimeframePricesCacheService.addPricesWithPrevCloseFrom(prevThreeQuarterlyPrices);
         higherTimeframePricesCacheService.addPricesWithPrevCloseFrom(prevThreeYearlyPrices);
 
-        List<String> tickerList = List.of("AAPL", "F");
-        higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickerList, WEEKLY).forEach(System.out::println);
-        higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickerList, MONTHLY).forEach(System.out::println);
-        higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickerList, QUARTERLY).forEach(System.out::println);
-        higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickerList, YEARLY).forEach(System.out::println);
-
         higherTimeframePricesCacheService.addPrices(prevThreeWeeklyPrices);
         higherTimeframePricesCacheService.addPrices(prevThreeMonthlyPrices);
         higherTimeframePricesCacheService.addPrices(prevThreeQuarterlyPrices);
         higherTimeframePricesCacheService.addPrices(prevThreeYearlyPrices);
-        System.out.println("===============");
-        higherTimeframePricesCacheService.htfPricesFor(tickerList, WEEKLY).forEach(System.out::println);
-        higherTimeframePricesCacheService.htfPricesFor(tickerList, MONTHLY).forEach(System.out::println);
-        higherTimeframePricesCacheService.htfPricesFor(tickerList, QUARTERLY).forEach(System.out::println);
-        higherTimeframePricesCacheService.htfPricesFor(tickerList, YEARLY).forEach(System.out::println);
+
+        List<AbstractPrice> htfPricesUpdated = new ArrayList<>();
+        htfPricesUpdated.addAll(higherTimeframePricesCacheService.htfPricesFor(tickers, WEEKLY));
+        htfPricesUpdated.addAll(higherTimeframePricesCacheService.htfPricesFor(tickers, MONTHLY));
+        htfPricesUpdated.addAll(higherTimeframePricesCacheService.htfPricesFor(tickers, QUARTERLY));
+        htfPricesUpdated.addAll(higherTimeframePricesCacheService.htfPricesFor(tickers, YEARLY));
+
+        List<AbstractPrice> htfPricesUpdated_v2 = new ArrayList<>();
+        htfPricesUpdated_v2.addAll(higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickers, WEEKLY).stream().map(PriceWithPrevClose::getPrice).toList());
+        htfPricesUpdated_v2.addAll(higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickers, MONTHLY).stream().map(PriceWithPrevClose::getPrice).toList());
+        htfPricesUpdated_v2.addAll(higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickers, QUARTERLY).stream().map(PriceWithPrevClose::getPrice).toList());
+        htfPricesUpdated_v2.addAll(higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickers, YEARLY).stream().map(PriceWithPrevClose::getPrice).toList());
+
+        Map<String, AbstractPrice> htfPricesUpdatedCompositeId = htfPricesUpdated.stream().collect(Collectors.toMap(AbstractPrice::compositeId, p -> p));
+        Map<String, AbstractPrice> htfPricesUpdatedCompositeId_v2 = htfPricesUpdated_v2.stream().collect(Collectors.toMap(AbstractPrice::compositeId, p -> p));
+        AtomicBoolean equal = new AtomicBoolean(true);
+        htfPricesUpdatedCompositeId_v2.forEach((compositeId, price) -> {
+            if (!price.toString().equals(htfPricesUpdatedCompositeId.get(compositeId).toString())) {
+                equal.set(false);
+                System.out.println(price + " not equal "  + htfPricesUpdatedCompositeId.get(compositeId));
+            }
+        });
+        if (equal.get()) {
+            System.out.println("equal prices between versions of HTF caches");
+        }
     }
 
     public List<CandleWithDateDTO> findFor(String ticker, StockTimeframe timeframe) {
