@@ -5,7 +5,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.model.fvg.FairValueGap;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.service.FVGTaggedService;
 import stock.price.analytics.service.FairValueGapService;
 
 import java.util.List;
@@ -19,7 +18,6 @@ import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
 public class FairValueGapController {
 
     private final FairValueGapService fairValueGapService;
-    private final FVGTaggedService fvgTaggedService;
 
     @GetMapping("/find-new")
     @ResponseStatus(HttpStatus.OK)
