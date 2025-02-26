@@ -1,13 +1,10 @@
 package stock.price.analytics.cache;
 
-import lombok.Getter;
-import org.aspectj.apache.bcel.generic.RET;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.cache.model.PriceWithPrevClose;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.model.prices.ohlc.*;
+import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,20 +13,7 @@ import java.util.stream.Collectors;
 import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
 
 @Component
-@Getter
 class HigherTimeframePricesCache {
-
-    private final Map<String, AbstractPrice> weeklyPricesByTickerAndDate = new HashMap<>();
-    private final Map<String, AbstractPrice> monthlyPricesByTickerAndDate = new HashMap<>();
-    private final Map<String, AbstractPrice> quarterlyPricesByTickerAndDate = new HashMap<>();
-    private final Map<String, AbstractPrice> yearlyPricesByTickerAndDate = new HashMap<>();
-
-    private final Map<StockTimeframe, Map<String, AbstractPrice>> pricesByTimeframe = Map.of(
-            WEEKLY, weeklyPricesByTickerAndDate,
-            MONTHLY, monthlyPricesByTickerAndDate,
-            QUARTERLY, quarterlyPricesByTickerAndDate,
-            YEARLY, yearlyPricesByTickerAndDate
-    );
 
     private final Map<String, PriceWithPrevClose> weeklyPricesWithPrevCloseByTicker = new HashMap<>();
     private final Map<String, PriceWithPrevClose> monthlyPricesWithPrevCloseByTicker = new HashMap<>();
@@ -59,36 +43,9 @@ class HigherTimeframePricesCache {
                 .collect(Collectors.toList());
     }
 
-    void addPrices(List<? extends AbstractPrice> prices) {
-        if (prices == null || prices.isEmpty()) return; // Handle null or empty list case to avoid exceptions
-
-        prices.forEach(price -> {
-            Map<String, AbstractPrice> pricesByTickerAndStartDate = pricesByTimeframe.get(prices.getFirst().getTimeframe());
-            pricesByTickerAndStartDate.put(createKey(price.getTicker(), price.getStartDate()), price);
-        });
-    }
-
-    List<? extends AbstractPrice> pricesFor(List<String> tickers, StockTimeframe timeframe) {
-        return tickers.stream()
-                .flatMap(ticker -> switch (timeframe) {
-                    case WEEKLY -> weeklyPricesByTickerAndDate.entrySet().stream()
-                            .filter(entry -> entry.getKey().startsWith(ticker + "_"))
-                            .map(Map.Entry::getValue);
-                    case MONTHLY -> monthlyPricesByTickerAndDate.entrySet().stream()
-                            .filter(entry -> entry.getKey().startsWith(ticker + "_"))
-                            .map(Map.Entry::getValue);
-                    case QUARTERLY -> quarterlyPricesByTickerAndDate.entrySet().stream()
-                            .filter(entry -> entry.getKey().startsWith(ticker + "_"))
-                            .map(Map.Entry::getValue);
-                    case YEARLY -> yearlyPricesByTickerAndDate.entrySet().stream()
-                            .filter(entry -> entry.getKey().startsWith(ticker + "_"))
-                            .map(Map.Entry::getValue);
-                    default -> throw new IllegalArgumentException("Unexpected timeframe: " + timeframe);
-                })
-                .collect(Collectors.toList());
-    }
-
-    private String createKey(String ticker, LocalDate startDate) {
-        return ticker + "_" + startDate;
+    List<AbstractPrice> htfPricesFor(StockTimeframe timeframe) {
+        return pricesWithPrevCloseByTimeframe.get(timeframe).values().stream()
+                .map(PriceWithPrevClose::getPrice)
+                .toList();
     }
 }

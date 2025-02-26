@@ -15,14 +15,8 @@ public class HigherTimeframePricesCacheService {
 
     private final HigherTimeframePricesCache higherTimeframePricesCache;
 
-    public Map<String, ? extends AbstractPrice> getPricesByTickerAndDateFor(StockTimeframe timeframe) {
-        return switch (timeframe) {
-            case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
-            case WEEKLY -> higherTimeframePricesCache.getWeeklyPricesByTickerAndDate();
-            case MONTHLY -> higherTimeframePricesCache.getMonthlyPricesByTickerAndDate();
-            case QUARTERLY -> higherTimeframePricesCache.getQuarterlyPricesByTickerAndDate();
-            case YEARLY -> higherTimeframePricesCache.getYearlyPricesByTickerAndDate();
-        };
+    public List<AbstractPrice> htfPricesFor(StockTimeframe timeframe) {
+        return higherTimeframePricesCache.htfPricesFor(timeframe);
     }
 
     public <T extends AbstractPrice> List<PriceWithPrevClose> pricesWithPrevCloseByTickerFrom(List<T> previousThreePricesForTickers) {
@@ -49,14 +43,6 @@ public class HigherTimeframePricesCacheService {
                     case YEARLY -> new YearlyPriceWithPrevClose((YearlyPrice) price, previousCloseByTicker.get(price.getTicker()));
                 })
                 .toList();
-    }
-
-    public void addPrices(List<? extends AbstractPrice> prices) {
-        higherTimeframePricesCache.addPrices(prices);
-    }
-
-    public List<? extends AbstractPrice> htfPricesFor(List<String> tickers, StockTimeframe timeframe) {
-        return higherTimeframePricesCache.pricesFor(tickers, timeframe);
     }
 
     public void addPricesWithPrevClose(List<PriceWithPrevClose> pricesWithPrevClose) {

@@ -18,7 +18,6 @@ import stock.price.analytics.repository.prices.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -50,16 +49,10 @@ public class PricesService {
     private final DailyPricesCacheService dailyPricesCacheService;
 
     public List<AbstractPrice> currentCachePricesFor(StockTimeframe timeframe) {
-        List<AbstractPrice> htfPricesUpdated = new ArrayList<>(switch (timeframe) {
+        return switch (timeframe) {
             case DAILY -> new ArrayList<>(dailyPricesCacheService.dailyPricesCache(REGULAR));
-            case WEEKLY, MONTHLY, QUARTERLY, YEARLY -> new ArrayList<>(higherTimeframePricesCacheService.getPricesByTickerAndDateFor(timeframe).values());
-        });
-
-        return htfPricesUpdated.stream()
-                .collect(Collectors.groupingBy(AbstractPrice::getTicker))
-                .values().stream()
-                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(AbstractPrice::getStartDate).reversed()).limit(1))
-                .toList();
+            case WEEKLY, MONTHLY, QUARTERLY, YEARLY -> higherTimeframePricesCacheService.htfPricesFor(timeframe);
+        };
     }
 
     @SuppressWarnings("unchecked")
