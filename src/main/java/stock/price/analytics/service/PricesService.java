@@ -63,8 +63,8 @@ public class PricesService {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends AbstractPrice> List<T> previousThreePricesFor(List<String> tickers, StockTimeframe timeframe) {
-        return (List<T>) (switch (timeframe) {
+    public List<stock.price.analytics.model.prices.ohlc.AbstractPrice> previousThreePricesFor(List<String> tickers, StockTimeframe timeframe) {
+        return (List<stock.price.analytics.model.prices.ohlc.AbstractPrice>) (switch (timeframe) {
             case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
             case WEEKLY -> weeklyPricesRepository.findPreviousThreeWeeklyPricesForTickers(tickers);
             case MONTHLY -> monthlyPricesRepository.findPreviousThreeMonthlyPricesForTickers(tickers);
