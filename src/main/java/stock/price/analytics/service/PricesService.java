@@ -26,8 +26,7 @@ import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
 import static stock.price.analytics.model.stocks.enums.MarketState.REGULAR;
 import static stock.price.analytics.util.Constants.DAILY_FVG_MIN_DATE;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
-import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
-import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveNoLogging;
+import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.*;
 import static stock.price.analytics.util.StockDateUtils.*;
 
 
@@ -130,7 +129,7 @@ public class PricesService {
         higherTimeframePricesCacheService.addPricesWithPrevClose(quarterlyPricesWithPrevCloseUpdated);
         higherTimeframePricesCacheService.addPricesWithPrevClose(yearlyPricesWithPrevCloseUpdated);
 
-        partitionDataAndSaveNoLogging(htfPricesUpdated, pricesRepository);
+        partitionDataAndSaveWithLogTime(htfPricesUpdated, pricesRepository, "saved HTFg prices");
 
         return htfPricesUpdated;
     }
