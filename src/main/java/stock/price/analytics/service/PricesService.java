@@ -109,17 +109,16 @@ public class PricesService {
     private List<AbstractPrice> updateHTF(List<DailyPrice> importedDailyPrices) {
         List<String> tickers = new ArrayList<>(importedDailyPrices.stream().map(DailyPrice::getTicker).toList());
 
-        List<PriceWithPrevClose> weeklyPricesWithPrevClose = higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickers, WEEKLY);
-        List<PriceWithPrevClose> monthlyPricesWithPrevClose = higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickers, MONTHLY);
-        List<PriceWithPrevClose> quarterlyPricesWithPrevClose = higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickers, QUARTERLY);
-        List<PriceWithPrevClose> yearlyPricesWithPrevClose = higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickers, YEARLY);
-
         // Update prices for each timeframe and return (used for stocks cache update)
         List<AbstractPrice> htfPricesUpdated = new ArrayList<>();
-        List<PriceWithPrevClose> weeklyPricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, WEEKLY, weeklyPricesWithPrevClose);
-        List<PriceWithPrevClose> monthlyPricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, MONTHLY, monthlyPricesWithPrevClose);
-        List<PriceWithPrevClose> quarterlyPricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, QUARTERLY, quarterlyPricesWithPrevClose);
-        List<PriceWithPrevClose> yearlyPricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, YEARLY, yearlyPricesWithPrevClose);
+        List<PriceWithPrevClose> weeklyPricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, WEEKLY,
+                higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickers, WEEKLY));
+        List<PriceWithPrevClose> monthlyPricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, MONTHLY,
+                higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickers, MONTHLY));
+        List<PriceWithPrevClose> quarterlyPricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, QUARTERLY,
+                higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickers, QUARTERLY));
+        List<PriceWithPrevClose> yearlyPricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, YEARLY,
+                higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickers, YEARLY));
 
         htfPricesUpdated.addAll(weeklyPricesWithPrevCloseUpdated.stream().map(PriceWithPrevClose::getPrice).toList());
         htfPricesUpdated.addAll(monthlyPricesWithPrevCloseUpdated.stream().map(PriceWithPrevClose::getPrice).toList());
@@ -138,8 +137,8 @@ public class PricesService {
 
 
     private List<PriceWithPrevClose> updateAndSavePrices(List<DailyPrice> importedDailyPrices,
-                                                                  StockTimeframe timeframe,
-                                                                  List<PriceWithPrevClose> pricesWithPrevClose) {
+                                                         StockTimeframe timeframe,
+                                                         List<PriceWithPrevClose> pricesWithPrevClose) {
         List<PriceWithPrevClose> result = new ArrayList<>();
         Map<String, PriceWithPrevClose> pricesWithPrevCloseByTicker = pricesWithPrevClose.stream()
                 .collect(Collectors.toMap(priceWithPrevClose -> priceWithPrevClose.getPrice().getTicker(), p -> p));
