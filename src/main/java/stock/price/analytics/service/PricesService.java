@@ -26,7 +26,8 @@ import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
 import static stock.price.analytics.model.stocks.enums.MarketState.REGULAR;
 import static stock.price.analytics.util.Constants.DAILY_FVG_MIN_DATE;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
-import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.*;
+import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
+import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
 import static stock.price.analytics.util.StockDateUtils.*;
 
 
