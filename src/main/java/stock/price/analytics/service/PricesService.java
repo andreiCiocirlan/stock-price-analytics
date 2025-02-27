@@ -130,7 +130,7 @@ public class PricesService {
         higherTimeframePricesCacheService.addPricesWithPrevClose(quarterlyPricesWithPrevCloseUpdated);
         higherTimeframePricesCacheService.addPricesWithPrevClose(yearlyPricesWithPrevCloseUpdated);
 
-        partitionDataAndSaveWithLogTime(htfPricesUpdated, pricesRepository, "saved HTFg prices");
+        partitionDataAndSaveWithLogTime(htfPricesUpdated, pricesRepository, "saved HTF prices");
 
         return htfPricesUpdated;
     }
