@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.DailyPricesCacheService;
 import stock.price.analytics.cache.HighLowPricesCacheService;
+import stock.price.analytics.model.prices.enums.IntradaySpike;
 import stock.price.analytics.model.prices.enums.PreMarketPriceMilestone;
 import stock.price.analytics.model.prices.enums.PriceMilestone;
 import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
@@ -15,6 +16,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
+import static stock.price.analytics.model.stocks.enums.MarketState.REGULAR;
+import static stock.price.analytics.util.Constants.INTRADAY_SPIKE_PERCENTAGE;
 import static stock.price.analytics.util.Constants.MIN_GAP_AND_GO_PERCENTAGE;
 import static stock.price.analytics.util.EnumParser.parseEnumWithNoneValue;
 
@@ -40,8 +43,14 @@ public class PriceMilestoneService {
         if (pricePerformanceMilestone.isPresent()) {
             tickers.addAll(findTickersForMilestone(pricePerformanceMilestone.get(), cfdMargins));
         } else {
-            parseEnumWithNoneValue(priceMilestone, PreMarketPriceMilestone.class)
-                    .ifPresent(milestone -> tickers.addAll(findTickersForPreMarketMilestone(milestone, cfdMargins)));
+            Optional<PreMarketPriceMilestone> preMarketPriceMilestone = parseEnumWithNoneValue(priceMilestone, PreMarketPriceMilestone.class);
+            if (preMarketPriceMilestone.isPresent()) {
+                parseEnumWithNoneValue(priceMilestone, PreMarketPriceMilestone.class)
+                        .ifPresent(milestone -> tickers.addAll(findTickersForPreMarketMilestone(milestone, cfdMargins)));
+            } else {
+                parseEnumWithNoneValue(priceMilestone, IntradaySpike.class)
+                        .ifPresent(milestone -> tickers.addAll(findTickersForIntradaySpikeMilestone(milestone, cfdMargins)));
+            }
         }
         return tickers;
     }
@@ -67,6 +76,19 @@ public class PriceMilestoneService {
                 .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
                 .filter(stock -> preMarketPricesCache.containsKey(stock.getTicker()))
                 .filter(stock -> withinPreMarketMilestone(stock, preMarketPricesCache.get(stock.getTicker()), milestone))
+                .map(Stock::getTicker)
+                .toList();
+    }
+
+    private List<String> findTickersForIntradaySpikeMilestone(IntradaySpike milestone, List<Double> cfdMargins) {
+        Map<String, DailyPrice> intradayPricesCache = dailyPricesCacheService.dailyPricesCache(REGULAR)
+                .stream()
+                .collect(Collectors.toMap(DailyPrice::getTicker, p -> p));
+
+        return stockService.getCachedStocks().stream()
+                .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
+                .filter(stock -> intradayPricesCache.containsKey(stock.getTicker()))
+                .filter(stock -> withinIntradaySpikeMilestone(stock, intradayPricesCache.get(stock.getTicker()), milestone))
                 .map(Stock::getTicker)
                 .toList();
     }
@@ -103,5 +125,12 @@ public class PriceMilestoneService {
         };
     }
 
-
+    // called before stocks cache is updated (compare daily price imported to determine spikes)
+    private boolean withinIntradaySpikeMilestone(Stock s, DailyPrice dailyPrice, IntradaySpike milestone) {
+        return switch (milestone) {
+            case SPIKE_UP -> dailyPrice.getClose() > s.getClose() * (1 + INTRADAY_SPIKE_PERCENTAGE);
+            case SPIKE_DOWN -> dailyPrice.getClose() < s.getClose() * (1 - INTRADAY_SPIKE_PERCENTAGE);
+            case NONE -> throw new IllegalStateException("Unexpected value NONE");
+        };
+    }
 }
