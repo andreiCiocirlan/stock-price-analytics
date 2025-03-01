@@ -53,7 +53,7 @@ public class PriceMilestoneService {
 
         return stockService.getCachedStocks().stream()
                 .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
-                .filter(stock -> priceWithinPerformanceMilestone(stock, hlPricesCache.get(stock.getTicker()), pricePerformanceMilestone))
+                .filter(stock -> withinPerformanceMilestone(stock, hlPricesCache.get(stock.getTicker()), pricePerformanceMilestone))
                 .map(Stock::getTicker)
                 .toList();
     }
@@ -66,12 +66,12 @@ public class PriceMilestoneService {
         return stockService.getCachedStocks().stream()
                 .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
                 .filter(stock -> preMarketPricesCache.containsKey(stock.getTicker()))
-                .filter(stock -> priceWithinMilestone(stock, preMarketPricesCache.get(stock.getTicker()), milestone))
+                .filter(stock -> withinPreMarketMilestone(stock, preMarketPricesCache.get(stock.getTicker()), milestone))
                 .map(Stock::getTicker)
                 .toList();
     }
 
-    private boolean priceWithinPerformanceMilestone(Stock s, HighLowForPeriod highLowForPeriod, PricePerformanceMilestone pricePerformanceMilestone) {
+    private boolean withinPerformanceMilestone(Stock s, HighLowForPeriod highLowForPeriod, PricePerformanceMilestone pricePerformanceMilestone) {
         return switch (pricePerformanceMilestone) {
             case NEW_52W_HIGH, NEW_ALL_TIME_HIGH, NEW_4W_HIGH -> s.getWeeklyHigh() > highLowForPeriod.getHigh();
             case NEW_52W_LOW, NEW_4W_LOW, NEW_ALL_TIME_LOW -> s.getWeeklyLow() < highLowForPeriod.getLow();
@@ -83,7 +83,7 @@ public class PriceMilestoneService {
         };
     }
 
-    private boolean priceWithinMilestone(Stock s, DailyPrice preMarketPrice, PreMarketPriceMilestone milestone) {
+    private boolean withinPreMarketMilestone(Stock s, DailyPrice preMarketPrice, PreMarketPriceMilestone milestone) {
         return switch (milestone) {
             // previous day DOWN more than 1% && pre-market GAP UP more than 4%
             case KICKING_CANDLE_UP ->
