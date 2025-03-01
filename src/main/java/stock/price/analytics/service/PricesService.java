@@ -105,25 +105,12 @@ public class PricesService {
 
         // Update prices for each timeframe and return (used for stocks cache update)
         List<AbstractPrice> htfPricesUpdated = new ArrayList<>();
-        List<PriceWithPrevClose> weeklyPricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, WEEKLY,
-                higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickers, WEEKLY));
-        List<PriceWithPrevClose> monthlyPricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, MONTHLY,
-                higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickers, MONTHLY));
-        List<PriceWithPrevClose> quarterlyPricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, QUARTERLY,
-                higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickers, QUARTERLY));
-        List<PriceWithPrevClose> yearlyPricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, YEARLY,
-                higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickers, YEARLY));
-
-        htfPricesUpdated.addAll(weeklyPricesWithPrevCloseUpdated.stream().map(PriceWithPrevClose::getPrice).toList());
-        htfPricesUpdated.addAll(monthlyPricesWithPrevCloseUpdated.stream().map(PriceWithPrevClose::getPrice).toList());
-        htfPricesUpdated.addAll(quarterlyPricesWithPrevCloseUpdated.stream().map(PriceWithPrevClose::getPrice).toList());
-        htfPricesUpdated.addAll(yearlyPricesWithPrevCloseUpdated.stream().map(PriceWithPrevClose::getPrice).toList());
-
-        higherTimeframePricesCacheService.addPricesWithPrevClose(weeklyPricesWithPrevCloseUpdated);
-        higherTimeframePricesCacheService.addPricesWithPrevClose(monthlyPricesWithPrevCloseUpdated);
-        higherTimeframePricesCacheService.addPricesWithPrevClose(quarterlyPricesWithPrevCloseUpdated);
-        higherTimeframePricesCacheService.addPricesWithPrevClose(yearlyPricesWithPrevCloseUpdated);
-
+        for (StockTimeframe timeframe : higherTimeframes()) {
+            List<PriceWithPrevClose> htfPricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, timeframe,
+                    higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickers, timeframe));
+            htfPricesUpdated.addAll(htfPricesWithPrevCloseUpdated.stream().map(PriceWithPrevClose::getPrice).toList());
+            higherTimeframePricesCacheService.addPricesWithPrevClose(htfPricesWithPrevCloseUpdated);
+        }
         partitionDataAndSaveWithLogTime(htfPricesUpdated, pricesRepository, "saved HTF prices");
 
         return htfPricesUpdated;
