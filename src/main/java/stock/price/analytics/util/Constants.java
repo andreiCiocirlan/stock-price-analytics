@@ -19,5 +19,6 @@ public class Constants {
     public static final List<Double> CFD_MARGINS_5X_4X = List.of(0.2, 0.25);
     public static final List<Double> CFD_MARGINS_5X_4X_3X = List.of(0.2, 0.25, 0.33);
     public static final List<Double> CFD_MARGINS_5X_4X_3X_2X = List.of(0.2, 0.25, 0.33, 0.5);
-     public static final Double MIN_GAP_AND_GO_PERCENTAGE = 0.04d;
+    public static final Double MIN_GAP_AND_GO_PERCENTAGE = 0.04d;
+    public static final Double INTRADAY_SPIKE_PERCENTAGE = 0.02d; // percentage of price movement between imports (20m) used for alerting spikes
 }
