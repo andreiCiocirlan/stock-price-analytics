@@ -124,6 +124,8 @@ public class PriceMilestoneService {
             case GAP_UP_AND_GO -> preMarketPrice.getClose() > s.getClose() * (1 + MIN_GAP_AND_GO_PERCENTAGE);
             // pre-market GAP DOWN more than 4%
             case GAP_DOWN_AND_GO -> preMarketPrice.getClose() < s.getClose() * (1 - MIN_GAP_AND_GO_PERCENTAGE);
+            case NEW_ATH -> preMarketPrice.getClose() > s.getHighest();
+            case NEW_ATL -> preMarketPrice.getClose() < s.getLowest();
             case NONE -> throw new IllegalStateException("Unexpected value NONE");
         };
     }
