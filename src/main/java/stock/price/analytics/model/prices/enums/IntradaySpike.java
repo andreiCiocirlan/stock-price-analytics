@@ -2,7 +2,7 @@ package stock.price.analytics.model.prices.enums;
 
 import java.util.List;
 
-public enum TickerSpike implements PriceMilestone {
+public enum IntradaySpike implements PriceMilestone {
 
     SPIKE_UP {
         @Override
