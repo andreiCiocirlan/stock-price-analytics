@@ -51,6 +51,18 @@ public enum PreMarketPriceMilestone implements PriceMilestone {
             return "Pre-Market: Kicking candlestick DOWN";
         }
     },
+    NEW_ATL {
+        @Override
+        public String toString() {
+            return "Pre-Market: New All-time Low";
+        }
+    },
+    NEW_ATH {
+        @Override
+        public String toString() {
+            return "Pre-Market: New All-time High";
+        }
+    },
     NONE {
         @Override
         public String toString() {
@@ -59,6 +71,6 @@ public enum PreMarketPriceMilestone implements PriceMilestone {
     };
 
     public static List<PriceMilestone> preMarketSchedulerValues() {
-        return List.of(KICKING_CANDLE_UP, KICKING_CANDLE_DOWN, GAP_UP_AND_GO, GAP_DOWN_AND_GO, GAP_UP_10_PERCENT, GAP_DOWN_10_PERCENT);
+        return List.of(KICKING_CANDLE_UP, KICKING_CANDLE_DOWN, GAP_UP_AND_GO, GAP_DOWN_AND_GO, GAP_UP_10_PERCENT, GAP_DOWN_10_PERCENT, NEW_ATL, NEW_ATH);
     }
 }
