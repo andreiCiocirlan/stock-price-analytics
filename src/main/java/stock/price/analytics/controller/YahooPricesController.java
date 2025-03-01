@@ -7,10 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
-import stock.price.analytics.service.HighLowForPeriodService;
-import stock.price.analytics.service.PricesService;
-import stock.price.analytics.service.StockService;
-import stock.price.analytics.service.YahooQuoteService;
+import stock.price.analytics.service.*;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -29,6 +26,7 @@ public class YahooPricesController {
 
     private final YahooQuoteService yahooQuoteService;
     private final PricesService pricesService;
+    private final DailyPricesService dailyPricesService;
     private final HighLowForPeriodService highLowForPeriodService;
     private final StockService stockService;
 
@@ -41,7 +39,10 @@ public class YahooPricesController {
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
             List<AbstractPrice> htfPricesUpdated = pricesService.updatePricesForHigherTimeframes(dailyImportedPrices);
 
-            logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices), "saved current week HighLow prices" );
+            dailyPricesService.tickersWithIntradaySpike().entrySet().stream()
+                    .filter(entry -> !entry.getValue().isEmpty())
+                    .forEach(entry -> log.info("Intraday {} : {}", entry.getKey(), entry.getValue()));
+            logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices), "saved current week HighLow prices");
             logTime(() -> stockService.updateStocksHighLowsAndOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks highs-lows 4w,52w,all-time and higher-timeframe OHLC prices");
         }
         long duration = (System.nanoTime() - start) / 1_000_000;
@@ -60,7 +61,10 @@ public class YahooPricesController {
             pricesService.savePrices(dailyImportedPrices);
             List<AbstractPrice> htfPricesUpdated = pricesService.updatePricesForHigherTimeframes(dailyImportedPrices);
 
-            logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices), "saved current week HighLow prices" );
+            dailyPricesService.tickersWithIntradaySpike().entrySet().stream()
+                    .filter(entry -> !entry.getValue().isEmpty())
+                    .forEach(entry -> log.info("Intraday {} : {}", entry.getKey(), entry.getValue()));
+            logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices), "saved current week HighLow prices");
             logTime(() -> stockService.updateStocksHighLowsAndOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks highs-lows 4w,52w,all-time and higher-timeframe OHLC prices");
         }
         long duration = (System.nanoTime() - start) / 1_000_000;
