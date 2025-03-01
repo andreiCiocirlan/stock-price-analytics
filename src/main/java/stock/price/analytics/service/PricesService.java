@@ -67,15 +67,9 @@ public class PricesService {
     }
 
     public void initHigherTimeframePricesCache(List<String> tickers) {
-        List<AbstractPrice> prevThreeWeeklyPrices = previousThreePricesFor(tickers, WEEKLY);
-        List<AbstractPrice> prevThreeMonthlyPrices = previousThreePricesFor(tickers, MONTHLY);
-        List<AbstractPrice> prevThreeQuarterlyPrices = previousThreePricesFor(tickers, QUARTERLY);
-        List<AbstractPrice> prevThreeYearlyPrices = previousThreePricesFor(tickers, YEARLY);
-
-        higherTimeframePricesCacheService.addPricesWithPrevCloseFrom(prevThreeWeeklyPrices);
-        higherTimeframePricesCacheService.addPricesWithPrevCloseFrom(prevThreeMonthlyPrices);
-        higherTimeframePricesCacheService.addPricesWithPrevCloseFrom(prevThreeQuarterlyPrices);
-        higherTimeframePricesCacheService.addPricesWithPrevCloseFrom(prevThreeYearlyPrices);
+        for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
+            higherTimeframePricesCacheService.addPricesWithPrevCloseFrom(previousThreePricesFor(tickers, timeframe));
+        }
     }
 
     public List<CandleWithDateDTO> findFor(String ticker, StockTimeframe timeframe) {
