@@ -25,6 +25,7 @@ import static stock.price.analytics.util.EnumParser.parseEnumWithNoneValue;
 @RequiredArgsConstructor
 public class PriceMilestoneService {
 
+    private static List<Stock> cachedStocks;
     private final DailyPricesCacheService dailyPricesCacheService;
     private final StockService stockService;
     private final HighLowPricesCacheService highLowPricesCacheService;
@@ -40,6 +41,7 @@ public class PriceMilestoneService {
     public List<String> findTickersForMilestone(String priceMilestone, List<Double> cfdMargins) {
         final List<String> tickers = new ArrayList<>();
         Optional<PricePerformanceMilestone> pricePerformanceMilestone = parseEnumWithNoneValue(priceMilestone, PricePerformanceMilestone.class);
+        cachedStocks = stockService.getCachedStocks();
         if (pricePerformanceMilestone.isPresent()) {
             tickers.addAll(findTickersForMilestone(pricePerformanceMilestone.get(), cfdMargins));
         } else {
@@ -60,7 +62,7 @@ public class PriceMilestoneService {
                 .stream()
                 .collect(Collectors.toMap(HighLowForPeriod::getTicker, p -> p));
 
-        return stockService.getCachedStocks().stream()
+        return cachedStocks.stream()
                 .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
                 .filter(stock -> withinPerformanceMilestone(stock, hlPricesCache.get(stock.getTicker()), pricePerformanceMilestone))
                 .map(Stock::getTicker)
@@ -72,7 +74,7 @@ public class PriceMilestoneService {
                 .stream()
                 .collect(Collectors.toMap(DailyPrice::getTicker, p -> p));
 
-        return stockService.getCachedStocks().stream()
+        return cachedStocks.stream()
                 .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
                 .filter(stock -> preMarketPricesCache.containsKey(stock.getTicker()))
                 .filter(stock -> withinPreMarketMilestone(stock, preMarketPricesCache.get(stock.getTicker()), milestone))
@@ -85,7 +87,7 @@ public class PriceMilestoneService {
                 .stream()
                 .collect(Collectors.toMap(DailyPrice::getTicker, p -> p));
 
-        return stockService.getCachedStocks().stream()
+        return cachedStocks.stream()
                 .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
                 .filter(stock -> intradayPricesCache.containsKey(stock.getTicker()))
                 .filter(stock -> withinIntradaySpikeMilestone(stock, intradayPricesCache.get(stock.getTicker()), milestone))
