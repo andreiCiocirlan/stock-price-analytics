@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import stock.price.analytics.model.prices.PriceEntity;
+import stock.price.analytics.model.prices.BusinessEntity;
 import stock.price.analytics.model.prices.ohlc.CandleOHLC;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.enums.MarketState;
@@ -21,7 +21,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Table(name = "daily_prices_json")
 @JsonIgnoreProperties(ignoreUnknown=true)
-public class DailyPricesJSON implements PriceEntity {
+public class DailyPricesJSON implements BusinessEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "daily_prices_json_gen")

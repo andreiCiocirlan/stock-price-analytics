@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import stock.price.analytics.model.fvg.FairValueGap;
-import stock.price.analytics.model.prices.PriceEntity;
+import stock.price.analytics.model.prices.BusinessEntity;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 
 import java.time.LocalDate;
@@ -16,7 +16,7 @@ import java.time.format.DateTimeFormatter;
 @Setter
 @MappedSuperclass
 @NoArgsConstructor
-public abstract class AbstractPrice implements PriceEntity {
+public abstract class AbstractPrice implements BusinessEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequence_prices")

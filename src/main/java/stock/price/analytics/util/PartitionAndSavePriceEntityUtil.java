@@ -3,7 +3,7 @@ package stock.price.analytics.util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
-import stock.price.analytics.model.prices.PriceEntity;
+import stock.price.analytics.model.prices.BusinessEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,20 +15,20 @@ import static stock.price.analytics.util.LoggingUtil.logTime;
 @Component
 public class PartitionAndSavePriceEntityUtil {
 
-    public static <T, R extends PriceEntity> void partitionDataAndSaveWithLogTime(List<T> entities, JpaRepository<R, Long> repository, String functionName) {
+    public static <T, R extends BusinessEntity> void partitionDataAndSaveWithLogTime(List<T> entities, JpaRepository<R, Long> repository, String functionName) {
         logTime(() -> partitionAndSave(entities, repository), functionName);
     }
 
-    public static <T, R extends PriceEntity> void partitionDataAndSave(List<T> entities, JpaRepository<R, Long> repository) {
+    public static <T, R extends BusinessEntity> void partitionDataAndSave(List<T> entities, JpaRepository<R, Long> repository) {
         partitionAndSave(entities, repository);
         log.info("Saved {} rows of type: {} ", entities.size(), entities.getFirst().getClass().getName());
     }
 
-    public static <T, R extends PriceEntity> void partitionDataAndSaveNoLogging(List<T> entities, JpaRepository<R, Long> repository) {
+    public static <T, R extends BusinessEntity> void partitionDataAndSaveNoLogging(List<T> entities, JpaRepository<R, Long> repository) {
         partitionAndSave(entities, repository);
     }
 
-    private static <T, R extends PriceEntity> void partitionAndSave(List<T> entities, JpaRepository<R, Long> repository) {
+    private static <T, R extends BusinessEntity> void partitionAndSave(List<T> entities, JpaRepository<R, Long> repository) {
         if (entities.isEmpty()) {
             log.info("entities isEmpty");
             return;

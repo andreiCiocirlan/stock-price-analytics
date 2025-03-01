@@ -7,7 +7,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.springframework.format.annotation.DateTimeFormat;
-import stock.price.analytics.model.prices.PriceEntity;
+import stock.price.analytics.model.prices.BusinessEntity;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 
@@ -20,7 +20,7 @@ import java.time.temporal.TemporalAdjusters;
 @NoArgsConstructor
 @Setter
 @Getter
-public abstract class HighLowForPeriod implements PriceEntity {
+public abstract class HighLowForPeriod implements BusinessEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequence_high_low")
