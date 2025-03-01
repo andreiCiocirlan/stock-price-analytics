@@ -64,6 +64,7 @@ public class PriceMilestoneService {
 
         return cachedStocks.stream()
                 .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
+                .filter(stock -> hlPricesCache.containsKey(stock.getTicker()))
                 .filter(stock -> withinPerformanceMilestone(stock, hlPricesCache.get(stock.getTicker()), pricePerformanceMilestone))
                 .map(Stock::getTicker)
                 .toList();
