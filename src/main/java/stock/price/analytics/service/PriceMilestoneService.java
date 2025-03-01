@@ -15,13 +15,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
+import static stock.price.analytics.util.Constants.MIN_GAP_AND_GO_PERCENTAGE;
 import static stock.price.analytics.util.EnumParser.parseEnumWithNoneValue;
 
 @Service
 @RequiredArgsConstructor
 public class PriceMilestoneService {
 
-    private static final Double MIN_GAP_AND_GO_PERCENTAGE = 0.04d;
     private final DailyPricesCacheService dailyPricesCacheService;
     private final StockService stockService;
     private final HighLowPricesCacheService highLowPricesCacheService;
