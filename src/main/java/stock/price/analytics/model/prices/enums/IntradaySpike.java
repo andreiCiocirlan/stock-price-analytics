@@ -23,7 +23,7 @@ public enum IntradaySpike implements PriceMilestone {
         }
     };
 
-    public static List<PriceMilestone> tickerSpikes() {
+    public static List<PriceMilestone> intradaySpikes() {
         return List.of(SPIKE_UP, SPIKE_DOWN);
     }
 }
