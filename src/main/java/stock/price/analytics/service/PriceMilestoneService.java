@@ -30,10 +30,10 @@ public class PriceMilestoneService {
     private final StockService stockService;
     private final HighLowPricesCacheService highLowPricesCacheService;
 
-    public Map<String, List<String>> findTickersForMilestones(List<PriceMilestone> priceMilestones, List<Double> cfdMargins) {
-        Map<String, List<String>> tickersByPriceMilestones = new HashMap<>();
+    public Map<PriceMilestone, List<String>> findTickersForMilestones(List<PriceMilestone> priceMilestones, List<Double> cfdMargins) {
+        Map<PriceMilestone, List<String>> tickersByPriceMilestones = new HashMap<>();
         for (PriceMilestone priceMilestone : priceMilestones) {
-            tickersByPriceMilestones.put(priceMilestone.toString(), findTickersForMilestone(priceMilestone.name(), cfdMargins));
+            tickersByPriceMilestones.put(priceMilestone, findTickersForMilestone(priceMilestone.name(), cfdMargins));
         }
         return tickersByPriceMilestones;
     }

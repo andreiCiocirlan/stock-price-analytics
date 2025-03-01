@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.DailyPricesCacheService;
+import stock.price.analytics.model.prices.enums.PriceMilestone;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.enums.MarketState;
 import stock.price.analytics.repository.prices.DailyPricesRepository;
@@ -74,7 +75,7 @@ public class DailyPricesService {
         dailyPricesCacheService.addPreMarketDailyPricesInCache(preMarketPrices);
     }
 
-    public Map<String, List<String>> tickersWithIntradaySpike() {
+    public Map<PriceMilestone, List<String>> tickersWithIntradaySpike() {
         return priceMilestoneService.findTickersForMilestones(intradaySpikes(), CFD_MARGINS_5X_4X_3X);
     }
 
