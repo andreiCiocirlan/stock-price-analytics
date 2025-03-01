@@ -187,7 +187,7 @@ public class StockService {
         stockRepository.updateHighestLowestPricesFor(ticker);
     }
 
-    public Collection<Stock> getCachedStocks() {
-        return stocksCache.getStocksMap().values();
+    public List<Stock> getCachedStocks() {
+        return stocksCache.getStocksMap().values().stream().toList();
     }
 }
