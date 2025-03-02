@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.controller.dto.CandleWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.service.PricesService;
-import stock.price.analytics.service.QuarterlyPriceService;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -21,7 +20,6 @@ import static stock.price.analytics.util.Constants.HIGHER_TIMEFRAMES_PATTERN;
 public class PricesController {
 
     private final PricesService pricesService;
-    private final QuarterlyPriceService quarterlyPriceService;
 
     @GetMapping("/prices")
     public List<CandleWithDateDTO> pricesFor(@RequestParam("ticker") String ticker, @RequestParam("timeFrame") String timeFrame) {
