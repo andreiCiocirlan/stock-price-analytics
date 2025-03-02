@@ -48,7 +48,7 @@ public class PricesService {
     private final HigherTimeframePricesCacheService higherTimeframePricesCacheService;
     private final DailyPricesCacheService dailyPricesCacheService;
 
-    public List<AbstractPrice> currentCachePricesFor(StockTimeframe timeframe) {
+    public List<AbstractPrice> htfPricesFor(StockTimeframe timeframe) {
         return switch (timeframe) {
             case DAILY -> new ArrayList<>(dailyPricesCacheService.dailyPricesCache(REGULAR));
             case WEEKLY, MONTHLY, QUARTERLY, YEARLY -> higherTimeframePricesCacheService.htfPricesFor(timeframe);

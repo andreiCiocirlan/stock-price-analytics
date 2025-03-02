@@ -29,7 +29,7 @@ public class PricesController {
 
     @GetMapping("/htf-prices")
     public List<AbstractPrice> htfPricesFor(@RequestParam(required = false, value = "ticker") String ticker, @RequestParam("timeFrame") String timeFrame) {
-        return pricesService.currentCachePricesFor(StockTimeframe.valueOf(timeFrame)).stream()
+        return pricesService.htfPricesFor(StockTimeframe.valueOf(timeFrame)).stream()
                 .filter(p -> ticker == null || p.getTicker().equals(ticker))
                 .toList();
     }
