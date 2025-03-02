@@ -6,6 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.controller.dto.CandleWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
+import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.service.PricesService;
 
 import java.time.LocalDate;
@@ -24,6 +25,13 @@ public class PricesController {
     @GetMapping("/prices")
     public List<CandleWithDateDTO> pricesFor(@RequestParam("ticker") String ticker, @RequestParam("timeFrame") String timeFrame) {
         return pricesService.findFor(ticker, StockTimeframe.valueOf(timeFrame.toUpperCase()));
+    }
+
+    @GetMapping("/htf-prices")
+    public List<AbstractPrice> htfPricesFor(@RequestParam(required = false, value = "ticker") String ticker, @RequestParam("timeFrame") String timeFrame) {
+        return pricesService.currentCachePricesFor(StockTimeframe.valueOf(timeFrame)).stream()
+                .filter(p -> ticker == null || p.getTicker().equals(ticker))
+                .toList();
     }
 
     @PostMapping("/update-higher-timeframes")
