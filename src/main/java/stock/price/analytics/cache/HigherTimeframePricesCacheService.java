@@ -19,16 +19,16 @@ public class HigherTimeframePricesCacheService {
         return higherTimeframePricesCache.htfPricesFor(timeframe);
     }
 
-    public <T extends AbstractPrice> List<PriceWithPrevClose> pricesWithPrevCloseByTickerFrom(List<T> previousThreePricesForTickers) {
-        Map<String, List<T>> previousTwoPricesByTicker = previousThreePricesForTickers
+    public List<PriceWithPrevClose> pricesWithPrevCloseByTickerFrom(List<stock.price.analytics.model.prices.ohlc.AbstractPrice> previousThreePricesForTickers) {
+        Map<String, List<stock.price.analytics.model.prices.ohlc.AbstractPrice>> previousTwoPricesByTicker = previousThreePricesForTickers
                 .stream()
                 .collect(Collectors.groupingBy(AbstractPrice::getTicker))
                 .values().stream()
                 .flatMap(prices -> prices.stream().sorted(Comparator.comparing(AbstractPrice::getStartDate).reversed()).limit(2))
                 .collect(Collectors.groupingBy(AbstractPrice::getTicker));
-        List<T> latestPrices = new ArrayList<>();
+        List<stock.price.analytics.model.prices.ohlc.AbstractPrice> latestPrices = new ArrayList<>();
         Map<String, Double> previousCloseByTicker = new HashMap<>();
-        for (List<T> prices : previousTwoPricesByTicker.values()) {
+        for (List<stock.price.analytics.model.prices.ohlc.AbstractPrice> prices : previousTwoPricesByTicker.values()) {
             latestPrices.add(prices.get(0)); // most recent price
             previousCloseByTicker.put(prices.get(0).getTicker(),
                     prices.size() > 1 ? prices.get(1).getClose() : prices.get(0).getOpen()); // if IPO week, month, quarter, year -> take opening price
