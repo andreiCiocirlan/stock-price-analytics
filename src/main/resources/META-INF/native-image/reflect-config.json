@@ -1,0 +1,20 @@
+[
+  {
+    "name": "stock.price.analytics.model.prices.json.Response",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "stock.price.analytics.model.prices.json.QuoteResponse",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "stock.price.analytics.model.prices.json.DailyPricesJSON",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  }
+]

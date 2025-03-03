@@ -104,6 +104,7 @@
                                 <buildArg>--enable-preview</buildArg>
                                 <buildArg>--no-fallback</buildArg>
                                 <buildArg>--no-server</buildArg>
+                                <buildArg>-H:ReflectionConfigurationFiles=src/main/resources/META-INF/native-image/reflect-config.json</buildArg>
                             </buildArgs>
                         </configuration>
                     </plugin>
