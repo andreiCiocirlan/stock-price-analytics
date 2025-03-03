@@ -153,6 +153,7 @@ public class StockService {
         List<Stock> stocksDelisted = new ArrayList<>();
         for (Stock stock : stocksCache.getStocksMap().values()) {
             if (stock.getLastUpdated().isBefore(LocalDate.now().minusDays(5))) {
+                log.warn("DELISTED stock {}", stock.getTicker());
                 stock.setDelistedDate(stock.getLastUpdated());
                 stocksDelisted.add(stock);
             }

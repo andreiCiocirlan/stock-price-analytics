@@ -38,7 +38,7 @@ public class Application implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
-        List<Stock> stocks = stockRepository.findByXtbStockIsTrue();
+        List<Stock> stocks = stockRepository.findByXtbStockIsTrueAndDelistedDateIsNull();
         List<String> tickers = stocks.stream().map(Stock::getTicker).toList();
         logTime(() -> pricesService.initHigherTimeframePricesCache(tickers), "initialized higher-timeframe prices cache");
         logTime(() -> stockService.initStocksCache(stocks), "initialized xtb stocks cache");
