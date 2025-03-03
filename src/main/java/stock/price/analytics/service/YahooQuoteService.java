@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.client.yahoo.YahooQuoteClient;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
+import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.prices.DailyPricesRepository;
 
 import java.io.File;
@@ -31,6 +32,7 @@ public class YahooQuoteService {
 
     private final YahooQuoteClient yahooQuoteClient;
     private final DailyPricesService dailyPricesService;
+    private final StockService stockService;
     private final DailyPricesJSONService dailyPricesJSONService;
     private final DailyPricesRepository dailyPricesRepository;
 
@@ -43,15 +45,14 @@ public class YahooQuoteService {
     public List<DailyPrice> dailyPricesImport() {
         int maxTickersPerRequest = 1700;
         List<DailyPrice> dailyImportedPrices = new ArrayList<>();
-        List<DailyPrice> latestPrices = dailyPricesService.dailyPricesCache(REGULAR);
-        List<String> tickersNotImported = new ArrayList<>(latestPrices.stream().map(DailyPrice::getTicker).toList());
+        List<Stock> cachedStocks = stockService.getCachedStocks();
+        List<String> tickersNotImported = new ArrayList<>(cachedStocks.stream().map(Stock::getTicker).toList());
 
         int start = 0;
-        int end = Math.min(maxTickersPerRequest, latestPrices.size());
+        int end = Math.min(maxTickersPerRequest, cachedStocks.size());
         int fileCounter = 1;
-        while (start < latestPrices.size()) {
-            List<DailyPrice> partition = latestPrices.subList(start, end);
-            String tickers = partition.stream().map(DailyPrice::getTicker).collect(Collectors.joining(","));
+        while (start < cachedStocks.size()) {
+            String tickers = cachedStocks.stream().map(Stock::getTicker).collect(Collectors.joining(","));
             String pricesJSON = logTimeAndReturn(() -> yahooQuoteClient.quotePricesJSON(tickers), "Yahoo API call and JSON result");
 
             List<DailyPrice> dailyPricesExtractedFromJSON = dailyPricesJSONService.extractDailyPricesFromJSON(pricesJSON);
@@ -68,7 +69,7 @@ public class YahooQuoteService {
             }
 
             start = end;
-            end = Math.min(start + maxTickersPerRequest, latestPrices.size());
+            end = Math.min(start + maxTickersPerRequest, cachedStocks.size());
             fileCounter++;
         }
 
