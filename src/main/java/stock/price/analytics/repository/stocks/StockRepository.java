@@ -161,7 +161,7 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
             """, nativeQuery = true)
     void saveStockUpdatedDate(); // only for new stocks with history
 
-    List<Stock> findByXtbStockTrueAndDelistedDateIsNull();
+    List<Stock> findByXtbStockIsTrue();
 
     @Modifying
     @Query(value = """
