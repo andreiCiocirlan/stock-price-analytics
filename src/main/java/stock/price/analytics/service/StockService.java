@@ -78,11 +78,12 @@ public class StockService {
         // update from daily prices
         for (DailyPrice dailyPrice : dailyPrices) {
             String ticker = dailyPrice.getTicker();
-            Stock stock = stocksMap.getOrDefault(ticker, new Stock(ticker, dailyPrice.getDate(), true));
-            if (!stock.getLastUpdated().isAfter(dailyPrice.getDate())) { // don't update for imports from the past
-                stock.updateFromDailyPrice(dailyPrice);
-                stocksUpdated.add(stock);
-            }
+            Optional.ofNullable(stocksMap.get(ticker))
+                    .filter(stock -> !stock.getLastUpdated().isAfter(dailyPrice.getDate()))
+                    .ifPresent(stock -> {
+                        stock.updateFromDailyPrice(dailyPrice);
+                        stocksUpdated.add(stock);
+                    });
         }
 
         // update from higher timeframe prices
