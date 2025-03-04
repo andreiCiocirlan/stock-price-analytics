@@ -107,11 +107,11 @@ public class StockService {
         for (HighLowPeriod period : HighLowPeriod.values()) {
             List<? extends HighLowForPeriod> cache = highLowPricesCacheService.cacheForHighLowPeriod(period);
             for (HighLowForPeriod hl : cache) {
-                Stock stock = stocksMap.get(hl.getTicker());
-                if (stock != null) { // Check if stock exists
-                    stock.updateFrom(hl);
-                    stocksUpdated.add(stock);
-                }
+                Optional.ofNullable(stocksMap.get(hl.getTicker()))
+                        .ifPresent(stock -> {
+                            stock.updateFrom(hl);
+                            stocksUpdated.add(stock);
+                        });
             }
         }
     }
