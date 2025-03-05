@@ -51,8 +51,8 @@ public class StockDiscrepanciesService {
         return stocksWithDiscrepancies;
     }
 
-    private void logDiscrepancyAndAddToList(String ticker, String name, List<String> discrepanciesFound) {
-        String stockDiscrepancy = String.format("%s with %s discrepancy", ticker, name);
+    private void logDiscrepancyAndAddToList(String ticker, String discrepancyType, List<String> discrepanciesFound) {
+        String stockDiscrepancy = String.format("%s with %s discrepancy", ticker, discrepancyType);
         discrepanciesFound.add(stockDiscrepancy);
         log.warn("{}", stockDiscrepancy);
     }
