@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 public class StockDateUtils {
 
-    public boolean isWithinSameTimeframe(LocalDate date, LocalDate latestEndDateWMY, StockTimeframe timeframe) {
+    public static boolean isWithinSameTimeframe(LocalDate date, LocalDate latestEndDateWMY, StockTimeframe timeframe) {
         return switch (timeframe) {
             case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
             case WEEKLY -> sameWeek(date, latestEndDateWMY);

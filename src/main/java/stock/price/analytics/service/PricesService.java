@@ -40,7 +40,6 @@ public class PricesService {
     private final EntityManager entityManager;
 
     private final PricesRepository pricesRepository;
-    private final StockDateUtils stockDateUtils;
     private final DailyPricesRepository dailyPricesRepository;
     private final WeeklyPricesRepository weeklyPricesRepository;
     private final MonthlyPricesRepository monthlyPricesRepository;
@@ -129,7 +128,7 @@ public class PricesService {
             PriceWithPrevClose priceWithPrevClose = pricesWithPrevCloseByTicker.get(ticker);
             AbstractPrice price = priceWithPrevClose.getPrice();
             LocalDate latestEndDateWMQY = price.getEndDate(); // latest cached w,m,q,y end_date per ticker
-            if (stockDateUtils.isWithinSameTimeframe(importedDailyPrice.getDate(), latestEndDateWMQY, timeframe)) {
+            if (isWithinSameTimeframe(importedDailyPrice.getDate(), latestEndDateWMQY, timeframe)) {
                 price.convertFrom(importedDailyPrice, priceWithPrevClose.previousClose());
                 result.add(priceWithPrevClose);
             } else { // new week, month, quarter, year
