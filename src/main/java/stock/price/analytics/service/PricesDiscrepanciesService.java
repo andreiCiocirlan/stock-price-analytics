@@ -15,6 +15,13 @@ public class PricesDiscrepanciesService {
 
     private final PricesDiscrepanciesRepository pricesDiscrepanciesRepository;
 
+    public List<String> findAllWeeklyPriceDiscrepancies() {
+        List<String> weeklyPriceDiscrepancies = findWeeklyOpeningPriceDiscrepancies();
+        weeklyPriceDiscrepancies.addAll(findWeeklyHighLowPriceDiscrepancies());
+        return weeklyPriceDiscrepancies;
+
+    }
+
     public List<String> findWeeklyOpeningPriceDiscrepancies() {
         List<String> wOpeningPriceDiscrepanciesTickers = new ArrayList<>();
         List<Object[]> weeklyOpeningPriceDiscrepancies = pricesDiscrepanciesRepository.findWeeklyOpeningPriceDiscrepancies();
@@ -40,5 +47,4 @@ public class PricesDiscrepanciesService {
         discrepanciesFound.add(stockDiscrepancy);
         log.warn("{}", stockDiscrepancy);
     }
-
 }
