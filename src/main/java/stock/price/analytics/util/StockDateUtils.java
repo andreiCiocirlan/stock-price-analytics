@@ -17,7 +17,7 @@ public class StockDateUtils {
         };
     }
 
-    public static boolean sameWeek(LocalDate date, LocalDate endDate) {
+    private static boolean sameWeek(LocalDate date, LocalDate endDate) {
         // Find the start of the week (Monday)
         LocalDate weekStart = endDate.with(DayOfWeek.MONDAY);
 
@@ -28,16 +28,16 @@ public class StockDateUtils {
         return !date.isBefore(weekStart) && !date.isAfter(weekEnd);
     }
 
-    public static boolean sameMonth(LocalDate date, LocalDate startOfMonth) {
+    private static boolean sameMonth(LocalDate date, LocalDate startOfMonth) {
         return date.getYear() == startOfMonth.getYear() && date.getMonthValue() == startOfMonth.getMonthValue();
     }
 
-    public static boolean sameQuarter(LocalDate date, LocalDate latestEndDateQuarter) {
+    private static boolean sameQuarter(LocalDate date, LocalDate latestEndDateQuarter) {
         return date.getYear() == latestEndDateQuarter.getYear() &&
                 date.getMonth().firstMonthOfQuarter() == latestEndDateQuarter.getMonth().firstMonthOfQuarter();
     }
 
-    public static boolean sameYear(LocalDate date, LocalDate startOfYear) {
+    private static boolean sameYear(LocalDate date, LocalDate startOfYear) {
         return date.getYear() == startOfYear.getYear();
     }
 }
