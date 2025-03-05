@@ -14,6 +14,7 @@ import stock.price.analytics.controller.dto.CandleWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.repository.prices.*;
+import stock.price.analytics.util.StockDateUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -28,7 +29,6 @@ import static stock.price.analytics.util.Constants.DAILY_FVG_MIN_DATE;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
-import static stock.price.analytics.util.StockDateUtils.*;
 
 
 @Slf4j
@@ -40,6 +40,7 @@ public class PricesService {
     private final EntityManager entityManager;
 
     private final PricesRepository pricesRepository;
+    private final StockDateUtils stockDateUtils;
     private final DailyPricesRepository dailyPricesRepository;
     private final WeeklyPricesRepository weeklyPricesRepository;
     private final MonthlyPricesRepository monthlyPricesRepository;
@@ -128,7 +129,7 @@ public class PricesService {
             PriceWithPrevClose priceWithPrevClose = pricesWithPrevCloseByTicker.get(ticker);
             AbstractPrice price = priceWithPrevClose.getPrice();
             LocalDate latestEndDateWMQY = price.getEndDate(); // latest cached w,m,q,y end_date per ticker
-            if (isWithinSameTimeframe(importedDailyPrice.getDate(), latestEndDateWMQY, timeframe)) {
+            if (stockDateUtils.isWithinSameTimeframe(importedDailyPrice.getDate(), latestEndDateWMQY, timeframe)) {
                 price.convertFrom(importedDailyPrice, priceWithPrevClose.previousClose());
                 result.add(priceWithPrevClose);
             } else { // new week, month, quarter, year
@@ -148,16 +149,6 @@ public class PricesService {
             case MONTHLY -> new MonthlyPriceWithPrevClose((MonthlyPrice) price, previousClose);
             case QUARTERLY -> new QuarterlyPriceWithPrevClose((QuarterlyPrice) price, previousClose);
             case YEARLY -> new YearlyPriceWithPrevClose((YearlyPrice) price, previousClose);
-        };
-    }
-
-    private boolean isWithinSameTimeframe(LocalDate date, LocalDate latestEndDateWMY, StockTimeframe timeframe) {
-        return switch (timeframe) {
-            case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
-            case WEEKLY -> sameWeek(date, latestEndDateWMY);
-            case MONTHLY -> sameMonth(date, latestEndDateWMY);
-            case QUARTERLY -> sameQuarter(date, latestEndDateWMY);
-            case YEARLY -> sameYear(date, latestEndDateWMY);
         };
     }
 
