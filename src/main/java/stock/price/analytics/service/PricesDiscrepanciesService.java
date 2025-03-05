@@ -15,7 +15,7 @@ public class PricesDiscrepanciesService {
 
     private final PricesDiscrepanciesRepository pricesDiscrepanciesRepository;
 
-    private List<String> findWeeklyOpeningPriceDiscrepancies() {
+    public List<String> findWeeklyOpeningPriceDiscrepancies() {
         List<String> wOpeningPriceDiscrepanciesTickers = new ArrayList<>();
         List<Object[]> weeklyOpeningPriceDiscrepancies = pricesDiscrepanciesRepository.findWeeklyOpeningPriceDiscrepancies();
         if (!weeklyOpeningPriceDiscrepancies.isEmpty()) {
@@ -25,7 +25,7 @@ public class PricesDiscrepanciesService {
         return wOpeningPriceDiscrepanciesTickers;
     }
 
-    private List<String> findWeeklyHighLowPriceDiscrepancies() {
+    public List<String> findWeeklyHighLowPriceDiscrepancies() {
         List<String> wHighLowPriceDiscrepanciesTickers = new ArrayList<>();
         List<Object[]> weeklyHighLowPriceDiscrepancies = pricesDiscrepanciesRepository.findWeeklyHighLowPriceDiscrepancies();
         if (!weeklyHighLowPriceDiscrepancies.isEmpty()) {
