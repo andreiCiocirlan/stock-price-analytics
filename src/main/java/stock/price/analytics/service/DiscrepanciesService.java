@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.stocks.Stock;
+import stock.price.analytics.repository.fvg.FVGRepository;
 import stock.price.analytics.repository.prices.PricesDiscrepanciesRepository;
 import stock.price.analytics.repository.stocks.StockDiscrepanciesRepository;
 
@@ -21,6 +22,16 @@ public class DiscrepanciesService {
 
     private final PricesDiscrepanciesRepository pricesDiscrepanciesRepository;
     private final StockDiscrepanciesRepository stockDiscrepanciesRepository;
+    private final FVGRepository fvgRepository;
+
+    public List<String> findFvgDateDiscrepancies() {
+        List<String> fvgDateDiscrepanciesResult = new ArrayList<>();
+        List<Object[]> fvgDateDiscrepancies = fvgRepository.findFvgDateDiscrepancies();
+        if (!fvgDateDiscrepancies.isEmpty()) {
+            fvgDateDiscrepancies.forEach(resultRow -> logDiscrepancyAndAddToList(String.valueOf(resultRow[0]), String.valueOf(resultRow[1]), fvgDateDiscrepanciesResult));
+        }
+        return fvgDateDiscrepanciesResult;
+    }
 
     public List<String> findAllStocksDiscrepancies() {
         List<String> stocksWithDiscrepancies = findStocksHighLowsOrHTFDiscrepancies();
