@@ -28,7 +28,7 @@ public class DiscrepanciesController {
 
     @PutMapping("/stocks/high-low-for-period")
     public void updateStocksWithHighLowDiscrepancy(@RequestParam(value = "period") HighLowPeriod period) {
-        discrepanciesService.updateStocksWithHighLow4wDiscrepancyFor(period);
+        discrepanciesService.updateStocksWithHighLowDiscrepancyFor(period);
     }
 
     @PutMapping("/weekly-prices/opening-prices")
