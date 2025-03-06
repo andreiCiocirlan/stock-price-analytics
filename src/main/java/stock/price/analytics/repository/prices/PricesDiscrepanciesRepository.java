@@ -1,5 +1,7 @@
 package stock.price.analytics.repository.prices;
 
+import jakarta.transaction.Transactional;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -53,4 +55,34 @@ public interface PricesDiscrepanciesRepository extends PricesRepository {
                 AND (round(wp.high::numeric, 2) <> round(pu.weekly_high::numeric, 2) or round(wp.low::numeric, 2) <> round(pu.weekly_low::numeric, 2))
             """, nativeQuery = true)
     List<Object[]> findWeeklyHighLowPriceDiscrepancies();
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+            WITH daily_grouped AS (
+                SELECT
+                    ticker,
+                    DATE_TRUNC('week', date)::date AS week_start,
+                    open,
+                    ROW_NUMBER() OVER (PARTITION BY ticker, DATE_TRUNC('week', date) ORDER BY date) AS rn
+                FROM
+                    daily_prices
+                WHERE date >=  date_trunc('week', CURRENT_DATE)
+            ),
+            m_daily as (
+                SELECT ticker, week_start, open
+                FROM daily_grouped
+                WHERE rn = 1
+            ),
+            PricesToUpdate as (
+                select wp.ticker, md.week_start, md.open from m_daily md
+                join weekly_prices wp on wp.ticker = md.ticker and wp.start_date = md.week_start
+                where round(wp.open::numeric, 2) <> round(md.open::numeric, 2)
+            )
+            UPDATE weekly_prices wp
+            SET open = pu.open
+            FROM PricesToUpdate pu
+            WHERE wp.ticker = pu.ticker AND wp.start_date = pu.week_start;
+            """, nativeQuery = true)
+    void updateWeeklyPricesWithOpeningPriceDiscrepancy();
 }
