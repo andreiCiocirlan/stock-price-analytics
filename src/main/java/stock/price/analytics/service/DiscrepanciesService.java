@@ -104,22 +104,10 @@ public class DiscrepanciesService {
 
     public void updateStocksWithHighLow4wDiscrepancyFor(HighLowPeriod period) {
         switch (period) {
-            case HIGH_LOW_4W -> updateStocksWithHighLow4wDiscrepancy();
-            case HIGH_LOW_52W -> updateStocksWithHighLow52wDiscrepancy();
-            case HIGH_LOW_ALL_TIME -> updateStocksWithHighestLowestDiscrepancy();
+            case HIGH_LOW_4W -> stockDiscrepanciesRepository.updateStocksWithHighLow4wDiscrepancy();
+            case HIGH_LOW_52W -> stockDiscrepanciesRepository.updateStocksWithHighLow52wDiscrepancy();
+            case HIGH_LOW_ALL_TIME -> stockDiscrepanciesRepository.updateStocksWithHighestLowestDiscrepancy();
         }
-    }
-
-    private void updateStocksWithHighLow4wDiscrepancy() {
-        stockDiscrepanciesRepository.updateStocksWithHighLow4wDiscrepancy();
-    }
-
-    private void updateStocksWithHighLow52wDiscrepancy() {
-        stockDiscrepanciesRepository.updateStocksWithHighLow52wDiscrepancy();
-    }
-
-    private void updateStocksWithHighestLowestDiscrepancy() {
-        stockDiscrepanciesRepository.updateStocksWithHighestLowestDiscrepancy();
     }
 
     private void logDiscrepancyAndAddToList(String ticker, String discrepancyType, List<String> discrepanciesFound) {
