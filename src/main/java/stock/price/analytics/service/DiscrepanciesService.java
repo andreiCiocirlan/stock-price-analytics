@@ -3,6 +3,8 @@ package stock.price.analytics.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import stock.price.analytics.model.prices.enums.HighLowPeriod;
+import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.prices.PricesDiscrepanciesRepository;
 import stock.price.analytics.repository.stocks.StockDiscrepanciesRepository;
@@ -74,6 +76,50 @@ public class DiscrepanciesService {
                     resultRow -> logDiscrepancyAndAddToList(String.valueOf(resultRow[0]), String.valueOf(resultRow[1]), wHighLowPriceDiscrepanciesTickers));
         }
         return wHighLowPriceDiscrepanciesTickers;
+    }
+
+    public List<Stock> findStocksWithOpeningPriceDiscrepancyFor(StockTimeframe timeframe) {
+        return switch (timeframe) {
+            case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
+            case WEEKLY -> stockDiscrepanciesRepository.findStocksWithWeeklyOpeningDiscrepancy();
+            case MONTHLY -> stockDiscrepanciesRepository.findStocksWithMonthlyOpeningDiscrepancy();
+            case QUARTERLY -> stockDiscrepanciesRepository.findStocksWithQuarterlyOpeningDiscrepancy();
+            case YEARLY -> stockDiscrepanciesRepository.findStocksWithYearlyOpeningDiscrepancy();
+        };
+    }
+
+    public void updateWeeklyPricesWithOpeningPriceDiscrepancy() {
+        pricesDiscrepanciesRepository.updateWeeklyPricesWithOpeningPriceDiscrepancy();
+    }
+
+    public void updateStocksWithOpeningPriceDiscrepancyFor(StockTimeframe timeframe) {
+        switch (timeframe) {
+            case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
+            case WEEKLY -> stockDiscrepanciesRepository.updateStocksWithWeeklyOpeningDiscrepancy();
+            case MONTHLY -> stockDiscrepanciesRepository.updateStocksWithMonthlyOpeningDiscrepancy();
+            case QUARTERLY -> stockDiscrepanciesRepository.updateStocksWithQuarterlyOpeningDiscrepancy();
+            case YEARLY -> stockDiscrepanciesRepository.updateStocksWithYearlyOpeningDiscrepancy();
+        }
+    }
+
+    public void updateStocksWithHighLow4wDiscrepancyFor(HighLowPeriod period) {
+        switch (period) {
+            case HIGH_LOW_4W -> updateStocksWithHighLow4wDiscrepancy();
+            case HIGH_LOW_52W -> updateStocksWithHighLow52wDiscrepancy();
+            case HIGH_LOW_ALL_TIME -> updateStocksWithHighestLowestDiscrepancy();
+        }
+    }
+
+    private void updateStocksWithHighLow4wDiscrepancy() {
+        stockDiscrepanciesRepository.updateStocksWithHighLow4wDiscrepancy();
+    }
+
+    private void updateStocksWithHighLow52wDiscrepancy() {
+        stockDiscrepanciesRepository.updateStocksWithHighLow52wDiscrepancy();
+    }
+
+    private void updateStocksWithHighestLowestDiscrepancy() {
+        stockDiscrepanciesRepository.updateStocksWithHighestLowestDiscrepancy();
     }
 
     private void logDiscrepancyAndAddToList(String ticker, String discrepancyType, List<String> discrepanciesFound) {
