@@ -20,7 +20,7 @@ public class DiscrepanciesService {
     private final PricesDiscrepanciesRepository pricesDiscrepanciesRepository;
     private final StockDiscrepanciesRepository stockDiscrepanciesRepository;
 
-    public List<String> findAllStockDiscrepancies() {
+    public List<String> findAllStocksDiscrepancies() {
         List<String> stocksWithDiscrepancies = findStocksHighLowsOrHTFDiscrepancies();
         stocksWithDiscrepancies.addAll(findStocksOpeningPriceDiscrepancies());
         return stocksWithDiscrepancies;
@@ -32,7 +32,7 @@ public class DiscrepanciesService {
         return weeklyPriceDiscrepancies;
     }
 
-    private List<String> findStocksHighLowsOrHTFDiscrepancies() {
+    public List<String> findStocksHighLowsOrHTFDiscrepancies() {
         List<String> stocksWithDiscrepancies = new ArrayList<>();
         List<Object[]> stocksHighLowsOrHTFDiscrepancies = stockDiscrepanciesRepository.findStocksHighLowsOrHTFDiscrepancies();
         if (!stocksHighLowsOrHTFDiscrepancies.isEmpty()) {
@@ -41,7 +41,7 @@ public class DiscrepanciesService {
         return stocksWithDiscrepancies;
     }
 
-    private List<String> findStocksOpeningPriceDiscrepancies() {
+    public List<String> findStocksOpeningPriceDiscrepancies() {
         List<String> stocksWithDiscrepancies = new ArrayList<>();
         Map<String, Supplier<List<Stock>>> discrepancyMethods = Map.of(
                 "Weekly Opening", stockDiscrepanciesRepository::findStocksWithWeeklyOpeningDiscrepancy,
