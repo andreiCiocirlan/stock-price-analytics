@@ -36,9 +36,6 @@ public class StockDiscrepanciesService {
     private List<String> findHighLowAndOpeningPriceDiscrepancies() {
         List<String> stocksWithDiscrepancies = new ArrayList<>();
         Map<String, Supplier<List<Stock>>> discrepancyMethods = Map.of(
-                "52-week High/Low", stockDiscrepanciesRepository::findStocksWithHighLow52wDiscrepancy,
-                "4-week High/Low", stockDiscrepanciesRepository::findStocksWithHighLow4wDiscrepancy,
-                "Highest Lowest", stockDiscrepanciesRepository::findStocksWithHighestLowestDiscrepancy,
                 "Weekly Opening", stockDiscrepanciesRepository::findStocksWithWeeklyOpeningDiscrepancy,
                 "Monthly Opening", stockDiscrepanciesRepository::findStocksWithMonthlyOpeningDiscrepancy,
                 "Quarterly Opening", stockDiscrepanciesRepository::findStocksWithQuarterlyOpeningDiscrepancy,
