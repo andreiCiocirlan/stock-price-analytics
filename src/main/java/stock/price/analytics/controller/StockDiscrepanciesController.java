@@ -23,15 +23,6 @@ public class StockDiscrepanciesController {
         return stockDiscrepanciesService.findAllStockDiscrepancies();
     }
 
-    @GetMapping("/high-low-for-period")
-    public List<Stock> findStocksWithHighLowDiscrepancy(@RequestParam(value = "period") HighLowPeriod period) {
-        return switch (period) {
-            case HIGH_LOW_4W -> stockDiscrepanciesRepository.findStocksWithHighLow4wDiscrepancy();
-            case HIGH_LOW_52W -> stockDiscrepanciesRepository.findStocksWithHighLow52wDiscrepancy();
-            case HIGH_LOW_ALL_TIME -> stockDiscrepanciesRepository.findStocksWithHighestLowestDiscrepancy();
-        };
-    }
-
     @PutMapping("/high-low-for-period")
     public void updateStocksWithHighLowDiscrepancy(@RequestParam(value = "period") HighLowPeriod period) {
         switch (period) {
