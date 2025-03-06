@@ -4,13 +4,13 @@ package stock.price.analytics.scheduler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import stock.price.analytics.service.*;
+import stock.price.analytics.service.DesktopNotificationService;
+import stock.price.analytics.service.DiscrepanciesService;
 
 @Component
 @RequiredArgsConstructor
 public class EndOfDayScheduler {
 
-    private final FairValueGapService fairValueGapService;
     private final DiscrepanciesService discrepanciesService;
     private final DesktopNotificationService desktopNotificationService;
 
@@ -23,7 +23,7 @@ public class EndOfDayScheduler {
         if (!discrepanciesService.findStocksHighLowsOrHTFDiscrepancies().isEmpty()) {
             desktopNotificationService.broadcastDesktopNotification("Stocks High-Low/HTF Discrepancies found, check logs!");
         }
-        if (!fairValueGapService.findFvgDateDiscrepancies().isEmpty()) {
+        if (!discrepanciesService.findFvgDateDiscrepancies().isEmpty()) {
             desktopNotificationService.broadcastDesktopNotification("FVG Date discrepancies found, check logs!");
         }
         if (!discrepanciesService.findWeeklyOpeningPriceDiscrepancies().isEmpty()) {

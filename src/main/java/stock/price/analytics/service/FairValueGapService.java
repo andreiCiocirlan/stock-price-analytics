@@ -258,10 +258,6 @@ public class FairValueGapService {
         log.warn("updated {} FVG rows for {} and stockSplitDate {}", updatedRows, ticker, stockSplitDate);
     }
 
-    public List<Object[]> findFvgDateDiscrepancies() {
-        return fvgRepository.findFvgDateDiscrepancies();
-    }
-
     public void logFVGsTagged95thPercentile(List<Double> cfdMargins) {
         String cfdMargins54 = cfdMargins.stream().map(cfdMargin -> STR."'\{cfdMargin}'").collect(Collectors.joining(", "));
         for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
