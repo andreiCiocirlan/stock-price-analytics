@@ -40,9 +40,6 @@ public class YahooPricesController {
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
             List<AbstractPrice> htfPricesUpdated = pricesService.updatePricesForHigherTimeframes(dailyImportedPrices);
 
-            dailyPricesService.tickersWithIntradaySpike(CFD_MARGINS_5X_4X_3X).entrySet().stream()
-                    .filter(entry -> !entry.getValue().isEmpty())
-                    .forEach(entry -> log.info("Intraday {} : {}", entry.getKey(), entry.getValue()));
             logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices), "saved current week HighLow prices");
             logTime(() -> stockService.updateStocksHighLowsAndOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks highs-lows 4w,52w,all-time and higher-timeframe OHLC prices");
         }
@@ -62,9 +59,6 @@ public class YahooPricesController {
             pricesService.savePrices(dailyImportedPrices);
             List<AbstractPrice> htfPricesUpdated = pricesService.updatePricesForHigherTimeframes(dailyImportedPrices);
 
-            dailyPricesService.tickersWithIntradaySpike(CFD_MARGINS_5X_4X_3X).entrySet().stream()
-                    .filter(entry -> !entry.getValue().isEmpty())
-                    .forEach(entry -> log.info("Intraday {} : {}", entry.getKey(), entry.getValue()));
             logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices), "saved current week HighLow prices");
             logTime(() -> stockService.updateStocksHighLowsAndOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks highs-lows 4w,52w,all-time and higher-timeframe OHLC prices");
         }
