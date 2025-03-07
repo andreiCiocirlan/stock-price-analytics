@@ -3,7 +3,6 @@ package stock.price.analytics.cache.util;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.service.DailyPricesService;
 
 import java.time.LocalDate;
 
@@ -14,15 +13,10 @@ import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 @RequiredArgsConstructor
 public class ImportDateUtil {
 
-    private final DailyPricesService dailyPricesService;
-
-    public boolean isFirstImportFor(StockTimeframe timeframe) {
+    public static boolean isFirstImportFor(StockTimeframe timeframe, LocalDate previousImportDate) {
         return switch (timeframe) {
             case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
-            case WEEKLY, YEARLY, QUARTERLY, MONTHLY -> {
-                LocalDate previousImportDate = dailyPricesService.previousDailyPrices().getFirst().getDate();
-                yield isWithinSameTimeframe(tradingDateNow(), previousImportDate, timeframe);
-            }
+            case WEEKLY, YEARLY, QUARTERLY, MONTHLY -> isWithinSameTimeframe(tradingDateNow(), previousImportDate, timeframe);
         };
     }
 
