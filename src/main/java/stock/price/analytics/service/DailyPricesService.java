@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.prices.enums.IntradaySpike.intradaySpikes;
-import static stock.price.analytics.util.Constants.CFD_MARGINS_5X_4X_3X;
 
 @Slf4j
 @Service
@@ -75,8 +74,8 @@ public class DailyPricesService {
         dailyPricesCacheService.addPreMarketDailyPricesInCache(preMarketPrices);
     }
 
-    public Map<PriceMilestone, List<String>> tickersWithIntradaySpike() {
-        return priceMilestoneService.findTickersForMilestones(intradaySpikes(), CFD_MARGINS_5X_4X_3X);
+    public Map<PriceMilestone, List<String>> tickersWithIntradaySpike(List<Double> cfdMargins) {
+        return priceMilestoneService.findTickersForMilestones(intradaySpikes(), cfdMargins);
     }
 
 }

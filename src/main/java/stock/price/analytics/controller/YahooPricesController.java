@@ -13,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
+import static stock.price.analytics.util.Constants.CFD_MARGINS_5X_4X_3X;
 import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
@@ -39,7 +40,7 @@ public class YahooPricesController {
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
             List<AbstractPrice> htfPricesUpdated = pricesService.updatePricesForHigherTimeframes(dailyImportedPrices);
 
-            dailyPricesService.tickersWithIntradaySpike().entrySet().stream()
+            dailyPricesService.tickersWithIntradaySpike(CFD_MARGINS_5X_4X_3X).entrySet().stream()
                     .filter(entry -> !entry.getValue().isEmpty())
                     .forEach(entry -> log.info("Intraday {} : {}", entry.getKey(), entry.getValue()));
             logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices), "saved current week HighLow prices");
@@ -61,7 +62,7 @@ public class YahooPricesController {
             pricesService.savePrices(dailyImportedPrices);
             List<AbstractPrice> htfPricesUpdated = pricesService.updatePricesForHigherTimeframes(dailyImportedPrices);
 
-            dailyPricesService.tickersWithIntradaySpike().entrySet().stream()
+            dailyPricesService.tickersWithIntradaySpike(CFD_MARGINS_5X_4X_3X).entrySet().stream()
                     .filter(entry -> !entry.getValue().isEmpty())
                     .forEach(entry -> log.info("Intraday {} : {}", entry.getKey(), entry.getValue()));
             logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices), "saved current week HighLow prices");
