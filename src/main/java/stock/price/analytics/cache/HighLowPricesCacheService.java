@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Collections.emptySet;
-import static stock.price.analytics.cache.util.ImportDateUtil.isFirstImportFor;
+import static stock.price.analytics.util.ImportDateUtil.isFirstImportFor;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 
 @Slf4j

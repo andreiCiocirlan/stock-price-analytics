@@ -1,4 +1,4 @@
-package stock.price.analytics.cache.util;
+package stock.price.analytics.util;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
