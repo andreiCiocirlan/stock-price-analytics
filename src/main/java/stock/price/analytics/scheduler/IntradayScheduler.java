@@ -28,9 +28,8 @@ public class IntradayScheduler {
         @Scheduled(cron = "${cron.intraday.ticker.spikes.between16and17}", zone = "${cron.timezone}")
     })
     public void alertIntradayPriceSpikes() {
-        dailyPricesService.tickersWithIntradaySpike(CFD_MARGINS_5X_4X_3X).entrySet().stream()
-                .filter(entry -> !entry.getValue().isEmpty())
-                .forEach(entry -> desktopNotificationService.broadcastDesktopNotification(entry.getKey().toString(), entry.getValue().toString()));
+        dailyPricesService.tickersWithIntradaySpike(CFD_MARGINS_5X_4X_3X)
+                .forEach((priceMilestone, tickers) -> desktopNotificationService.broadcastDesktopNotification(priceMilestone.toString(), tickers.toString()));
     }
 
 }
