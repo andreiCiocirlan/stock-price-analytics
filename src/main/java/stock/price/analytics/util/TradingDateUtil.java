@@ -60,11 +60,4 @@ public class TradingDateUtil {
                 .orElseThrow();
     }
 
-    private static boolean isPreMarketHours() {
-        return LocalDateTime.now().toLocalTime().isAfter(preMarketStartHours) && LocalDateTime.now().toLocalTime().isBefore(startMarketHours);
-    }
-
-    public static boolean isFirstImportMonday(LocalDate lastImportDate) {
-        return lastImportDate.getDayOfWeek().equals(DayOfWeek.FRIDAY) && (LocalDate.now().getDayOfWeek().equals(DayOfWeek.MONDAY) && isPreMarketHours());
-    }
 }
