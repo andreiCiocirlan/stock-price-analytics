@@ -35,7 +35,7 @@ public class YahooQuotesController {
     @Transactional
     @GetMapping("/import")
     @ResponseStatus(HttpStatus.OK)
-    public List<DailyPrice> yahooPricesImport() {
+    public List<DailyPrice> yahooQuotesImport() {
         long start = System.nanoTime();
         List<DailyPrice> dailyImportedPrices = logTimeAndReturn(yahooQuoteService::yahooQuotesImport, "imported daily prices");
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
@@ -52,7 +52,7 @@ public class YahooQuotesController {
     @Transactional
     @GetMapping("/from-file")
     @ResponseStatus(HttpStatus.OK)
-    public List<DailyPrice> yahooPricesImportFromFile(@RequestParam(value = "fileName", required = false) String fileNameStr) {
+    public List<DailyPrice> yahooQuotesImportFromFile(@RequestParam(value = "fileName", required = false) String fileNameStr) {
         long start = System.nanoTime();
         String fileName = Objects.requireNonNullElseGet(fileNameStr, () -> tradingDateNow().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_1");
         List<DailyPrice> dailyImportedPrices = logTimeAndReturn(() -> yahooQuoteService.yahooQuotesFromFile(fileName), "imported daily prices");
