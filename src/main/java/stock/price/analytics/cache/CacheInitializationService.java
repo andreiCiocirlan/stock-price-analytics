@@ -9,6 +9,8 @@ import stock.price.analytics.model.prices.highlow.*;
 import stock.price.analytics.model.prices.json.DailyPricesJSON;
 import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.model.stocks.Stock;
+import stock.price.analytics.repository.prices.DailyPricesJSONRepository;
+import stock.price.analytics.repository.prices.DailyPricesRepository;
 import stock.price.analytics.repository.prices.HighLowForPeriodRepository;
 import stock.price.analytics.repository.stocks.StockRepository;
 
@@ -23,6 +25,7 @@ import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
 import static stock.price.analytics.model.stocks.enums.MarketState.REGULAR;
 import static stock.price.analytics.util.ImportDateUtil.isFirstImportFor;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
+import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 @Slf4j
 @Service
@@ -32,13 +35,16 @@ public class CacheInitializationService {
     private final DailyPricesJSONCache dailyPricesJSONCache;
     private final DailyPricesCache dailyPricesCache;
     private final StockRepository stockRepository;
+    private final DailyPricesJSONRepository dailyPricesJSONRepository;
+    private final DailyPricesRepository dailyPricesRepository;
     private final HigherTimeframePricesCache higherTimeframePricesCache;
     private final HighLowPricesCache highLowPricesCache;
     private final HighLowForPeriodRepository highLowForPeriodRepository;
     private final StocksCache stocksCache;
 
-    public void initDailyJSONPricesCache(List<DailyPricesJSON> latestDailyPricesJSON) {
-        dailyPricesJSONCache.addDailyJSONPrices(latestDailyPricesJSON);
+    public void initDailyJSONPricesCache() {
+        LocalDate tradingDateNow = tradingDateNow();
+        dailyPricesJSONCache.addDailyJSONPrices(dailyPricesJSONRepository.findByDateBetween(tradingDateNow.minusDays(7), tradingDateNow));
     }
 
     public void initializePreMarketDailyPrices() {
@@ -57,11 +63,11 @@ public class CacheInitializationService {
         dailyPricesCache.addDailyPrices(latestPreMarketDailyPrices, PRE);
     }
 
-    public void initLatestTwoDaysPricesCache(List<DailyPrice> latestTwoDaysDailyPrices) {
+    public void initLatestTwoDaysPricesCache() {
         List<DailyPrice> latestPrices = new ArrayList<>();
         List<DailyPrice> previousDayPrices = new ArrayList<>();
 
-        latestTwoDaysDailyPrices.stream()
+        dailyPricesRepository.findLatestTwoDailyPrices().stream()
                 .sorted(Comparator.comparing(DailyPrice::getDate).reversed())
                 .collect(Collectors.groupingBy(DailyPrice::getTicker))
                 .forEach((_, dailyPrices) -> {
