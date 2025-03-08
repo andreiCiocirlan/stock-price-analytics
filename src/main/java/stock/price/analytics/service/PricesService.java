@@ -69,7 +69,7 @@ public class PricesService {
 
     public void initHigherTimeframePricesCache(List<String> tickers) {
         for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
-            higherTimeframePricesCacheService.addPricesWithPrevCloseFrom(previousThreePricesFor(tickers, timeframe));
+            higherTimeframePricesCacheService.addHtfPricesWithPrevCloseFrom(previousThreePricesFor(tickers, timeframe));
         }
     }
 
@@ -108,9 +108,9 @@ public class PricesService {
         List<AbstractPrice> htfPricesUpdated = new ArrayList<>();
         for (StockTimeframe timeframe : higherTimeframes()) {
             List<PriceWithPrevClose> htfPricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, timeframe,
-                    higherTimeframePricesCacheService.pricesWithPrevCloseFor(tickers, timeframe));
+                    higherTimeframePricesCacheService.htfPricesWithPrevCloseFor(tickers, timeframe));
             htfPricesUpdated.addAll(htfPricesWithPrevCloseUpdated.stream().map(PriceWithPrevClose::getPrice).toList());
-            higherTimeframePricesCacheService.addPricesWithPrevClose(htfPricesWithPrevCloseUpdated);
+            higherTimeframePricesCacheService.addHtfPricesWithPrevClose(htfPricesWithPrevCloseUpdated);
         }
         partitionDataAndSaveWithLogTime(htfPricesUpdated, pricesRepository, "saved HTF prices");
 
