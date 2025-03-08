@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.enums.IntradaySpike;
 import stock.price.analytics.model.prices.enums.PreMarketPriceMilestone;
-import stock.price.analytics.model.prices.enums.PriceMilestone;
+import stock.price.analytics.model.prices.PriceMilestone;
 import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
