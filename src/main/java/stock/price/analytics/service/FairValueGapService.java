@@ -264,8 +264,8 @@ public class FairValueGapService {
             for (PricePerformanceMilestone priceMilestone : milestones95thPercentile()) {
                 for (FvgType fvgType : FvgType.values()) {
                     String fvgLabel = fvgLabelFrom(priceMilestone, fvgType, timeframe);
-                    Set<String> fvgTaggedTickers = fvgTaggedService.findTickersFVGsTaggedFor(timeframe, fvgType, priceMilestone, cfdMargins54);
-                    log.warn("{}", fvgLabel + fvgTaggedTickers);
+                    fvgTaggedService.findTickersFVGsTaggedFor(timeframe, fvgType, priceMilestone, cfdMargins54)
+                            .forEach(fvgTaggedTickers ->  log.warn("{}", fvgLabel + fvgTaggedTickers));
                 }
             }
         }
