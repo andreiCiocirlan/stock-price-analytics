@@ -7,7 +7,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
-import stock.price.analytics.service.*;
+import stock.price.analytics.service.HighLowForPeriodService;
+import stock.price.analytics.service.PricesService;
+import stock.price.analytics.service.StockService;
+import stock.price.analytics.service.YahooQuoteService;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;

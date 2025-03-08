@@ -6,9 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import stock.price.analytics.cache.HighLowPricesCacheService;
 import stock.price.analytics.model.prices.enums.StockPerformanceInterval;
 import stock.price.analytics.service.HighLowForPeriodService;
+import stock.price.analytics.service.HighLowPricesCacheService;
 
 import java.time.LocalDate;
 import java.util.List;

@@ -10,11 +10,11 @@ import java.util.Map;
 
 @Getter
 @Component
-public class StocksCache {
+class StocksCache {
 
     private final Map<String, Stock> stocksMap = new HashMap<>();
 
-    public void addStocks(List<Stock> stocks) {
+    void addStocks(List<Stock> stocks) {
         stocks.forEach(s -> stocksMap.merge(s.getTicker(), s, (_, newValue) -> newValue));
     }
 

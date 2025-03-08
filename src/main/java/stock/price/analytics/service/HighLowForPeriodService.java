@@ -6,7 +6,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import stock.price.analytics.cache.HighLowPricesCacheService;
+import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.BusinessEntity;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.enums.StockPerformanceInterval;
@@ -48,6 +48,7 @@ public class HighLowForPeriodService {
     private final EntityManager entityManager;
     private final HighLowForPeriodRepository highLowForPeriodRepository;
     private final HighLowPricesCacheService highLowPricesCacheService;
+    private final CacheService cacheService;
 
     @Transactional
     public void saveHighLowPricesForPeriod(StockPerformanceInterval stockPerformanceInterval) {
@@ -74,10 +75,10 @@ public class HighLowForPeriodService {
     public void saveCurrentWeekHighLowPricesFrom(List<DailyPrice> dailyPrices) {
         List<String> tickers = dailyPrices.stream().map(DailyPrice::getTicker).toList();
         for (HighLowPeriod highLowPeriod : values()) {
-            List<? extends HighLowForPeriod> hlPricesUpdated = highLowPricesCacheService.getUpdatedHighLowPricesForTickers(dailyPrices, tickers, highLowPeriod);
+            List<? extends HighLowForPeriod> hlPricesUpdated = cacheService.getUpdatedHighLowPricesForTickers(dailyPrices, tickers, highLowPeriod);
             if (!hlPricesUpdated.isEmpty()) {
                 partitionDataAndSaveNoLogging(hlPricesUpdated, highLowForPeriodRepository);
-                highLowPricesCacheService.addHighLowPrices(hlPricesUpdated, highLowPeriod);
+                cacheService.addHighLowPrices(hlPricesUpdated, highLowPeriod);
             }
         }
     }

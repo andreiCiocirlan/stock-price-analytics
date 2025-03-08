@@ -1,0 +1,200 @@
+package stock.price.analytics.cache;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import stock.price.analytics.cache.model.*;
+import stock.price.analytics.model.prices.enums.HighLowPeriod;
+import stock.price.analytics.model.prices.highlow.*;
+import stock.price.analytics.model.prices.json.DailyPricesJSON;
+import stock.price.analytics.model.prices.ohlc.*;
+import stock.price.analytics.model.stocks.Stock;
+import stock.price.analytics.repository.prices.HighLowForPeriodRepository;
+import stock.price.analytics.repository.stocks.StockRepository;
+
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static stock.price.analytics.model.prices.enums.StockTimeframe.WEEKLY;
+import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
+import static stock.price.analytics.model.stocks.enums.MarketState.REGULAR;
+import static stock.price.analytics.util.ImportDateUtil.isFirstImportFor;
+import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class CacheInitializationService {
+
+    private final DailyPricesJSONCache dailyPricesJSONCache;
+    private final DailyPricesCache dailyPricesCache;
+    private final StockRepository stockRepository;
+    private final HigherTimeframePricesCache higherTimeframePricesCache;
+    private final HighLowPricesCache highLowPricesCache;
+    private final HighLowForPeriodRepository highLowForPeriodRepository;
+    private final StocksCache stocksCache;
+
+    public void initDailyJSONPricesCache(List<DailyPricesJSON> latestDailyPricesJSON) {
+        dailyPricesJSONCache.addDailyJSONPrices(latestDailyPricesJSON);
+    }
+
+    public void initializePreMarketDailyPrices() {
+        Map<String, List<DailyPricesJSON>> dailyPricesJSONByTicker = dailyPricesJSONCache.getDailyPricesJSONByTicker().values().stream()
+                .sorted(Comparator.comparing(DailyPricesJSON::getDate).reversed()) // order by date desc
+                .collect(Collectors.groupingBy(DailyPricesJSON::getSymbol));
+
+        List<DailyPrice> latestPreMarketDailyPrices = new ArrayList<>();
+
+        for (List<DailyPricesJSON> dailyPricesJSONs : dailyPricesJSONByTicker.values()) {
+            DailyPricesJSON latestPrice = dailyPricesJSONs.getFirst(); // take the first (latest) daily price per ticker
+            if (latestPrice.getPreMarketPrice() != 0d) {
+                latestPreMarketDailyPrices.add(latestPrice.convertToDailyPrice(true));
+            }
+        }
+        dailyPricesCache.addDailyPrices(latestPreMarketDailyPrices, PRE);
+    }
+
+    public void initLatestTwoDaysPricesCache(List<DailyPrice> latestTwoDaysDailyPrices) {
+        List<DailyPrice> latestPrices = new ArrayList<>();
+        List<DailyPrice> previousDayPrices = new ArrayList<>();
+
+        latestTwoDaysDailyPrices.stream()
+                .sorted(Comparator.comparing(DailyPrice::getDate).reversed())
+                .collect(Collectors.groupingBy(DailyPrice::getTicker))
+                .forEach((_, dailyPrices) -> {
+                    if (!dailyPrices.isEmpty()) {
+                        latestPrices.add(dailyPrices.getFirst()); // Latest day
+                    }
+                    if (dailyPrices.size() > 1) {
+                        previousDayPrices.add(dailyPrices.get(1)); // Previous day
+                    }
+                });
+
+        dailyPricesCache.addDailyPrices(latestPrices, REGULAR);
+        dailyPricesCache.addPreviousDayPrices(previousDayPrices);
+    }
+
+    public void initHighLowPricesCache(LocalDate latestDailyPriceImportDate) {
+        for (HighLowPeriod highLowPeriod : HighLowPeriod.values()) {
+            initHighLowPriceCache(highLowPeriod, latestDailyPriceImportDate);
+            initPrevWeekHighLowPricesCache(highLowPeriod, latestDailyPriceImportDate);
+        }
+    }
+
+    private void initPrevWeekHighLowPricesCache(HighLowPeriod highLowPeriod, LocalDate latestDailyPriceImportDate) {
+        boolean firstImportOfTheWeek = isFirstImportFor(WEEKLY, latestDailyPriceImportDate);
+        LocalDate prevWeekStartDate = latestDailyPriceImportDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        if (!firstImportOfTheWeek) { // on Monday first import need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
+            prevWeekStartDate = prevWeekStartDate.minusWeeks(1);
+        }
+        List<? extends HighLowForPeriod> prevWeekHighLowPrices = switch (highLowPeriod) {
+            case HIGH_LOW_4W -> highLowForPeriodRepository.highLow4wPricesFor(prevWeekStartDate);
+            case HIGH_LOW_52W -> highLowForPeriodRepository.highLow52wPricesFor(prevWeekStartDate);
+            case HIGH_LOW_ALL_TIME -> highLowForPeriodRepository.highestLowestPrices(prevWeekStartDate);
+        };
+        highLowPricesCache.addPrevWeekHighLowPrices(prevWeekHighLowPrices, highLowPeriod);
+    }
+
+    private void initHighLowPriceCache(HighLowPeriod highLowPeriod, LocalDate latestDailyPriceImportDate) {
+        LocalDate startDate = latestDailyPriceImportDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDate endDate = latestDailyPriceImportDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
+        boolean firstImportOfTheWeek = isFirstImportFor(WEEKLY, latestDailyPriceImportDate);
+        if (firstImportOfTheWeek) { // on first import of the week need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
+            LocalDate newWeekStartDate = startDate.plusWeeks(1);
+            LocalDate newWeekEndDate = endDate.plusWeeks(1);
+            if (highLowPeriod == HighLowPeriod.HIGH_LOW_ALL_TIME) { // for all-time highs/lows simply copy the existing row on Mondays
+                List<HighestLowestPrices> highestLowestPrices = new ArrayList<>();
+                highLowForPeriodRepository.highestLowestPrices(startDate).forEach(hlp -> highestLowestPrices.add(hlp.copyWith(newWeekStartDate)));
+                partitionDataAndSave(highestLowestPrices, highLowForPeriodRepository);
+                highLowPricesCache.addHighLowPrices(highestLowestPrices, highLowPeriod);
+            } else { // for 4w, 52w need sql select for the period (for all-time it would simply be a copy)
+                int weekCount = switch (highLowPeriod) {
+                    case HIGH_LOW_4W -> 3; // last imported date was Friday -> new week -> look back 3 instead of 4 weeks
+                    case HIGH_LOW_52W -> 51;
+                    case HIGH_LOW_ALL_TIME -> throw new IllegalArgumentException("HIGH_LOW_ALL_TIME is not supported.");
+                };
+                List<HighLowForPeriod> highLowForPeriods = highLowForPeriodRepository.highLowPricesInPastWeeks(startDate, weekCount)
+                        .stream()
+                        .map(dto -> convertToHighLowForPeriod(dto, newWeekStartDate, newWeekEndDate, highLowPeriod))
+                        .toList();
+                partitionDataAndSave(highLowForPeriods, highLowForPeriodRepository);
+                highLowPricesCache.addHighLowPrices(highLowForPeriods, highLowPeriod);
+            }
+        } else {
+            List<? extends HighLowForPeriod> highLowPrices = switch (highLowPeriod) {
+                case HIGH_LOW_4W -> highLowForPeriodRepository.highLow4wPricesFor(startDate);
+                case HIGH_LOW_52W -> highLowForPeriodRepository.highLow52wPricesFor(startDate);
+                case HIGH_LOW_ALL_TIME -> highLowForPeriodRepository.highestLowestPrices(startDate);
+            };
+            highLowPricesCache.addHighLowPrices(highLowPrices, highLowPeriod);
+        }
+    }
+
+    private HighLowForPeriod convertToHighLowForPeriod(TickerHighLowView dto, LocalDate newWeekStartDate, LocalDate newWeekEndDate, HighLowPeriod highLowPeriod) {
+        HighLowForPeriod highLowForPeriod = switch (highLowPeriod) {
+            case HIGH_LOW_4W -> new HighLow4w(dto.getTicker(), newWeekStartDate, newWeekEndDate);
+            case HIGH_LOW_52W -> new HighLow52Week(dto.getTicker(), newWeekStartDate, newWeekEndDate);
+            case HIGH_LOW_ALL_TIME -> throw new IllegalArgumentException("HIGH_LOW_ALL_TIME is not supported.");
+        };
+        highLowForPeriod.setLow(dto.getLow());
+        highLowForPeriod.setHigh(dto.getHigh());
+        return highLowForPeriod;
+    }
+
+    public void initializeStocks(List<Stock> stocks) {
+        stocksCache.addStocks(stocks);
+        findDelistedStocksAndUpdate();
+    }
+
+    private void findDelistedStocksAndUpdate() {
+        List<Stock> delistedStocks = stocksCache.getStocksMap().values().stream()
+                .filter(stock -> stock.getLastUpdated().isBefore(LocalDate.now().minusDays(5)))
+                .peek(stock -> {
+                    log.warn("DELISTED stock {}", stock.getTicker());
+                    stock.setDelistedDate(stock.getLastUpdated());
+                })
+                .toList();
+
+        if (!delistedStocks.isEmpty()) {
+            partitionDataAndSave(delistedStocks, stockRepository);
+        }
+    }
+
+    public void initHigherTimeframePricesCache(List<AbstractPrice> previousThreePrices) {
+        addHtfPricesWithPrevCloseFrom(previousThreePrices);
+    }
+
+    public void addHtfPricesWithPrevCloseFrom(List<AbstractPrice> prevThreePrices) {
+        List<PriceWithPrevClose> pricesWithPrevClose = pricesWithPrevCloseByTickerFrom(prevThreePrices);
+        higherTimeframePricesCache.addPricesWithPrevClose(pricesWithPrevClose, prevThreePrices.getFirst().getTimeframe());
+    }
+
+    private List<PriceWithPrevClose> pricesWithPrevCloseByTickerFrom(List<stock.price.analytics.model.prices.ohlc.AbstractPrice> previousThreePricesForTickers) {
+        Map<String, List<AbstractPrice>> previousTwoPricesByTicker = previousThreePricesForTickers
+                .stream()
+                .collect(Collectors.groupingBy(AbstractPrice::getTicker))
+                .values().stream()
+                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(AbstractPrice::getStartDate).reversed()).limit(2))
+                .collect(Collectors.groupingBy(AbstractPrice::getTicker));
+        List<stock.price.analytics.model.prices.ohlc.AbstractPrice> latestPrices = new ArrayList<>();
+        Map<String, Double> previousCloseByTicker = new HashMap<>();
+        for (List<stock.price.analytics.model.prices.ohlc.AbstractPrice> prices : previousTwoPricesByTicker.values()) {
+            latestPrices.add(prices.get(0)); // most recent price
+            previousCloseByTicker.put(prices.get(0).getTicker(),
+                    prices.size() > 1 ? prices.get(1).getClose() : prices.get(0).getOpen()); // if IPO week, month, quarter, year -> take opening price
+        }
+
+        return latestPrices.stream()
+                .map(price -> (PriceWithPrevClose) switch (price.getTimeframe()) {
+                    case DAILY -> throw new IllegalStateException("Unexpected timeframe DAILY");
+                    case WEEKLY -> new WeeklyPriceWithPrevClose((WeeklyPrice) price, previousCloseByTicker.get(price.getTicker()));
+                    case MONTHLY -> new MonthlyPriceWithPrevClose((MonthlyPrice) price, previousCloseByTicker.get(price.getTicker()));
+                    case QUARTERLY -> new QuarterlyPriceWithPrevClose((QuarterlyPrice) price, previousCloseByTicker.get(price.getTicker()));
+                    case YEARLY -> new YearlyPriceWithPrevClose((YearlyPrice) price, previousCloseByTicker.get(price.getTicker()));
+                })
+                .toList();
+    }
+}

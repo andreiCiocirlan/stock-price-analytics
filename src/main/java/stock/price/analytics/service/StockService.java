@@ -4,8 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import stock.price.analytics.cache.HighLowPricesCacheService;
-import stock.price.analytics.cache.StocksCache;
+import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.ohlc.*;
@@ -36,8 +35,7 @@ import static stock.price.analytics.util.PricesUtil.tickerFrom;
 public class StockService {
 
     private final StockRepository stockRepository;
-    private final StocksCache stocksCache;
-    private final HighLowPricesCacheService highLowPricesCacheService;
+    private final CacheService cacheService;
 
     @Transactional
     public void saveStocks() throws IOException {
@@ -74,7 +72,7 @@ public class StockService {
     }
 
     private void updateStocksFromOHLCPrices(List<DailyPrice> dailyPrices, List<AbstractPrice> htfPrices, Set<Stock> stocksUpdated) {
-        Map<String, Stock> stocksMap = stocksCache.getStocksMap();
+        Map<String, Stock> stocksMap = cacheService.getStocksMap();
         // update from daily prices
         for (DailyPrice dailyPrice : dailyPrices) {
             String ticker = dailyPrice.getTicker();
@@ -102,10 +100,10 @@ public class StockService {
     }
 
     private void updateStocksFromHighLowCaches(Set<Stock> stocksUpdated) {
-        Map<String, Stock> stocksMap = stocksCache.getStocksMap();
+        Map<String, Stock> stocksMap = cacheService.getStocksMap();
 
         for (HighLowPeriod period : HighLowPeriod.values()) {
-            List<? extends HighLowForPeriod> cache = highLowPricesCacheService.cacheForHighLowPeriod(period);
+            List<? extends HighLowForPeriod> cache = cacheService.cacheForHighLowPeriod(period);
             for (HighLowForPeriod hl : cache) {
                 Optional.ofNullable(stocksMap.get(hl.getTicker()))
                         .ifPresent(stock -> {
@@ -123,7 +121,7 @@ public class StockService {
 
         List<Stock> stocks = new ArrayList<>(stocksUpdated);
         partitionDataAndSaveWithLogTime(stocks, stockRepository, "saved stocks " + stocks.size() + " after OHLC higher-timeframe and high-lows 4w, 52w, all-time updates");
-        stocksCache.addStocks(stocks);
+        cacheService.addStocks(stocks);
     }
 
     public void updateHighLowForPeriodFromHLCachesAndAdjustWeekend() {
@@ -138,34 +136,11 @@ public class StockService {
         }
         List<Stock> stocks = new ArrayList<>(stocksUpdated);
         partitionDataAndSaveWithLogTime(stocks, stockRepository, "saved stocks after generating high-lows 4w, 52w, all-time for the first import of the week");
-        stocksCache.addStocks(stocks);
-    }
-
-    public Map<String, Stock> stocksCacheMap() {
-        return stocksCache.getStocksMap();
-    }
-
-    public void initStocksCache(List<Stock> stocks) {
-        stocksCache.addStocks(stocks);
-        findAndDelistStocksFromCache();
-    }
-
-    private void findAndDelistStocksFromCache() {
-        List<Stock> stocksDelisted = new ArrayList<>();
-        for (Stock stock : stocksCache.getStocksMap().values()) {
-            if (stock.getLastUpdated().isBefore(LocalDate.now().minusDays(5))) {
-                log.warn("DELISTED stock {}", stock.getTicker());
-                stock.setDelistedDate(stock.getLastUpdated());
-                stocksDelisted.add(stock);
-            }
-        }
-        if (!stocksDelisted.isEmpty()) {
-            partitionDataAndSave(stocksDelisted, stockRepository);
-        }
+        cacheService.addStocks(stocks);
     }
 
     public LocalDate findLastUpdate() {
-        return stocksCache.getStocksMap().values().stream()
+        return cacheService.getStocksMap().values().stream()
                 .max(Comparator.comparing(Stock::getLastUpdated))
                 .map(Stock::getLastUpdated)
                 .orElseThrow();
@@ -186,9 +161,5 @@ public class StockService {
         stockRepository.updateHighLow4wPricesFor(ticker);
         stockRepository.updateHighLow52wPricesFor(ticker);
         stockRepository.updateHighestLowestPricesFor(ticker);
-    }
-
-    public List<Stock> getCachedStocks() {
-        return stocksCache.getStocksMap().values().stream().toList();
     }
 }

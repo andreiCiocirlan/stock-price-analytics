@@ -7,14 +7,12 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import stock.price.analytics.cache.DailyPricesCacheService;
-import stock.price.analytics.cache.HigherTimeframePricesCacheService;
+import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.cache.model.*;
 import stock.price.analytics.controller.dto.CandleWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.repository.prices.*;
-import stock.price.analytics.util.StockDateUtils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -23,7 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
+import static stock.price.analytics.model.prices.enums.StockTimeframe.DAILY;
+import static stock.price.analytics.model.prices.enums.StockTimeframe.higherTimeframes;
 import static stock.price.analytics.model.stocks.enums.MarketState.REGULAR;
 import static stock.price.analytics.util.Constants.DAILY_FVG_MIN_DATE;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
@@ -46,13 +45,12 @@ public class PricesService {
     private final MonthlyPricesRepository monthlyPricesRepository;
     private final QuarterlyPricesRepository quarterlyPricesRepository;
     private final YearlyPricesRepository yearlyPricesRepository;
-    private final HigherTimeframePricesCacheService higherTimeframePricesCacheService;
-    private final DailyPricesCacheService dailyPricesCacheService;
+    private final CacheService cacheService;
 
     public List<AbstractPrice> htfPricesFor(StockTimeframe timeframe) {
         return switch (timeframe) {
-            case DAILY -> new ArrayList<>(dailyPricesCacheService.dailyPricesCache(REGULAR));
-            case WEEKLY, MONTHLY, QUARTERLY, YEARLY -> higherTimeframePricesCacheService.htfPricesFor(timeframe);
+            case DAILY -> new ArrayList<>(cacheService.getCachedDailyPrices(REGULAR));
+            case WEEKLY, MONTHLY, QUARTERLY, YEARLY -> cacheService.htfPricesFor(timeframe);
         };
     }
 
@@ -65,10 +63,6 @@ public class PricesService {
             case QUARTERLY -> quarterlyPricesRepository.findPreviousThreeQuarterlyPricesForTickers(tickers);
             case YEARLY -> yearlyPricesRepository.findPreviousThreeYearlyPricesForTickers(tickers);
         });
-    }
-
-    public void initHigherTimeframePricesCache(List<AbstractPrice> previousThreePricesForTimeframe) {
-        higherTimeframePricesCacheService.addHtfPricesWithPrevCloseFrom(previousThreePricesForTimeframe);
     }
 
     public List<CandleWithDateDTO> findFor(String ticker, StockTimeframe timeframe) {
@@ -106,9 +100,9 @@ public class PricesService {
         List<AbstractPrice> htfPricesUpdated = new ArrayList<>();
         for (StockTimeframe timeframe : higherTimeframes()) {
             List<PriceWithPrevClose> htfPricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, timeframe,
-                    higherTimeframePricesCacheService.htfPricesWithPrevCloseFor(tickers, timeframe));
+                    cacheService.htfPricesWithPrevCloseFor(tickers, timeframe));
             htfPricesUpdated.addAll(htfPricesWithPrevCloseUpdated.stream().map(PriceWithPrevClose::getPrice).toList());
-            higherTimeframePricesCacheService.addHtfPricesWithPrevClose(htfPricesWithPrevCloseUpdated);
+            cacheService.addHtfPricesWithPrevClose(htfPricesWithPrevCloseUpdated);
         }
         partitionDataAndSaveWithLogTime(htfPricesUpdated, pricesRepository, "saved HTF prices");
 

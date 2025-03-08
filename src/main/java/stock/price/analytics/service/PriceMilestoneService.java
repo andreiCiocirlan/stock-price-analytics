@@ -2,8 +2,7 @@ package stock.price.analytics.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import stock.price.analytics.cache.DailyPricesCacheService;
-import stock.price.analytics.cache.HighLowPricesCacheService;
+import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.enums.IntradaySpike;
 import stock.price.analytics.model.prices.enums.PreMarketPriceMilestone;
 import stock.price.analytics.model.prices.enums.PriceMilestone;
@@ -26,9 +25,7 @@ import static stock.price.analytics.util.EnumParser.parseEnumWithNoneValue;
 public class PriceMilestoneService {
 
     private static List<Stock> cachedStocks;
-    private final DailyPricesCacheService dailyPricesCacheService;
-    private final StockService stockService;
-    private final HighLowPricesCacheService highLowPricesCacheService;
+    private final CacheService cacheService;
 
     public Map<PriceMilestone, List<String>> findTickersForMilestones(List<PriceMilestone> priceMilestones, List<Double> cfdMargins) {
         Map<PriceMilestone, List<String>> tickersByPriceMilestones = new HashMap<>();
@@ -44,7 +41,7 @@ public class PriceMilestoneService {
     public List<String> findTickersForMilestone(String priceMilestone, List<Double> cfdMargins) {
         final List<String> tickers = new ArrayList<>();
         Optional<PricePerformanceMilestone> pricePerformanceMilestone = parseEnumWithNoneValue(priceMilestone, PricePerformanceMilestone.class);
-        cachedStocks = stockService.getCachedStocks();
+        cachedStocks = cacheService.getCachedStocks();
         if (pricePerformanceMilestone.isPresent()) {
             tickers.addAll(findTickersForMilestone(pricePerformanceMilestone.get(), cfdMargins));
         } else {
@@ -61,7 +58,7 @@ public class PriceMilestoneService {
     }
 
     private List<String> findTickersForMilestone(PricePerformanceMilestone pricePerformanceMilestone, List<Double> cfdMargins) {
-        Map<String, HighLowForPeriod> hlPricesCache = highLowPricesCacheService.cacheForMilestone(pricePerformanceMilestone)
+        Map<String, HighLowForPeriod> hlPricesCache = cacheService.cacheForMilestone(pricePerformanceMilestone)
                 .stream()
                 .collect(Collectors.toMap(HighLowForPeriod::getTicker, p -> p));
 
@@ -74,7 +71,7 @@ public class PriceMilestoneService {
     }
 
     private List<String> findTickersForPreMarketMilestone(PreMarketPriceMilestone milestone, List<Double> cfdMargins) {
-        Map<String, DailyPrice> preMarketPricesCache = dailyPricesCacheService.dailyPricesCache(PRE)
+        Map<String, DailyPrice> preMarketPricesCache = cacheService.getCachedDailyPrices(PRE)
                 .stream()
                 .collect(Collectors.toMap(DailyPrice::getTicker, p -> p));
 
@@ -87,7 +84,7 @@ public class PriceMilestoneService {
     }
 
     private List<String> findTickersForIntradaySpikeMilestone(IntradaySpike milestone, List<Double> cfdMargins) {
-        Map<String, DailyPrice> intradayPricesCache = dailyPricesCacheService.dailyPricesCache(REGULAR)
+        Map<String, DailyPrice> intradayPricesCache = cacheService.getCachedDailyPrices(REGULAR)
                 .stream()
                 .collect(Collectors.toMap(DailyPrice::getTicker, p -> p));
 

@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
-import stock.price.analytics.cache.DailyPricesJSONCacheService;
+import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.json.*;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.repository.prices.DailyPricesJSONRepository;
@@ -35,8 +35,7 @@ public class DailyPricesJSONService {
 
     private static final List<String> inconsistentHighs = new ArrayList<>();
     private static final List<String> inconsistentLows = new ArrayList<>();
-    private final DailyPricesJSONCacheService dailyPricesJSONCacheService;
-    private final DailyPricesService dailyPricesService;
+    private final CacheService cacheService;
     private final DailyPricesJSONRepository dailyPricesJSONRepository;
 
     public List<DailyPrice> dailyPricesFromFile(String fileName) {
@@ -60,7 +59,7 @@ public class DailyPricesJSONService {
             Response response = objectMapper.readValue(jsonData, Response.class);
             List<DailyPricesJSON> dailyPricesJSON = response.getQuoteResponse().getResult();
 
-            return extractDailyJSONPricesAndSave(dailyPricesJSON, dailyPricesJSONCacheService.dailyPricesJSONCache());
+            return extractDailyJSONPricesAndSave(dailyPricesJSON, cacheService.dailyPricesJSONCache());
         } catch (JsonProcessingException ex) {
             throw new RuntimeException(ex);
         }
@@ -98,7 +97,7 @@ public class DailyPricesJSONService {
                 log.warn("{}", sameDailyPrices);
             }
         }
-        List<DailyPricesJSON> dailyPricesJSONSInCache = dailyPricesJSONCacheService.addDailyPricesJSONInCacheAndReturn(dailyJSONPrices);
+        List<DailyPricesJSON> dailyPricesJSONSInCache = cacheService.cacheAndReturnDailyPricesJSON(dailyJSONPrices);
         if (!dailyPricesJSONSInCache.isEmpty()) {
             partitionDataAndSaveWithLogTime(dailyPricesJSONSInCache, dailyPricesJSONRepository, "saved " + dailyJSONPrices.size() + " daily json prices");
         }
@@ -138,7 +137,7 @@ public class DailyPricesJSONService {
                 .toList();
 
         if (!preMarketPrices.isEmpty()) {
-            dailyPricesService.addPreMarketDailyPricesInCache(preMarketPrices);
+            cacheService.addPreMarketDailyPrices(preMarketPrices);
         }
         return dailyPricesFrom(dailyPricesJSON);
     }
@@ -254,12 +253,6 @@ public class DailyPricesJSONService {
         } catch (IOException e) {
             log.error("trading date missing from json file for ticker {}", e.getMessage());
         }
-    }
-
-    public void initDailyJSONPricesCache() {
-        LocalDate tradingDateNow = tradingDateNow();
-        // add last 7 trading days in  cache for good measure
-        dailyPricesJSONCacheService.initDailyJSONPricesCache(dailyPricesJSONRepository.findByDateBetween(tradingDateNow.minusDays(7), tradingDateNow));
     }
 
     private void logInconsistentHighLowImportedPrices() {

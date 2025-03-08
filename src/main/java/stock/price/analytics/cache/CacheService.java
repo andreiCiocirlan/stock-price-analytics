@@ -1,0 +1,105 @@
+package stock.price.analytics.cache;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import stock.price.analytics.cache.model.PriceWithPrevClose;
+import stock.price.analytics.model.prices.enums.HighLowPeriod;
+import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
+import stock.price.analytics.model.prices.enums.StockTimeframe;
+import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
+import stock.price.analytics.model.prices.json.DailyPricesJSON;
+import stock.price.analytics.model.prices.ohlc.AbstractPrice;
+import stock.price.analytics.model.prices.ohlc.DailyPrice;
+import stock.price.analytics.model.stocks.Stock;
+import stock.price.analytics.model.stocks.enums.MarketState;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.Collections.emptySet;
+import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
+
+@Service
+@RequiredArgsConstructor
+public class CacheService {
+
+    private final DailyPricesJSONCache dailyPricesJSONCache;
+    private final DailyPricesCache dailyPricesCache;
+    private final StocksCache stocksCache;
+    private final HigherTimeframePricesCache higherTimeframePricesCache;
+    private final HighLowPricesCache highLowPricesCache;
+
+
+    public List<DailyPricesJSON> dailyPricesJSONCache() {
+        return dailyPricesJSONCache.getDailyPricesJSONByTicker().values().stream().toList();
+    }
+
+    public List<DailyPricesJSON> cacheAndReturnDailyPricesJSON(List<DailyPricesJSON> dailyPricesJSON) {
+        return dailyPricesJSONCache.addDailyPricesJSONInCacheAndReturn(dailyPricesJSON);
+    }
+
+    public List<DailyPrice> cacheAndReturnDailyPrices(List<DailyPrice> dailyPrices) {
+        return dailyPricesCache.addDailyPricesInCacheAndReturn(dailyPrices);
+    }
+
+    public void addPreMarketDailyPrices(List<DailyPrice> preMarketPrices) {
+        dailyPricesCache.addDailyPrices(preMarketPrices, PRE);
+    }
+
+    public List<DailyPrice> getCachedDailyPrices(MarketState marketState) {
+        return dailyPricesCache.dailyPrices(marketState);
+    }
+
+    public List<DailyPrice> getPreviousDailyPrices() {
+        return dailyPricesCache.previousDailyPrices();
+    }
+
+    public List<? extends HighLowForPeriod> cacheForHighLowPeriod(HighLowPeriod period) {
+        return highLowPricesCache.cacheForHighLowPeriod(period);
+    }
+
+    public List<? extends HighLowForPeriod> cacheForMilestone(PricePerformanceMilestone pricePerformanceMilestone) {
+        return highLowPricesCache.cacheForMilestone(pricePerformanceMilestone);
+    }
+
+    public List<? extends HighLowForPeriod> getUpdatedHighLowPricesForTickers(List<DailyPrice> dailyPrices, List<String> tickers, HighLowPeriod highLowPeriod) {
+        return highLowPricesCache.getUpdatedHighLowPricesForTickers(dailyPrices, tickers, highLowPeriod);
+    }
+
+    public List<String> getNewHighLowsForHLPeriod(HighLowPeriod highLowPeriod) {
+        return new ArrayList<>(highLowPricesCache.getDailyNewHighLowsByHLPeriod().getOrDefault(highLowPeriod, emptySet()));
+    }
+
+    public List<String> getEqualHighLowsForHLPeriod(HighLowPeriod highLowPeriod) {
+        return new ArrayList<>(highLowPricesCache.getDailyEqualHighLowsByHLPeriod().getOrDefault(highLowPeriod, emptySet()));
+    }
+
+    public void addHighLowPrices(List<? extends HighLowForPeriod> hlPricesUpdated, HighLowPeriod highLowPeriod) {
+        highLowPricesCache.addHighLowPrices(hlPricesUpdated, highLowPeriod);
+    }
+
+    public Map<String, Stock> getStocksMap() {
+        return stocksCache.getStocksMap();
+    }
+
+    public List<Stock> getCachedStocks() {
+        return getStocksMap().values().stream().toList();
+    }
+
+    public void addStocks(List<Stock> stocks) {
+        stocksCache.addStocks(stocks);
+    }
+
+    public List<AbstractPrice> htfPricesFor(StockTimeframe timeframe) {
+        return higherTimeframePricesCache.htfPricesFor(timeframe);
+    }
+
+    public List<PriceWithPrevClose> htfPricesWithPrevCloseFor(List<String> tickers, StockTimeframe timeframe) {
+        return higherTimeframePricesCache.pricesWithPrevCloseFor(tickers, timeframe);
+    }
+
+    public void addHtfPricesWithPrevClose(List<PriceWithPrevClose> pricesWithPrevClose) {
+        higherTimeframePricesCache.addPricesWithPrevClose(pricesWithPrevClose, pricesWithPrevClose.getFirst().getPrice().getTimeframe());
+    }
+}

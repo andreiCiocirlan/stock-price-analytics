@@ -2,6 +2,7 @@ package stock.price.analytics.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.controller.dto.StockPerformanceDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.stocks.Stock;
@@ -16,8 +17,7 @@ import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
 @RequiredArgsConstructor
 public class StockHeatmapPerformanceService {
 
-    private final StockService stockService;
-    private final DailyPricesService dailyPricesService;
+    private final CacheService cacheService;
 
     private static void addPreMarketPriceOrStockPrice(Stock stock, StockTimeframe timeFrame, Map<String, StockPerformanceDTO> preMarketMap, List<StockPerformanceDTO> result) {
         String ticker = stock.getTicker();
@@ -28,13 +28,13 @@ public class StockHeatmapPerformanceService {
     }
 
     public List<StockPerformanceDTO> stockPerformanceFor(StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, List<Double> cfdMargins, List<String> tickers) {
-        Map<String, StockPerformanceDTO> preMarketMap = dailyPricesService.dailyPricesCache(PRE).stream()
+        Map<String, StockPerformanceDTO> preMarketMap = cacheService.getCachedDailyPrices(PRE).stream()
                 .filter(dp -> tickers.contains(dp.getTicker()))
                 .map(dp -> new StockPerformanceDTO(dp.getTicker(), dp.getPerformance()))
                 .collect(Collectors.toMap(StockPerformanceDTO::ticker, dto -> dto));
 
         List<StockPerformanceDTO> result = new ArrayList<>();
-        stockService.stocksCacheMap().values().stream()
+        cacheService.getStocksMap().values().stream()
                 .filter(stockFilterPredicate(tickers, cfdMargins))
                 .forEach(stock -> addPreMarketPriceOrStockPrice(stock, timeFrame, preMarketMap, result)); // pre-market price takes precedence
 
