@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.DailyPricesCacheService;
-import stock.price.analytics.model.prices.enums.PriceMilestone;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.enums.MarketState;
 import stock.price.analytics.repository.prices.DailyPricesRepository;
@@ -12,10 +11,8 @@ import stock.price.analytics.repository.prices.DailyPricesRepository;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-import static stock.price.analytics.model.prices.enums.IntradaySpike.intradaySpikes;
 
 @Slf4j
 @Service
@@ -24,7 +21,6 @@ public class DailyPricesService {
 
     private final DailyPricesCacheService dailyPricesCacheService;
     private final DailyPricesRepository dailyPricesRepository;
-    private final PriceMilestoneService priceMilestoneService;
 
     public void initLatestTwoDaysPricesCache() {
         List<DailyPrice> latestPrices = new ArrayList<>();
@@ -73,9 +69,4 @@ public class DailyPricesService {
     public void addPreMarketDailyPricesInCache(List<DailyPrice> preMarketPrices) {
         dailyPricesCacheService.addPreMarketDailyPricesInCache(preMarketPrices);
     }
-
-    public Map<PriceMilestone, List<String>> tickersWithIntradaySpike(List<Double> cfdMargins) {
-        return priceMilestoneService.findTickersForMilestones(intradaySpikes(), cfdMargins);
-    }
-
 }
