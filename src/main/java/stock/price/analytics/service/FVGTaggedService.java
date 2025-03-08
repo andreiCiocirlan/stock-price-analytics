@@ -8,7 +8,7 @@ import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.model.fvg.FairValueGap;
-import stock.price.analytics.model.prices.enums.FvgType;
+import stock.price.analytics.model.fvg.FvgType;
 import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 
