@@ -13,7 +13,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
-import static stock.price.analytics.util.Constants.CFD_MARGINS_5X_4X_3X;
 import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
@@ -27,7 +26,6 @@ public class YahooPricesController {
 
     private final YahooQuoteService yahooQuoteService;
     private final PricesService pricesService;
-    private final DailyPricesService dailyPricesService;
     private final HighLowForPeriodService highLowForPeriodService;
     private final StockService stockService;
 
