@@ -42,37 +42,22 @@ public class YahooQuoteService {
 
     @Transactional
     public List<DailyPrice> dailyPricesImport() {
-        int maxTickersPerRequest = 1700;
-        List<DailyPrice> dailyImportedPrices = new ArrayList<>();
         List<Stock> cachedStocks = cacheService.getCachedStocks();
         List<String> tickersNotImported = new ArrayList<>(cachedStocks.stream().map(Stock::getTicker).toList());
 
-        int start = 0;
-        int end = Math.min(maxTickersPerRequest, cachedStocks.size());
-        int fileCounter = 1;
-        while (start < cachedStocks.size()) {
-            String tickers = cachedStocks.stream().map(Stock::getTicker).collect(Collectors.joining(","));
-            String pricesJSON = logTimeAndReturn(() -> yahooQuoteClient.quotePricesJSON(tickers), "Yahoo API call and JSON result");
+        String tickers = cachedStocks.stream().map(Stock::getTicker).collect(Collectors.joining(","));
+        String pricesJSON = logTimeAndReturn(() -> yahooQuoteClient.quotePricesJSON(tickers), "Yahoo API call and JSON result");
 
-            List<DailyPrice> dailyPricesExtractedFromJSON = dailyPricesJSONService.extractDailyPricesFromJSON(pricesJSON);
-            List<DailyPrice> dailyPrices = cacheService.cacheAndReturnDailyPrices(dailyPricesExtractedFromJSON);
-            dailyImportedPrices.addAll(dailyPrices);
+        List<DailyPrice> dailyPricesExtractedFromJSON = dailyPricesJSONService.extractDailyPricesFromJSON(pricesJSON);
+        List<DailyPrice> dailyImportedPrices = cacheService.cacheAndReturnDailyPrices(dailyPricesExtractedFromJSON);
 
-            // keep track of which tickers were imported
-            tickersNotImported.removeAll(dailyPrices.stream().map(DailyPrice::getTicker).toList());
+        // keep track of which tickers were imported
+        tickersNotImported.removeAll(dailyImportedPrices.stream().map(DailyPrice::getTicker).toList());
 
-            if (!dailyPrices.isEmpty()) {
-                String fileName = tradingDateImported(dailyPricesExtractedFromJSON).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_" + fileCounter + ".json";
-                String path = "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/" + fileName;
-                writeToFile(path, pricesJSON);
-            }
-
-            start = end;
-            end = Math.min(start + maxTickersPerRequest, cachedStocks.size());
-            fileCounter++;
-        }
-
-        if (!dailyImportedPrices.isEmpty()) { // only save if intraday prices, for pre-market only display
+        if (!dailyImportedPrices.isEmpty()) {
+            String fileName = tradingDateImported(dailyPricesExtractedFromJSON).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + ".json";
+            String path = "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/" + fileName;
+            writeToFile(path, pricesJSON);
             partitionDataAndSaveWithLogTime(dailyImportedPrices, dailyPricesRepository, "saved " + dailyImportedPrices.size() + " daily prices");
         }
 
