@@ -32,9 +32,12 @@ public class PriceMilestoneService {
 
     public Map<PriceMilestone, List<String>> findTickersForMilestones(List<PriceMilestone> priceMilestones, List<Double> cfdMargins) {
         Map<PriceMilestone, List<String>> tickersByPriceMilestones = new HashMap<>();
-        for (PriceMilestone priceMilestone : priceMilestones) {
-            tickersByPriceMilestones.put(priceMilestone, findTickersForMilestone(priceMilestone.name(), cfdMargins));
-        }
+        priceMilestones.forEach(priceMilestone -> {
+            List<String> tickers = findTickersForMilestone(priceMilestone.name(), cfdMargins);
+            if (!tickers.isEmpty()) {
+                tickersByPriceMilestones.put(priceMilestone, tickers);
+            }
+        });
         return tickersByPriceMilestones;
     }
 
