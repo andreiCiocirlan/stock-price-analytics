@@ -12,9 +12,12 @@ public class DesktopNotificationService {
 
     private final SimpMessagingTemplate template;
 
-    public void broadcastDesktopNotification(String message) {
+    public void broadcastDesktopNotification(String title, String message) {
         log.info("{}", message);
-        this.template.convertAndSend("/topic/desktop-notification", message);
+        this.template.convertAndSend("/topic/desktop-notification", new Notification(title, message));
+    }
+
+    private record Notification(String title, String message) {
     }
 
 }

@@ -17,9 +17,9 @@ public class DesktopNotificationsController {
     private final DesktopNotificationService desktopNotificationService;
 
     @PostMapping("/send")
-    public void sendDesktopNotification(@RequestParam String message) {
-        desktopNotificationService.broadcastDesktopNotification(message);
-        log.info("Desktop notification sent: {}", message);
+    public void sendDesktopNotification(@RequestParam String title, @RequestParam String message) {
+        desktopNotificationService.broadcastDesktopNotification(title, message);
+        log.info("Desktop notification {} sent with message: {}", title, message);
     }
 
 }

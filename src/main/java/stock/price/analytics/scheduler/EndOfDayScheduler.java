@@ -17,20 +17,21 @@ public class EndOfDayScheduler {
     // At the end of the trading day check if any stock discrepancies are found
     @Scheduled(cron = "${cron.post.market.checks}", zone = "${cron.timezone}")
     public void findAllStockDiscrepanciesAtEOD() {
+        String title = "Discrepancy Found";
         if (!discrepanciesService.findStocksOpeningPriceDiscrepancies().isEmpty()) {
-            desktopNotificationService.broadcastDesktopNotification("Stocks Opening Price Discrepancies found, check logs!");
+            desktopNotificationService.broadcastDesktopNotification(title, "Stocks Opening Price Discrepancies found, check logs!");
         }
         if (!discrepanciesService.findStocksHighLowsOrHTFDiscrepancies().isEmpty()) {
-            desktopNotificationService.broadcastDesktopNotification("Stocks High-Low/HTF Discrepancies found, check logs!");
+            desktopNotificationService.broadcastDesktopNotification(title, "Stocks High-Low/HTF Discrepancies found, check logs!");
         }
         if (!discrepanciesService.findFvgDateDiscrepancies().isEmpty()) {
-            desktopNotificationService.broadcastDesktopNotification("FVG Date discrepancies found, check logs!");
+            desktopNotificationService.broadcastDesktopNotification(title, "FVG Date discrepancies found, check logs!");
         }
         if (!discrepanciesService.findWeeklyOpeningPriceDiscrepancies().isEmpty()) {
-            desktopNotificationService.broadcastDesktopNotification("Weekly opening price discrepancies found, check logs!");
+            desktopNotificationService.broadcastDesktopNotification(title, "Weekly opening price discrepancies found, check logs!");
         }
         if (!discrepanciesService.findWeeklyHighLowPriceDiscrepancies().isEmpty()) {
-            desktopNotificationService.broadcastDesktopNotification("Weekly High-Low price discrepancies found, check logs!");
+            desktopNotificationService.broadcastDesktopNotification(title, "Weekly High-Low price discrepancies found, check logs!");
         }
     }
 

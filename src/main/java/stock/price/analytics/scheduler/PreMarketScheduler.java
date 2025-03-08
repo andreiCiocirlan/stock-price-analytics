@@ -25,7 +25,7 @@ public class PreMarketScheduler {
         priceMilestoneService.findTickersForMilestones(preMarketSchedulerValues(), CFD_MARGINS_5X_4X_3X)
                 .forEach((priceMilestone, tickers) -> {
                     if (!tickers.isEmpty())
-                        desktopNotificationService.broadcastDesktopNotification(String.join(" ", priceMilestone.toString(), tickers.toString()));
+                        desktopNotificationService.broadcastDesktopNotification("Pre-Market alert", String.join(" ", priceMilestone.toString(), tickers.toString()));
                 });
     }
 
