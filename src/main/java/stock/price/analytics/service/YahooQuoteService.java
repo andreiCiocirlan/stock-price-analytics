@@ -35,13 +35,13 @@ public class YahooQuoteService {
     private final DailyPricesJSONService dailyPricesJSONService;
     private final DailyPricesRepository dailyPricesRepository;
 
-    public List<DailyPrice> dailyPricesFromFile(String fileName) {
+    public List<DailyPrice> yahooQuotesFromFile(String fileName) {
         List<DailyPrice> dailyPrices = dailyPricesJSONService.dailyPricesFromFile(fileName);
         return cacheService.cacheAndReturnDailyPrices(dailyPrices);
     }
 
     @Transactional
-    public List<DailyPrice> dailyPricesImport() {
+    public List<DailyPrice> yahooQuotesImport() {
         List<Stock> cachedStocks = cacheService.getCachedStocks();
         List<String> tickersNotImported = new ArrayList<>(cachedStocks.stream().map(Stock::getTicker).toList());
 

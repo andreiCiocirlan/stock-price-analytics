@@ -13,10 +13,10 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class YahooPricesImportScheduler {
+public class YahooQuotesImportScheduler {
 
     public static final String HTTP_LOCALHOST = "http://localhost:";
-    public static final String YAHOO_PRICES_IMPORT_ENDPOINT = "/yahoo-prices/import";
+    public static final String YAHOO_QUOTES_IMPORT_ENDPOINT = "/yahoo-quotes/import";
     public static final String INTRADAY_LOG_PREFIX = "INTRADAY";
     public static final String PREMARKET_LOG_PREFIX = "PRE-MARKET";
 
@@ -31,8 +31,8 @@ public class YahooPricesImportScheduler {
             @Scheduled(cron = "${cron.yahoo.quotes.intraday.between10and16}", zone = "${cron.timezone}"),
             @Scheduled(cron = "${cron.yahoo.quotes.intraday.between16and17}", zone = "${cron.timezone}")
     })
-    public void yahooPricesIntraday() {
-        callYahooPricesImport(INTRADAY_LOG_PREFIX);
+    public void yahooQuotesIntraday() {
+        callYahooQuotesImport(INTRADAY_LOG_PREFIX);
     }
 
     // executed at 8:00, 8:15, 8:30, 8:45 NY time (pre-market)
@@ -41,13 +41,13 @@ public class YahooPricesImportScheduler {
             @Scheduled(cron = "${cron.yahoo.quotes.pre.market.between8and9}", zone = "${cron.timezone}"),
             @Scheduled(cron = "${cron.yahoo.quotes.pre.market.between9and915}", zone = "${cron.timezone}")
     })
-    public void yahooPricesPreMarket() {
-        callYahooPricesImport(PREMARKET_LOG_PREFIX);
+    public void yahooQuotesPreMarket() {
+        callYahooQuotesImport(PREMARKET_LOG_PREFIX);
     }
 
-    private void callYahooPricesImport(String logPrefix) {
-        restTemplate.getForObject(String.join("", HTTP_LOCALHOST, serverPort, YAHOO_PRICES_IMPORT_ENDPOINT), List.class);
-        log.info(logPrefix + " Yahoo Prices Scheduler imported prices successfully");
+    private void callYahooQuotesImport(String logPrefix) {
+        restTemplate.getForObject(String.join("", HTTP_LOCALHOST, serverPort, YAHOO_QUOTES_IMPORT_ENDPOINT), List.class);
+        log.info(logPrefix + " Yahoo Quotes Scheduler imported prices successfully");
     }
 
 }

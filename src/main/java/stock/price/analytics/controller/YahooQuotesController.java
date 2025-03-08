@@ -24,8 +24,8 @@ import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/yahoo-prices")
-public class YahooPricesController {
+@RequestMapping("/yahoo-quotes")
+public class YahooQuotesController {
 
     private final YahooQuoteService yahooQuoteService;
     private final PricesService pricesService;
@@ -37,7 +37,7 @@ public class YahooPricesController {
     @ResponseStatus(HttpStatus.OK)
     public List<DailyPrice> yahooPricesImport() {
         long start = System.nanoTime();
-        List<DailyPrice> dailyImportedPrices = logTimeAndReturn(yahooQuoteService::dailyPricesImport, "imported daily prices");
+        List<DailyPrice> dailyImportedPrices = logTimeAndReturn(yahooQuoteService::yahooQuotesImport, "imported daily prices");
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
             List<AbstractPrice> htfPricesUpdated = pricesService.updatePricesForHigherTimeframes(dailyImportedPrices);
 
@@ -55,7 +55,7 @@ public class YahooPricesController {
     public List<DailyPrice> yahooPricesImportFromFile(@RequestParam(value = "fileName", required = false) String fileNameStr) {
         long start = System.nanoTime();
         String fileName = Objects.requireNonNullElseGet(fileNameStr, () -> tradingDateNow().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_1");
-        List<DailyPrice> dailyImportedPrices = logTimeAndReturn(() -> yahooQuoteService.dailyPricesFromFile(fileName), "imported daily prices");
+        List<DailyPrice> dailyImportedPrices = logTimeAndReturn(() -> yahooQuoteService.yahooQuotesFromFile(fileName), "imported daily prices");
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
             pricesService.savePrices(dailyImportedPrices);
             List<AbstractPrice> htfPricesUpdated = pricesService.updatePricesForHigherTimeframes(dailyImportedPrices);
