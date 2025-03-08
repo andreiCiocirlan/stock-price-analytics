@@ -1,6 +1,7 @@
 package stock.price.analytics.cache;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.model.PriceWithPrevClose;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
@@ -20,6 +21,7 @@ import java.util.Map;
 import static java.util.Collections.emptySet;
 import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CacheService {
@@ -101,5 +103,23 @@ public class CacheService {
 
     public void addHtfPricesWithPrevClose(List<PriceWithPrevClose> pricesWithPrevClose) {
         higherTimeframePricesCache.addPricesWithPrevClose(pricesWithPrevClose, pricesWithPrevClose.getFirst().getPrice().getTimeframe());
+    }
+
+    public void logNewHighLowsForHLPeriods() {
+        for (HighLowPeriod highLowPeriod : HighLowPeriod.values()) {
+            List<String> newHighLowsForHLPeriod = getNewHighLowsForHLPeriod(highLowPeriod);
+            if (!newHighLowsForHLPeriod.isEmpty()) {
+                log.info("{} New {} : {}", newHighLowsForHLPeriod.size(), highLowPeriod, newHighLowsForHLPeriod);
+            }
+        }
+    }
+
+    public void logEqualHighLowsForHLPeriods() {
+        for (HighLowPeriod highLowPeriod : HighLowPeriod.values()) {
+            List<String> equalHighLowsForHLPeriod = getEqualHighLowsForHLPeriod(highLowPeriod);
+            if (!equalHighLowsForHLPeriod.isEmpty()) {
+                log.info("{} Equal {} : {}", equalHighLowsForHLPeriod.size(), highLowPeriod, equalHighLowsForHLPeriod);
+            }
+        }
     }
 }

@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.enums.StockPerformanceInterval;
 import stock.price.analytics.service.HighLowForPeriodService;
 import stock.price.analytics.service.HighLowPricesCacheService;
@@ -19,7 +20,7 @@ import java.util.List;
 public class HighLowForPeriodController {
 
     private final HighLowForPeriodService highLowForPeriodService;
-    private final HighLowPricesCacheService highLowPricesCacheService;
+    private final CacheService cacheService;
 
     @PostMapping("/save-52w-high-low")
     @ResponseStatus(HttpStatus.OK)
@@ -45,13 +46,13 @@ public class HighLowForPeriodController {
     @GetMapping("/daily-new-high-lows-for-hl-period")
     @ResponseStatus(HttpStatus.OK)
     public void newDailyHighLowsForHLPeriods() {
-        highLowPricesCacheService.logNewHighLowsForHLPeriods();
+        cacheService.logNewHighLowsForHLPeriods();
     }
 
     @GetMapping("/daily-equal-high-lows-for-hl-period")
     @ResponseStatus(HttpStatus.OK)
     public void equalHighLowsForHLPeriods() {
-        highLowPricesCacheService.logEqualHighLowsForHLPeriods();
+        cacheService.logEqualHighLowsForHLPeriods();
     }
 
 }
