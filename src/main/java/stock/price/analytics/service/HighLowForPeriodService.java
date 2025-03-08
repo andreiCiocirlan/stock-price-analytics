@@ -47,7 +47,6 @@ public class HighLowForPeriodService {
     @PersistenceContext
     private final EntityManager entityManager;
     private final HighLowForPeriodRepository highLowForPeriodRepository;
-    private final HighLowPricesCacheService highLowPricesCacheService;
     private final CacheService cacheService;
 
     @Transactional

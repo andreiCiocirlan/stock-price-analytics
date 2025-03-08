@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.enums.StockPerformanceInterval;
 import stock.price.analytics.service.HighLowForPeriodService;
-import stock.price.analytics.service.HighLowPricesCacheService;
 
 import java.time.LocalDate;
 import java.util.List;
