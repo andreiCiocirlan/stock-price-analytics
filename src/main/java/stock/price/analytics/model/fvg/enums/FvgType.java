@@ -1,4 +1,4 @@
-package stock.price.analytics.model.fvg;
+package stock.price.analytics.model.fvg.enums;
 
 public enum FvgType {
 
