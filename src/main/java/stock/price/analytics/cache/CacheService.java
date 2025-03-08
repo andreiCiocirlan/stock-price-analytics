@@ -55,11 +55,11 @@ public class CacheService {
         return dailyPricesCache.previousDailyPrices();
     }
 
-    public List<? extends HighLowForPeriod> cacheForHighLowPeriod(HighLowPeriod period) {
+    public List<? extends HighLowForPeriod> highLowForPeriodPricesFor(HighLowPeriod period) {
         return highLowPricesCache.cacheForHighLowPeriod(period);
     }
 
-    public List<? extends HighLowForPeriod> cacheForMilestone(PricePerformanceMilestone pricePerformanceMilestone) {
+    public List<? extends HighLowForPeriod> highLowForPeriodPricesForMilestone(PricePerformanceMilestone pricePerformanceMilestone) {
         return highLowPricesCache.cacheForMilestone(pricePerformanceMilestone);
     }
 

@@ -103,7 +103,7 @@ public class StockService {
         Map<String, Stock> stocksMap = cacheService.getStocksMap();
 
         for (HighLowPeriod period : HighLowPeriod.values()) {
-            List<? extends HighLowForPeriod> cache = cacheService.cacheForHighLowPeriod(period);
+            List<? extends HighLowForPeriod> cache = cacheService.highLowForPeriodPricesFor(period);
             for (HighLowForPeriod hl : cache) {
                 Optional.ofNullable(stocksMap.get(hl.getTicker()))
                         .ifPresent(stock -> {
@@ -130,8 +130,8 @@ public class StockService {
 
         for (Stock stock : stocksUpdated) {
             LocalDate lastUpdated = stock.getLastUpdated();
-            if (lastUpdated.getDayOfWeek().equals(DayOfWeek.FRIDAY)) { // change last_updated to monday
-                stock.setLastUpdated(lastUpdated.plusDays(3));
+            if (lastUpdated.getDayOfWeek().equals(DayOfWeek.FRIDAY)) {
+                stock.setLastUpdated(LocalDate.now()); // lastUpdated becomes current date (might not be necessarily Monday if holiday)
             }
         }
         List<Stock> stocks = new ArrayList<>(stocksUpdated);

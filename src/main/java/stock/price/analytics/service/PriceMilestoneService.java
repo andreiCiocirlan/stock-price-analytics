@@ -58,7 +58,7 @@ public class PriceMilestoneService {
     }
 
     private List<String> findTickersForMilestone(PricePerformanceMilestone pricePerformanceMilestone, List<Double> cfdMargins) {
-        Map<String, HighLowForPeriod> hlPricesCache = cacheService.cacheForMilestone(pricePerformanceMilestone)
+        Map<String, HighLowForPeriod> hlPricesCache = cacheService.highLowForPeriodPricesForMilestone(pricePerformanceMilestone)
                 .stream()
                 .collect(Collectors.toMap(HighLowForPeriod::getTicker, p -> p));
 
