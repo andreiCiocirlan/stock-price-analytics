@@ -18,49 +18,49 @@ public enum PreMarketPriceMilestone implements PriceMilestone {
     GAP_UP_10_PERCENT {
         @Override
         public String toString() {
-            return "Pre-Market: Up more than 10%";
+            return "Gap-Up more than 10%";
         }
     },
     GAP_DOWN_10_PERCENT {
         @Override
         public String toString() {
-            return "Pre-Market: Down more than 10%";
+            return "Gap-Down more than 10%";
         }
     },
     GAP_UP_AND_GO {
         @Override
         public String toString() {
-            return "Pre-Market: Gap UP & Go";
+            return "Gap UP & Go";
         }
     },
     GAP_DOWN_AND_GO {
         @Override
         public String toString() {
-            return "Pre-Market: Gap Down & Go";
+            return "Gap Down & Go";
         }
     },
     KICKING_CANDLE_UP {
         @Override
         public String toString() {
-            return "Pre-Market: Kicking candlestick UP";
+            return "Kicking candlestick UP";
         }
     },
     KICKING_CANDLE_DOWN {
         @Override
         public String toString() {
-            return "Pre-Market: Kicking candlestick DOWN";
+            return "Kicking candlestick DOWN";
         }
     },
     NEW_ATL {
         @Override
         public String toString() {
-            return "Pre-Market: New All-time Low";
+            return "New All-time Low";
         }
     },
     NEW_ATH {
         @Override
         public String toString() {
-            return "Pre-Market: New All-time High";
+            return "New All-time High";
         }
     },
     NONE {
