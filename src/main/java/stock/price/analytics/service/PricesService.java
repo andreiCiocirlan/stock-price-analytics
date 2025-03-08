@@ -67,10 +67,8 @@ public class PricesService {
         });
     }
 
-    public void initHigherTimeframePricesCache(List<String> tickers) {
-        for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
-            higherTimeframePricesCacheService.addHtfPricesWithPrevCloseFrom(previousThreePricesFor(tickers, timeframe));
-        }
+    public void initHigherTimeframePricesCache(List<AbstractPrice> previousThreePricesForTimeframe) {
+        higherTimeframePricesCacheService.addHtfPricesWithPrevCloseFrom(previousThreePricesForTimeframe);
     }
 
     public List<CandleWithDateDTO> findFor(String ticker, StockTimeframe timeframe) {

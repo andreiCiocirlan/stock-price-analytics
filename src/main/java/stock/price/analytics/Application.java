@@ -41,7 +41,9 @@ public class Application implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         List<Stock> stocks = stockRepository.findByXtbStockIsTrueAndDelistedDateIsNull();
         List<String> tickers = stocks.stream().map(Stock::getTicker).toList();
-        logTime(() -> pricesService.initHigherTimeframePricesCache(tickers), "initialized higher-timeframe prices cache");
+        for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
+            logTime(() -> pricesService.initHigherTimeframePricesCache(pricesService.previousThreePricesFor(tickers, timeframe)), "initialized higher-timeframe prices cache");
+        }
         logTime(() -> stockService.initStocksCache(stocks), "initialized xtb stocks cache");
         LocalDate latestDailyPriceImportDate = stockService.findLastUpdate(); // find last update from stocksCache
         logTime(() -> highLowPricesCacheService.initHighLowPricesCache(latestDailyPriceImportDate), "initialized high low prices cache");
