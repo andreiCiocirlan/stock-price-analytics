@@ -23,10 +23,7 @@ public class PreMarketScheduler {
     })
     public void alertPreMarketGaps_moreThan_10Percent() {
         priceMilestoneService.findTickersForMilestones(preMarketSchedulerValues(), CFD_MARGINS_5X_4X_3X)
-                .forEach((priceMilestone, tickers) -> {
-                    if (!tickers.isEmpty())
-                        desktopNotificationService.broadcastDesktopNotification("Pre-Market alert", String.join(" ", priceMilestone.toString(), tickers.toString()));
-                });
+                .forEach((priceMilestone, tickers) -> desktopNotificationService.broadcastDesktopNotification("Pre-Market alert", String.join(" ", priceMilestone.toString(), tickers.toString())));
     }
 
 }
