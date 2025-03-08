@@ -3,7 +3,7 @@ package stock.price.analytics.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
-import stock.price.analytics.model.prices.enums.IntradaySpike;
+import stock.price.analytics.model.prices.enums.IntradayPriceSpike;
 import stock.price.analytics.model.prices.enums.PreMarketPriceMilestone;
 import stock.price.analytics.model.prices.PriceMilestone;
 import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
@@ -50,7 +50,7 @@ public class PriceMilestoneService {
                 parseEnumWithNoneValue(priceMilestone, PreMarketPriceMilestone.class)
                         .ifPresent(milestone -> tickers.addAll(findTickersForPreMarketMilestone(milestone, cfdMargins)));
             } else {
-                parseEnumWithNoneValue(priceMilestone, IntradaySpike.class)
+                parseEnumWithNoneValue(priceMilestone, IntradayPriceSpike.class)
                         .ifPresent(milestone -> tickers.addAll(findTickersForIntradaySpikeMilestone(milestone, cfdMargins)));
             }
         }
@@ -83,7 +83,7 @@ public class PriceMilestoneService {
                 .toList();
     }
 
-    private List<String> findTickersForIntradaySpikeMilestone(IntradaySpike milestone, List<Double> cfdMargins) {
+    private List<String> findTickersForIntradaySpikeMilestone(IntradayPriceSpike milestone, List<Double> cfdMargins) {
         Map<String, DailyPrice> intradayPricesCache = cacheService.getCachedDailyPrices(REGULAR)
                 .stream()
                 .collect(Collectors.toMap(DailyPrice::getTicker, p -> p));
@@ -136,10 +136,10 @@ public class PriceMilestoneService {
     }
 
     // called before stocks cache is updated (compare daily price imported to determine spikes)
-    private boolean withinIntradaySpikeMilestone(Stock s, DailyPrice dailyPrice, IntradaySpike milestone) {
+    private boolean withinIntradaySpikeMilestone(Stock s, DailyPrice dailyPrice, IntradayPriceSpike milestone) {
         return switch (milestone) {
-            case SPIKE_UP -> dailyPrice.getClose() > s.getClose() * (1 + INTRADAY_SPIKE_PERCENTAGE);
-            case SPIKE_DOWN -> dailyPrice.getClose() < s.getClose() * (1 - INTRADAY_SPIKE_PERCENTAGE);
+            case INTRADAY_SPIKE_UP -> dailyPrice.getClose() > s.getClose() * (1 + INTRADAY_SPIKE_PERCENTAGE);
+            case INTRADAY_SPIKE_DOWN -> dailyPrice.getClose() < s.getClose() * (1 - INTRADAY_SPIKE_PERCENTAGE);
             case NONE -> throw new IllegalStateException("Unexpected value NONE");
         };
     }

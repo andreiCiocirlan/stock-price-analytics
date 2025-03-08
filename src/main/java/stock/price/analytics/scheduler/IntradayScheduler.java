@@ -8,7 +8,7 @@ import stock.price.analytics.service.DesktopNotificationService;
 import stock.price.analytics.service.FairValueGapService;
 import stock.price.analytics.service.PriceMilestoneService;
 
-import static stock.price.analytics.model.prices.enums.IntradaySpike.intradaySpikes;
+import static stock.price.analytics.model.prices.enums.IntradayPriceSpike.intradaySpikes;
 import static stock.price.analytics.util.Constants.CFD_MARGINS_5X_4X_3X;
 
 @Component

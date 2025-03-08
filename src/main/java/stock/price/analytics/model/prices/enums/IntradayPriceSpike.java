@@ -4,15 +4,15 @@ import stock.price.analytics.model.prices.PriceMilestone;
 
 import java.util.List;
 
-public enum IntradaySpike implements PriceMilestone {
+public enum IntradayPriceSpike implements PriceMilestone {
 
-    SPIKE_UP {
+    INTRADAY_SPIKE_UP {
         @Override
         public String toString() {
             return "Intraday Spike Up";
         }
     },
-    SPIKE_DOWN {
+    INTRADAY_SPIKE_DOWN {
         @Override
         public String toString() {
             return "Intraday Spike Down";
@@ -26,6 +26,6 @@ public enum IntradaySpike implements PriceMilestone {
     };
 
     public static List<PriceMilestone> intradaySpikes() {
-        return List.of(SPIKE_UP, SPIKE_DOWN);
+        return List.of(INTRADAY_SPIKE_UP, INTRADAY_SPIKE_DOWN);
     }
 }
