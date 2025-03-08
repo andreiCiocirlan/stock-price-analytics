@@ -7,6 +7,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import stock.price.analytics.cache.HighLowPricesCacheService;
+import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.stocks.StockRepository;
 import stock.price.analytics.service.DailyPricesJSONService;
@@ -17,8 +18,8 @@ import stock.price.analytics.service.StockService;
 import java.time.LocalDate;
 import java.util.List;
 
+import static stock.price.analytics.cache.util.ImportDateUtil.isFirstImportFor;
 import static stock.price.analytics.util.LoggingUtil.logTime;
-import static stock.price.analytics.util.TradingDateUtil.isFirstImportMonday;
 
 @RequiredArgsConstructor
 @SpringBootApplication
@@ -44,7 +45,7 @@ public class Application implements ApplicationRunner {
         logTime(() -> stockService.initStocksCache(stocks), "initialized xtb stocks cache");
         LocalDate latestDailyPriceImportDate = stockService.findLastUpdate(); // find last update from stocksCache
         logTime(() -> highLowPricesCacheService.initHighLowPricesCache(latestDailyPriceImportDate), "initialized high low prices cache");
-        if (isFirstImportMonday(latestDailyPriceImportDate)) {
+        if (isFirstImportFor(StockTimeframe.WEEKLY, latestDailyPriceImportDate)) {
             stockService.updateHighLowForPeriodFromHLCachesAndAdjustWeekend();
         }
         logTime(dailyPricesService::initLatestTwoDaysPricesCache, "initialized latest two days prices cache");

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
+import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.highlow.*;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.repository.prices.HighLowForPeriodRepository;
@@ -16,8 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Collections.emptySet;
+import static stock.price.analytics.cache.util.ImportDateUtil.isFirstImportFor;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
-import static stock.price.analytics.util.TradingDateUtil.isFirstImportMonday;
 
 @Slf4j
 @Service
@@ -46,9 +47,9 @@ public class HighLowPricesCacheService {
     }
 
     private void initPrevWeekHighLowPricesCache(HighLowPeriod highLowPeriod, LocalDate latestDailyPriceImportDate) {
-        boolean firstImportMonday = isFirstImportMonday(latestDailyPriceImportDate);
+        boolean firstImportOfTheWeek = isFirstImportFor(StockTimeframe.WEEKLY, latestDailyPriceImportDate);
         LocalDate prevWeekStartDate = latestDailyPriceImportDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-        if (!firstImportMonday) { // on Monday first import need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
+        if (!firstImportOfTheWeek) { // on Monday first import need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
             prevWeekStartDate = prevWeekStartDate.minusWeeks(1);
         }
         List<? extends HighLowForPeriod> prevWeekHighLowPrices = switch (highLowPeriod) {
@@ -62,8 +63,8 @@ public class HighLowPricesCacheService {
     public void initHighLowPricesCache(HighLowPeriod highLowPeriod, LocalDate latestDailyPriceImportDate) {
         LocalDate startDate = latestDailyPriceImportDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         LocalDate endDate = latestDailyPriceImportDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
-        boolean firstImportMonday = isFirstImportMonday(latestDailyPriceImportDate);
-        if (firstImportMonday) { // on Monday first import need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
+        boolean firstImportOfTheWeek = isFirstImportFor(StockTimeframe.WEEKLY, latestDailyPriceImportDate);
+        if (firstImportOfTheWeek) { // on first import of the week need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
             LocalDate newWeekStartDate = startDate.plusWeeks(1);
             LocalDate newWeekEndDate = endDate.plusWeeks(1);
             if (highLowPeriod == HighLowPeriod.HIGH_LOW_ALL_TIME) { // for all-time highs/lows simply copy the existing row on Mondays
