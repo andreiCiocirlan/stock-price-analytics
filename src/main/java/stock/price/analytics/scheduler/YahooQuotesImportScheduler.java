@@ -24,22 +24,18 @@ public class YahooQuotesImportScheduler {
     @Value("${server.port}")
     private String serverPort;
 
-    // executed at 9:35 NY time (5 minutes after market open)
-    // executed at 5 and 35 minutes past the hour between 10-17 NY time (intraday)
     @Schedules({
-            @Scheduled(cron = "${cron.yahoo.quotes.intraday.at935}", zone = "${cron.timezone}"),
-            @Scheduled(cron = "${cron.yahoo.quotes.intraday.between10and16}", zone = "${cron.timezone}"),
-            @Scheduled(cron = "${cron.yahoo.quotes.intraday.between16and17}", zone = "${cron.timezone}")
+            @Scheduled(cron = "${cron.yahoo.quotes.intraday.at935}", zone = "${cron.timezone}"),            // 0 35,55 9 * * MON-FRI
+            @Scheduled(cron = "${cron.yahoo.quotes.intraday.between10and16}", zone = "${cron.timezone}"),   // 0 15,35,55 10-15 * * MON-FRI
+            @Scheduled(cron = "${cron.yahoo.quotes.intraday.between16and17}", zone = "${cron.timezone}")    // 0 15,35 16 * * MON-FRI
     })
     public void yahooQuotesIntraday() {
         callYahooQuotesImport(INTRADAY_LOG_PREFIX);
     }
 
-    // executed at 8:00, 8:15, 8:30, 8:45 NY time (pre-market)
-    // executed at 9:00, 9:15 NY time (pre-market)
     @Schedules({
-            @Scheduled(cron = "${cron.yahoo.quotes.pre.market.between8and9}", zone = "${cron.timezone}"),
-            @Scheduled(cron = "${cron.yahoo.quotes.pre.market.between9and915}", zone = "${cron.timezone}")
+            @Scheduled(cron = "${cron.yahoo.quotes.pre.market.between8and9}", zone = "${cron.timezone}"),   // 0 15,30,45 8 * * MON-FRI
+            @Scheduled(cron = "${cron.yahoo.quotes.pre.market.between9and915}", zone = "${cron.timezone}")  // 0 0,15 9 * * MON-FRI
     })
     public void yahooQuotesPreMarket() {
         callYahooQuotesImport(PREMARKET_LOG_PREFIX);

@@ -14,7 +14,7 @@ public class EndOfDayScheduler {
     private final DiscrepanciesService discrepanciesService;
     private final DesktopNotificationService desktopNotificationService;
 
-    // At the end of the trading day check if any stock discrepancies are found
+    // 0 45 16 * * MON-FRI
     @Scheduled(cron = "${cron.post.market.checks}", zone = "${cron.timezone}")
     public void findAllStockDiscrepanciesAtEOD() {
         String title = "Discrepancy Found";

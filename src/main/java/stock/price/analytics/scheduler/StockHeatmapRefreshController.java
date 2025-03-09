@@ -15,6 +15,7 @@ public class StockHeatmapRefreshController {
 
     private volatile boolean dataUpdated = false;
 
+    // executed 10 seconds after the Yahoo-Quotes API is called (same cron otherwise)
     @Schedules({
             @Scheduled(cron = "${cron.stocks.heatmap.refresh.intraday.at935}", zone = "${cron.timezone}"),
             @Scheduled(cron = "${cron.stocks.heatmap.refresh.intraday.between10and16}", zone = "${cron.timezone}"),
