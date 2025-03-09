@@ -50,7 +50,7 @@ public class YahooQuoteClient {
         return quoteReponse;
     }
 
-    private String cookieFromFcYahoo() {
+    public String cookieFromFcYahoo() {
         String cookieValue = null;
         try (CloseableHttpClient httpClient = createHttpClient()) {
             HttpGet request = new HttpGet("https://fc.yahoo.com");
