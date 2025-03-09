@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -14,10 +16,8 @@ public class DesktopNotificationService {
 
     public void broadcastDesktopNotification(String title, String message) {
         log.info("{}", message);
-        this.template.convertAndSend("/topic/desktop-notification", new Notification(title, message));
+        this.template.convertAndSend("/topic/desktop-notification", Map.of("title", title, "message", message));
     }
 
-    private record Notification(String title, String message) {
-    }
 
 }
