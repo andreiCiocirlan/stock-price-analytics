@@ -61,7 +61,9 @@ public class StockService {
     @Transactional
     public void saveStocks(String tickers, boolean xtbStock, boolean shortSell, double cfdMargin) {
         for (String ticker : tickers.split(",")) {
-            stockRepository.save(new Stock(ticker, xtbStock, shortSell, cfdMargin));
+            if (!cacheService.getStocksMap().containsKey(tickers)) { // only create new stock object if not already in DB
+                stockRepository.save(new Stock(ticker, xtbStock, shortSell, cfdMargin));
+            }
         }
     }
 
