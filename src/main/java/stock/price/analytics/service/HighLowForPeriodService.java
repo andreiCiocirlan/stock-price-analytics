@@ -82,6 +82,7 @@ public class HighLowForPeriodService {
         }
     }
 
+    @Transactional
     public void saveAllHistoricalHighLowPrices(List<String> tickers, LocalDate tradingDate) {
         logTime(() -> executeQueryAllHistoricalHLPrices(tickers, tradingDate), "saved ALL historical HighLow prices for " + tickers);
     }
