@@ -167,7 +167,6 @@ public class FairValueGapService {
     }
 
     public List<FairValueGap> findNewFVGsFor(StockTimeframe timeframe) {
-        Set<String> newFvgTickers = new HashSet<>();
         List<FairValueGap> newFVGsFound = new ArrayList<>();
         List<FairValueGap> recentFVGs = findRecentByTimeframe(timeframe);
 
@@ -179,11 +178,10 @@ public class FairValueGapService {
                 newFVG.setUnfilledLow1(fvg.getLow());
                 newFVG.setUnfilledHigh1(fvg.getHigh());
                 newFVGsFound.add(newFVG);
-                newFvgTickers.add(fvg.getTicker());
             }
         });
         if (!newFVGsFound.isEmpty()) {
-            log.info("Found {} new {} FVGs for: {}", newFVGsFound.size(), timeframe, newFvgTickers);
+            log.info("Found {} new {} FVGs", newFVGsFound.size(), timeframe);
         }
 
         return newFVGsFound;
