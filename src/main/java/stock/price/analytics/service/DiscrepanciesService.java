@@ -122,7 +122,7 @@ public class DiscrepanciesService {
     }
 
     private void logDiscrepancyAndAddToList(String ticker, String discrepancyType, List<String> discrepanciesFound) {
-        String discrepancy = String.format("%s with %s discrepancy", ticker, discrepancyType);
+        String discrepancy = String.format("%s with %s", ticker, discrepancyType);
         discrepanciesFound.add(discrepancy);
         log.warn("{}", discrepancy);
     }
