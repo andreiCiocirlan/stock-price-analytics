@@ -31,7 +31,8 @@ public interface PricesDiscrepanciesRepository extends PricesRepository {
                 join weekly_prices wp on wp.ticker = md.ticker and wp.start_date = md.week_start
                 where round(wp.open::numeric, 2) <> round(md.open::numeric, 2)
             )
-            select wp.start_date, wp.ticker, wp.open as weekly_open, pu.open as correct_open from weekly_prices wp
+            select wp.ticker, 'weekly_opening_price_discrepancy'
+            from weekly_prices wp
             join PricesToUpdate pu on wp.ticker = pu.ticker AND wp.start_date = pu.week_start;
             """, nativeQuery = true)
     List<Object[]> findWeeklyOpeningPriceDiscrepancies();
@@ -48,8 +49,7 @@ public interface PricesDiscrepanciesRepository extends PricesRepository {
                 WHERE date >= date_trunc('week', CURRENT_DATE)
                 GROUP BY date_trunc('week', date), ticker
             )
-            select wp.start_date, wp.ticker, round(wp.low::numeric, 2) as w_low, round(pu.weekly_low::numeric, 2) as d_low, round(wp.high::numeric, 2) as w_high, round(pu.weekly_high::numeric, 2) as d_high,
-                wp.high <> pu.weekly_high as high_diff, pu.weekly_low <> wp.low as low_diff
+            select wp.ticker, 'weekly_high_low_discrepancy'
             from weekly_prices wp
             join daily_grouped pu on wp.ticker = pu.ticker AND wp.start_date = pu.start_date
                 AND (round(wp.high::numeric, 2) <> round(pu.weekly_high::numeric, 2) or round(wp.low::numeric, 2) <> round(pu.weekly_low::numeric, 2))
