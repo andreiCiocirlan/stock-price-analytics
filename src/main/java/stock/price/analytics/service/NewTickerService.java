@@ -54,6 +54,7 @@ public class NewTickerService {
         List<DailyPrice> dailyPricesImported = saveAllDailyPricesAndReturn(tickers);
         List<AbstractPrice> htfPricesImported = saveAllHtfPricesAndReturn(dailyPricesImported);
         saveAllHighLowPricesAndUpdateStocksFor(dailyPricesImported, htfPricesImported);
+        // fairValueGapService.saveNewFVGsAndUpdateHighLowAndClosedAllTimeframes(); // make sure to add "where ticker in (...) AND increase findRecentByTimeframe intervals
     }
 
     private void writeJSONDailyPricesFileFor(String tickers) {
