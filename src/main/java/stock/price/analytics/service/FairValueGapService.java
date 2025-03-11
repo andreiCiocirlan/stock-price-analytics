@@ -65,6 +65,7 @@ public class FairValueGapService {
                 fvg.setUnfilledHigh1(null);
                 fvg.setUnfilledLow2(null);
                 fvg.setUnfilledHigh2(null);
+                log.info("{} FVG {} {} completely filled", fvg.getTimeframe(), fvg.getId(), fvg.compositeId());
 //                log.info("FVG {} filled by {}", fvg.getId(), price.getStartDate());
                 break; // Move to the next FVG
             }
