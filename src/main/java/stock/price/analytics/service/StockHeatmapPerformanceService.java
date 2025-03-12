@@ -6,12 +6,11 @@ import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.controller.dto.StockPerformanceDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.stocks.Stock;
+import stock.price.analytics.model.stocks.enums.MarketState;
 
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
 
 @Service
 @RequiredArgsConstructor
@@ -27,8 +26,8 @@ public class StockHeatmapPerformanceService {
         result.add(Objects.requireNonNullElseGet(preMarketPrice, () -> new StockPerformanceDTO(ticker, stock.performanceFor(timeFrame))));
     }
 
-    public List<StockPerformanceDTO> stockPerformanceFor(StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, List<Double> cfdMargins, List<String> tickers) {
-        Map<String, StockPerformanceDTO> preMarketMap = cacheService.getCachedDailyPrices(PRE).stream()
+    public List<StockPerformanceDTO> stockPerformanceFor(StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, List<Double> cfdMargins, List<String> tickers, MarketState marketState) {
+        Map<String, StockPerformanceDTO> dailyPricesCache = cacheService.getCachedDailyPrices(marketState).stream()
                 .filter(dp -> tickers.contains(dp.getTicker()))
                 .map(dp -> new StockPerformanceDTO(dp.getTicker(), dp.getPerformance()))
                 .collect(Collectors.toMap(StockPerformanceDTO::ticker, dto -> dto));
@@ -36,7 +35,7 @@ public class StockHeatmapPerformanceService {
         List<StockPerformanceDTO> result = new ArrayList<>();
         cacheService.getStocksMap().values().stream()
                 .filter(stockFilterPredicate(tickers, cfdMargins))
-                .forEach(stock -> addPreMarketPriceOrStockPrice(stock, timeFrame, preMarketMap, result)); // pre-market price takes precedence
+                .forEach(stock -> addPreMarketPriceOrStockPrice(stock, timeFrame, dailyPricesCache, result)); // pre-market price takes precedence
 
         List<StockPerformanceDTO> performanceDTOs = result.stream()
                 .sorted(Comparator.comparingDouble(StockPerformanceDTO::performance)

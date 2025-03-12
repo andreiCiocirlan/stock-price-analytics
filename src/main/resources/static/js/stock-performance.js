@@ -52,18 +52,31 @@ function updatePricesIntraday() {
         .catch(error => console.error(error));
 }
 
+function getMarketState() {
+    let now = new Date();
+    let nytzString = now.toLocaleString("en-US", { timeZone: "America/New_York" });
+    let nytzDate = new Date(nytzString);
+
+    // Check if within specified time frame
+    let weekday = (nytzDate.getDay() >= 1 && nytzDate.getDay() <= 5),
+        hours = ((nytzDate.getHours() === 8) || ((nytzDate.getHours() === 9 && nytzDate.getMinutes() < 30)));
+
+    return weekday && hours ? "PRE" : "REGULAR";
+}
+
 function updateStockPerformanceChart(timeFrame) {
     const numRows = document.getElementById('numRows').value || 5;
     const numCols = document.getElementById('numCols').value || 5;
     const positivePerfFirst = document.getElementById('positivePerfFirst').checked || false;
     const cfdMarginValues = document.getElementById('cfdMarginValues').value.split(',');
     const priceMilestone = document.getElementById('priceMilestone');
+    const marketState = getMarketState();
 
     if (timeFrame == undefined) {
         timeFrame = 'WEEKLY';
     }
     const limit = numRows * numCols;
-    url = `/stock-performance-json?timeFrame=${timeFrame}&positivePerfFirst=${positivePerfFirst}&limit=${limit}`;
+    url = `/stock-performance-json?timeFrame=${timeFrame}&positivePerfFirst=${positivePerfFirst}&limit=${limit}&marketState=${marketState}`;
 
     // set cfdMargins from multi-select
     cfdMarginValues.forEach(margin => { url += '&cfdMargin=' + margin; });

@@ -10,6 +10,7 @@ import stock.price.analytics.controller.dto.StockPerformanceDTO;
 import stock.price.analytics.model.prices.enums.PreMarketPriceMilestone;
 import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
+import stock.price.analytics.model.stocks.enums.MarketState;
 import stock.price.analytics.service.PriceMilestoneService;
 import stock.price.analytics.service.StockHeatmapPerformanceService;
 
@@ -37,7 +38,8 @@ public class StockHeatmapPerformanceController {
                                                          @RequestParam(required = false, value = "positivePerfFirst") Boolean positivePerfFirst,
                                                          @RequestParam(required = false, value = "limit") Integer limit,
                                                          @RequestParam(required = false, value = "cfdMargin") List<Double> cfdMargins,
-                                                         @RequestParam(required = false, value = "priceMilestone") String priceMilestone) {
+                                                         @RequestParam(required = false, value = "priceMilestone") String priceMilestone,
+                                                         @RequestParam(required = false, value = "marketState") MarketState marketState) {
         StockTimeframe stockTimeframe = ("undefined".equals(timeFrame)) ? StockTimeframe.MONTHLY : StockTimeframe.valueOf(timeFrame);
         List<String> tickers = emptyList();
         if (!isNoneMilestone(priceMilestone)) {
@@ -46,7 +48,7 @@ public class StockHeatmapPerformanceController {
                 return emptyList();
             }
         }
-        return stockHeatmapPerformanceService.stockPerformanceFor(stockTimeframe, positivePerfFirst, limit, cfdMargins, tickers);
+        return stockHeatmapPerformanceService.stockPerformanceFor(stockTimeframe, positivePerfFirst, limit, cfdMargins, tickers, marketState);
     }
 
     private boolean isNoneMilestone(String milestone) {
