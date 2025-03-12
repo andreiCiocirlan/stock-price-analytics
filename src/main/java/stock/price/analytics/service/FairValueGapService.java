@@ -57,7 +57,7 @@ public class FairValueGapService {
                 break; // Skip further processing for this FVG
             }
 
-            // ***  Engulfing Scenario ***
+            //  Engulfing Scenario
             if (price.getLow() <= fvg.getLow() && price.getHigh() >= fvg.getHigh()) {
                 // Candlestick completely engulfs the original FVG
                 fvg.setStatus(FvgStatus.CLOSED);
@@ -66,28 +66,25 @@ public class FairValueGapService {
                 fvg.setUnfilledLow2(null);
                 fvg.setUnfilledHigh2(null);
                 log.info("{} FVG {} {} completely filled", fvg.getTimeframe(), fvg.getId(), fvg.compositeId());
-//                log.info("FVG {} filled by {}", fvg.getId(), price.getStartDate());
                 break; // Move to the next FVG
             }
 
-            // *** Gap Handling ***
+            // Gap Handling
             if (fvg.getUnfilledLow1() != null && price.getOpen() > fvg.getUnfilledLow1() && price.getOpen() < fvg.getUnfilledHigh1()) {
                 if (price.getClose() > fvg.getUnfilledHigh1()) {
                     // Gap Up
                     fvg.setUnfilledLow2(price.getOpen());
                     fvg.setUnfilledHigh2(fvg.getUnfilledHigh1());
                     fvg.setUnfilledHigh1(price.getOpen());  //Reduce the original gap to end at the open
-//                    log.info("FVG {} split by gap up. New range2: [{}, {}]", fvg.getId(), fvg.getUnfilledLow2(), fvg.getUnfilledHigh2());
                 } else if (price.getClose() < fvg.getUnfilledLow1()) {
                     // Gap Down
                     fvg.setUnfilledLow2(fvg.getUnfilledLow1());
                     fvg.setUnfilledHigh2(price.getOpen());
                     fvg.setUnfilledLow1(price.getOpen());  //reduce the original gap to start at the open
-//                    log.info("FVG {} split by gap down. New range2: [{}, {}]", fvg.getId(), fvg.getUnfilledLow2(), fvg.getUnfilledHigh2());
                 }
             }
 
-            // *** Intersection with Unfilled Portion 1 ***
+            // Intersection with Unfilled Portion 1
             if (fvg.getUnfilledLow1() != null && price.getLow() <= fvg.getUnfilledHigh1() && price.getHigh() >= fvg.getUnfilledLow1()) {
                 // Price intersects with the first unfilled range
 
@@ -95,53 +92,45 @@ public class FairValueGapService {
                     //Candlestick engulfs unfilled1
                     fvg.setUnfilledLow1(null);
                     fvg.setUnfilledHigh1(null);
-//                    log.info("FVG {} unfilled1 range filled by {}", fvg.getId(), price.getStartDate());
                 } else if (price.getHigh() > fvg.getUnfilledHigh1()) {
                     // Intersects top of unfilled1
                     fvg.setUnfilledHigh1(price.getLow());
-//                    log.info("FVG {} high1 updated to {} by {}", fvg.getId(), price.getLow(), price.getStartDate());
                 } else if (price.getLow() < fvg.getUnfilledLow1()) {
                     // Intersects bottom of unfilled1
                     fvg.setUnfilledLow1(price.getHigh());
-//                    log.info("FVG {} low1 updated to {} by {}", fvg.getId(), price.getHigh(), price.getStartDate());
                 } else if (price.getLow() >= fvg.getUnfilledLow1() && price.getHigh() <= fvg.getUnfilledHigh1()) {
                     // Candlestick is completely within the FVG
                     fvg.setUnfilledLow2(fvg.getUnfilledLow1());
                     fvg.setUnfilledHigh2(price.getLow());
                     fvg.setUnfilledLow1(price.getHigh());
-//                    log.info("FVG {} split by {} . New FVG {} created.", fvg.getId(), price.getStartDate(), fvg.getHigh());
                 }
             }
 
-            // *** Intersection with Unfilled Portion 2 ***
+            // Intersection with Unfilled Portion 2
             if (fvg.getUnfilledLow2() != null && price.getLow() <= fvg.getUnfilledHigh2() && price.getHigh() >= fvg.getUnfilledLow2()) {
                 // Price intersects with the second unfilled range
                 if (price.getHigh() >= fvg.getUnfilledHigh2() && price.getLow() < fvg.getUnfilledLow2()) {
                     //Candlestick engulfs unfilled2
                     fvg.setUnfilledLow2(null);
                     fvg.setUnfilledHigh2(null);
-//                    log.info("FVG {} unfilled2 range filled by {}", fvg.getId(), price.getStartDate());
                 } else if (price.getHigh() > fvg.getUnfilledHigh2()) {
                     // Intersects top of unfilled2
                     fvg.setUnfilledHigh2(price.getLow());
-//                    log.info("FVG {} high2 updated to {} by {}", fvg.getId(), price.getLow(), price.getStartDate());
                 } else if (price.getLow() < fvg.getUnfilledLow2()) {
                     // Intersects bottom of unfilled2
                     fvg.setUnfilledLow2(price.getHigh());
-//                    log.info("FVG {} low2 updated to {} by {}", fvg.getId(), price.getHigh(), price.getStartDate());
                 } else if (price.getLow() >= fvg.getUnfilledLow2() && price.getHigh() <= fvg.getUnfilledHigh2()) {
                     // Candlestick is completely within the FVG
                     fvg.setUnfilledLow2(price.getHigh());
                     fvg.setUnfilledHigh2(price.getLow());
-//                    log.info("FVG {} split by {} . New FVG {} created.", fvg.getId(), price.getStartDate(), fvg.getHigh());
                 }
             }
 
-            // *** Check if both unfilled portions are filled ***
+            // Check if both unfilled portions are filled
             if (fvg.getUnfilledLow1() == null && fvg.getUnfilledHigh1() == null && fvg.getUnfilledLow2() == null && fvg.getUnfilledHigh2() == null) {
                 fvg.setStatus(FvgStatus.CLOSED);
                 log.info("{} FVG {} {} completely filled", fvg.getTimeframe(), fvg.getId(), fvg.compositeId());
-                break; // Move to the next FVG
+                break;
             }
         }
         return !originalFVG.equals(fvg);
