@@ -12,7 +12,7 @@ import stock.price.analytics.service.DesktopNotificationService;
 @RequestMapping("/desktop-notification")
 @RestController
 @RequiredArgsConstructor
-public class DesktopNotificationsController {
+public class DesktopNotificationRestController {
 
     private final DesktopNotificationService desktopNotificationService;
 
