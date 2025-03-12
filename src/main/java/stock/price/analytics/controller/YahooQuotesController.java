@@ -54,7 +54,7 @@ public class YahooQuotesController {
     @ResponseStatus(HttpStatus.OK)
     public List<DailyPrice> yahooQuotesImportFromFile(@RequestParam(value = "fileName", required = false) String fileNameStr) {
         long start = System.nanoTime();
-        String fileName = Objects.requireNonNullElseGet(fileNameStr, () -> tradingDateNow().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_1");
+        String fileName = Objects.requireNonNullElseGet(fileNameStr, () -> tradingDateNow().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
         List<DailyPrice> dailyImportedPrices = logTimeAndReturn(() -> yahooQuoteService.yahooQuotesFromFile(fileName), "imported daily prices");
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
             pricesService.savePrices(dailyImportedPrices);
