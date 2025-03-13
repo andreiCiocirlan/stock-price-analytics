@@ -25,29 +25,53 @@ public class YahooQuoteClient {
     private static final String USER_AGENT_VALUE = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0";
     private static final int MAX_RETRIES_CRUMB = 5;
     private int RETRY_COUNT_CRUMB = 0;
-    private String COOKIE_FC_YAHOO = "";
-    private String CRUMB_COOKIE = "";
+    private String COOKIE_FC_YAHOO = "EuConsent=CQONUAAQONUAAAOACKROBgFgAAAAAAAAACiQAAAAAAAA; A1S=d=AQABBHu40mcCECI3dDTimCiMyiAvT34B1oUFEgABCAH-02cCaPF3ziMAAiAAAAcIdrfSZ2r5DG4&S=AQAAAszl9s9YvJYIkeFU0a_zZTg; A1=d=AQABBHu40mcCECI3dDTimCiMyiAvT34B1oUFEgABCAH-02cCaPF3ziMAAiAAAAcIdrfSZ2r5DG4&S=AQAAAszl9s9YvJYIkeFU0a_zZTg; GUC=AQABCAFn0_5oAkIdNgR3&s=AQAAAL3PAraG&g=Z9K4hQ; A3=d=AQABBHu40mcCECI3dDTimCiMyiAvT34B1oUFEgABCAH-02cCaPF3ziMAAiAAAAcIdrfSZ2r5DG4&S=AQAAAszl9s9YvJYIkeFU0a_zZTg; PRF=theme%3Dauto";
+    private String CRUMB_COOKIE = "Ux/F/1Q/D1k";
 
     public String quotePricesJSON(String tickers) {
+        String crumb = CRUMB_COOKIE.isEmpty() ? getCrumb() : CRUMB_COOKIE;
         String URL = String.join("", "https://query2.finance.yahoo.com/v7/finance/quote?lang=en-US&region=US&corsDomain=finance.yahoo.com&symbols=",
-                tickers, "&crumb=", getCrumb());
-        String quoteReponse = null;
-        try (CloseableHttpClient httpClient = createHttpClient()) {
-            HttpGet request = new HttpGet(URL);
+                tickers, "&crumb=", crumb);
+        String quoteResponse = null;
+        int maxRetries = 3;
+        int retryCount = 0;
 
-            request.setHeader("Cookie", COOKIE_FC_YAHOO);
-            request.setHeader(HttpHeaders.USER_AGENT, USER_AGENT_VALUE);
-
-            HttpResponse response = httpClient.execute(request);
-            HttpEntity entity = response.getEntity();
-            if (entity != null) {
-                quoteReponse = EntityUtils.toString(entity);
+        while (quoteResponse == null || quoteResponse.isEmpty()) {
+            if (retryCount >= maxRetries) {
+                log.error("Failed to retrieve quote after {} retries.", maxRetries);
+                break; // Exit loop if max retries reached
             }
-        } catch (IOException e) {
-            log.error(e.getMessage());
-            throw new RuntimeException(e);
+
+            try (CloseableHttpClient httpClient = createHttpClient()) {
+                HttpGet request = new HttpGet(URL);
+
+                request.setHeader("Cookie", COOKIE_FC_YAHOO);
+                request.setHeader(HttpHeaders.USER_AGENT, USER_AGENT_VALUE);
+
+                HttpResponse response = httpClient.execute(request);
+                HttpEntity entity = response.getEntity();
+                if (entity != null) {
+                    quoteResponse = EntityUtils.toString(entity);
+                    if (quoteResponse != null && !quoteResponse.contains("\"error\":null")) {
+                        log.warn("ERROR for tickers {}", tickers);
+                        log.warn("quoteResponse {}", quoteResponse);
+                    }
+                } else {
+                    log.info("Empty response received. Retrying...");
+                    retryCount++;
+                    Thread.sleep(1000); // Wait for 1 second before retrying
+                }
+            } catch (IOException | InterruptedException e) {
+                log.error(e.getMessage());
+                retryCount++;
+                try {
+                    Thread.sleep(1000); // Wait before retrying
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
+            }
         }
-        return quoteReponse;
+        return quoteResponse;
     }
 
     public String cookieFromFcYahoo() {
