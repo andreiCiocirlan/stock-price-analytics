@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.model.PriceWithPrevClose;
+import stock.price.analytics.model.prices.PriceMilestone;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
@@ -31,6 +32,7 @@ public class CacheService {
     private final StocksCache stocksCache;
     private final HigherTimeframePricesCache higherTimeframePricesCache;
     private final HighLowPricesCache highLowPricesCache;
+    private final PriceMilestoneCache priceMilestoneCache;
 
 
     public List<DailyPricesJSON> dailyPricesJSONCache() {
@@ -121,5 +123,9 @@ public class CacheService {
                 log.info("{} Equal {} : {}", equalHighLowsForHLPeriod.size(), highLowPeriod, equalHighLowsForHLPeriod);
             }
         }
+    }
+
+    public void cachePriceMilestoneTickers(PriceMilestone priceMilestone, List<String> tickers) {
+        priceMilestoneCache.cachePriceMilestoneTickers(priceMilestone, tickers);
     }
 }

@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static stock.price.analytics.model.prices.enums.IntradayPriceSpike.intradaySpikes;
+import static stock.price.analytics.util.Constants.CFD_MARGINS_5X_4X_3X;
 import static stock.price.analytics.util.Constants.MAX_TICKER_COUNT_PRINT;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
@@ -33,6 +35,7 @@ public class YahooQuoteService {
     private final YahooQuoteClient yahooQuoteClient;
     private final CacheService cacheService;
     private final DailyPricesJSONService dailyPricesJSONService;
+    private final PriceMilestoneService priceMilestoneService;
     private final DailyPricesRepository dailyPricesRepository;
 
     public List<DailyPrice> yahooQuotesFromFile(String fileName) {
@@ -69,6 +72,10 @@ public class YahooQuoteService {
         } else {
             log.warn("Imported {} tickers", dailyImportedPrices.size());
         }
+
+        // cache Intraday Spike tickers (compares closing prices from dailyPrices and stocks cache, which was not updated yet)
+        priceMilestoneService.findTickersForMilestones(intradaySpikes(), CFD_MARGINS_5X_4X_3X)
+                .forEach(cacheService::cachePriceMilestoneTickers);
 
         return dailyImportedPrices;
     }
