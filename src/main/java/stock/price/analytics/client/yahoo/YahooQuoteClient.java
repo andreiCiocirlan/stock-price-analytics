@@ -5,25 +5,45 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.config.CookieSpecs;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class YahooQuoteClient {
 
+    private static final CloseableHttpClient httpClient;
     private static final String USER_AGENT_VALUE = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0";
     private static final int MAX_RETRIES_CRUMB = 5;
     private int RETRY_COUNT_CRUMB = 0;
     private String COOKIE_FC_YAHOO = "EuConsent=CQONUAAQONUAAAOACKROBgFgAAAAAAAAACiQAAAAAAAA; A1S=d=AQABBHu40mcCECI3dDTimCiMyiAvT34B1oUFEgABCAH-02cCaPF3ziMAAiAAAAcIdrfSZ2r5DG4&S=AQAAAszl9s9YvJYIkeFU0a_zZTg; A1=d=AQABBHu40mcCECI3dDTimCiMyiAvT34B1oUFEgABCAH-02cCaPF3ziMAAiAAAAcIdrfSZ2r5DG4&S=AQAAAszl9s9YvJYIkeFU0a_zZTg; GUC=AQABCAFn0_5oAkIdNgR3&s=AQAAAL3PAraG&g=Z9K4hQ; A3=d=AQABBHu40mcCECI3dDTimCiMyiAvT34B1oUFEgABCAH-02cCaPF3ziMAAiAAAAcIdrfSZ2r5DG4&S=AQAAAszl9s9YvJYIkeFU0a_zZTg; PRF=theme%3Dauto";
     private String CRUMB_COOKIE = "Ux/F/1Q/D1k";
+
+    static {
+        httpClient = createHttpClient();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                if (httpClient != null) {
+                    httpClient.close();
+                }
+            } catch (IOException e) {
+                log.error("Error closing HttpClient", e);
+            }
+        }));
+    }
 
     public String quotePricesJSON(String tickers) {
         String crumb = CRUMB_COOKIE.isEmpty() ? getCrumb() : CRUMB_COOKIE;
@@ -39,7 +59,7 @@ public class YahooQuoteClient {
                 break; // Exit loop if max retries reached
             }
 
-            try (CloseableHttpClient httpClient = HttpClientFactory.getHttpClient()) {
+            try {
                 HttpGet request = new HttpGet(URL);
 
                 request.setHeader("Cookie", COOKIE_FC_YAHOO);
@@ -73,7 +93,7 @@ public class YahooQuoteClient {
 
     public String cookieFromFcYahoo() {
         String cookieValue = null;
-        try (CloseableHttpClient httpClient = HttpClientFactory.getHttpClient()) {
+        try {
             HttpGet request = new HttpGet("https://fc.yahoo.com");
             request.setHeader(HttpHeaders.USER_AGENT, USER_AGENT_VALUE);
 
@@ -98,7 +118,7 @@ public class YahooQuoteClient {
         }
         while (RETRY_COUNT_CRUMB < MAX_RETRIES_CRUMB) {
             String crumb = null;
-            try (CloseableHttpClient httpClient = HttpClientFactory.getHttpClient()) {
+            try {
                 HttpGet request = new HttpGet("https://query2.finance.yahoo.com/v1/test/getcrumb");
                 request.setHeader("Cookie", cookieFromFcYahoo());
                 request.setHeader("User-Agent", USER_AGENT_VALUE);
@@ -130,6 +150,15 @@ public class YahooQuoteClient {
         // If we reach this point, all retries have been exhausted
         log.error("Maximum number of retries reached. Unable to get crumb.");
         throw new RuntimeException("Unable to get crumb after multiple attempts.");
+    }
+
+    private static CloseableHttpClient createHttpClient() {
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setCookieSpec(CookieSpecs.STANDARD)
+                .build();
+        return HttpClientBuilder.create()
+                .setDefaultRequestConfig(requestConfig)
+                .build();
     }
 
 }
