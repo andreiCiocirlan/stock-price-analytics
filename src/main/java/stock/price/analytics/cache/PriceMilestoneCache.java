@@ -26,4 +26,7 @@ class PriceMilestoneCache {
         return tickersByPriceMilestones.get(priceMilestone);
     }
 
+    public void clearTickersByPriceMilestone() {
+        tickersByPriceMilestones.clear();
+    }
 }

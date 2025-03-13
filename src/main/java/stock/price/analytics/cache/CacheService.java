@@ -128,4 +128,12 @@ public class CacheService {
     public void cachePriceMilestoneTickers(PriceMilestone priceMilestone, List<String> tickers) {
         priceMilestoneCache.cachePriceMilestoneTickers(priceMilestone, tickers);
     }
+
+    public Map<PriceMilestone, List<String>> tickersByPriceMilestones() {
+        return priceMilestoneCache.tickersByPriceMilestones();
+    }
+
+    public void clearTickersByPriceMilestone() {
+        priceMilestoneCache.clearTickersByPriceMilestone();
+    }
 }
