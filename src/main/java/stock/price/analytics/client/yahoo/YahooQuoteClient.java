@@ -5,11 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -42,7 +39,7 @@ public class YahooQuoteClient {
                 break; // Exit loop if max retries reached
             }
 
-            try (CloseableHttpClient httpClient = createHttpClient()) {
+            try (CloseableHttpClient httpClient = HttpClientFactory.getHttpClient()) {
                 HttpGet request = new HttpGet(URL);
 
                 request.setHeader("Cookie", COOKIE_FC_YAHOO);
@@ -76,7 +73,7 @@ public class YahooQuoteClient {
 
     public String cookieFromFcYahoo() {
         String cookieValue = null;
-        try (CloseableHttpClient httpClient = createHttpClient()) {
+        try (CloseableHttpClient httpClient = HttpClientFactory.getHttpClient()) {
             HttpGet request = new HttpGet("https://fc.yahoo.com");
             request.setHeader(HttpHeaders.USER_AGENT, USER_AGENT_VALUE);
 
@@ -101,7 +98,7 @@ public class YahooQuoteClient {
         }
         while (RETRY_COUNT_CRUMB < MAX_RETRIES_CRUMB) {
             String crumb = null;
-            try (CloseableHttpClient httpClient = createHttpClient()) {
+            try (CloseableHttpClient httpClient = HttpClientFactory.getHttpClient()) {
                 HttpGet request = new HttpGet("https://query2.finance.yahoo.com/v1/test/getcrumb");
                 request.setHeader("Cookie", cookieFromFcYahoo());
                 request.setHeader("User-Agent", USER_AGENT_VALUE);
@@ -135,12 +132,4 @@ public class YahooQuoteClient {
         throw new RuntimeException("Unable to get crumb after multiple attempts.");
     }
 
-    private CloseableHttpClient createHttpClient() {
-        RequestConfig requestConfig = RequestConfig.custom()
-                .setCookieSpec(CookieSpecs.STANDARD)
-                .build();
-        return HttpClientBuilder.create()
-                .setDefaultRequestConfig(requestConfig)
-                .build();
-    }
 }
