@@ -23,6 +23,7 @@ import static stock.price.analytics.model.prices.enums.IntradayPriceSpike.intrad
 import static stock.price.analytics.util.Constants.CFD_MARGINS_5X_4X_3X;
 import static stock.price.analytics.util.Constants.MAX_TICKER_COUNT_PRINT;
 import static stock.price.analytics.util.FileUtils.writeToFile;
+import static stock.price.analytics.util.JsonUtils.mergedPricesJSONs;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateImported;
@@ -78,28 +79,6 @@ public class YahooQuoteService {
         return dailyImportedPrices;
     }
 
-    private String mergedPricesJSONs(List<String> pricesJSONs) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            ObjectNode mergedQuoteResponse = objectMapper.createObjectNode();
-            ArrayNode mergedResults = objectMapper.createArrayNode();
-            for (String json : pricesJSONs) {
-                JsonNode rootNode = objectMapper.readTree(json);
-                JsonNode results = rootNode.path("quoteResponse").path("result");
-
-                if (results.isArray()) {
-                    results.forEach(mergedResults::add);
-                }
-            }
-            mergedQuoteResponse.set("result", mergedResults);
-            ObjectNode finalResponse = objectMapper.createObjectNode();
-            finalResponse.set("quoteResponse", mergedQuoteResponse);
-
-            return objectMapper.writeValueAsString(finalResponse);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
 
 }
