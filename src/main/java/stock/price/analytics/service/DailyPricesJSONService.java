@@ -1,5 +1,6 @@
 package stock.price.analytics.service;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -246,6 +247,7 @@ public class DailyPricesJSONService {
         SimpleModule module = new SimpleModule();
         module.addSerializer(LocalDate.class, new LocalDateToUnixTimestampSerializer());
         objectMapper.registerModule(module);
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
         try {
             String path = "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/";
