@@ -31,19 +31,18 @@ public class TradingDateUtil {
 
     public static LocalDate tradingDateNow() {
         DayOfWeek dayOfWeekInNY = LocalDate.now(NY_ZONE).getDayOfWeek();
-        LocalTime nowInNY = LocalDateTime.now(NY_ZONE).toLocalTime();
 
         if (dayOfWeekInNY.equals(DayOfWeek.SATURDAY) || dayOfWeekInNY.equals(DayOfWeek.SUNDAY)
+            || (dayOfWeekInNY.equals(DayOfWeek.FRIDAY) && isBetweenMarketHours())
             || (dayOfWeekInNY.equals(DayOfWeek.MONDAY) && isBeforeMarketHours())) {
             return LocalDate.now(NY_ZONE).with(TemporalAdjusters.previous(DayOfWeek.FRIDAY));
         }
 
-        if (isBetweenMarketHours() || (isAfterMarketHours() && nowInNY.getHour() == END_MARKET_HOURS_NYSE.getHour())) {
+        if (isBetweenMarketHours() || isAfterMarketHours()) {
             return LocalDate.now(NY_ZONE);
+        } else { // Before market hours
+            return LocalDate.now(NY_ZONE).minusDays(1);
         }
-
-        // Before market hours or after midnight
-        return LocalDate.now(NY_ZONE).minusDays(1);
     }
 
     public static LocalDate previousTradingDate(LocalDate date) {
