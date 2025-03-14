@@ -45,6 +45,26 @@ public class YahooQuoteClient {
         }));
     }
 
+    public List<String> quotePricesFor(List<String> tickerStrings) {
+        int maxTickersPerRequest = 100;
+
+        List<String> res = new ArrayList<>();
+        List<String> partitions = new ArrayList<>();
+        int start = 0;
+        int end = Math.min(maxTickersPerRequest, tickerStrings.size());
+        while (start < tickerStrings.size()) {
+            List<String> partition = tickerStrings.subList(start, end);
+            String tickers = String.join(",", partition);
+            partitions.add(tickers);
+
+            start = end;
+            end = Math.min(start + maxTickersPerRequest, tickerStrings.size());
+        }
+
+        partitions.parallelStream().forEachOrdered(s -> res.add(quotePricesJSON(s)));
+        return res;
+    }
+
     public String quotePricesJSON(String tickers) {
         String crumb = CRUMB_COOKIE.isEmpty() ? getCrumb() : CRUMB_COOKIE;
         String URL = String.join("", "https://query2.finance.yahoo.com/v7/finance/quote?lang=en-US&region=US&corsDomain=finance.yahoo.com&symbols=",
