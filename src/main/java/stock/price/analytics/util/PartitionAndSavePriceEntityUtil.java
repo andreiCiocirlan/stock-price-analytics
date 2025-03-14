@@ -37,7 +37,7 @@ public class PartitionAndSavePriceEntityUtil {
         for (int i = 0; i < entities.size(); i += 250) { // default batchSize to 250 like in application.properties
             partitions.add(entities.subList(i, Math.min(i + 250, entities.size())));
         }
-        List<CompletableFuture<Void>> futures = partitions.stream()
+        List<CompletableFuture<Void>> futures = partitions.parallelStream()
                 .map(partition -> CompletableFuture.runAsync(() -> {
                     @SuppressWarnings("unchecked")
                     List<R> entitiesToSave = (List<R>) partition;
