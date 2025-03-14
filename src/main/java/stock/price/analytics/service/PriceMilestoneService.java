@@ -125,12 +125,12 @@ public class PriceMilestoneService {
             // pre-market GAP DOWN more than 4%
             case GAP_DOWN_AND_GO -> preMarketPrice.getClose() < s.getClose() * (1 - MIN_GAP_AND_GO_PERCENTAGE);
             // new 4w, 52w, all-time high-low in pre-market
-            case NEW_4W_HIGH -> preMarketPrice.getClose() > s.getHigh4w();
-            case NEW_4W_LOW -> preMarketPrice.getClose() < s.getLow4w();
-            case NEW_52W_HIGH -> preMarketPrice.getClose() > s.getHigh52w();
-            case NEW_52W_LOW -> preMarketPrice.getClose() < s.getLow52w();
-            case NEW_ALL_TIME_HIGH -> preMarketPrice.getClose() > s.getHighest();
-            case NEW_ALL_TIME_LOW -> preMarketPrice.getClose() < s.getLowest();
+            case PRE_NEW_4W_HIGH -> preMarketPrice.getClose() > s.getHigh4w();
+            case PRE_NEW_4W_LOW -> preMarketPrice.getClose() < s.getLow4w();
+            case PRE_NEW_52W_HIGH -> preMarketPrice.getClose() > s.getHigh52w();
+            case PRE_NEW_52W_LOW -> preMarketPrice.getClose() < s.getLow52w();
+            case PRE_NEW_ALL_TIME_HIGH -> preMarketPrice.getClose() > s.getHighest();
+            case PRE_NEW_ALL_TIME_LOW -> preMarketPrice.getClose() < s.getLowest();
             case NONE -> throw new IllegalStateException("Unexpected value NONE");
         };
     }
