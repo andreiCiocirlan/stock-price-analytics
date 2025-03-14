@@ -15,11 +15,6 @@ import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.prices.DailyPricesRepository;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +22,7 @@ import java.util.List;
 import static stock.price.analytics.model.prices.enums.IntradayPriceSpike.intradaySpikes;
 import static stock.price.analytics.util.Constants.CFD_MARGINS_5X_4X_3X;
 import static stock.price.analytics.util.Constants.MAX_TICKER_COUNT_PRINT;
+import static stock.price.analytics.util.FileUtils.writeToFile;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateImported;
@@ -80,19 +76,6 @@ public class YahooQuoteService {
                 .forEach(cacheService::cachePriceMilestoneTickers);
 
         return dailyImportedPrices;
-    }
-
-    private void writeToFile(String filePath, String jsonData) {
-        try {
-            File jsonFile = new File(filePath);
-
-            try (OutputStream outputStream = new FileOutputStream(jsonFile)) {
-                outputStream.write(jsonData.getBytes(StandardCharsets.UTF_8));
-            }
-            log.info("saved daily prices file {}", jsonFile.getAbsolutePath());
-        } catch (IOException e) {
-            log.error("Error writing to file: {}", filePath, e);
-        }
     }
 
     private String mergedPricesJSONs(List<String> pricesJSONs) {
