@@ -1,5 +1,10 @@
 package stock.price.analytics.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +23,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.prices.enums.IntradayPriceSpike.intradaySpikes;
 import static stock.price.analytics.util.Constants.CFD_MARGINS_5X_4X_3X;
@@ -45,37 +49,20 @@ public class YahooQuoteService {
 
     @Transactional
     public List<DailyPrice> yahooQuotesImport() {
-        int maxTickersPerRequest = 100;
-        List<DailyPrice> dailyImportedPrices = new ArrayList<>();
         List<Stock> cachedStocks = cacheService.getCachedStocks();
         List<String> tickersNotImported = new ArrayList<>(cachedStocks.stream().map(Stock::getTicker).toList());
+        List<String> pricesJSONs = logTimeAndReturn(() -> yahooQuoteClient.quotePricesFor(cachedStocks.stream().map(Stock::getTicker).toList()), "Yahoo API call and JSON result");
+        String pricesJSON = mergedPricesJSONs(pricesJSONs);
+        List<DailyPrice> dailyPricesExtractedFromJSON = dailyPricesJSONService.extractDailyPricesFromJSON(pricesJSON);
+        List<DailyPrice> dailyImportedPrices = cacheService.cacheAndReturnDailyPrices(dailyPricesExtractedFromJSON);
 
-        int start = 0;
-        int end = Math.min(maxTickersPerRequest, cachedStocks.size());
-        int fileCounter = 1;
-        while (start < cachedStocks.size()) {
-            List<Stock> partition = cachedStocks.subList(start, end);
-            String tickers = partition.stream().map(Stock::getTicker).collect(Collectors.joining(","));
-            String pricesJSON = logTimeAndReturn(() -> yahooQuoteClient.quotePricesJSON(tickers), "Yahoo API call and JSON result");
-
-            List<DailyPrice> dailyPricesExtractedFromJSON = dailyPricesJSONService.extractDailyPricesFromJSON(pricesJSON);
-            dailyImportedPrices.addAll(cacheService.cacheAndReturnDailyPrices(dailyPricesExtractedFromJSON));
-
-            // keep track of which tickers were imported
-            tickersNotImported.removeAll(dailyImportedPrices.stream().map(DailyPrice::getTicker).toList());
-
-            if (!dailyImportedPrices.isEmpty()) {
-                String fileName = tradingDateImported(dailyPricesExtractedFromJSON).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + "_" + fileCounter + ".json";
-                String path = "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/" + fileName;
-                writeToFile(path, pricesJSON);
-            }
-
-            start = end;
-            end = Math.min(start + maxTickersPerRequest, cachedStocks.size());
-            fileCounter++;
-        }
+        // keep track of which tickers were imported
+        tickersNotImported.removeAll(dailyImportedPrices.stream().map(DailyPrice::getTicker).toList());
 
         if (!dailyImportedPrices.isEmpty()) {
+            String fileName = tradingDateImported(dailyPricesExtractedFromJSON).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + ".json";
+            String path = "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/" + fileName;
+            writeToFile(path, pricesJSON);
             partitionDataAndSaveWithLogTime(dailyImportedPrices, dailyPricesRepository, "saved " + dailyImportedPrices.size() + " daily prices");
         }
 
@@ -105,6 +92,29 @@ public class YahooQuoteService {
             log.info("saved daily prices file {}", jsonFile.getAbsolutePath());
         } catch (IOException e) {
             log.error("Error writing to file: {}", filePath, e);
+        }
+    }
+
+    private String mergedPricesJSONs(List<String> pricesJSONs) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode mergedQuoteResponse = objectMapper.createObjectNode();
+            ArrayNode mergedResults = objectMapper.createArrayNode();
+            for (String json : pricesJSONs) {
+                JsonNode rootNode = objectMapper.readTree(json);
+                JsonNode results = rootNode.path("quoteResponse").path("result");
+
+                if (results.isArray()) {
+                    results.forEach(mergedResults::add);
+                }
+            }
+            mergedQuoteResponse.set("result", mergedResults);
+            ObjectNode finalResponse = objectMapper.createObjectNode();
+            finalResponse.set("quoteResponse", mergedQuoteResponse);
+
+            return objectMapper.writeValueAsString(finalResponse);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 
