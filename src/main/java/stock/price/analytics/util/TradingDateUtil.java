@@ -2,10 +2,7 @@ package stock.price.analytics.util;
 
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Map;
@@ -13,32 +10,40 @@ import java.util.stream.Collectors;
 
 public class TradingDateUtil {
 
-    private static final LocalTime preMarketStartHours = LocalTime.of(14, 0, 0, 0);
-    private static final LocalTime startMarketHours = LocalTime.of(16, 30, 0, 0);
-    private static final LocalTime endMarketHours = LocalTime.of(23, 0, 0, 0);
+    private static final ZoneId NY_ZONE = ZoneId.of("America/New_York");
+    private static final LocalTime START_MARKET_HOURS_NYSE = LocalTime.of(9, 30);
+    private static final LocalTime END_MARKET_HOURS_NYSE = LocalTime.of(16, 0);
 
     private static boolean isBetweenMarketHours() {
-        return LocalDateTime.now().toLocalTime().isAfter(startMarketHours) && LocalDateTime.now().toLocalTime().isBefore(endMarketHours);
+        LocalTime nowInNY = LocalDateTime.now(NY_ZONE).toLocalTime();
+        return nowInNY.isAfter(START_MARKET_HOURS_NYSE) && nowInNY.isBefore(END_MARKET_HOURS_NYSE);
     }
 
     private static boolean isBeforeMarketHours() {
-        return LocalDateTime.now().toLocalTime().isBefore(startMarketHours);
+        LocalTime nowInNY = LocalDateTime.now(NY_ZONE).toLocalTime();
+        return nowInNY.isBefore(START_MARKET_HOURS_NYSE);
     }
 
     private static boolean isAfterMarketHours() {
-        return LocalDateTime.now().toLocalTime().isAfter(endMarketHours);
+        LocalTime nowInNY = LocalDateTime.now(NY_ZONE).toLocalTime();
+        return nowInNY.isAfter(END_MARKET_HOURS_NYSE);
     }
 
     public static LocalDate tradingDateNow() {
-        if (LocalDate.now().getDayOfWeek().equals(DayOfWeek.SATURDAY) || LocalDate.now().getDayOfWeek().equals(DayOfWeek.SUNDAY)
-                || (LocalDate.now().getDayOfWeek().equals(DayOfWeek.MONDAY) && isBeforeMarketHours())) {
-            return LocalDate.now().with(TemporalAdjusters.previous(DayOfWeek.FRIDAY));
-        }
-        if (isBetweenMarketHours() || (isAfterMarketHours() && LocalDateTime.now().toLocalTime().getHour() == 23))
-            return LocalDate.now();
+        DayOfWeek dayOfWeekInNY = LocalDate.now(NY_ZONE).getDayOfWeek();
+        LocalTime nowInNY = LocalDateTime.now(NY_ZONE).toLocalTime();
 
-        // is before market hours || is after 23:59
-        return LocalDate.now().minusDays(1);
+        if (dayOfWeekInNY.equals(DayOfWeek.SATURDAY) || dayOfWeekInNY.equals(DayOfWeek.SUNDAY)
+            || (dayOfWeekInNY.equals(DayOfWeek.MONDAY) && isBeforeMarketHours())) {
+            return LocalDate.now(NY_ZONE).with(TemporalAdjusters.previous(DayOfWeek.FRIDAY));
+        }
+
+        if (isBetweenMarketHours() || (isAfterMarketHours() && nowInNY.getHour() == END_MARKET_HOURS_NYSE.getHour())) {
+            return LocalDate.now(NY_ZONE);
+        }
+
+        // Before market hours or after midnight
+        return LocalDate.now(NY_ZONE).minusDays(1);
     }
 
     public static LocalDate previousTradingDate(LocalDate date) {
