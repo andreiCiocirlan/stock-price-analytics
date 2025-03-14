@@ -16,8 +16,8 @@ import stock.price.analytics.service.StockService;
 import java.time.LocalDate;
 import java.util.List;
 
-import static stock.price.analytics.util.ImportDateUtil.isFirstImportFor;
 import static stock.price.analytics.util.LoggingUtil.logTime;
+import static stock.price.analytics.util.TradingDateUtil.isFirstImportFor;
 
 @RequiredArgsConstructor
 @SpringBootApplication

@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 import static stock.price.analytics.model.prices.enums.StockTimeframe.WEEKLY;
 import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
 import static stock.price.analytics.model.stocks.enums.MarketState.REGULAR;
-import static stock.price.analytics.util.ImportDateUtil.isFirstImportFor;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
+import static stock.price.analytics.util.TradingDateUtil.isFirstImportFor;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 @Slf4j

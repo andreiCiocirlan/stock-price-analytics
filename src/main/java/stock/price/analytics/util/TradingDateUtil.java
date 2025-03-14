@@ -1,5 +1,6 @@
 package stock.price.analytics.util;
 
+import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 
 import java.time.*;
@@ -7,6 +8,8 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static stock.price.analytics.util.StockDateUtils.isWithinSameTimeframe;
 
 public class TradingDateUtil {
 
@@ -43,6 +46,13 @@ public class TradingDateUtil {
         } else { // Before market hours
             return LocalDate.now(NY_ZONE).minusDays(1);
         }
+    }
+
+    public static boolean isFirstImportFor(StockTimeframe timeframe, LocalDate previousImportDate) {
+        return switch (timeframe) {
+            case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
+            case WEEKLY, YEARLY, QUARTERLY, MONTHLY -> !isWithinSameTimeframe(LocalDateTime.now(NY_ZONE).toLocalDate(), previousImportDate, timeframe);
+        };
     }
 
     public static LocalDate previousTradingDate(LocalDate date) {
