@@ -24,6 +24,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static java.nio.file.Files.walk;
+import static stock.price.analytics.util.Constants.NY_ZONE;
 import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
@@ -133,7 +134,7 @@ public class StockService {
         for (Stock stock : stocksUpdated) {
             LocalDate lastUpdated = stock.getLastUpdated();
             if (lastUpdated.getDayOfWeek().equals(DayOfWeek.FRIDAY)) {
-                stock.setLastUpdated(LocalDate.now()); // lastUpdated becomes current date (might not be necessarily Monday if holiday)
+                stock.setLastUpdated(LocalDate.now(NY_ZONE)); // lastUpdated becomes current date (might not be necessarily Monday if holiday)
             }
         }
         List<Stock> stocks = new ArrayList<>(stocksUpdated);
