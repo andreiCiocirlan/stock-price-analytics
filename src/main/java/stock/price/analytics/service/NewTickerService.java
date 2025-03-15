@@ -31,6 +31,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
 import static java.nio.file.Files.readAllLines;
+import static stock.price.analytics.util.Constants.USER_AGENT_VALUE;
 import static stock.price.analytics.util.PricesUtil.getPricesForTimeframe;
 
 @Slf4j
@@ -68,7 +69,7 @@ public class NewTickerService {
                 try {
                     HttpHeaders headers = new HttpHeaders();
                     headers.add("Cookie", COOKIE);
-                    headers.add(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0");
+                    headers.add(HttpHeaders.USER_AGENT, USER_AGENT_VALUE);
 
                     HttpEntity<String> entity = new HttpEntity<>(null, headers);
                     response = restTemplate.exchange(
