@@ -99,8 +99,15 @@ public class DiscrepanciesService {
         };
     }
 
-    public void updateWeeklyPricesWithOpeningPriceDiscrepancy() {
-        pricesDiscrepanciesRepository.updateWeeklyPricesWithOpeningPriceDiscrepancy();
+    public void updateWeeklyPricesWithOpeningPriceDiscrepancy(StockTimeframe timeframe) {
+        switch (timeframe) {
+            case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
+            case WEEKLY -> pricesDiscrepanciesRepository.updateWeeklyPricesWithOpeningPriceDiscrepancy();
+            case MONTHLY -> pricesDiscrepanciesRepository.updateMonthlyPricesWithOpeningPriceDiscrepancy();
+            case QUARTERLY -> pricesDiscrepanciesRepository.updateQuarterlyPricesWithOpeningPriceDiscrepancy();
+            case YEARLY -> pricesDiscrepanciesRepository.updateYearlyPricesWithOpeningPriceDiscrepancy();
+        }
+
     }
 
     public void updateStocksWithOpeningPriceDiscrepancyFor(StockTimeframe timeframe) {

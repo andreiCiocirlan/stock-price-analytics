@@ -85,4 +85,94 @@ public interface PricesDiscrepanciesRepository extends PricesRepository {
             WHERE wp.ticker = pu.ticker AND wp.start_date = pu.week_start;
             """, nativeQuery = true)
     void updateWeeklyPricesWithOpeningPriceDiscrepancy();
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+            WITH daily_grouped AS (
+                SELECT
+                    ticker,
+                    DATE_TRUNC('month', date)::date AS month_start,
+                    open,
+                    ROW_NUMBER() OVER (PARTITION BY ticker, DATE_TRUNC('month', date) ORDER BY date) AS rn
+                FROM
+                    daily_prices
+                WHERE date >=  date_trunc('month', CURRENT_DATE)
+            ),
+            m_daily as (
+                SELECT ticker, month_start, open
+                FROM daily_grouped
+                WHERE rn = 1
+            ),
+            PricesToUpdate as (
+                select wp.ticker, md.month_start, md.open from m_daily md
+                join monthly_prices wp on wp.ticker = md.ticker and wp.start_date = md.month_start
+                where round(wp.open::numeric, 2) <> round(md.open::numeric, 2)
+            )
+            UPDATE monthly_prices wp
+            SET open = pu.open
+            FROM PricesToUpdate pu
+            WHERE wp.ticker = pu.ticker AND wp.start_date = pu.month_start;
+            """, nativeQuery = true)
+    void updateMonthlyPricesWithOpeningPriceDiscrepancy();
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+            WITH daily_grouped AS (
+                SELECT
+                    ticker,
+                    DATE_TRUNC('quarter', date)::date AS quarter_start,
+                    open,
+                    ROW_NUMBER() OVER (PARTITION BY ticker, DATE_TRUNC('quarter', date) ORDER BY date) AS rn
+                FROM
+                    daily_prices
+                WHERE date >=  date_trunc('quarter', CURRENT_DATE)
+            ),
+            m_daily as (
+                SELECT ticker, quarter_start, open
+                FROM daily_grouped
+                WHERE rn = 1
+            ),
+            PricesToUpdate as (
+                select wp.ticker, md.quarter_start, md.open from m_daily md
+                join quarterly_prices wp on wp.ticker = md.ticker and wp.start_date = md.quarter_start
+                where round(wp.open::numeric, 2) <> round(md.open::numeric, 2)
+            )
+            UPDATE quarterly_prices wp
+            SET open = pu.open
+            FROM PricesToUpdate pu
+            WHERE wp.ticker = pu.ticker AND wp.start_date = pu.quarter_start;
+            """, nativeQuery = true)
+    void updateQuarterlyPricesWithOpeningPriceDiscrepancy();
+
+    @Modifying
+    @Transactional
+    @Query(value = """
+            WITH daily_grouped AS (
+                SELECT
+                    ticker,
+                    DATE_TRUNC('year', date)::date AS year_start,
+                    open,
+                    ROW_NUMBER() OVER (PARTITION BY ticker, DATE_TRUNC('year', date) ORDER BY date) AS rn
+                FROM
+                    daily_prices
+                WHERE date >=  date_trunc('year', CURRENT_DATE)
+            ),
+            m_daily as (
+                SELECT ticker, year_start, open
+                FROM daily_grouped
+                WHERE rn = 1
+            ),
+            PricesToUpdate as (
+                select wp.ticker, md.year_start, md.open from m_daily md
+                join yearly_prices wp on wp.ticker = md.ticker and wp.start_date = md.year_start
+                where round(wp.open::numeric, 2) <> round(md.open::numeric, 2)
+            )
+            UPDATE yearly_prices wp
+            SET open = pu.open
+            FROM PricesToUpdate pu
+            WHERE wp.ticker = pu.ticker AND wp.start_date = pu.year_start;
+            """, nativeQuery = true)
+    void updateYearlyPricesWithOpeningPriceDiscrepancy();
 }
