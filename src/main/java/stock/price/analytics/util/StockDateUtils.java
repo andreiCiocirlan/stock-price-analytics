@@ -4,6 +4,7 @@ import stock.price.analytics.model.prices.enums.StockTimeframe;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 
 public class StockDateUtils {
 
@@ -18,14 +19,7 @@ public class StockDateUtils {
     }
 
     private static boolean sameWeek(LocalDate firstDate, LocalDate secondDate) {
-        // Find the start of the week (Monday)
-        LocalDate weekStart = secondDate.with(DayOfWeek.MONDAY);
-
-        // Calculate the end of the week (Friday)
-        LocalDate weekEnd = weekStart.plusDays(4); // 4 days after Monday is Friday
-
-        // Check if the date is within the range of the week
-        return !firstDate.isBefore(weekStart) && !firstDate.isAfter(weekEnd);
+        return firstDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).isEqual(secondDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)));
     }
 
     private static boolean sameMonth(LocalDate firstDate, LocalDate secondDate) {
