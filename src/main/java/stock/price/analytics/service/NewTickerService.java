@@ -245,7 +245,7 @@ public class NewTickerService {
         return prices;
     }
 
-    private static String timeframeToQParam(StockTimeframe timeframe) {
+    private String timeframeToQParam(StockTimeframe timeframe) {
         return switch (timeframe) {
             case DAILY -> "1d";
             case WEEKLY -> "1wk";
