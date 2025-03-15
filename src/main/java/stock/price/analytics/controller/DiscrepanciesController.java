@@ -33,7 +33,7 @@ public class DiscrepanciesController {
 
     @PutMapping("/weekly-prices/opening-prices")
     public void updateHTFPricesWithOpeningPriceDiscrepancy(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
-        discrepanciesService.updateWeeklyPricesWithOpeningPriceDiscrepancy(timeframe);
+        discrepanciesService.updateHTFOpeningPricesDiscrepancyFor(timeframe);
     }
 
     @GetMapping("/stocks/opening-price")
