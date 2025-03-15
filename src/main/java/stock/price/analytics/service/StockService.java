@@ -13,7 +13,6 @@ import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.stocks.StockRepository;
 import stock.price.analytics.util.Constants;
 import stock.price.analytics.util.FileUtils;
-import stock.price.analytics.util.TradingDateUtil;
 
 import java.io.IOException;
 import java.nio.file.Files;
