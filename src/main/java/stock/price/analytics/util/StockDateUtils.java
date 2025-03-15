@@ -17,27 +17,27 @@ public class StockDateUtils {
         };
     }
 
-    private static boolean sameWeek(LocalDate date, LocalDate endDate) {
+    private static boolean sameWeek(LocalDate firstDate, LocalDate secondDate) {
         // Find the start of the week (Monday)
-        LocalDate weekStart = endDate.with(DayOfWeek.MONDAY);
+        LocalDate weekStart = secondDate.with(DayOfWeek.MONDAY);
 
         // Calculate the end of the week (Friday)
         LocalDate weekEnd = weekStart.plusDays(4); // 4 days after Monday is Friday
 
         // Check if the date is within the range of the week
-        return !date.isBefore(weekStart) && !date.isAfter(weekEnd);
+        return !firstDate.isBefore(weekStart) && !firstDate.isAfter(weekEnd);
     }
 
-    private static boolean sameMonth(LocalDate date, LocalDate startOfMonth) {
-        return date.getYear() == startOfMonth.getYear() && date.getMonthValue() == startOfMonth.getMonthValue();
+    private static boolean sameMonth(LocalDate firstDate, LocalDate secondDate) {
+        return firstDate.getYear() == secondDate.getYear() && firstDate.getMonthValue() == secondDate.getMonthValue();
     }
 
-    private static boolean sameQuarter(LocalDate date, LocalDate latestEndDateQuarter) {
-        return date.getYear() == latestEndDateQuarter.getYear() &&
-                date.getMonth().firstMonthOfQuarter() == latestEndDateQuarter.getMonth().firstMonthOfQuarter();
+    private static boolean sameQuarter(LocalDate firstDate, LocalDate secondDate) {
+        return firstDate.getYear() == secondDate.getYear() &&
+                firstDate.getMonth().firstMonthOfQuarter() == secondDate.getMonth().firstMonthOfQuarter();
     }
 
-    private static boolean sameYear(LocalDate date, LocalDate startOfYear) {
-        return date.getYear() == startOfYear.getYear();
+    private static boolean sameYear(LocalDate firstDate, LocalDate secondDate) {
+        return firstDate.getYear() == secondDate.getYear();
     }
 }
