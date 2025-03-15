@@ -52,8 +52,10 @@ public class NewTickerService {
         stockService.saveStocks(tickers, Boolean.TRUE, Boolean.TRUE.equals(shortSell), cfdMargin);
         COOKIE = yahooQuoteClient.cookieFromFcYahoo();
         getYahooQuotesAndSaveJSONFileFor(tickers);
-        List<DailyPrice> dailyPricesImported = saveAllDailyPricesAndReturn(tickers);
-        List<AbstractPrice> htfPricesImported = saveAllHtfPricesAndReturn(dailyPricesImported);
+        List<DailyPrice> dailyPricesImported = getDailyPricesFor(tickers);
+        pricesService.savePrices(dailyPricesImported);
+        List<AbstractPrice> htfPricesImported = getHigherTimeframePricesFor(dailyPricesImported);
+        pricesService.savePrices(htfPricesImported);
         saveAllHighLowPricesAndUpdateStocksFor(dailyPricesImported, htfPricesImported);
         // fairValueGapService.saveNewFVGsAndUpdateHighLowAndClosedAllTimeframes(); // make sure to add "where ticker in (...) AND increase findRecentByTimeframe intervals
     }
@@ -102,7 +104,7 @@ public class NewTickerService {
         }
     }
 
-    private List<DailyPrice> saveAllDailyPricesAndReturn(String tickers) {
+    private List<DailyPrice> getDailyPricesFor(String tickers) {
         List<String> tickerList = Arrays.stream(tickers.split(",")).toList();
         List<DailyPrice> dailyPricesImported = new ArrayList<>();
 
@@ -112,7 +114,6 @@ public class NewTickerService {
                 String dailyPricesFileContent = String.join("", readAllLines(Path.of(jsonFilePath)));
                 List<DailyPrice> dailyPricesExtracted = extractDailyPricesFrom(ticker, dailyPricesFileContent).stream().sorted(Comparator.comparing(DailyPrice::getDate)).toList();
                 dailyPricesImported.addAll(pricesWithPerformance(dailyPricesExtracted));
-                pricesService.savePrices(dailyPricesImported);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -120,7 +121,7 @@ public class NewTickerService {
         return dailyPricesImported;
     }
 
-    private List<AbstractPrice> saveAllHtfPricesAndReturn(List<DailyPrice> dailyPricesImported) {
+    private List<AbstractPrice> getHigherTimeframePricesFor(List<DailyPrice> dailyPricesImported) {
         List<AbstractPrice> htfPrices = new ArrayList<>();
         List<WeeklyPrice> weeklyPrices = getPricesForTimeframe(dailyPricesImported, StockTimeframe.WEEKLY).stream().map(WeeklyPrice.class::cast).toList();
         List<MonthlyPrice> monthlyPrices = getPricesForTimeframe(dailyPricesImported, StockTimeframe.MONTHLY).stream().map(MonthlyPrice.class::cast).toList();
@@ -131,8 +132,6 @@ public class NewTickerService {
         htfPrices.addAll(pricesWithPerformance(monthlyPrices.stream().sorted(Comparator.comparing(MonthlyPrice::getStartDate)).toList()));
         htfPrices.addAll(pricesWithPerformance(quarterlyPrices.stream().sorted(Comparator.comparing(QuarterlyPrice::getStartDate)).toList()));
         htfPrices.addAll(pricesWithPerformance(yearlyPrices.stream().sorted(Comparator.comparing(YearlyPrice::getStartDate)).toList()));
-
-        pricesService.savePrices(htfPrices);
 
         return htfPrices;
     }
