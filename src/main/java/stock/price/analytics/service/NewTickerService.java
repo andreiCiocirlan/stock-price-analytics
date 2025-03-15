@@ -13,8 +13,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import stock.price.analytics.client.yahoo.YahooQuoteClient;
+import stock.price.analytics.model.prices.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
+import stock.price.analytics.model.prices.highlow.HighLow4w;
+import stock.price.analytics.model.prices.highlow.HighLow52Week;
+import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
+import stock.price.analytics.model.prices.highlow.HighestLowestPrices;
 import stock.price.analytics.model.prices.ohlc.*;
+import stock.price.analytics.repository.prices.HighLowForPeriodRepository;
 import stock.price.analytics.util.TradingDateUtil;
 
 import java.io.File;
@@ -29,9 +35,11 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.nio.file.Files.readAllLines;
 import static stock.price.analytics.util.Constants.USER_AGENT_VALUE;
+import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveNoLogging;
 import static stock.price.analytics.util.PricesUtil.getPricesForTimeframe;
 
 @Slf4j
@@ -44,7 +52,7 @@ public class NewTickerService {
     private final RestTemplate restTemplate;
     private final StockService stockService;
     private final PricesService pricesService;
-    private final HighLowForPeriodService highLowForPeriodService;
+    private final HighLowForPeriodRepository highLowForPeriodRepository;
     private String COOKIE;
 
     // import all data pertaining to the new tickers and create dailyPrices, htfPrices, stocks, highLowPrices etc.
@@ -56,7 +64,8 @@ public class NewTickerService {
         pricesService.savePrices(dailyPricesImported);
         List<AbstractPrice> htfPricesImported = getHigherTimeframePricesFor(dailyPricesImported);
         pricesService.savePrices(htfPricesImported);
-        saveAllHighLowPricesAndUpdateStocksFor(dailyPricesImported, htfPricesImported);
+        saveHighLowPricesForPeriodFrom(htfPricesImported);
+        saveAndUpdateStocksFor(dailyPricesImported, htfPricesImported);
         // fairValueGapService.saveNewFVGsAndUpdateHighLowAndClosedAllTimeframes(); // make sure to add "where ticker in (...) AND increase findRecentByTimeframe intervals
     }
 
@@ -136,7 +145,7 @@ public class NewTickerService {
         return htfPrices;
     }
 
-    private void saveAllHighLowPricesAndUpdateStocksFor(List<DailyPrice> dailyPricesImported, List<AbstractPrice> htfPricesImported) {
+    private void saveAndUpdateStocksFor(List<DailyPrice> dailyPricesImported, List<AbstractPrice> htfPricesImported) {
         LocalDate tradingDateNow = TradingDateUtil.tradingDateNow();
         List<DailyPrice> latestDailyPricesImported = dailyPricesImported.stream()
                 .filter(dp -> dp.getDate().isEqual(tradingDateNow))
@@ -146,8 +155,6 @@ public class NewTickerService {
                 .filter(this::isLatestHTFPrice)
                 .toList();
 
-        List<String> tickerList = dailyPricesImported.stream().map(DailyPrice::getTicker).toList();
-        highLowForPeriodService.saveAllHistoricalHighLowPrices(tickerList, tradingDateNow);
         stockService.updateStocksHighLowsAndOHLCFrom(latestDailyPricesImported, latestHTFPrices);
     }
 
@@ -163,6 +170,59 @@ public class NewTickerService {
             case YEARLY -> startDate.isEqual(tradingDateNow.with(TemporalAdjusters.firstDayOfYear()));
             default -> false;
         };
+    }
+
+    private void saveHighLowPricesForPeriodFrom(List<AbstractPrice> htfPricesImported) {
+        List<HighLowForPeriod> highLowForPeriodPrices = new ArrayList<>();
+        Map<String, List<AbstractPrice>> weeklyPricesByTicker = htfPricesImported.stream()
+                .filter(price -> price.getTimeframe() == StockTimeframe.WEEKLY)
+                .collect(Collectors.groupingBy(AbstractPrice::getTicker));
+
+        for (HighLowPeriod highLowPeriod : HighLowPeriod.values()) {
+            int intervalNrWeeks = switch (highLowPeriod) {
+                case HIGH_LOW_4W -> 4;
+                case HIGH_LOW_52W -> 52;
+                case HIGH_LOW_ALL_TIME -> 1;
+            };
+            for (Map.Entry<String, List<AbstractPrice>> entry : weeklyPricesByTicker.entrySet()) {
+                String ticker = entry.getKey();
+                List<AbstractPrice> prices = entry.getValue();
+                prices.sort(Comparator.comparing(AbstractPrice::getStartDate).reversed());
+
+                for (int i = 0; i <= prices.size() - intervalNrWeeks; i++) {
+                    int fromIndex = intervalNrWeeks == 1 ? 0 : i;
+                    int toIndex = intervalNrWeeks == 1 ? prices.size() : i + intervalNrWeeks;
+                    List<AbstractPrice> currentWeeksForPeriod = prices.subList(fromIndex, toIndex);
+                    double highestPriceForPeriod = currentWeeksForPeriod.stream()
+                            .mapToDouble(AbstractPrice::getHigh)
+                            .max()
+                            .orElseThrow();
+
+                    double lowestPriceForPeriod = currentWeeksForPeriod.stream()
+                            .mapToDouble(AbstractPrice::getLow)
+                            .min()
+                            .orElseThrow();
+
+                    LocalDate startDate = prices.get(i).getStartDate();
+                    LocalDate endDate = startDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
+
+                    HighLowForPeriod highLowForPeriod = switch (highLowPeriod) {
+                        case HIGH_LOW_4W -> new HighLow4w(ticker, startDate, endDate);
+                        case HIGH_LOW_52W -> new HighLow52Week(ticker, startDate, endDate);
+                        case HIGH_LOW_ALL_TIME -> new HighestLowestPrices(ticker, startDate, endDate);
+                    };
+                    highLowForPeriod.setLow(lowestPriceForPeriod);
+                    highLowForPeriod.setHigh(highestPriceForPeriod);
+
+                    if (startDate.isAfter(LocalDate.now().minusWeeks(3))) {
+                        log.warn("highLowForPeriod {} : {}", highLowPeriod, highLowForPeriod);
+                    }
+                    highLowForPeriodPrices.add(highLowForPeriod);
+                }
+
+            }
+        }
+        partitionDataAndSaveNoLogging(highLowForPeriodPrices, highLowForPeriodRepository);
     }
 
     private List<DailyPrice> extractDailyPricesFrom(String ticker, String jsonResponse) throws JsonProcessingException {
