@@ -3,19 +3,19 @@ package stock.price.analytics.util;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 
-import java.time.*;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static stock.price.analytics.util.Constants.*;
 import static stock.price.analytics.util.StockDateUtils.isWithinSameTimeframe;
 
 public class TradingDateUtil {
-
-    private static final ZoneId NY_ZONE = ZoneId.of("America/New_York");
-    private static final LocalTime START_MARKET_HOURS_NYSE = LocalTime.of(9, 30);
-    private static final LocalTime END_MARKET_HOURS_NYSE = LocalTime.of(16, 0);
 
     private static boolean isBetweenMarketHours() {
         LocalTime nowInNY = LocalDateTime.now(NY_ZONE).toLocalTime();

@@ -1,10 +1,15 @@
 package stock.price.analytics.util;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.List;
 
 public class Constants {
 
+    public static final ZoneId NY_ZONE = ZoneId.of("America/New_York");
+    public static final LocalTime START_MARKET_HOURS_NYSE = LocalTime.of(9, 30);
+    public static final LocalTime END_MARKET_HOURS_NYSE = LocalTime.of(16, 0);
     public static final String STOCKS_LOCATION = "D:\\stocks-data\\historical_prices\\ALL_STOCKS\\";
     public static final String FINNHUB_BASE_URL = "https://finnhub.io/api/v1";
     public static final String CLASSPATH_TICKERS_XTB_TXT = "classpath:tickers_XTB.txt";
