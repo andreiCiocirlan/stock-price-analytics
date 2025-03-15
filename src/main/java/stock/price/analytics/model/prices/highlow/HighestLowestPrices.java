@@ -25,6 +25,9 @@ public class HighestLowestPrices extends HighLowForPeriod {
     @Column(name = "high")
     private double highest;
 
+    public HighestLowestPrices(String ticker, LocalDate startDate, LocalDate endDate) {
+        super(ticker, startDate, endDate);
+    }
 
     public HighestLowestPrices copyWith(LocalDate startDate) {
         HighestLowestPrices copy = new HighestLowestPrices();
