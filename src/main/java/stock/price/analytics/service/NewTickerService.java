@@ -50,21 +50,47 @@ public class NewTickerService {
     public void importAllDataFor(String tickers, Double cfdMargin, Boolean shortSell) {
         stockService.saveStocks(tickers, Boolean.TRUE, Boolean.TRUE.equals(shortSell), cfdMargin);
         COOKIE = yahooQuoteClient.cookieFromFcYahoo();
-        writeJSONDailyPricesFileFor(tickers);
+        getYahooQuotesAndSaveJSONFileFor(tickers);
         List<DailyPrice> dailyPricesImported = saveAllDailyPricesAndReturn(tickers);
         List<AbstractPrice> htfPricesImported = saveAllHtfPricesAndReturn(dailyPricesImported);
         saveAllHighLowPricesAndUpdateStocksFor(dailyPricesImported, htfPricesImported);
         // fairValueGapService.saveNewFVGsAndUpdateHighLowAndClosedAllTimeframes(); // make sure to add "where ticker in (...) AND increase findRecentByTimeframe intervals
     }
 
-    private void writeJSONDailyPricesFileFor(String tickers) {
+    private void getYahooQuotesAndSaveJSONFileFor(String tickers) {
         int lowerBound = 100;
         int upperBound = 200;
         int range = (upperBound - lowerBound) + 1;
         try {
             for (String ticker : tickers.split(",")) {
                 long currentTime = System.currentTimeMillis();
-                writeJSONDailyPriceFileFor(ticker);
+                ResponseEntity<String> response;
+                try {
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.add("Cookie", COOKIE);
+                    headers.add(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0");
+
+                    HttpEntity<String> entity = new HttpEntity<>(null, headers);
+                    response = restTemplate.exchange(
+                            YAHOO_BASE_URL + "/chart/{ticker}?range=60y&interval=" + timeframeToQParam(StockTimeframe.DAILY)
+                            + "&indicators=quote&includeTimestamps=true",
+                            HttpMethod.GET,
+                            entity,
+                            String.class,
+                            ticker
+                    );
+
+                    String responseBody = response.getBody();
+                    if (responseBody != null) {
+                        String fileName = ticker + ".json";
+                        String path = "./all-historical-prices/DAILY/" + fileName;
+                        writeToFile(path, responseBody);
+                    } else {
+                        log.error("response body is null for ticker {}", ticker);
+                    }
+                } catch (RestClientException e) {
+                    log.error("Failed retrieving prices data for ticker {}: {}", ticker, e.getMessage());
+                }
                 log.info("saving JSON historical prices for {} took {} ms", ticker, (System.currentTimeMillis() - currentTime));
                 int sleepTime = (int) (Math.random() * range) + lowerBound;
                 Thread.sleep(sleepTime);
@@ -72,36 +98,6 @@ public class NewTickerService {
             }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    private void writeJSONDailyPriceFileFor(String ticker) {
-        ResponseEntity<String> response;
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Cookie", COOKIE);
-            headers.add(HttpHeaders.USER_AGENT, "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0");
-
-            HttpEntity<String> entity = new HttpEntity<>(null, headers);
-            response = restTemplate.exchange(
-                    YAHOO_BASE_URL + "/chart/{ticker}?range=60y&interval=" + timeframeToQParam(StockTimeframe.DAILY)
-                    + "&indicators=quote&includeTimestamps=true",
-                    HttpMethod.GET,
-                    entity,
-                    String.class,
-                    ticker
-            );
-
-            String responseBody = response.getBody();
-            if (responseBody != null) {
-                String fileName = ticker + ".json";
-                String path = "./all-historical-prices/DAILY/" + fileName;
-                writeToFile(path, responseBody);
-            } else {
-                log.error("response body is null for ticker {}", ticker);
-            }
-        } catch (RestClientException e) {
-            log.error("Failed retrieving prices data for ticker {}: {}", ticker, e.getMessage());
         }
     }
 
