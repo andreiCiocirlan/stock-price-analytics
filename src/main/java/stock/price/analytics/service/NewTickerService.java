@@ -55,6 +55,16 @@ public class NewTickerService {
     private final HighLowForPeriodRepository highLowForPeriodRepository;
     private String COOKIE;
 
+    public void importFromExistingJSONFor(String tickers) {
+        List<DailyPrice> dailyPricesImported = getDailyPricesFor(tickers);
+        List<AbstractPrice> htfPricesImported = getHigherTimeframePricesFor(dailyPricesImported);
+        pricesService.savePrices(dailyPricesImported);
+        pricesService.savePrices(htfPricesImported);
+        saveHighLowPricesForPeriodFrom(htfPricesImported);
+        saveAndUpdateStocksFor(dailyPricesImported, htfPricesImported);
+        // fairValueGapService.saveNewFVGsAndUpdateHighLowAndClosedAllTimeframes(); // make sure to add "where ticker in (...) AND increase findRecentByTimeframe intervals
+    }
+
     // import all data pertaining to the new tickers and create dailyPrices, htfPrices, stocks, highLowPrices etc.
     public void importAllDataFor(String tickers, Double cfdMargin, Boolean shortSell) {
         stockService.saveStocks(tickers, Boolean.TRUE, Boolean.TRUE.equals(shortSell), cfdMargin);
@@ -190,7 +200,6 @@ public class NewTickerService {
                 prices.sort(Comparator.comparing(AbstractPrice::getStartDate).reversed());
 
                 for (int i = 0; i <= prices.size() - intervalNrWeeks; i++) {
-                    int fromIndex = intervalNrWeeks == 1 ? 0 : i;
                     int toIndex = intervalNrWeeks == 1 ? prices.size() : i + intervalNrWeeks;
                     List<AbstractPrice> currentWeeksForPeriod = prices.subList(i, toIndex);
                     double highestPriceForPeriod = currentWeeksForPeriod.stream()
