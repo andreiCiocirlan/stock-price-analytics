@@ -15,7 +15,7 @@ public class EndOfDayScheduler {
     private final DesktopNotificationService desktopNotificationService;
 
     // 0 45 16 * * MON-FRI
-    @Scheduled(cron = "${cron.post.market.checks}", zone = "${cron.timezone}")
+    @Scheduled(cron = "${cron.post.market.discrepancy.checks}", zone = "${cron.timezone}")
     public void findAllStockDiscrepanciesAtEOD() {
         String title = "Discrepancy Found";
         if (!discrepanciesService.findStocksOpeningPriceDiscrepancies().isEmpty()) {
