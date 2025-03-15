@@ -51,7 +51,7 @@ public class TradingDateUtil {
     public static boolean isFirstImportFor(StockTimeframe timeframe, LocalDate previousImportDate) {
         return switch (timeframe) {
             case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
-            case WEEKLY, YEARLY, QUARTERLY, MONTHLY -> !isWithinSameTimeframe(LocalDateTime.now(NY_ZONE).toLocalDate(), previousImportDate, timeframe);
+            case WEEKLY, YEARLY, QUARTERLY, MONTHLY -> !isWithinSameTimeframe(LocalDate.now(NY_ZONE), previousImportDate, timeframe);
         };
     }
 
