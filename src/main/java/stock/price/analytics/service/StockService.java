@@ -6,12 +6,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
+import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.stocks.StockRepository;
 import stock.price.analytics.util.Constants;
 import stock.price.analytics.util.FileUtils;
+import stock.price.analytics.util.TradingDateUtil;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,6 +31,7 @@ import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
 import static stock.price.analytics.util.PricesUtil.tickerFrom;
+import static stock.price.analytics.util.TradingDateUtil.isFirstImportFor;
 
 @Slf4j
 @Service
@@ -132,8 +135,7 @@ public class StockService {
         updateStocksFromHighLowCaches(stocksUpdated);
 
         for (Stock stock : stocksUpdated) {
-            LocalDate lastUpdated = stock.getLastUpdated();
-            if (lastUpdated.getDayOfWeek().equals(DayOfWeek.FRIDAY)) {
+            if (isFirstImportFor(StockTimeframe.WEEKLY, stock.getLastUpdated())) {
                 stock.setLastUpdated(LocalDate.now(NY_ZONE)); // lastUpdated becomes current date (might not be necessarily Monday if holiday)
             }
         }
