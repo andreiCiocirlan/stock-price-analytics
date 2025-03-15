@@ -192,7 +192,7 @@ public class NewTickerService {
                 for (int i = 0; i <= prices.size() - intervalNrWeeks; i++) {
                     int fromIndex = intervalNrWeeks == 1 ? 0 : i;
                     int toIndex = intervalNrWeeks == 1 ? prices.size() : i + intervalNrWeeks;
-                    List<AbstractPrice> currentWeeksForPeriod = prices.subList(fromIndex, toIndex);
+                    List<AbstractPrice> currentWeeksForPeriod = prices.subList(i, toIndex);
                     double highestPriceForPeriod = currentWeeksForPeriod.stream()
                             .mapToDouble(AbstractPrice::getHigh)
                             .max()
