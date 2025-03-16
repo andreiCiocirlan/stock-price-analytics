@@ -222,10 +222,6 @@ public class NewTickerService {
                     };
                     highLowForPeriod.setLow(lowestPriceForPeriod);
                     highLowForPeriod.setHigh(highestPriceForPeriod);
-
-                    if (startDate.isAfter(LocalDate.now().minusWeeks(3))) {
-                        log.warn("highLowForPeriod {} : {}", highLowPeriod, highLowForPeriod);
-                    }
                     highLowForPeriodPrices.add(highLowForPeriod);
                 }
 
