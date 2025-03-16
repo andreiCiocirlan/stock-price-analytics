@@ -227,5 +227,33 @@ public interface PriceGapsRepository extends JpaRepository<PriceGap, Long> {
             """, nativeQuery = true)
     void saveYearlyPriceGaps(List<String> tickers);
 
-
+    @Modifying
+    @Transactional
+    @Query(value = """
+            with closed_gaps as (
+            	select pg.id from price_gaps pg
+            	join stocks s on s.ticker = pg.ticker
+            	where (pg.timeframe = 'DAILY' AND pg.close between s.d_low and s.d_high)
+            		union all
+            	select pg.id from price_gaps pg
+            	join stocks s on s.ticker = pg.ticker
+            	where (pg.timeframe = 'WEEKLY' AND pg.close between s.w_low and s.w_high)
+            		union all
+            	select pg.id from price_gaps pg
+            	join stocks s on s.ticker = pg.ticker
+            	where (pg.timeframe = 'MONTHLY' AND pg.close between s.m_low and s.m_high)
+            		union all
+            	select pg.id from price_gaps pg
+            	join stocks s on s.ticker = pg.ticker
+            	where (pg.timeframe = 'QUARTERLY' AND pg.close between s.q_low and s.q_high)
+            		union all
+            	select pg.id from price_gaps pg
+            	join stocks s on s.ticker = pg.ticker
+            	where (pg.timeframe = 'YEARLY' AND pg.close between s.y_low and s.y_high)
+            )
+            UPDATE price_gaps
+            set status = 'OPEN'
+            where id in (select id from closed_gaps)
+            """, nativeQuery = true)
+    void closePriceGaps();
 }

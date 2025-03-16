@@ -20,4 +20,7 @@ public class PriceGapsService {
         priceGapsRepository.saveYearlyPriceGaps(tickers);
     }
 
+    public void closePriceGaps() {
+        priceGapsRepository.closePriceGaps();
+    }
 }
