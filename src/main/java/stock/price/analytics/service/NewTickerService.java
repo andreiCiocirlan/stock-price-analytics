@@ -52,6 +52,7 @@ public class NewTickerService {
     private final RestTemplate restTemplate;
     private final StockService stockService;
     private final PricesService pricesService;
+    private final PriceGapsService priceGapsService;
     private final HighLowForPeriodRepository highLowForPeriodRepository;
     private String COOKIE;
 
@@ -63,6 +64,7 @@ public class NewTickerService {
         pricesService.savePrices(htfPricesImported);
         saveHighLowPricesForPeriodFrom(htfPricesImported);
         saveAndUpdateStocksFor(dailyPricesImported, htfPricesImported);
+        priceGapsService.saveAllPriceGapsFor(tickerList);
         // fairValueGapService.saveNewFVGsAndUpdateHighLowAndClosedAllTimeframes(); // make sure to add "where ticker in (...) AND increase findRecentByTimeframe intervals
     }
 
@@ -78,6 +80,7 @@ public class NewTickerService {
         pricesService.savePrices(htfPricesImported);
         saveHighLowPricesForPeriodFrom(htfPricesImported);
         saveAndUpdateStocksFor(dailyPricesImported, htfPricesImported);
+        priceGapsService.saveAllPriceGapsFor(tickerList);
         // fairValueGapService.saveNewFVGsAndUpdateHighLowAndClosedAllTimeframes(); // make sure to add "where ticker in (...) AND increase findRecentByTimeframe intervals
     }
 
