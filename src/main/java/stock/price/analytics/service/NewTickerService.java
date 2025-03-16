@@ -56,7 +56,8 @@ public class NewTickerService {
     private String COOKIE;
 
     public void importFromExistingJSONFor(String tickers) {
-        List<DailyPrice> dailyPricesImported = getDailyPricesFor(tickers);
+        List<String> tickerList = Arrays.stream(tickers.split(",")).toList();
+        List<DailyPrice> dailyPricesImported = getDailyPricesFor(tickerList);
         List<AbstractPrice> htfPricesImported = getHigherTimeframePricesFor(dailyPricesImported);
         pricesService.savePrices(dailyPricesImported);
         pricesService.savePrices(htfPricesImported);
@@ -67,10 +68,11 @@ public class NewTickerService {
 
     // import all data pertaining to the new tickers and create dailyPrices, htfPrices, stocks, highLowPrices etc.
     public void importAllDataFor(String tickers, Double cfdMargin, Boolean shortSell) {
+        List<String> tickerList = Arrays.stream(tickers.split(",")).toList();
         stockService.saveStocks(tickers, Boolean.TRUE, Boolean.TRUE.equals(shortSell), cfdMargin);
         COOKIE = yahooQuoteClient.cookieFromFcYahoo();
         getYahooQuotesAndSaveJSONFileFor(tickers);
-        List<DailyPrice> dailyPricesImported = getDailyPricesFor(tickers);
+        List<DailyPrice> dailyPricesImported = getDailyPricesFor(tickerList);
         pricesService.savePrices(dailyPricesImported);
         List<AbstractPrice> htfPricesImported = getHigherTimeframePricesFor(dailyPricesImported);
         pricesService.savePrices(htfPricesImported);
@@ -123,8 +125,7 @@ public class NewTickerService {
         }
     }
 
-    private List<DailyPrice> getDailyPricesFor(String tickers) {
-        List<String> tickerList = Arrays.stream(tickers.split(",")).toList();
+    private List<DailyPrice> getDailyPricesFor(List<String> tickerList) {
         List<DailyPrice> dailyPricesImported = new ArrayList<>();
 
         try {
