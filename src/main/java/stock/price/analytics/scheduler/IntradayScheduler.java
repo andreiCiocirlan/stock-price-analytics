@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.service.DesktopNotificationService;
 import stock.price.analytics.service.FairValueGapService;
+import stock.price.analytics.service.PriceGapsService;
 
 @Component
 @RequiredArgsConstructor
@@ -15,11 +16,13 @@ public class IntradayScheduler {
     private final FairValueGapService fairValueGapService;
     private final CacheService cacheService;
     private final DesktopNotificationService desktopNotificationService;
+    private final PriceGapsService priceGapsService;
 
     // 10 15,35,55 9-16 * * MON-FRI
-    @Scheduled(cron = "${cron.intraday.fvg.update}", zone = "${cron.timezone}")
-    public void updateFVGsAtIntraday() {
+    @Scheduled(cron = "${cron.intraday.gaps.update}", zone = "${cron.timezone}")
+    public void updateGapsIntraday() {
         fairValueGapService.saveNewFVGsAndUpdateHighLowAndClosedAllTimeframes();
+        priceGapsService.closePriceGaps();
     }
 
     @Schedules({
