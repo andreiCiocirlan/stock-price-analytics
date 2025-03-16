@@ -2,7 +2,7 @@ package stock.price.analytics.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import stock.price.analytics.repository.prices.TickerRenameRepository;
+import stock.price.analytics.repository.stocks.TickerRenameRepository;
 
 @Service
 @RequiredArgsConstructor
