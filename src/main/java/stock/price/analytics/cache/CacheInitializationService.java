@@ -11,7 +11,7 @@ import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.prices.DailyPricesJSONRepository;
 import stock.price.analytics.repository.prices.DailyPricesRepository;
-import stock.price.analytics.repository.prices.HighLowForPeriodRepository;
+import stock.price.analytics.repository.prices.highlow.HighLowForPeriodRepository;
 import stock.price.analytics.repository.stocks.StockRepository;
 
 import java.time.DayOfWeek;

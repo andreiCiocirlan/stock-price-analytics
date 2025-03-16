@@ -14,7 +14,7 @@ import stock.price.analytics.model.prices.highlow.HighLow4w;
 import stock.price.analytics.model.prices.highlow.HighLow52Week;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
-import stock.price.analytics.repository.prices.HighLowForPeriodRepository;
+import stock.price.analytics.repository.prices.highlow.HighLowForPeriodRepository;
 import stock.price.analytics.util.Constants;
 
 import java.io.IOException;

@@ -20,7 +20,7 @@ import stock.price.analytics.model.prices.highlow.HighLow52Week;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.highlow.HighestLowestPrices;
 import stock.price.analytics.model.prices.ohlc.*;
-import stock.price.analytics.repository.prices.HighLowForPeriodRepository;
+import stock.price.analytics.repository.prices.highlow.HighLowForPeriodRepository;
 import stock.price.analytics.util.TradingDateUtil;
 
 import java.io.File;
