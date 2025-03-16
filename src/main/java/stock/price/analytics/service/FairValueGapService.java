@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.model.fvg.FairValueGap;
-import stock.price.analytics.model.fvg.enums.FvgStatus;
+import stock.price.analytics.model.fvg.enums.GapStatus;
 import stock.price.analytics.model.fvg.enums.FvgType;
 import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
@@ -39,7 +39,7 @@ public class FairValueGapService {
         FairValueGap originalFVG = new FairValueGap(fvg);
 
         // Initialize unfilled portions if they are null (first time processing)
-        if (fvg.getStatus() == FvgStatus.OPEN && fvg.getUnfilledLow1() == null) {
+        if (fvg.getStatus() == GapStatus.OPEN && fvg.getUnfilledLow1() == null) {
             fvg.setUnfilledLow1(fvg.getLow());
             fvg.setUnfilledHigh1(fvg.getHigh());
         }
@@ -52,14 +52,14 @@ public class FairValueGapService {
             }
 
             // Check if the FVG is already filled
-            if (fvg.getStatus() == FvgStatus.CLOSED) {
+            if (fvg.getStatus() == GapStatus.CLOSED) {
                 break; // Skip further processing for this FVG
             }
 
             //  Engulfing Scenario
             if (price.getLow() <= fvg.getLow() && price.getHigh() >= fvg.getHigh()) {
                 // Candlestick completely engulfs the original FVG
-                fvg.setStatus(FvgStatus.CLOSED);
+                fvg.setStatus(GapStatus.CLOSED);
                 fvg.setUnfilledLow1(null);
                 fvg.setUnfilledHigh1(null);
                 fvg.setUnfilledLow2(null);
@@ -127,7 +127,7 @@ public class FairValueGapService {
 
             // Check if both unfilled portions are filled
             if (fvg.getUnfilledLow1() == null && fvg.getUnfilledHigh1() == null && fvg.getUnfilledLow2() == null && fvg.getUnfilledHigh2() == null) {
-                fvg.setStatus(FvgStatus.CLOSED);
+                fvg.setStatus(GapStatus.CLOSED);
                 log.info("{} FVG {} {} completely filled", fvg.getTimeframe(), fvg.getId(), fvg.compositeId());
                 break;
             }

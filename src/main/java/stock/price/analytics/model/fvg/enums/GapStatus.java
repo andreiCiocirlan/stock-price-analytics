@@ -1,6 +1,6 @@
 package stock.price.analytics.model.fvg.enums;
 
-public enum FvgStatus {
+public enum GapStatus {
 
     OPEN, CLOSED
 }

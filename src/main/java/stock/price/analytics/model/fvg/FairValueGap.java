@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
-import stock.price.analytics.model.fvg.enums.FvgStatus;
+import stock.price.analytics.model.fvg.enums.GapStatus;
 import stock.price.analytics.model.fvg.enums.FvgType;
 import stock.price.analytics.model.BusinessEntity;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
@@ -43,7 +43,7 @@ public class FairValueGap implements BusinessEntity {
     @Setter
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    private FvgStatus status;
+    private GapStatus status;
 
     @Setter
     @Column(name = "low")
@@ -85,7 +85,7 @@ public class FairValueGap implements BusinessEntity {
         this.unfilledHigh2 = fvg.getUnfilledHigh2();
     }
 
-    public FairValueGap(String ticker, StockTimeframe timeframe, LocalDate date, FvgType type, FvgStatus status, double low, double high) {
+    public FairValueGap(String ticker, StockTimeframe timeframe, LocalDate date, FvgType type, GapStatus status, double low, double high) {
         this.ticker = ticker;
         this.timeframe = timeframe;
         this.date = date;
