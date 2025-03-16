@@ -7,11 +7,9 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.client.yahoo.YahooQuoteClient;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
-import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.prices.ohlc.DailyPricesRepository;
 
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 import static stock.price.analytics.model.prices.enums.IntradayPriceSpike.intradaySpikes;
@@ -41,9 +39,9 @@ public class YahooQuoteService {
 
     @Transactional
     public List<DailyPrice> yahooQuotesImport() {
-        List<Stock> cachedStocks = cacheService.getCachedStocks();
-        List<String> tickersNotImported = new ArrayList<>(cachedStocks.stream().map(Stock::getTicker).toList());
-        List<String> pricesJSONs = logTimeAndReturn(() -> yahooQuoteClient.quotePricesFor(cachedStocks.stream().map(Stock::getTicker).toList()), "Yahoo API call and JSON result");
+        List<String> cachedTickers = cacheService.getCachedTickers();
+        List<String> tickersNotImported = cacheService.getCachedTickers();
+        List<String> pricesJSONs = logTimeAndReturn(() -> yahooQuoteClient.quotePricesFor(cachedTickers), "Yahoo API call and JSON result");
         String pricesJSON = mergedPricesJSONs(pricesJSONs);
         List<DailyPrice> dailyPricesExtractedFromJSON = dailyPricesJSONService.extractDailyPricesFromJSON(pricesJSON);
         List<DailyPrice> dailyImportedPrices = cacheService.cacheAndReturnDailyPrices(dailyPricesExtractedFromJSON);
