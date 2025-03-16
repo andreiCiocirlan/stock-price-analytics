@@ -103,7 +103,7 @@ public class CacheService {
     public List<AbstractPrice> htfPricesFor(StockTimeframe timeframe) {
         return switch (timeframe) {
             case DAILY -> new ArrayList<>(getCachedDailyPrices(REGULAR));
-            case WEEKLY, MONTHLY, QUARTERLY, YEARLY -> higherTimeframePricesCache.htfPricesFor(timeframe);
+            case WEEKLY, MONTHLY, QUARTERLY, YEARLY -> new ArrayList<>(higherTimeframePricesCache.htfPricesFor(timeframe));
         };
     }
 
