@@ -79,13 +79,13 @@ public class PricesService {
         return candles;
     }
 
-    public List<? extends AbstractPrice> findAllPricesFor(StockTimeframe timeframe) {
+    public List<? extends AbstractPrice> findAllPricesFor(List<String> tickers, StockTimeframe timeframe) {
         return switch (timeframe) {
             case DAILY -> dailyPricesRepository.findByDateBetween(DAILY_FVG_MIN_DATE, LocalDate.now());
-            case WEEKLY -> weeklyPricesRepository.findAll();
-            case MONTHLY -> monthlyPricesRepository.findAll();
-            case QUARTERLY -> quarterlyPricesRepository.findAll();
-            case YEARLY -> yearlyPricesRepository.findAll();
+            case WEEKLY -> weeklyPricesRepository.findByTickerIn(tickers);
+            case MONTHLY -> monthlyPricesRepository.findByTickerIn(tickers);
+            case QUARTERLY -> quarterlyPricesRepository.findByTickerIn(tickers);
+            case YEARLY -> yearlyPricesRepository.findByTickerIn(tickers);
         };
     }
 

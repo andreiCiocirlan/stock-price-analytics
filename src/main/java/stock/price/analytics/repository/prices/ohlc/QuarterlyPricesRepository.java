@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface QuarterlyPricesRepository extends JpaRepository<QuarterlyPrice, Long> {
 
+    List<QuarterlyPrice> findByTickerIn(List<String> tickers);
 
     @Query(value = """
                 SELECT *

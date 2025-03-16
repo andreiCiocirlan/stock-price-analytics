@@ -10,6 +10,8 @@ import java.util.List;
 
 public interface MonthlyPricesRepository extends JpaRepository<MonthlyPrice, Long> {
 
+    List<MonthlyPrice> findByTickerIn(List<String> tickers);
+
     @Query(value = """
                 SELECT *
                 FROM monthly_prices

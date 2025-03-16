@@ -10,6 +10,8 @@ import java.util.List;
 
 public interface YearlyPricesRepository extends JpaRepository<YearlyPrice, Long> {
 
+    List<YearlyPrice> findByTickerIn(List<String> tickers);
+
     @Query(value = """
                 SELECT *
                 FROM yearly_prices
@@ -24,5 +26,4 @@ public interface YearlyPricesRepository extends JpaRepository<YearlyPrice, Long>
 
     @Query("SELECT y FROM YearlyPrice y WHERE y.ticker = :ticker AND y.startDate = :date")
     List<YearlyPrice> findYearlyByTickerAndStartDate(String ticker, LocalDate date);
-
 }

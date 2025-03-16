@@ -10,6 +10,8 @@ import java.util.List;
 
 public interface WeeklyPricesRepository extends JpaRepository<WeeklyPrice, Long> {
 
+    List<WeeklyPrice> findByTickerIn(List<String> tickers);
+
     @Query(value = """
                 SELECT *
                 FROM weekly_prices
@@ -24,5 +26,4 @@ public interface WeeklyPricesRepository extends JpaRepository<WeeklyPrice, Long>
 
     @Query("SELECT w FROM WeeklyPrice w WHERE w.ticker = :ticker AND w.startDate = :date")
     List<WeeklyPrice> findWeeklyByTickerAndStartDate(String ticker, LocalDate date);
-
 }
