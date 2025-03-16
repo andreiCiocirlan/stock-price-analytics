@@ -5,9 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
-import stock.price.analytics.model.fvg.enums.GapStatus;
-import stock.price.analytics.model.fvg.enums.FvgType;
 import stock.price.analytics.model.BusinessEntity;
+import stock.price.analytics.model.fvg.enums.FvgType;
+import stock.price.analytics.model.fvg.enums.GapStatus;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 
 import java.time.LocalDate;

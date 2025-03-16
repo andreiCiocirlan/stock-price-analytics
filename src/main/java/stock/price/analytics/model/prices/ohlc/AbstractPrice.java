@@ -5,8 +5,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import stock.price.analytics.model.fvg.FairValueGap;
 import stock.price.analytics.model.BusinessEntity;
+import stock.price.analytics.model.fvg.FairValueGap;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 
 import java.time.LocalDate;
