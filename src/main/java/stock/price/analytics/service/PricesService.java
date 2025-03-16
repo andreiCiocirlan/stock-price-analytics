@@ -12,7 +12,7 @@ import stock.price.analytics.cache.model.*;
 import stock.price.analytics.controller.dto.CandleWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
-import stock.price.analytics.repository.prices.*;
+import stock.price.analytics.repository.prices.ohlc.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

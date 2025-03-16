@@ -8,7 +8,7 @@ import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.client.yahoo.YahooQuoteClient;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.Stock;
-import stock.price.analytics.repository.prices.DailyPricesRepository;
+import stock.price.analytics.repository.prices.ohlc.DailyPricesRepository;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;

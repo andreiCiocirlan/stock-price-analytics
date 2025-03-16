@@ -12,8 +12,8 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.controller.dto.StockWithPrevCloseDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
-import stock.price.analytics.repository.prices.DailyPricesRepository;
-import stock.price.analytics.repository.prices.PricesRepository;
+import stock.price.analytics.repository.prices.ohlc.DailyPricesRepository;
+import stock.price.analytics.repository.prices.ohlc.PricesRepository;
 import stock.price.analytics.util.Constants;
 
 import java.io.IOException;

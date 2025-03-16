@@ -10,7 +10,7 @@ import stock.price.analytics.model.prices.json.DailyPricesJSON;
 import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.prices.json.DailyPricesJSONRepository;
-import stock.price.analytics.repository.prices.DailyPricesRepository;
+import stock.price.analytics.repository.prices.ohlc.DailyPricesRepository;
 import stock.price.analytics.repository.prices.highlow.HighLowForPeriodRepository;
 import stock.price.analytics.repository.stocks.StockRepository;
 

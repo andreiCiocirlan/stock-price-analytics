@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.model.prices.ohlc.CandleOHLC;
 import stock.price.analytics.model.prices.ohlc.MonthlyPrice;
 import stock.price.analytics.model.prices.ohlc.QuarterlyPrice;
-import stock.price.analytics.repository.prices.MonthlyPricesRepository;
-import stock.price.analytics.repository.prices.QuarterlyPricesRepository;
+import stock.price.analytics.repository.prices.ohlc.MonthlyPricesRepository;
+import stock.price.analytics.repository.prices.ohlc.QuarterlyPricesRepository;
 
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
