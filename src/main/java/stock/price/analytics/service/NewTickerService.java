@@ -53,6 +53,7 @@ public class NewTickerService {
     private final StockService stockService;
     private final PricesService pricesService;
     private final PriceGapsService priceGapsService;
+    private final FairValueGapService fairValueGapService;
     private final HighLowForPeriodRepository highLowForPeriodRepository;
     private String COOKIE;
 
@@ -65,7 +66,7 @@ public class NewTickerService {
         saveHighLowPricesForPeriodFrom(htfPricesImported);
         saveAndUpdateStocksFor(dailyPricesImported, htfPricesImported);
         priceGapsService.saveAllPriceGapsFor(tickerList);
-        // fairValueGapService.saveNewFVGsAndUpdateHighLowAndClosedAllTimeframes(); // make sure to add "where ticker in (...) AND increase findRecentByTimeframe intervals
+        fairValueGapService.findNewFVGsAndSaveForAllTimeframes(tickerList, true);
     }
 
     // import all data pertaining to the new tickers and create dailyPrices, htfPrices, stocks, highLowPrices etc.
@@ -81,7 +82,7 @@ public class NewTickerService {
         saveHighLowPricesForPeriodFrom(htfPricesImported);
         saveAndUpdateStocksFor(dailyPricesImported, htfPricesImported);
         priceGapsService.saveAllPriceGapsFor(tickerList);
-        // fairValueGapService.saveNewFVGsAndUpdateHighLowAndClosedAllTimeframes(); // make sure to add "where ticker in (...) AND increase findRecentByTimeframe intervals
+        fairValueGapService.findNewFVGsAndSaveForAllTimeframes(tickerList, true);
     }
 
     private void getYahooQuotesAndSaveJSONFileFor(String tickers) {
