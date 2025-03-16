@@ -106,22 +106,22 @@ class HighLowPricesCache {
     }
 
     List<? extends HighLowForPeriod> cacheForHighLowPeriod(HighLowPeriod highLowPeriod) {
-        return switch (highLowPeriod) {
-            case HIGH_LOW_4W -> new ArrayList<>(highLow4wMap.values());
-            case HIGH_LOW_52W -> new ArrayList<>(highLow52wMap.values());
-            case HIGH_LOW_ALL_TIME -> new ArrayList<>(highestLowestMap.values());
-        };
+        return new ArrayList<>(switch (highLowPeriod) {
+            case HIGH_LOW_4W -> highLow4wMap.values();
+            case HIGH_LOW_52W -> highLow52wMap.values();
+            case HIGH_LOW_ALL_TIME -> highestLowestMap.values();
+        });
     }
 
     List<? extends HighLowForPeriod> cacheForMilestone(PricePerformanceMilestone pricePerformanceMilestone) {
-        return switch (pricePerformanceMilestone) {
-            case HIGH_4W_95, LOW_4W_95 -> new ArrayList<>(highLow4wMap.values());
-            case NEW_4W_HIGH, NEW_4W_LOW -> new ArrayList<>(prevWeekHighLow4wMap.values());
-            case HIGH_52W_95, LOW_52W_95 -> new ArrayList<>(highLow52wMap.values());
-            case NEW_52W_HIGH, NEW_52W_LOW -> new ArrayList<>(prevWeekHighLow52wMap.values());
-            case HIGH_ALL_TIME_95, LOW_ALL_TIME_95 -> new ArrayList<>(highestLowestMap.values());
-            case NEW_ALL_TIME_HIGH, NEW_ALL_TIME_LOW -> new ArrayList<>(prevWeekHighestLowestMap.values());
+        return new ArrayList<>(switch (pricePerformanceMilestone) {
+            case HIGH_4W_95, LOW_4W_95 -> highLow4wMap.values();
+            case NEW_4W_HIGH, NEW_4W_LOW -> prevWeekHighLow4wMap.values();
+            case HIGH_52W_95, LOW_52W_95 -> highLow52wMap.values();
+            case NEW_52W_HIGH, NEW_52W_LOW -> prevWeekHighLow52wMap.values();
+            case HIGH_ALL_TIME_95, LOW_ALL_TIME_95 -> highestLowestMap.values();
+            case NEW_ALL_TIME_HIGH, NEW_ALL_TIME_LOW -> prevWeekHighestLowestMap.values();
             case NONE -> throw new IllegalStateException("Unexpected value NONE");
-        };
+        });
     }
 }
