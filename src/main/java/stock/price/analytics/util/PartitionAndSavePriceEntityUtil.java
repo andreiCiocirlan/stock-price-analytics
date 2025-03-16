@@ -3,7 +3,7 @@ package stock.price.analytics.util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
-import stock.price.analytics.model.prices.BusinessEntity;
+import stock.price.analytics.model.BusinessEntity;
 
 import java.util.ArrayList;
 import java.util.List;

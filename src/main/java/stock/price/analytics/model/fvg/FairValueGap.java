@@ -7,7 +7,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import stock.price.analytics.model.fvg.enums.FvgStatus;
 import stock.price.analytics.model.fvg.enums.FvgType;
-import stock.price.analytics.model.prices.BusinessEntity;
+import stock.price.analytics.model.BusinessEntity;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 
 import java.time.LocalDate;

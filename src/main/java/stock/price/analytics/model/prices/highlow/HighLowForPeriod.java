@@ -7,7 +7,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.springframework.format.annotation.DateTimeFormat;
-import stock.price.analytics.model.prices.BusinessEntity;
+import stock.price.analytics.model.BusinessEntity;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 
