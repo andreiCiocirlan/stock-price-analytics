@@ -46,7 +46,7 @@ public class Application implements ApplicationRunner {
         if (isFirstImportFor(StockTimeframe.WEEKLY, latestDailyPriceImportDate)) {
             stockService.updateHighLowForPeriodFromHLCachesAndAdjustWeekend();
         }
-        logTime(cacheInitializationService::initLatestTwoDaysPricesCache, "initialized latest two days prices cache");
+        logTime(cacheInitializationService::initLatestDailyPricesCache, "initialized latest daily prices cache");
         logTime(cacheInitializationService::initDailyJSONPricesCache, "initialized daily JSON prices cache");
         logTime(cacheInitializationService::initializePreMarketDailyPrices, "initialized pre-market daily prices cache");
     }

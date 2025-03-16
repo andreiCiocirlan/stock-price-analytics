@@ -22,7 +22,6 @@ class DailyPricesCache {
     private final List<String> inconsistentHighs = new ArrayList<>();
     private final Map<String, DailyPrice> preMarketDailyPricesByTicker = new HashMap<>();
     private final Map<String, DailyPrice> dailyPricesByTicker = new HashMap<>();
-    private final Map<String, DailyPrice> previousDayPricesByTicker = new HashMap<>();
 
     void addDailyPrices(List<DailyPrice> dailyPrices, MarketState marketState) {
         if (PRE == marketState) {
@@ -64,14 +63,6 @@ class DailyPricesCache {
             return new ArrayList<>(preMarketDailyPricesByTicker.values());
         }
         return new ArrayList<>(dailyPricesByTicker.values());
-    }
-
-    void addPreviousDayPrices(List<DailyPrice> previousDayPrices) {
-        previousDayPrices.forEach(price -> previousDayPricesByTicker.put(price.getTicker(), price));
-    }
-
-    List<DailyPrice> previousDailyPrices() {
-        return new ArrayList<>(previousDayPricesByTicker.values());
     }
 
     // utility method to find inconsistencies between imported high-low prices and already stored prices

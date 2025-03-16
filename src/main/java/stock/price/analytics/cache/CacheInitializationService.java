@@ -63,24 +63,8 @@ public class CacheInitializationService {
         dailyPricesCache.addDailyPrices(latestPreMarketDailyPrices, PRE);
     }
 
-    public void initLatestTwoDaysPricesCache() {
-        List<DailyPrice> latestPrices = new ArrayList<>();
-        List<DailyPrice> previousDayPrices = new ArrayList<>();
-
-        dailyPricesRepository.findLatestTwoDailyPrices().stream()
-                .sorted(Comparator.comparing(DailyPrice::getDate).reversed())
-                .collect(Collectors.groupingBy(DailyPrice::getTicker))
-                .forEach((_, dailyPrices) -> {
-                    if (!dailyPrices.isEmpty()) {
-                        latestPrices.add(dailyPrices.getFirst()); // Latest day
-                    }
-                    if (dailyPrices.size() > 1) {
-                        previousDayPrices.add(dailyPrices.get(1)); // Previous day
-                    }
-                });
-
-        dailyPricesCache.addDailyPrices(latestPrices, REGULAR);
-        dailyPricesCache.addPreviousDayPrices(previousDayPrices);
+    public void initLatestDailyPricesCache() {
+        dailyPricesCache.addDailyPrices(dailyPricesRepository.findLatestDailyPrices(), REGULAR);
     }
 
     public void initHighLowPricesCache(LocalDate latestDailyPriceImportDate) {

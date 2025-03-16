@@ -31,9 +31,9 @@ public interface DailyPricesRepository extends JpaRepository<DailyPrice, Long> {
             )
             SELECT id, open, high, low, close, ticker, date, performance
             FROM latest_prices
-            WHERE row_num <= 2;
+            WHERE row_num = 1;
             """, nativeQuery = true)
-    List<DailyPrice> findLatestTwoDailyPrices();
+    List<DailyPrice> findLatestDailyPrices();
 
     List<DailyPrice> findByTickerAndDateLessThan(String ticker, LocalDate date);
 
