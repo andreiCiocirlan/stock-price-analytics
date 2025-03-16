@@ -91,6 +91,10 @@ public class CacheService {
         return getStocksMap().values().stream().toList();
     }
 
+    public List<String> getCachedTickers() {
+        return getStocksMap().values().stream().map(Stock::getTicker).toList();
+    }
+
     public void addStocks(List<Stock> stocks) {
         stocksCache.addStocks(stocks);
     }
