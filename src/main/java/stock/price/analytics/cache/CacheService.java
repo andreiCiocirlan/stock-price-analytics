@@ -21,6 +21,7 @@ import java.util.Map;
 
 import static java.util.Collections.emptySet;
 import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
+import static stock.price.analytics.model.stocks.enums.MarketState.REGULAR;
 
 @Slf4j
 @Service
@@ -100,7 +101,10 @@ public class CacheService {
     }
 
     public List<AbstractPrice> htfPricesFor(StockTimeframe timeframe) {
-        return higherTimeframePricesCache.htfPricesFor(timeframe);
+        return switch (timeframe) {
+            case DAILY -> new ArrayList<>(getCachedDailyPrices(REGULAR));
+            case WEEKLY, MONTHLY, QUARTERLY, YEARLY -> higherTimeframePricesCache.htfPricesFor(timeframe);
+        };
     }
 
     public List<PriceWithPrevClose> htfPricesWithPrevCloseFor(List<String> tickers, StockTimeframe timeframe) {

@@ -47,12 +47,6 @@ public class PricesService {
     private final YearlyPricesRepository yearlyPricesRepository;
     private final CacheService cacheService;
 
-    public List<AbstractPrice> htfPricesFor(StockTimeframe timeframe) {
-        return switch (timeframe) {
-            case DAILY -> new ArrayList<>(cacheService.getCachedDailyPrices(REGULAR));
-            case WEEKLY, MONTHLY, QUARTERLY, YEARLY -> cacheService.htfPricesFor(timeframe);
-        };
-    }
 
     @SuppressWarnings("unchecked")
     public List<stock.price.analytics.model.prices.ohlc.AbstractPrice> previousThreePricesFor(List<String> tickers, StockTimeframe timeframe) {

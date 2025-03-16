@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.controller.dto.CandleWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
@@ -21,6 +22,7 @@ import static stock.price.analytics.util.Constants.HIGHER_TIMEFRAMES_PATTERN;
 public class PricesController {
 
     private final PricesService pricesService;
+    private final CacheService cacheService;
 
     @GetMapping("/prices")
     public List<CandleWithDateDTO> pricesFor(@RequestParam("ticker") String ticker, @RequestParam("timeFrame") String timeFrame) {
@@ -29,7 +31,7 @@ public class PricesController {
 
     @GetMapping("/htf-prices")
     public List<AbstractPrice> htfPricesFor(@RequestParam(required = false, value = "ticker") String ticker, @RequestParam("timeFrame") String timeFrame) {
-        return pricesService.htfPricesFor(StockTimeframe.valueOf(timeFrame)).stream()
+        return cacheService.htfPricesFor(StockTimeframe.valueOf(timeFrame)).stream()
                 .filter(p -> ticker == null || p.getTicker().equals(ticker))
                 .toList();
     }

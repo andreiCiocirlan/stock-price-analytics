@@ -31,8 +31,8 @@ import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partiti
 public class FairValueGapService {
 
     private final FVGRepository fvgRepository;
-    private final PricesService pricesService;
     private final FVGTaggedService fvgTaggedService;
+    private final CacheService cacheService;
 
     private boolean updateUnfilledGapsHighLowAndStatus(FairValueGap fvg, List<AbstractPrice> pricesForTicker) {
         // copy original state and compare at the end
@@ -198,7 +198,7 @@ public class FairValueGapService {
         Map<String, FairValueGap> updatedFVGsByCompositeId = new HashMap<>();
         List<FairValueGap> recentFVGs = findRecentByTimeframe(timeframe); // existing recent FVGs (to update high-low)
         Map<String, FairValueGap> dbFVGsByCompositeId = fvgRepository.findByTimeframe(timeframe.name()).stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
-        Map<String, List<AbstractPrice>> pricesByTicker = pricesService.htfPricesFor(timeframe).stream().collect(Collectors.groupingBy(AbstractPrice::getTicker));
+        Map<String, List<AbstractPrice>> pricesByTicker = cacheService.htfPricesFor(timeframe).stream().collect(Collectors.groupingBy(AbstractPrice::getTicker));
 
         Map<String, FairValueGap> currentFVGsByCompositeId = recentFVGs.stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
         currentFVGsByCompositeId.forEach((compositeKey, fvg) -> {
