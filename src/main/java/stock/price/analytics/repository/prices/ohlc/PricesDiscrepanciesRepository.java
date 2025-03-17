@@ -105,14 +105,14 @@ public interface PricesDiscrepanciesRepository extends PricesRepository {
                 WHERE rn = 1
             ),
             PricesToUpdate as (
-                select wp.ticker, md.month_start, md.open from m_daily md
-                join monthly_prices wp on wp.ticker = md.ticker and wp.start_date = md.month_start
-                where round(wp.open::numeric, 2) <> round(md.open::numeric, 2)
+                select mp.ticker, md.month_start, md.open from m_daily md
+                join monthly_prices mp on mp.ticker = md.ticker and mp.start_date = md.month_start
+                where round(mp.open::numeric, 2) <> round(md.open::numeric, 2)
             )
-            UPDATE monthly_prices wp
+            UPDATE monthly_prices mp
             SET open = pu.open
             FROM PricesToUpdate pu
-            WHERE wp.ticker = pu.ticker AND wp.start_date = pu.month_start;
+            WHERE mp.ticker = pu.ticker AND mp.start_date = pu.month_start;
             """, nativeQuery = true)
     void updateMonthlyPricesWithOpeningPriceDiscrepancy();
 
@@ -135,14 +135,14 @@ public interface PricesDiscrepanciesRepository extends PricesRepository {
                 WHERE rn = 1
             ),
             PricesToUpdate as (
-                select wp.ticker, md.quarter_start, md.open from m_daily md
-                join quarterly_prices wp on wp.ticker = md.ticker and wp.start_date = md.quarter_start
-                where round(wp.open::numeric, 2) <> round(md.open::numeric, 2)
+                select qp.ticker, md.quarter_start, md.open from m_daily md
+                join quarterly_prices qp on qp.ticker = md.ticker and qp.start_date = md.quarter_start
+                where round(qp.open::numeric, 2) <> round(md.open::numeric, 2)
             )
-            UPDATE quarterly_prices wp
+            UPDATE quarterly_prices qp
             SET open = pu.open
             FROM PricesToUpdate pu
-            WHERE wp.ticker = pu.ticker AND wp.start_date = pu.quarter_start;
+            WHERE qp.ticker = pu.ticker AND qp.start_date = pu.quarter_start;
             """, nativeQuery = true)
     void updateQuarterlyPricesWithOpeningPriceDiscrepancy();
 
@@ -165,14 +165,14 @@ public interface PricesDiscrepanciesRepository extends PricesRepository {
                 WHERE rn = 1
             ),
             PricesToUpdate as (
-                select wp.ticker, md.year_start, md.open from m_daily md
-                join yearly_prices wp on wp.ticker = md.ticker and wp.start_date = md.year_start
-                where round(wp.open::numeric, 2) <> round(md.open::numeric, 2)
+                select yp.ticker, md.year_start, md.open from m_daily md
+                join yearly_prices yp on yp.ticker = md.ticker and yp.start_date = md.year_start
+                where round(yp.open::numeric, 2) <> round(md.open::numeric, 2)
             )
-            UPDATE yearly_prices wp
+            UPDATE yearly_prices yp
             SET open = pu.open
             FROM PricesToUpdate pu
-            WHERE wp.ticker = pu.ticker AND wp.start_date = pu.year_start;
+            WHERE yp.ticker = pu.ticker AND yp.start_date = pu.year_start;
             """, nativeQuery = true)
     void updateYearlyPricesWithOpeningPriceDiscrepancy();
 }
