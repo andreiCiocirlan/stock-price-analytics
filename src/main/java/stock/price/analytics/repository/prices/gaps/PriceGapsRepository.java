@@ -252,7 +252,7 @@ public interface PriceGapsRepository extends JpaRepository<PriceGap, Long> {
             	where (pg.timeframe = 'YEARLY' AND pg.close between s.y_low and s.y_high)
             )
             UPDATE price_gaps
-            set status = 'OPEN'
+            set status = 'CLOSED'
             where id in (select id from closed_gaps)
             """, nativeQuery = true)
     void closePriceGaps();
