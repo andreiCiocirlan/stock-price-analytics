@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 import static java.nio.file.Files.readAllLines;
 import static stock.price.analytics.util.Constants.MAX_TICKER_COUNT_PRINT;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
-import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveNoLogging;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
@@ -106,7 +105,7 @@ public class DailyPricesJSONService {
         }
         List<DailyPricesJSON> dailyPricesJSONSInCache = cacheService.cacheAndReturnDailyPricesJSON(dailyJSONPrices);
         if (!dailyPricesJSONSInCache.isEmpty()) {
-            partitionDataAndSaveNoLogging(dailyPricesJSONSInCache, dailyPricesJSONRepository);
+            partitionDataAndSaveWithLogTime(dailyPricesJSONSInCache, dailyPricesJSONRepository, "saved " + dailyPricesJSONSInCache.size() +  " daily json prices");
         }
 
         return dailyPricesJSONSInCache;
@@ -188,17 +187,26 @@ public class DailyPricesJSONService {
         if (recentJsonPricesById.containsKey(key)) {
             DailyPricesJSON storedDailyPriceJSON = recentJsonPricesById.get(key);
             Pair<Double, Double> highLowPrices = getHighLowImportedPrices(importedDailyPriceJSON, storedDailyPriceJSON);
-            DailyPricesJSON updatedPrice = storedDailyPriceJSON.updateFrom(importedDailyPriceJSON);
-            updatedPrice.setRegularMarketDayHigh(highLowPrices.getLeft());
-            updatedPrice.setRegularMarketDayLow(highLowPrices.getRight());
-            if (importedDailyPriceJSON.getPreMarketPrice() != 0d) { // add to pre-market prices (to be cached)
-                preMarketPrices.add(updatedPrice.convertToDailyPrice(true));
-            } else if (storedDailyPriceJSON.differentPrices(importedDailyPriceJSON)) { // compare OHLC, performance, or if pre-market price
-                dailyJSONPrices.add(updatedPrice);
+            if (ticker.equals("TTD")) {
+                log.warn("recentJsonPricesById.containsKey(key) storedDailyPriceJSON {}", storedDailyPriceJSON.getRegularMarketPrice());
+                log.warn("recentJsonPricesById.containsKey(key) importedDailyPriceJSON {}", importedDailyPriceJSON.getRegularMarketPrice());
+            }
+            if (importedDailyPriceJSON.getPreMarketPrice() != 0d || storedDailyPriceJSON.differentPrices(importedDailyPriceJSON)) { // compare OHLC, performance, or if pre-market price
+                DailyPricesJSON updatedPrice = storedDailyPriceJSON.updateFrom(importedDailyPriceJSON);
+                updatedPrice.setRegularMarketDayHigh(highLowPrices.getLeft());
+                updatedPrice.setRegularMarketDayLow(highLowPrices.getRight());
+                if (importedDailyPriceJSON.getPreMarketPrice() != 0d) { // add to pre-market prices (to be cached)
+                    preMarketPrices.add(updatedPrice.convertToDailyPrice(true));
+                } else { // add to imported json prices (to be stored)
+                    dailyJSONPrices.add(updatedPrice);
+                }
             } else {
                 sameDailyPrices.add(ticker);
             }
         } else {
+            if (ticker.equals("TTD")) {
+                log.warn("not in cache : importedDailyPriceJSON {}", importedDailyPriceJSON.getRegularMarketPrice());
+            }
             dailyJSONPrices.add(importedDailyPriceJSON);
         }
     }
