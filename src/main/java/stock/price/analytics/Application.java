@@ -42,6 +42,7 @@ public class Application implements ApplicationRunner {
         }
         logTime(() -> cacheInitializationService.initializeStocks(stocks), "initialized xtb stocks cache");
         LocalDate latestDailyPriceImportDate = stockService.findLastUpdate(); // find last update from stocksCache
+        logTime(() -> cacheInitializationService.initializeLatestImportDate(latestDailyPriceImportDate), "initialized latest import date cache");
         logTime(() -> cacheInitializationService.initHighLowPricesCache(latestDailyPriceImportDate), "initialized high low prices cache");
         if (isFirstImportFor(StockTimeframe.WEEKLY, latestDailyPriceImportDate)) {
             stockService.updateHighLowForPeriodFromHLCachesAndAdjustWeekend();

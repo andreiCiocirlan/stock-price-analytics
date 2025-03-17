@@ -137,6 +137,10 @@ public class CacheInitializationService {
         findDelistedStocksAndUpdate();
     }
 
+    public void initializeLatestImportDate(LocalDate latestDailyPriceImportDate) {
+        stocksCache.setLatestImportDate(latestDailyPriceImportDate);
+    }
+
     private void findDelistedStocksAndUpdate() {
         List<Stock> delistedStocks = stocksCache.getStocksMap().values().stream()
                 .filter(stock -> stock.getLastUpdated().isBefore(LocalDate.now().minusDays(5)))

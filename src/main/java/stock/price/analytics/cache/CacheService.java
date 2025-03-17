@@ -15,6 +15,7 @@ import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.model.stocks.enums.MarketState;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -94,6 +95,10 @@ public class CacheService {
 
     public void addStocks(List<Stock> stocks) {
         stocksCache.addStocks(stocks);
+    }
+
+    public LocalDate getLatestImportDate() {
+        return stocksCache.getLatestImportDate();
     }
 
     public List<AbstractPrice> htfPricesFor(StockTimeframe timeframe) {
