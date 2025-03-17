@@ -72,24 +72,24 @@ public interface StockDiscrepanciesRepository extends StockRepository {
     @Query(value = """
             SELECT s.*
             FROM public.stocks s
-            JOIN monthly_prices wp ON wp.start_date = DATE_TRUNC('month', s.last_updated) AND wp.ticker = s.ticker
-            WHERE s.delisted_date IS NULL AND (wp.open <> s.m_open)
+            JOIN monthly_prices mp ON mp.start_date = DATE_TRUNC('month', s.last_updated) AND mp.ticker = s.ticker
+            WHERE s.delisted_date IS NULL AND (mp.open <> s.m_open)
             """, nativeQuery = true)
     List<Stock> findStocksWithMonthlyOpeningDiscrepancy();
 
     @Query(value = """
             SELECT s.*
             FROM public.stocks s
-            JOIN quarterly_prices wp ON wp.start_date = DATE_TRUNC('quarter', s.last_updated) AND wp.ticker = s.ticker
-            WHERE s.delisted_date IS NULL AND (wp.open <> s.q_open)
+            JOIN quarterly_prices qp ON qp.start_date = DATE_TRUNC('quarter', s.last_updated) AND qp.ticker = s.ticker
+            WHERE s.delisted_date IS NULL AND (qp.open <> s.q_open)
             """, nativeQuery = true)
     List<Stock> findStocksWithQuarterlyOpeningDiscrepancy();
 
     @Query(value = """
             SELECT s.*
             FROM public.stocks s
-            JOIN yearly_prices wp ON wp.start_date = DATE_TRUNC('year', s.last_updated) AND wp.ticker = s.ticker
-            WHERE s.delisted_date IS NULL AND (wp.open <> s.y_open)
+            JOIN yearly_prices yp ON yp.start_date = DATE_TRUNC('year', s.last_updated) AND yp.ticker = s.ticker
+            WHERE s.delisted_date IS NULL AND (yp.open <> s.y_open)
             """, nativeQuery = true)
     List<Stock> findStocksWithYearlyOpeningDiscrepancy();
 
@@ -112,10 +112,10 @@ public interface StockDiscrepanciesRepository extends StockRepository {
     @Transactional
     @Query(value = """
             WITH discrepancies AS (
-                SELECT s.ticker, wp.open
+                SELECT s.ticker, mp.open
                 FROM public.stocks s
-                JOIN monthly_prices wp ON wp.start_date = DATE_TRUNC('month', s.last_updated) AND wp.ticker = s.ticker
-                WHERE s.delisted_date IS NULL AND (wp.open <> s.m_open)
+                JOIN monthly_prices mp ON mp.start_date = DATE_TRUNC('month', s.last_updated) AND mp.ticker = s.ticker
+                WHERE s.delisted_date IS NULL AND (mp.open <> s.m_open)
             )
             UPDATE stocks s SET m_open = dscr.open
             FROM discrepancies dscr
@@ -127,10 +127,10 @@ public interface StockDiscrepanciesRepository extends StockRepository {
     @Transactional
     @Query(value = """
             WITH discrepancies AS (
-                SELECT s.ticker, wp.open
+                SELECT s.ticker, qp.open
                 FROM public.stocks s
-                JOIN quarterly_prices wp ON wp.start_date = DATE_TRUNC('quarter', s.last_updated) AND wp.ticker = s.ticker
-                WHERE s.delisted_date IS NULL AND (wp.open <> s.q_open)
+                JOIN quarterly_prices qp ON qp.start_date = DATE_TRUNC('quarter', s.last_updated) AND qp.ticker = s.ticker
+                WHERE s.delisted_date IS NULL AND (qp.open <> s.q_open)
             )
             UPDATE stocks s SET q_open = dscr.open
             FROM discrepancies dscr
@@ -142,10 +142,10 @@ public interface StockDiscrepanciesRepository extends StockRepository {
     @Transactional
     @Query(value = """
             WITH discrepancies AS (
-                SELECT s.ticker, wp.open
+                SELECT s.ticker, yp.open
                 FROM public.stocks s
-                JOIN yearly_prices wp ON wp.start_date = DATE_TRUNC('year', s.last_updated) AND wp.ticker = s.ticker
-                WHERE s.delisted_date IS NULL AND (wp.open <> s.y_open)
+                JOIN yearly_prices yp ON yp.start_date = DATE_TRUNC('year', s.last_updated) AND yp.ticker = s.ticker
+                WHERE s.delisted_date IS NULL AND (yp.open <> s.y_open)
             )
             UPDATE stocks s SET y_open = dscr.open
             FROM discrepancies dscr
