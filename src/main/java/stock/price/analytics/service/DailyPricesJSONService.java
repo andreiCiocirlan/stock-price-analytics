@@ -70,6 +70,7 @@ public class DailyPricesJSONService {
     public List<DailyPricesJSON> extractDailyJSONPricesAndSave(List<DailyPricesJSON> dailyPricesJSON, List<DailyPricesJSON> recentJsonPrices) {
         List<String> sameDailyPrices = new ArrayList<>();
         List<DailyPricesJSON> dailyJSONPrices = new ArrayList<>();
+        List<DailyPrice> preMarketPrices = new ArrayList<>();
         Map<String, DailyPricesJSON> recentJsonPricesById = recentJsonPrices.stream().collect(Collectors.toMap(DailyPricesJSON::getCompositeId, p -> p));
         LocalDate tradingDateNow = tradingDateNow();
         for (DailyPricesJSON dailyPriceJson : dailyPricesJSON) {
@@ -88,7 +89,11 @@ public class DailyPricesJSONService {
                     log.warn("Extracting stock daily prices for ticker {} and date {}", ticker, tradingDate);
                 }
             }
-            compareAndAddToList(dailyPriceJson, recentJsonPricesById, dailyJSONPrices, sameDailyPrices, ticker);
+            compareAndAddToList(dailyPriceJson, recentJsonPricesById, dailyJSONPrices, preMarketPrices, sameDailyPrices, ticker);
+        }
+
+        if (!preMarketPrices.isEmpty()) {
+            cacheService.addPreMarketDailyPrices(preMarketPrices);
         }
 
         logInconsistentHighLowImportedPrices();
@@ -132,15 +137,6 @@ public class DailyPricesJSONService {
     public List<DailyPrice> extractDailyPricesFromJSON(String pricesJSON) {
         List<DailyPricesJSON> dailyPricesJSON = dailyPricesJSONFrom(pricesJSON);
 
-        // Cache premarket prices if during pre-market hours
-        List<DailyPrice> preMarketPrices = dailyPricesJSON.stream()
-                .filter(dp -> dp.getPreMarketPrice() != 0d)
-                .map(dp -> dp.convertToDailyPrice(true))
-                .toList();
-
-        if (!preMarketPrices.isEmpty()) {
-            cacheService.addPreMarketDailyPrices(preMarketPrices);
-        }
         return dailyPricesFrom(dailyPricesJSON);
     }
 
@@ -159,6 +155,7 @@ public class DailyPricesJSONService {
     public List<DailyPricesJSON> extractAllDailyPricesJSONFrom(List<DailyPricesJSON> dailyPricesJSON, List<DailyPricesJSON> recentJsonPrices) {
         List<String> sameDailyPrices = new ArrayList<>();
         List<DailyPricesJSON> dailyJSONPrices = new ArrayList<>();
+        List<DailyPrice> preMarketPrices = new ArrayList<>();
         Map<String, DailyPricesJSON> recentJsonPricesById = recentJsonPrices.stream().collect(Collectors.toMap(DailyPricesJSON::getCompositeId, p -> p));
 
         for (DailyPricesJSON dailyPriceJson : dailyPricesJSON) {
@@ -168,7 +165,10 @@ public class DailyPricesJSONService {
                 log.warn("trading date missing from json file for ticker {}", ticker);
                 continue;
             }
-            compareAndAddToList(dailyPriceJson, recentJsonPricesById, dailyJSONPrices, sameDailyPrices, ticker);
+            compareAndAddToList(dailyPriceJson, recentJsonPricesById, dailyJSONPrices, preMarketPrices, sameDailyPrices, ticker);
+        }
+        if (!preMarketPrices.isEmpty()) {
+            cacheService.addPreMarketDailyPrices(preMarketPrices);
         }
 
         if (!sameDailyPrices.isEmpty()) {
@@ -183,15 +183,17 @@ public class DailyPricesJSONService {
         return dailyJSONPrices;
     }
 
-    private void compareAndAddToList(DailyPricesJSON importedDailyPriceJSON, Map<String, DailyPricesJSON> recentJsonPricesById, List<DailyPricesJSON> dailyJSONPrices, List<String> sameDailyPrices, String ticker) {
+    private void compareAndAddToList(DailyPricesJSON importedDailyPriceJSON, Map<String, DailyPricesJSON> recentJsonPricesById, List<DailyPricesJSON> dailyJSONPrices, List<DailyPrice> preMarketPrices, List<String> sameDailyPrices, String ticker) {
         String key = importedDailyPriceJSON.getCompositeId();
         if (recentJsonPricesById.containsKey(key)) {
             DailyPricesJSON storedDailyPriceJSON = recentJsonPricesById.get(key);
             Pair<Double, Double> highLowPrices = getHighLowImportedPrices(importedDailyPriceJSON, storedDailyPriceJSON);
-            if (importedDailyPriceJSON.getPreMarketPrice() != 0d || storedDailyPriceJSON.differentPrices(importedDailyPriceJSON)) { // compare OHLC, performance, or if pre-market price
-                DailyPricesJSON updatedPrice = storedDailyPriceJSON.updateFrom(importedDailyPriceJSON);
-                updatedPrice.setRegularMarketDayHigh(highLowPrices.getLeft());
-                updatedPrice.setRegularMarketDayLow(highLowPrices.getRight());
+            DailyPricesJSON updatedPrice = storedDailyPriceJSON.updateFrom(importedDailyPriceJSON);
+            updatedPrice.setRegularMarketDayHigh(highLowPrices.getLeft());
+            updatedPrice.setRegularMarketDayLow(highLowPrices.getRight());
+            if (importedDailyPriceJSON.getPreMarketPrice() != 0d) { // add to pre-market prices (to be cached)
+                preMarketPrices.add(updatedPrice.convertToDailyPrice(true));
+            } else if (storedDailyPriceJSON.differentPrices(importedDailyPriceJSON)) { // compare OHLC, performance, or if pre-market price
                 dailyJSONPrices.add(updatedPrice);
             } else {
                 sameDailyPrices.add(ticker);
