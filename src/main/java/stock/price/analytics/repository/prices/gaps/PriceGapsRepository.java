@@ -7,8 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import stock.price.analytics.model.prices.gaps.PriceGap;
 
-import java.util.List;
-
 @Repository
 public interface PriceGapsRepository extends JpaRepository<PriceGap, Long> {
 
