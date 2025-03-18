@@ -97,7 +97,6 @@ public class PriceGapsService {
             FROM unfilled_gaps;
             """;
 
-        log.info("QUERY {}", query);
         int rowsAffected = entityManager.createNativeQuery(query).executeUpdate();
         log.info("saved {} rows for {} price gaps", rowsAffected, timeframe);
     }
