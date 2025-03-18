@@ -43,7 +43,7 @@ public class PriceGapsService {
         String dbTable = timeframe.dbTableOHLC();
         String dateColumn = timeframe == StockTimeframe.DAILY ? "date" : "start_date";
         String dateTruncPeriod = timeframe.toDateTruncPeriod();
-        int lookBackCount = cacheService.isFirstImportFor(StockTimeframe.WEEKLY) ? 4 : 1;
+        int lookBackCount = timeframe == StockTimeframe.DAILY && cacheService.isFirstImportFor(StockTimeframe.WEEKLY) ? 4 : 1;
         if (allHistoricalData) {
             lookBackCount = switch (timeframe) {
                 case DAILY -> 1000;
