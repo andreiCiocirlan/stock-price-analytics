@@ -1,9 +1,12 @@
 package stock.price.analytics.cache;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
+import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.enums.MarketState;
 
@@ -18,6 +21,8 @@ import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
 @Component
 class DailyPricesCache {
 
+    @Setter @Getter
+    private Map<StockTimeframe, Boolean> firstImportForTimeframe = new HashMap<>();
     private final List<String> inconsistentLows = new ArrayList<>();
     private final List<String> inconsistentHighs = new ArrayList<>();
     private final Map<String, DailyPrice> preMarketDailyPricesByTicker = new HashMap<>();

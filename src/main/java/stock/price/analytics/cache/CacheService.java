@@ -45,6 +45,10 @@ public class CacheService {
         return dailyPricesJSONCache.addDailyPricesJSONInCacheAndReturn(dailyPricesJSON);
     }
 
+    public boolean isFirstImportFor(StockTimeframe timeframe) {
+        return dailyPricesCache.getFirstImportForTimeframe().get(timeframe);
+    }
+
     public List<DailyPrice> cacheAndReturnDailyPrices(List<DailyPrice> dailyPrices) {
         return dailyPricesCache.addDailyPricesInCacheAndReturn(dailyPrices);
     }
@@ -95,10 +99,6 @@ public class CacheService {
 
     public void addStocks(List<Stock> stocks) {
         stocksCache.addStocks(stocks);
-    }
-
-    public LocalDate getLatestImportDate() {
-        return stocksCache.getLatestImportDate();
     }
 
     public List<AbstractPrice> htfPricesFor(StockTimeframe timeframe) {

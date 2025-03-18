@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.prices.enums.StockTimeframe.DAILY;
 import static stock.price.analytics.model.prices.enums.StockTimeframe.higherTimeframes;
-import static stock.price.analytics.model.stocks.enums.MarketState.REGULAR;
 import static stock.price.analytics.util.Constants.DAILY_FVG_MIN_DATE;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
@@ -57,6 +56,26 @@ public class PricesService {
             case QUARTERLY -> quarterlyPricesRepository.findPreviousThreeQuarterlyPricesForTickers(tickers);
             case YEARLY -> yearlyPricesRepository.findPreviousThreeYearlyPricesForTickers(tickers);
         });
+    }
+
+    public boolean isFirstImportFor(StockTimeframe timeframe) {
+        String timeframePeriod = timeframe.toDateTruncPeriod();
+        String query = STR."""
+                SELECT
+                    CASE
+                        WHEN COUNT(*) IN (0) THEN TRUE
+                        ELSE FALSE
+                    END AS result
+                FROM
+                    daily_prices
+                WHERE
+                    ticker = 'AAPL'
+                    AND date_trunc('\{timeframePeriod}', date) = date_trunc('\{timeframePeriod}', current_date);
+                """;
+
+        Query nativeQuery = entityManager.createNativeQuery(query, Boolean.class);
+
+        return (Boolean) nativeQuery.getResultList().getFirst();
     }
 
     public List<CandleWithDateDTO> findFor(String ticker, StockTimeframe timeframe) {

@@ -11,8 +11,6 @@ import stock.price.analytics.service.DesktopNotificationService;
 import stock.price.analytics.service.DiscrepanciesService;
 import stock.price.analytics.service.PriceGapsService;
 
-import static stock.price.analytics.util.TradingDateUtil.isFirstImportFor;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -45,14 +43,17 @@ public class EndOfDayScheduler {
 
         // update opening prices for first import of the week, month, quarter, year
         for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
-            if (isFirstImportFor(timeframe, cacheService.getLatestImportDate())) {
+            if (cacheService.isFirstImportFor(timeframe)) {
                 log.warn("Updating {} opening prices for stocks, OHLC tables", timeframe);
                 discrepanciesService.updateHTFOpeningPricesDiscrepancyFor(timeframe);
                 discrepanciesService.updateStocksWithOpeningPriceDiscrepancyFor(timeframe);
+                priceGapsService.savePriceGapsTodayFor(cacheService.getCachedTickers(), timeframe);
             }
         }
         // close price gaps at EOD
         priceGapsService.closePriceGaps();
+        // save daily price gaps at EOD
+        priceGapsService.savePriceGapsTodayFor(cacheService.getCachedTickers(), StockTimeframe.DAILY);
     }
 
 }

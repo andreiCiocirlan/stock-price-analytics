@@ -7,6 +7,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import stock.price.analytics.cache.CacheInitializationService;
+import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.stocks.StockRepository;
@@ -17,7 +18,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static stock.price.analytics.util.LoggingUtil.logTime;
-import static stock.price.analytics.util.TradingDateUtil.isFirstImportFor;
 
 @RequiredArgsConstructor
 @SpringBootApplication
@@ -27,6 +27,7 @@ public class Application implements ApplicationRunner {
     private final StockService stockService;
     private final PricesService pricesService;
     private final CacheInitializationService cacheInitializationService;
+    private final CacheService cacheService;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -35,6 +36,12 @@ public class Application implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
+        for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
+            boolean firstImportFor = pricesService.isFirstImportFor(timeframe);
+            System.out.println(timeframe + " isFirstImport: " + firstImportFor);
+            cacheInitializationService.setFirstImportFor(timeframe, firstImportFor);
+        }
+
         List<Stock> stocks = stockRepository.findByXtbStockIsTrueAndDelistedDateIsNull();
         List<String> tickers = stocks.stream().map(Stock::getTicker).toList();
         for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
@@ -42,9 +49,8 @@ public class Application implements ApplicationRunner {
         }
         logTime(() -> cacheInitializationService.initializeStocks(stocks), "initialized xtb stocks cache");
         LocalDate latestDailyPriceImportDate = stockService.findLastUpdate(); // find last update from stocksCache
-        logTime(() -> cacheInitializationService.initializeLatestImportDate(latestDailyPriceImportDate), "initialized latest import date cache");
         logTime(() -> cacheInitializationService.initHighLowPricesCache(latestDailyPriceImportDate), "initialized high low prices cache");
-        if (isFirstImportFor(StockTimeframe.WEEKLY, latestDailyPriceImportDate)) {
+        if (cacheService.isFirstImportFor(StockTimeframe.WEEKLY)) {
             stockService.updateHighLowForPeriodFromHLCachesAndAdjustWeekend();
         }
         logTime(cacheInitializationService::initLatestDailyPricesCache, "initialized latest daily prices cache");

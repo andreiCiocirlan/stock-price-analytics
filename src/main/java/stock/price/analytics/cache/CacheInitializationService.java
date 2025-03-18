@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.model.*;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
+import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.highlow.*;
 import stock.price.analytics.model.prices.json.DailyPricesJSON;
 import stock.price.analytics.model.prices.ohlc.*;
@@ -20,11 +21,9 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static stock.price.analytics.model.prices.enums.StockTimeframe.WEEKLY;
 import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
 import static stock.price.analytics.model.stocks.enums.MarketState.REGULAR;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
-import static stock.price.analytics.util.TradingDateUtil.isFirstImportFor;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 @Slf4j
@@ -41,6 +40,7 @@ public class CacheInitializationService {
     private final HighLowPricesCache highLowPricesCache;
     private final HighLowForPeriodRepository highLowForPeriodRepository;
     private final StocksCache stocksCache;
+    private final CacheService cacheService;
 
     public void initDailyJSONPricesCache() {
         LocalDate tradingDateNow = tradingDateNow();
@@ -67,6 +67,10 @@ public class CacheInitializationService {
         dailyPricesCache.addDailyPrices(dailyPricesRepository.findLatestDailyPrices(), REGULAR);
     }
 
+    public void setFirstImportFor(StockTimeframe timeframe, Boolean isFirstImport) {
+        dailyPricesCache.getFirstImportForTimeframe().put(timeframe, isFirstImport);
+    }
+
     public void initHighLowPricesCache(LocalDate latestDailyPriceImportDate) {
         for (HighLowPeriod highLowPeriod : HighLowPeriod.values()) {
             initHighLowPriceCache(highLowPeriod, latestDailyPriceImportDate);
@@ -76,7 +80,7 @@ public class CacheInitializationService {
 
     private void initPrevWeekHighLowPricesCache(HighLowPeriod highLowPeriod, LocalDate latestDailyPriceImportDate) {
         LocalDate prevWeekStartDate = latestDailyPriceImportDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-        if (!isFirstImportFor(WEEKLY, latestDailyPriceImportDate)) { // on first import of the week need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
+        if (!cacheService.isFirstImportFor(StockTimeframe.WEEKLY)) { // on first import of the week need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
             prevWeekStartDate = prevWeekStartDate.minusWeeks(1);
         }
         List<? extends HighLowForPeriod> prevWeekHighLowPrices = switch (highLowPeriod) {
@@ -90,7 +94,7 @@ public class CacheInitializationService {
     private void initHighLowPriceCache(HighLowPeriod highLowPeriod, LocalDate latestDailyPriceImportDate) {
         LocalDate startDate = latestDailyPriceImportDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         LocalDate endDate = latestDailyPriceImportDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
-        if (isFirstImportFor(WEEKLY, latestDailyPriceImportDate)) { // on first import of the week need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
+        if (cacheService.isFirstImportFor(StockTimeframe.WEEKLY)) { // on first import of the week need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
             LocalDate newWeekStartDate = startDate.plusWeeks(1);
             LocalDate newWeekEndDate = endDate.plusWeeks(1);
             if (highLowPeriod == HighLowPeriod.HIGH_LOW_ALL_TIME) { // for all-time highs/lows simply copy the existing row on Mondays
@@ -135,10 +139,6 @@ public class CacheInitializationService {
     public void initializeStocks(List<Stock> stocks) {
         stocksCache.addStocks(stocks);
         findDelistedStocksAndUpdate();
-    }
-
-    public void initializeLatestImportDate(LocalDate latestDailyPriceImportDate) {
-        stocksCache.setLatestImportDate(latestDailyPriceImportDate);
     }
 
     private void findDelistedStocksAndUpdate() {
