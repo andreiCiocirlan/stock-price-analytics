@@ -63,7 +63,7 @@ public class PricesService {
         String query = STR."""
                 SELECT
                     CASE
-                        WHEN COUNT(*) IN (0) THEN TRUE
+                        WHEN COUNT(*) IN (0, 1) THEN TRUE
                         ELSE FALSE
                     END AS result
                 FROM
