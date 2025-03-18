@@ -9,6 +9,7 @@ import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.service.DesktopNotificationService;
 import stock.price.analytics.service.DiscrepanciesService;
+import stock.price.analytics.service.PriceGapsService;
 
 import static stock.price.analytics.util.TradingDateUtil.isFirstImportFor;
 
@@ -20,6 +21,7 @@ public class EndOfDayScheduler {
     private final CacheService cacheService;
     private final DiscrepanciesService discrepanciesService;
     private final DesktopNotificationService desktopNotificationService;
+    private final PriceGapsService priceGapsService;
 
     // 0 45 16 * * MON-FRI
     @Scheduled(cron = "${cron.post.market.discrepancy.checks}", zone = "${cron.timezone}")
@@ -49,6 +51,8 @@ public class EndOfDayScheduler {
                 discrepanciesService.updateStocksWithOpeningPriceDiscrepancyFor(timeframe);
             }
         }
+        // close price gaps at EOD
+        priceGapsService.closePriceGaps();
     }
 
 }
