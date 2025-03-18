@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static stock.price.analytics.util.LoggingUtil.logTime;
+import static stock.price.analytics.util.TradingDateUtil.isFirstImportFor;
 
 @RequiredArgsConstructor
 @SpringBootApplication
@@ -50,7 +51,7 @@ public class Application implements ApplicationRunner {
         logTime(() -> cacheInitializationService.initializeStocks(stocks), "initialized xtb stocks cache");
         LocalDate latestDailyPriceImportDate = stockService.findLastUpdate(); // find last update from stocksCache
         logTime(() -> cacheInitializationService.initHighLowPricesCache(latestDailyPriceImportDate), "initialized high low prices cache");
-        if (cacheService.isFirstImportFor(StockTimeframe.WEEKLY)) {
+        if (isFirstImportFor(StockTimeframe.WEEKLY, latestDailyPriceImportDate) &&  cacheService.isFirstImportFor(StockTimeframe.WEEKLY)) {
             stockService.updateHighLowForPeriodFromHLCachesAndAdjustWeekend();
         }
         logTime(cacheInitializationService::initLatestDailyPricesCache, "initialized latest daily prices cache");
