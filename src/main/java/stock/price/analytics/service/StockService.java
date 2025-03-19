@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
-import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.ohlc.*;
@@ -25,12 +24,10 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static java.nio.file.Files.walk;
-import static stock.price.analytics.util.Constants.NY_ZONE;
 import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
 import static stock.price.analytics.util.PricesUtil.tickerFrom;
-import static stock.price.analytics.util.TradingDateUtil.isFirstImportFor;
 
 @Slf4j
 @Service
@@ -132,11 +129,6 @@ public class StockService {
         Set<Stock> stocksUpdated = new HashSet<>();
         updateStocksFromHighLowCaches(stocksUpdated);
 
-        for (Stock stock : stocksUpdated) {
-            if (isFirstImportFor(StockTimeframe.WEEKLY, stock.getLastUpdated())) {
-                stock.setLastUpdated(LocalDate.now(NY_ZONE)); // lastUpdated becomes current date (might not be necessarily Monday if holiday)
-            }
-        }
         List<Stock> stocks = new ArrayList<>(stocksUpdated);
         partitionDataAndSaveWithLogTime(stocks, stockRepository, "saved stocks after generating high-lows 4w, 52w, all-time for the first import of the week");
         cacheService.addStocks(stocks);
