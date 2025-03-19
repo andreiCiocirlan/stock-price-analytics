@@ -11,6 +11,7 @@ import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.stocks.StockRepository;
+import stock.price.analytics.service.HighLowForPeriodService;
 import stock.price.analytics.service.PricesService;
 import stock.price.analytics.service.StockService;
 
@@ -18,7 +19,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static stock.price.analytics.util.LoggingUtil.logTime;
-import static stock.price.analytics.util.TradingDateUtil.isFirstImportFor;
 
 @RequiredArgsConstructor
 @SpringBootApplication
@@ -29,6 +29,7 @@ public class Application implements ApplicationRunner {
     private final PricesService pricesService;
     private final CacheInitializationService cacheInitializationService;
     private final CacheService cacheService;
+    private final HighLowForPeriodService highLowForPeriodService;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -50,8 +51,9 @@ public class Application implements ApplicationRunner {
         }
         logTime(() -> cacheInitializationService.initializeStocks(stocks), "initialized xtb stocks cache");
         LocalDate latestDailyPriceImportDate = stockService.findLastUpdate(); // find last update from stocksCache
-        logTime(() -> cacheInitializationService.initHighLowPricesCache(latestDailyPriceImportDate), "initialized high low prices cache");
-        if (isFirstImportFor(StockTimeframe.WEEKLY, latestDailyPriceImportDate) &&  cacheService.isFirstImportFor(StockTimeframe.WEEKLY)) {
+        boolean weeklyHighLowExists = highLowForPeriodService.weeklyHighLowExists();
+        logTime(() -> cacheInitializationService.initHighLowPricesCache(latestDailyPriceImportDate, weeklyHighLowExists), "initialized high low prices cache");
+        if (!weeklyHighLowExists && cacheService.isFirstImportFor(StockTimeframe.WEEKLY)) {
             stockService.updateHighLowForPeriodFromHLCachesAndAdjustWeekend();
         }
         logTime(cacheInitializationService::initLatestDailyPricesCache, "initialized latest daily prices cache");

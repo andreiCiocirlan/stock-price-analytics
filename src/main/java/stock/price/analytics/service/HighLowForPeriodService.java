@@ -2,6 +2,7 @@ package stock.price.analytics.service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +22,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,6 +34,7 @@ import java.util.stream.Stream;
 import static java.nio.file.Files.walk;
 import static java.time.LocalDate.of;
 import static stock.price.analytics.model.prices.highlow.enums.HighLowPeriod.values;
+import static stock.price.analytics.util.Constants.NY_ZONE;
 import static stock.price.analytics.util.HighLowPeriodPricesUtil.highLowFromFileForPeriod;
 import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
@@ -129,6 +133,26 @@ public class HighLowForPeriodService {
             int rowsAffected = entityManager.createNativeQuery(query).executeUpdate();
             log.info("saved {} rows for {} and high low period {}", rowsAffected, tickers, highLowPeriod);
         }
+    }
+
+    public boolean weeklyHighLowExists() {
+        String date = LocalDate.now(NY_ZONE).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).format(DateTimeFormatter.ISO_LOCAL_DATE);
+        String query = STR."""
+                SELECT
+                    CASE
+                        WHEN COUNT(*) = 1 THEN TRUE
+                        ELSE FALSE
+                    END AS result
+                FROM
+                    high_low4w
+                WHERE
+                    ticker = 'AAPL'
+                    AND start_date = '\{date}'::date;
+                """;
+
+        Query nativeQuery = entityManager.createNativeQuery(query, Boolean.class);
+
+        return (Boolean) nativeQuery.getResultList().getFirst();
     }
 
 }
