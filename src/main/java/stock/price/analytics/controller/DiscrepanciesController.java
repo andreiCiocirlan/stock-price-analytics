@@ -2,8 +2,8 @@ package stock.price.analytics.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
+import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.service.DiscrepanciesService;
 

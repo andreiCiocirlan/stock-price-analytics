@@ -7,10 +7,7 @@ import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 import stock.price.analytics.model.BusinessEntity;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.model.prices.highlow.HighLow4w;
-import stock.price.analytics.model.prices.highlow.HighLow52Week;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
-import stock.price.analytics.model.prices.highlow.HighestLowestPrices;
 import stock.price.analytics.model.prices.ohlc.*;
 
 import java.time.LocalDate;

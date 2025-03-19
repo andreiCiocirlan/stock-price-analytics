@@ -3,12 +3,12 @@ package stock.price.analytics.cache;
 import lombok.Getter;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
-import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
 import stock.price.analytics.model.prices.highlow.HighLow4w;
 import stock.price.analytics.model.prices.highlow.HighLow52Week;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.highlow.HighestLowestPrices;
+import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 
 import java.util.*;
