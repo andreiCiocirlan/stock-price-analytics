@@ -101,7 +101,6 @@ public class DiscrepanciesService {
 
     public void updateHTFOpeningPricesDiscrepancyFor(StockTimeframe timeframe) {
         switch (timeframe) {
-            case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
             case WEEKLY -> pricesDiscrepanciesRepository.updateWeeklyPricesWithOpeningPriceDiscrepancy();
             case MONTHLY -> pricesDiscrepanciesRepository.updateMonthlyPricesWithOpeningPriceDiscrepancy();
             case QUARTERLY -> pricesDiscrepanciesRepository.updateQuarterlyPricesWithOpeningPriceDiscrepancy();
@@ -112,7 +111,6 @@ public class DiscrepanciesService {
 
     public void updateStocksWithOpeningPriceDiscrepancyFor(StockTimeframe timeframe) {
         switch (timeframe) {
-            case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
             case WEEKLY -> stockDiscrepanciesRepository.updateStocksWithWeeklyOpeningDiscrepancy();
             case MONTHLY -> stockDiscrepanciesRepository.updateStocksWithMonthlyOpeningDiscrepancy();
             case QUARTERLY -> stockDiscrepanciesRepository.updateStocksWithQuarterlyOpeningDiscrepancy();
