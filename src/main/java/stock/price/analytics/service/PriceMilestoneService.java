@@ -11,6 +11,7 @@ import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.Stock;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,10 @@ public class PriceMilestoneService {
     }
 
     public List<String> findTickersForMilestone(String priceMilestone, String milestoneType, List<Double> cfdMargins) {
+        if (!isValidTypeMapping(priceMilestone, milestoneType)) {
+            throw new IllegalArgumentException("Invalid milestone type combination");
+        }
+
         return switch (milestoneType) {
             case "performance" -> findTickersForMilestone(PricePerformanceMilestone.valueOf(priceMilestone), cfdMargins);
             case "premarket" -> findTickersForPreMarketMilestone(PreMarketPriceMilestone.valueOf(priceMilestone), cfdMargins);
@@ -131,6 +136,21 @@ public class PriceMilestoneService {
             case INTRADAY_SPIKE_UP -> dailyPrice.getClose() > s.getClose() * (1 + INTRADAY_SPIKE_PERCENTAGE);
             case INTRADAY_SPIKE_DOWN -> dailyPrice.getClose() < s.getClose() * (1 - INTRADAY_SPIKE_PERCENTAGE);
             case NONE -> throw new IllegalStateException("Unexpected value NONE");
+        };
+    }
+
+    private boolean isValidTypeMapping(String priceMilestone, String milestoneType) {
+        return switch (milestoneType) {
+            case "premarket" -> Arrays.stream(PreMarketPriceMilestone.values())
+                    .map(Enum::name)
+                    .anyMatch(pm -> pm.equals(priceMilestone));
+            case "performance" -> Arrays.stream(PricePerformanceMilestone.values())
+                    .map(Enum::name)
+                    .anyMatch(pm -> pm.equals(priceMilestone));
+            case "intraday-spike" -> Arrays.stream(IntradayPriceSpike.values())
+                    .map(Enum::name)
+                    .anyMatch(pm -> pm.equals(priceMilestone));
+            default -> false;
         };
     }
 }
