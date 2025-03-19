@@ -11,26 +11,26 @@ import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.Stock;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
 import static stock.price.analytics.model.stocks.enums.MarketState.REGULAR;
 import static stock.price.analytics.util.Constants.INTRADAY_SPIKE_PERCENTAGE;
 import static stock.price.analytics.util.Constants.MIN_GAP_AND_GO_PERCENTAGE;
-import static stock.price.analytics.util.EnumParser.parseEnumWithNoneValue;
 
 @Service
 @RequiredArgsConstructor
 public class PriceMilestoneService {
 
-    private static List<Stock> cachedStocks;
     private final CacheService cacheService;
 
     public Map<PriceMilestone, List<String>> findTickersForMilestones(List<PriceMilestone> priceMilestones, List<Double> cfdMargins) {
         Map<PriceMilestone, List<String>> tickersByPriceMilestones = new HashMap<>();
         priceMilestones.forEach(priceMilestone -> {
-            List<String> tickers = findTickersForMilestone(priceMilestone.name(), cfdMargins);
+            List<String> tickers = findTickersForMilestone(priceMilestone.name(), priceMilestone.getType(), cfdMargins);
             if (!tickers.isEmpty()) {
                 tickersByPriceMilestones.put(priceMilestone, tickers);
             }
@@ -38,23 +38,13 @@ public class PriceMilestoneService {
         return tickersByPriceMilestones;
     }
 
-    public List<String> findTickersForMilestone(String priceMilestone, List<Double> cfdMargins) {
-        final List<String> tickers = new ArrayList<>();
-        Optional<PricePerformanceMilestone> pricePerformanceMilestone = parseEnumWithNoneValue(priceMilestone, PricePerformanceMilestone.class);
-        cachedStocks = cacheService.getCachedStocks();
-        if (pricePerformanceMilestone.isPresent()) {
-            tickers.addAll(findTickersForMilestone(pricePerformanceMilestone.get(), cfdMargins));
-        } else {
-            Optional<PreMarketPriceMilestone> preMarketPriceMilestone = parseEnumWithNoneValue(priceMilestone, PreMarketPriceMilestone.class);
-            if (preMarketPriceMilestone.isPresent()) {
-                parseEnumWithNoneValue(priceMilestone, PreMarketPriceMilestone.class)
-                        .ifPresent(milestone -> tickers.addAll(findTickersForPreMarketMilestone(milestone, cfdMargins)));
-            } else {
-                parseEnumWithNoneValue(priceMilestone, IntradayPriceSpike.class)
-                        .ifPresent(milestone -> tickers.addAll(findTickersForIntradaySpikeMilestone(milestone, cfdMargins)));
-            }
-        }
-        return tickers;
+    public List<String> findTickersForMilestone(String priceMilestone, String milestoneType, List<Double> cfdMargins) {
+        return switch (milestoneType) {
+            case "performance" -> findTickersForMilestone(PricePerformanceMilestone.valueOf(priceMilestone), cfdMargins);
+            case "premarket" -> findTickersForPreMarketMilestone(PreMarketPriceMilestone.valueOf(priceMilestone), cfdMargins);
+            case "intraday-spike" -> findTickersForIntradaySpikeMilestone(IntradayPriceSpike.valueOf(priceMilestone), cfdMargins);
+            default -> throw new IllegalArgumentException("Invalid milestone type");
+        };
     }
 
     private List<String> findTickersForMilestone(PricePerformanceMilestone pricePerformanceMilestone, List<Double> cfdMargins) {
@@ -62,7 +52,7 @@ public class PriceMilestoneService {
                 .stream()
                 .collect(Collectors.toMap(HighLowForPeriod::getTicker, p -> p));
 
-        return cachedStocks.stream()
+        return cacheService.getCachedStocks().stream()
                 .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
                 .filter(stock -> hlPricesCache.containsKey(stock.getTicker()))
                 .filter(stock -> withinPerformanceMilestone(stock, hlPricesCache.get(stock.getTicker()), pricePerformanceMilestone))
@@ -75,7 +65,7 @@ public class PriceMilestoneService {
                 .stream()
                 .collect(Collectors.toMap(DailyPrice::getTicker, p -> p));
 
-        return cachedStocks.stream()
+        return cacheService.getCachedStocks().stream()
                 .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
                 .filter(stock -> preMarketPricesCache.containsKey(stock.getTicker()))
                 .filter(stock -> withinPreMarketMilestone(stock, preMarketPricesCache.get(stock.getTicker()), milestone))
@@ -88,7 +78,7 @@ public class PriceMilestoneService {
                 .stream()
                 .collect(Collectors.toMap(DailyPrice::getTicker, p -> p));
 
-        return cachedStocks.stream()
+        return cacheService.getCachedStocks().stream()
                 .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
                 .filter(stock -> intradayPricesCache.containsKey(stock.getTicker()))
                 .filter(stock -> withinIntradaySpikeMilestone(stock, intradayPricesCache.get(stock.getTicker()), milestone))

@@ -83,6 +83,18 @@ function updateStockPerformanceChart(timeFrame) {
 
     if (priceMilestone) {
         url += '&priceMilestone=' + priceMilestone.value;
+
+        const selectedOption = priceMilestone.options[priceMilestone.selectedIndex];
+        const milestoneType = selectedOption.className.split(' ')[0];
+
+        const typeMap = {
+            'none-option': 'none',
+            'pre-market-option': 'premarket',
+            'performance-option': 'performance',
+            'intraday-spike-option': 'intraday-spike'
+        };
+
+        url += '&milestoneType=' + typeMap[milestoneType];
     }
 
     fetch(url)
