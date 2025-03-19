@@ -1,4 +1,4 @@
-package stock.price.analytics.model.prices.enums;
+package stock.price.analytics.model.prices.highlow.enums;
 
 public enum HighLowPeriod {
 

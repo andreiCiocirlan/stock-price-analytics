@@ -3,7 +3,7 @@ package stock.price.analytics.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import stock.price.analytics.model.prices.enums.HighLowPeriod;
+import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.fvg.FVGRepository;

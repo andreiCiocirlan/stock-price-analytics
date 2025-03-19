@@ -6,7 +6,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import stock.price.analytics.model.prices.enums.HighLowPeriod;
+import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.model.stocks.Stock;
 
 import java.time.LocalDate;

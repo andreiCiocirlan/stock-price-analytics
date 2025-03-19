@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.BusinessEntity;
-import stock.price.analytics.model.prices.enums.HighLowPeriod;
+import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.enums.StockPerformanceInterval;
 import stock.price.analytics.model.prices.highlow.HighLow4w;
 import stock.price.analytics.model.prices.highlow.HighLow52Week;
@@ -30,7 +30,7 @@ import java.util.stream.Stream;
 
 import static java.nio.file.Files.walk;
 import static java.time.LocalDate.of;
-import static stock.price.analytics.model.prices.enums.HighLowPeriod.values;
+import static stock.price.analytics.model.prices.highlow.enums.HighLowPeriod.values;
 import static stock.price.analytics.util.HighLowPeriodPricesUtil.highLowFromFileForPeriod;
 import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
