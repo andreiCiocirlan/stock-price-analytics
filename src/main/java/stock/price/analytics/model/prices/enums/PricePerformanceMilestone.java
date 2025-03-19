@@ -5,19 +5,30 @@ import stock.price.analytics.model.prices.PriceMilestone;
 import java.util.List;
 
 public enum PricePerformanceMilestone implements PriceMilestone {
-    NEW_52W_HIGH,
-    NEW_4W_HIGH,
-    NEW_ALL_TIME_HIGH,
-    NEW_52W_LOW,
-    NEW_4W_LOW,
-    NEW_ALL_TIME_LOW,
-    HIGH_52W_95,
-    HIGH_4W_95,
-    HIGH_ALL_TIME_95,
-    LOW_52W_95,
-    LOW_4W_95,
-    LOW_ALL_TIME_95,
-    NONE;
+    NEW_52W_HIGH("performance"),
+    NEW_4W_HIGH("performance"),
+    NEW_ALL_TIME_HIGH("performance"),
+    NEW_52W_LOW("performance"),
+    NEW_4W_LOW("performance"),
+    NEW_ALL_TIME_LOW("performance"),
+    HIGH_52W_95("performance"),
+    HIGH_4W_95("performance"),
+    HIGH_ALL_TIME_95("performance"),
+    LOW_52W_95("performance"),
+    LOW_4W_95("performance"),
+    LOW_ALL_TIME_95("performance"),
+    NONE("performance");
+
+    private final String type;
+
+    PricePerformanceMilestone(String type) {
+        this.type = type;
+    }
+
+    @Override
+    public String getType() {
+        return type;
+    }
 
     public static String timeframeFrom(PricePerformanceMilestone milestone) {
         return switch (milestone) {
