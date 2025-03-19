@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 import static java.nio.file.Files.readAllLines;
 import static stock.price.analytics.util.Constants.USER_AGENT_VALUE;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveNoLogging;
-import static stock.price.analytics.util.PricesUtil.getPricesForTimeframe;
+import static stock.price.analytics.util.PricesUtil.htfPricesForTimeframe;
 
 @Slf4j
 @Service
@@ -147,10 +147,10 @@ public class NewTickerService {
 
     private List<AbstractPrice> getHigherTimeframePricesFor(List<DailyPrice> dailyPricesImported) {
         List<AbstractPrice> htfPrices = new ArrayList<>();
-        List<WeeklyPrice> weeklyPrices = getPricesForTimeframe(dailyPricesImported, StockTimeframe.WEEKLY).stream().map(WeeklyPrice.class::cast).toList();
-        List<MonthlyPrice> monthlyPrices = getPricesForTimeframe(dailyPricesImported, StockTimeframe.MONTHLY).stream().map(MonthlyPrice.class::cast).toList();
-        List<QuarterlyPrice> quarterlyPrices = getPricesForTimeframe(dailyPricesImported, StockTimeframe.QUARTERLY).stream().map(QuarterlyPrice.class::cast).toList();
-        List<YearlyPrice> yearlyPrices = getPricesForTimeframe(dailyPricesImported, StockTimeframe.YEARLY).stream().map(YearlyPrice.class::cast).toList();
+        List<WeeklyPrice> weeklyPrices = htfPricesForTimeframe(dailyPricesImported, StockTimeframe.WEEKLY).stream().map(WeeklyPrice.class::cast).toList();
+        List<MonthlyPrice> monthlyPrices = htfPricesForTimeframe(dailyPricesImported, StockTimeframe.MONTHLY).stream().map(MonthlyPrice.class::cast).toList();
+        List<QuarterlyPrice> quarterlyPrices = htfPricesForTimeframe(dailyPricesImported, StockTimeframe.QUARTERLY).stream().map(QuarterlyPrice.class::cast).toList();
+        List<YearlyPrice> yearlyPrices = htfPricesForTimeframe(dailyPricesImported, StockTimeframe.YEARLY).stream().map(YearlyPrice.class::cast).toList();
 
         htfPrices.addAll(pricesWithPerformance(weeklyPrices.stream().sorted(Comparator.comparing(WeeklyPrice::getStartDate)).toList()));
         htfPrices.addAll(pricesWithPerformance(monthlyPrices.stream().sorted(Comparator.comparing(MonthlyPrice::getStartDate)).toList()));

@@ -36,10 +36,10 @@ public class PricesUtil {
         if (StockTimeframe.DAILY == stockTimeframe)
             return new ArrayList<>(dailyPrices);
 
-        return getPricesForTimeframe(dailyPrices, stockTimeframe);
+        return htfPricesForTimeframe(dailyPrices, stockTimeframe);
     }
 
-    public static List<AbstractPrice> getPricesForTimeframe(List<DailyPrice> dailyPrices, StockTimeframe stockTimeframe) {
+    public static List<AbstractPrice> htfPricesForTimeframe(List<DailyPrice> dailyPrices, StockTimeframe stockTimeframe) {
         return new ArrayList<>(
                 dailyPrices.stream()
                         .collect(Collectors.groupingBy(

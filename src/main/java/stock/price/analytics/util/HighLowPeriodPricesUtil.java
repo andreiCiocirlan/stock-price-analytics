@@ -20,7 +20,7 @@ public class HighLowPeriodPricesUtil extends PricesUtil {
 
     public static List<HighLowForPeriod> highLowFromFileForPeriod(Path srcFile, LocalDate startDate, LocalDate endDate, StockPerformanceInterval stockPerformanceInterval) {
         List<DailyPrice> dailyPrices = dailyPricesFromFile(srcFile);
-        List<WeeklyPrice> weeklyGroupedPrices = getPricesForTimeframe(dailyPrices, StockTimeframe.WEEKLY).stream().map(WeeklyPrice.class::cast).toList();
+        List<WeeklyPrice> weeklyGroupedPrices = htfPricesForTimeframe(dailyPrices, StockTimeframe.WEEKLY).stream().map(WeeklyPrice.class::cast).toList();
         return getHighLowForPeriod(
                 weeklyGroupedPrices.stream().filter(whp -> whp.getStartDate().isAfter(startDate) && whp.getStartDate().isBefore(endDate)).toList(),
                 dailyPrices.stream().filter(shp -> shp.getDate().isAfter(startDate) && shp.getDate().isBefore(endDate)).toList(),
