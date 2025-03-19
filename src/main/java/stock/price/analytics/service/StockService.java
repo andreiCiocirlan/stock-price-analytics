@@ -94,7 +94,6 @@ public class StockService {
             String ticker = wmyPrice.getTicker();
             Stock stock = stocksMap.getOrDefault(ticker, new Stock(ticker, wmyPrice.getStartDate(), true));
             switch (wmyPrice.getTimeframe()) {
-                case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
                 case WEEKLY -> stock.updateFromWeeklyPrice((WeeklyPrice) wmyPrice);
                 case MONTHLY -> stock.updateFromMonthlyPrice((MonthlyPrice) wmyPrice);
                 case QUARTERLY -> stock.updateFromQuarterlyPrice((QuarterlyPrice) wmyPrice);
