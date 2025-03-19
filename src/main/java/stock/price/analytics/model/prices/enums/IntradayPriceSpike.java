@@ -6,19 +6,19 @@ import java.util.List;
 
 public enum IntradayPriceSpike implements PriceMilestone {
 
-    INTRADAY_SPIKE_UP("intraday") {
+    INTRADAY_SPIKE_UP("intraday-spike") {
         @Override
         public String toString() {
             return "Intraday Spike Up";
         }
     },
-    INTRADAY_SPIKE_DOWN("intraday") {
+    INTRADAY_SPIKE_DOWN("intraday-spike") {
         @Override
         public String toString() {
             return "Intraday Spike Down";
         }
     },
-    NONE("intraday") {
+    NONE("intraday-spike") {
         @Override
         public String toString() {
             return "None";
