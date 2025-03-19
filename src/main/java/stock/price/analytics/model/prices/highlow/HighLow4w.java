@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
+import stock.price.analytics.model.stocks.Stock;
 
 import java.time.LocalDate;
 
@@ -49,6 +50,12 @@ public class HighLow4w extends HighLowForPeriod {
     @Override
     public HighLowPeriod getHighLowPeriod() {
         return HighLowPeriod.HIGH_LOW_4W;
+    }
+
+    @Override
+    public void updateStock(Stock stock) {
+        stock.setLow4w(this.getLow4w());
+        stock.setHigh4w(this.getHigh4w());
     }
 
     @Override

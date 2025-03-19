@@ -148,22 +148,7 @@ public class Stock implements BusinessEntity {
     }
 
     public void updateFrom(HighLowForPeriod highLowForPeriod) {
-        switch (highLowForPeriod) {
-            case HighLow4w highLow4w -> updateFromHighLow4w(highLow4w);
-            case HighLow52Week highLow52Week -> updateFromHighLow52Week(highLow52Week);
-            case HighestLowestPrices highestLowestPrices -> updateFromHighestLowestPrices(highestLowestPrices);
-            default -> throw new IllegalArgumentException("Unknown type: " + highLowForPeriod.getClass().getSimpleName());
-        }
-    }
-
-    private void updateFromHighestLowestPrices(HighestLowestPrices highestLowestPrices) {
-        this.setLowest(highestLowestPrices.getLowest());
-        this.setHighest(highestLowestPrices.getHighest());
-    }
-
-    private void updateFromHighLow52Week(HighLow52Week highLow52Week) {
-        this.setLow52w(highLow52Week.getLow52w());
-        this.setHigh52w(highLow52Week.getHigh52w());
+        highLowForPeriod.updateStock(this);
     }
 
     public void updateFromDailyPrice(DailyPrice dailyPrice) {
@@ -201,11 +186,6 @@ public class Stock implements BusinessEntity {
         this.setYearlyHigh(yearlyPrice.getHigh());
         this.setYearlyLow(yearlyPrice.getLow());
         this.setYearlyPerformance(yearlyPrice.getPerformance());
-    }
-
-    private void updateFromHighLow4w(HighLow4w highLow4w) {
-        this.setLow4w(highLow4w.getLow4w());
-        this.setHigh4w(highLow4w.getHigh4w());
     }
 
     public double performanceFor(StockTimeframe timeFrame) {

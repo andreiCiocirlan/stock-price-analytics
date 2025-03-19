@@ -10,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import stock.price.analytics.model.BusinessEntity;
 import stock.price.analytics.model.prices.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
+import stock.price.analytics.model.stocks.Stock;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -72,6 +73,7 @@ public abstract class HighLowForPeriod implements BusinessEntity {
     public abstract double getHigh();
     public abstract double getLow();
     public abstract HighLowPeriod getHighLowPeriod();
+    public abstract void updateStock(Stock stock);
 
     @Override
     public String toString() {
