@@ -16,23 +16,23 @@ public interface PriceGapsRepository extends JpaRepository<PriceGap, Long> {
             with closed_gaps as (
             	select pg.id from price_gaps pg
             	join stocks s on s.ticker = pg.ticker
-            	where (pg.timeframe = 'DAILY' AND pg.close between s.d_low and s.d_high)
+            	where (pg.timeframe = 'DAILY' AND pg.status = 'OPEN' AND pg.close between s.d_low and s.d_high)
             		union all
             	select pg.id from price_gaps pg
             	join stocks s on s.ticker = pg.ticker
-            	where (pg.timeframe = 'WEEKLY' AND pg.close between s.w_low and s.w_high)
+            	where (pg.timeframe = 'WEEKLY' AND pg.status = 'OPEN' AND pg.close between s.w_low and s.w_high)
             		union all
             	select pg.id from price_gaps pg
             	join stocks s on s.ticker = pg.ticker
-            	where (pg.timeframe = 'MONTHLY' AND pg.close between s.m_low and s.m_high)
+            	where (pg.timeframe = 'MONTHLY' AND pg.status = 'OPEN' AND pg.close between s.m_low and s.m_high)
             		union all
             	select pg.id from price_gaps pg
             	join stocks s on s.ticker = pg.ticker
-            	where (pg.timeframe = 'QUARTERLY' AND pg.close between s.q_low and s.q_high)
+            	where (pg.timeframe = 'QUARTERLY' AND pg.status = 'OPEN' AND pg.close between s.q_low and s.q_high)
             		union all
             	select pg.id from price_gaps pg
             	join stocks s on s.ticker = pg.ticker
-            	where (pg.timeframe = 'YEARLY' AND pg.close between s.y_low and s.y_high)
+            	where (pg.timeframe = 'YEARLY' AND pg.status = 'OPEN' AND pg.close between s.y_low and s.y_high)
             )
             UPDATE price_gaps
             set status = 'CLOSED'
