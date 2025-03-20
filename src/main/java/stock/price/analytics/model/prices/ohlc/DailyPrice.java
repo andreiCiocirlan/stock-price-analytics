@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.springframework.format.annotation.DateTimeFormat;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
+import stock.price.analytics.model.stocks.Stock;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -32,6 +33,16 @@ public class DailyPrice extends AbstractPrice {
         super(ticker, candleOHLC);
         this.date = date;
         this.setPerformance(performance);
+    }
+
+    @Override
+    public void updateStock(Stock stock) {
+        stock.setDailyOpen(this.getOpen());
+        stock.setDailyHigh(this.getHigh());
+        stock.setDailyLow(this.getLow());
+        stock.setClose(this.getClose());
+        stock.setDailyPerformance(this.getPerformance());
+        stock.setLastUpdated(this.getDate());
     }
 
     @Override

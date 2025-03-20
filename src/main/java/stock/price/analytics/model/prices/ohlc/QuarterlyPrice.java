@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
+import stock.price.analytics.model.stocks.Stock;
 
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
@@ -46,6 +47,14 @@ public class QuarterlyPrice extends AbstractPrice {
                 dailyPrices.getDate(),
                 performanceFrom(dailyPrices, previousClose),
                 new CandleOHLC(dailyPrices.getOpen(), dailyPrices.getHigh(), dailyPrices.getLow(), dailyPrices.getClose()));
+    }
+
+    @Override
+    public void updateStock(Stock stock) {
+        stock.setQuarterlyOpen(this.getOpen());
+        stock.setQuarterlyHigh(this.getHigh());
+        stock.setQuarterlyLow(this.getLow());
+        stock.setQuarterlyPerformance(this.getPerformance());
     }
 
     @Override

@@ -81,7 +81,7 @@ public class StockService {
             Optional.ofNullable(stocksMap.get(ticker))
                     .filter(stock -> !stock.getLastUpdated().isAfter(dailyPrice.getDate()))
                     .ifPresent(stock -> {
-                        stock.updateFromDailyPrice(dailyPrice);
+                        stock.updateFrom(dailyPrice);
                         stocksUpdated.add(stock);
                     });
         }
@@ -90,12 +90,7 @@ public class StockService {
         for (AbstractPrice wmyPrice : htfPrices) {
             String ticker = wmyPrice.getTicker();
             Stock stock = stocksMap.getOrDefault(ticker, new Stock(ticker, wmyPrice.getStartDate(), true));
-            switch (wmyPrice.getTimeframe()) {
-                case WEEKLY -> stock.updateFromWeeklyPrice((WeeklyPrice) wmyPrice);
-                case MONTHLY -> stock.updateFromMonthlyPrice((MonthlyPrice) wmyPrice);
-                case QUARTERLY -> stock.updateFromQuarterlyPrice((QuarterlyPrice) wmyPrice);
-                case YEARLY -> stock.updateFromYearlyPrice((YearlyPrice) wmyPrice);
-            }
+            stock.updateFrom(wmyPrice);
             stocksUpdated.add(stock);
         }
     }

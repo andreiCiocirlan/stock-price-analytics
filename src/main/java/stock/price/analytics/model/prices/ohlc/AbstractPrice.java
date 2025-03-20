@@ -8,6 +8,7 @@ import lombok.Setter;
 import stock.price.analytics.model.BusinessEntity;
 import stock.price.analytics.model.fvg.FairValueGap;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
+import stock.price.analytics.model.stocks.Stock;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -55,6 +56,7 @@ public abstract class AbstractPrice implements BusinessEntity {
     public abstract void setStartDateFrom(LocalDate date);
     public abstract void setEndDateFrom(LocalDate date);
     public abstract StockTimeframe getTimeframe();
+    public abstract void updateStock(Stock stock);
 
     public String compositeId() {
         return getTicker() + "_" + getTimeframe() + "_" + getStartDate().format(DateTimeFormatter.ISO_LOCAL_DATE);

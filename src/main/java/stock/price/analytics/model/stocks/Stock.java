@@ -148,41 +148,8 @@ public class Stock implements BusinessEntity {
         highLowForPeriod.updateStock(this);
     }
 
-    public void updateFromDailyPrice(DailyPrice dailyPrice) {
-        this.setDailyOpen(dailyPrice.getOpen());
-        this.setDailyHigh(dailyPrice.getHigh());
-        this.setDailyLow(dailyPrice.getLow());
-        this.setClose(dailyPrice.getClose());
-        this.setDailyPerformance(dailyPrice.getPerformance());
-        this.setLastUpdated(dailyPrice.getDate());
-    }
-
-    public void updateFromWeeklyPrice(WeeklyPrice weeklyPrice) {
-        this.setWeeklyOpen(weeklyPrice.getOpen());
-        this.setWeeklyHigh(weeklyPrice.getHigh());
-        this.setWeeklyLow(weeklyPrice.getLow());
-        this.setWeeklyPerformance(weeklyPrice.getPerformance());
-    }
-
-    public void updateFromMonthlyPrice(MonthlyPrice monthlyPrice) {
-        this.setMonthlyOpen(monthlyPrice.getOpen());
-        this.setMonthlyHigh(monthlyPrice.getHigh());
-        this.setMonthlyLow(monthlyPrice.getLow());
-        this.setMonthlyPerformance(monthlyPrice.getPerformance());
-    }
-
-    public void updateFromQuarterlyPrice(QuarterlyPrice quarterlyPrice) {
-        this.setQuarterlyOpen(quarterlyPrice.getOpen());
-        this.setQuarterlyHigh(quarterlyPrice.getHigh());
-        this.setQuarterlyLow(quarterlyPrice.getLow());
-        this.setQuarterlyPerformance(quarterlyPrice.getPerformance());
-    }
-
-    public void updateFromYearlyPrice(YearlyPrice yearlyPrice) {
-        this.setYearlyOpen(yearlyPrice.getOpen());
-        this.setYearlyHigh(yearlyPrice.getHigh());
-        this.setYearlyLow(yearlyPrice.getLow());
-        this.setYearlyPerformance(yearlyPrice.getPerformance());
+    public void updateFrom(AbstractPrice price) {
+        price.updateStock(this);
     }
 
     public double performanceFor(StockTimeframe timeFrame) {
