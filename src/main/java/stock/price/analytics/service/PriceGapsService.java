@@ -99,6 +99,7 @@ public class PriceGapsService {
     }
 
     public void closePriceGaps() {
-        priceGapsRepository.closePriceGaps();
+        int rowsAffected = priceGapsRepository.closePriceGaps();
+        log.info("Closed {} price gaps", rowsAffected);
     }
 }

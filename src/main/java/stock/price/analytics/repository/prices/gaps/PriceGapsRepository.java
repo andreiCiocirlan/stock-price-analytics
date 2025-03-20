@@ -38,5 +38,5 @@ public interface PriceGapsRepository extends JpaRepository<PriceGap, Long> {
             set status = 'CLOSED'
             where id in (select id from closed_gaps)
             """, nativeQuery = true)
-    void closePriceGaps();
+    int closePriceGaps();
 }
