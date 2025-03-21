@@ -50,8 +50,6 @@ public class EndOfDayScheduler {
                 priceGapsService.savePriceGapsTodayFor(cacheService.getCachedTickers(), timeframe);
             }
         }
-        // close price gaps at EOD
-        priceGapsService.closePriceGaps();
         // save daily price gaps at EOD
         priceGapsService.savePriceGapsTodayFor(cacheService.getCachedTickers(), StockTimeframe.DAILY);
     }
