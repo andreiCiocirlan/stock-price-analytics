@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.prices.enums.StockTimeframe.DAILY;
 import static stock.price.analytics.model.prices.enums.StockTimeframe.higherTimeframes;
-import static stock.price.analytics.util.Constants.DAILY_FVG_MIN_DATE;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
@@ -90,16 +89,6 @@ public class PricesService {
         List<CandleWithDateDTO> candles = (List<CandleWithDateDTO>) nativeQuery.getResultList();
 
         return candles;
-    }
-
-    public List<? extends AbstractPrice> findAllPricesFor(List<String> tickers, StockTimeframe timeframe) {
-        return switch (timeframe) {
-            case DAILY -> dailyPricesRepository.findByDateBetween(DAILY_FVG_MIN_DATE, LocalDate.now());
-            case WEEKLY -> weeklyPricesRepository.findByTickerIn(tickers);
-            case MONTHLY -> monthlyPricesRepository.findByTickerIn(tickers);
-            case QUARTERLY -> quarterlyPricesRepository.findByTickerIn(tickers);
-            case YEARLY -> yearlyPricesRepository.findByTickerIn(tickers);
-        };
     }
 
     public List<AbstractPrice> updatePricesForHigherTimeframes(List<DailyPrice> importedDailyPrices) {
