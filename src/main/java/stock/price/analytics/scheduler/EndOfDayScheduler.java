@@ -22,8 +22,8 @@ public class EndOfDayScheduler {
     private final PriceGapsService priceGapsService;
 
     // 0 45 16 * * MON-FRI
-    @Scheduled(cron = "${cron.post.market.discrepancy.checks}", zone = "${cron.timezone}")
-    public void findAllStockDiscrepanciesAtEOD() {
+    @Scheduled(cron = "${cron.post.market.processing}", zone = "${cron.timezone}")
+    public void postProcessingEndOfDay() {
         String title = "Discrepancy Found";
         if (!discrepanciesService.findStocksOpeningPriceDiscrepancies().isEmpty()) {
             desktopNotificationService.broadcastDesktopNotification(title, "Stocks Opening Price Discrepancies found, check logs!");
