@@ -1,6 +1,5 @@
 package stock.price.analytics.util;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -20,7 +19,6 @@ public class Constants {
     public static final String FVG_95TH_PERCENTILE_4W = "95% 4w";
     public static final String FVG_95TH_PERCENTILE_52W = "95% 52w";
     public static final String FVG_95TH_PERCENTILE_ALL_TIME = "95% All-Time";
-    public static final LocalDate DAILY_FVG_MIN_DATE = LocalDate.of(2022, 1, 31);
     public static final List<Double> CFD_MARGINS_5X = List.of(0.2);
     public static final List<Double> CFD_MARGINS_5X_4X = List.of(0.2, 0.25);
     public static final List<Double> CFD_MARGINS_5X_4X_3X = List.of(0.2, 0.25, 0.33);
