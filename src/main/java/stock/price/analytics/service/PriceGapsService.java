@@ -100,6 +100,8 @@ public class PriceGapsService {
 
     public void closePriceGaps() {
         int rowsAffected = priceGapsRepository.closePriceGaps();
-        log.info("Closed {} price gaps", rowsAffected);
+        if (rowsAffected != 0) {
+            log.info("Closed {} price gaps", rowsAffected);
+        }
     }
 }
