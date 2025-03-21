@@ -38,7 +38,7 @@ public class TradingDateUtil {
         if (dayOfWeekInNY.equals(DayOfWeek.SATURDAY) || dayOfWeekInNY.equals(DayOfWeek.SUNDAY)
             || (dayOfWeekInNY.equals(DayOfWeek.FRIDAY) && isBetweenMarketHours())
             || (dayOfWeekInNY.equals(DayOfWeek.MONDAY) && isBeforeMarketHours())) {
-            return LocalDate.now(NY_ZONE).with(TemporalAdjusters.previous(DayOfWeek.FRIDAY));
+            return LocalDate.now(NY_ZONE).with(TemporalAdjusters.previousOrSame(DayOfWeek.FRIDAY));
         }
 
         if (isBetweenMarketHours() || isAfterMarketHours()) {
