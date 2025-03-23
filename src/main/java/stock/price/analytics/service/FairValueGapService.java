@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.fvg.FairValueGap;
 import stock.price.analytics.model.prices.fvg.enums.FvgType;
-import stock.price.analytics.model.prices.fvg.enums.GapStatus;
+import stock.price.analytics.model.prices.enums.GapStatus;
 import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
