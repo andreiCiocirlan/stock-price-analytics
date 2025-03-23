@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.cache.CacheService;
-import stock.price.analytics.model.fvg.FairValueGap;
+import stock.price.analytics.model.prices.fvg.FairValueGap;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.service.FairValueGapService;
 
