@@ -22,5 +22,6 @@ public class TickerRenameService {
         tickerRenameRepository.updateHighLow52WeekTicker(oldTicker, newTicker);
         tickerRenameRepository.updateHighestLowestPricesTicker(oldTicker, newTicker);
         tickerRenameRepository.updateFairValueGapTicker(oldTicker, newTicker);
+        tickerRenameRepository.updatPriceGapTicker(oldTicker, newTicker);
     }
 }

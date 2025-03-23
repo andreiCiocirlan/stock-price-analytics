@@ -77,4 +77,9 @@ public interface TickerRenameRepository extends JpaRepository<Stock, Long> {
     void updateFairValueGapTicker(@Param("oldTicker") String oldTicker,
                                          @Param("newTicker") String newTicker);
 
+    @Modifying
+    @Transactional
+    @Query("UPDATE PriceGap d SET d.ticker = :newTicker WHERE d.ticker = :oldTicker")
+    void updatPriceGapTicker(@Param("oldTicker") String oldTicker,
+                                  @Param("newTicker") String newTicker);
 }
