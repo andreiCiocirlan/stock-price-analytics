@@ -49,9 +49,6 @@ public abstract class HighLowForPeriod implements BusinessEntity {
     public MutablePair<Boolean, Boolean> newHighLowOrEqual(DailyPrice dailyPriceImported) {
         boolean newHighLowFound = false;
         boolean equalHighLowFound = false;
-
-        startDate = dailyPriceImported.getDate().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-        endDate = dailyPriceImported.getDate().with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
         if (dailyPriceImported.getHigh() > this.getHigh()) {
             this.setHigh(dailyPriceImported.getHigh());
             newHighLowFound = true;
@@ -77,6 +74,6 @@ public abstract class HighLowForPeriod implements BusinessEntity {
 
     @Override
     public String toString() {
-        return STR."ticker=\{ticker}, startDate=\{startDate}, endDate=\{endDate}";
+        return STR."id=\{id}, ticker=\{ticker}, startDate=\{startDate}, endDate=\{endDate}";
     }
 }
