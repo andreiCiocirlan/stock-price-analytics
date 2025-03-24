@@ -260,7 +260,7 @@ public class FairValueGapService {
 
     public void updateFVGPricesForStockSplit(String ticker, LocalDate stockSplitDate, double stockSplitMultiplier) {
         int updatedRows = fvgRepository.updateFVGPricesForStockSplit(ticker, stockSplitDate, stockSplitMultiplier);
-        log.warn("updated {} FVG rows for {} and stockSplitDate {}", updatedRows, ticker, stockSplitDate);
+        log.info("updated {} FVG rows for {} and stockSplitDate {}", updatedRows, ticker, stockSplitDate);
     }
 
     public void logFVGsTagged95thPercentile(List<Double> cfdMargins) {
@@ -269,7 +269,7 @@ public class FairValueGapService {
             for (PricePerformanceMilestone priceMilestone : milestones95thPercentile()) {
                 for (FvgType fvgType : FvgType.values()) {
                     String fvgLabel = fvgLabelFrom(priceMilestone, fvgType, timeframe);
-                    log.warn("{}", fvgLabel + fvgTaggedService.findTickersFVGsTaggedFor(timeframe, fvgType, priceMilestone, cfdMargins54));
+                    log.info("{}", fvgLabel + fvgTaggedService.findTickersFVGsTaggedFor(timeframe, fvgType, priceMilestone, cfdMargins54));
                 }
             }
         }
