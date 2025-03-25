@@ -89,14 +89,14 @@ public class DiscrepanciesService {
         return wHighLowPriceDiscrepanciesTickers;
     }
 
-    public List<Stock> findStocksWithOpeningPriceDiscrepancyFor(StockTimeframe timeframe) {
-        return switch (timeframe) {
+    public List<String> findStocksWithOpeningPriceDiscrepancyFor(StockTimeframe timeframe) {
+        return (switch (timeframe) {
             case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
             case WEEKLY -> stockDiscrepanciesRepository.findStocksWithWeeklyOpeningDiscrepancy();
             case MONTHLY -> stockDiscrepanciesRepository.findStocksWithMonthlyOpeningDiscrepancy();
             case QUARTERLY -> stockDiscrepanciesRepository.findStocksWithQuarterlyOpeningDiscrepancy();
             case YEARLY -> stockDiscrepanciesRepository.findStocksWithYearlyOpeningDiscrepancy();
-        };
+        }).stream().map(Stock::getTicker).toList();
     }
 
     public void updateHTFOpeningPricesDiscrepancyFor(StockTimeframe timeframe) {

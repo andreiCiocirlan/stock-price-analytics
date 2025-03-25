@@ -37,7 +37,7 @@ public class DiscrepanciesController {
     }
 
     @GetMapping("/stocks/opening-price")
-    public List<Stock> findStocksWithOpeningPriceDiscrepancy(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
+    public List<String> findStocksWithOpeningPriceDiscrepancy(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
         return discrepanciesService.findStocksWithOpeningPriceDiscrepancyFor(timeframe);
     }
 
