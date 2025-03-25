@@ -81,11 +81,11 @@ public class DailyPricesJSONService {
                     continue;
                 } else if (tradingDate.plusDays(5).isBefore(tradingDateNow)) {
                     // more than 5 days passed since last intraDay price
-                    log.warn("Not extracting delisted stock daily prices for ticker {} and date {}", ticker, tradingDate);
+                    log.info("Not extracting delisted stock daily prices for ticker {} and date {}", ticker, tradingDate);
                     continue;
                 } else {
                     // less than 5 days passed since last intraDay price
-                    log.warn("Extracting stock daily prices for ticker {} and date {}", ticker, tradingDate);
+                    log.info("Extracting stock daily prices for ticker {} and date {}", ticker, tradingDate);
                 }
             }
             compareAndAddToList(dailyPriceJson, recentJsonPricesById, dailyJSONPrices, preMarketPrices, sameDailyPrices, ticker);
@@ -98,9 +98,9 @@ public class DailyPricesJSONService {
         logInconsistentHighLowImportedPrices();
 
         if (!sameDailyPrices.isEmpty()) {
-            log.warn("same {} daily prices json as in DB", sameDailyPrices.size());
+            log.info("same {} daily prices json as in DB", sameDailyPrices.size());
             if (sameDailyPrices.size() <= MAX_TICKER_COUNT_PRINT) {
-                log.warn("{}", sameDailyPrices);
+                log.info("{}", sameDailyPrices);
             }
         }
         List<DailyPricesJSON> dailyPricesJSONSInCache = cacheService.cacheAndReturnDailyPricesJSON(dailyJSONPrices);
@@ -171,9 +171,9 @@ public class DailyPricesJSONService {
         }
 
         if (!sameDailyPrices.isEmpty()) {
-            log.warn("same {} daily prices json as in DB", sameDailyPrices.size());
+            log.info("same {} daily prices json as in DB", sameDailyPrices.size());
             if (sameDailyPrices.size() <= MAX_TICKER_COUNT_PRINT) {
-                log.warn("{}", sameDailyPrices);
+                log.info("{}", sameDailyPrices);
             }
         }
 

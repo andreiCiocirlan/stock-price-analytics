@@ -57,12 +57,12 @@ public class YahooQuoteService {
         }
 
         if (!tickersNotImported.isEmpty()) {
-            log.warn("Did not import {} tickers", tickersNotImported.size());
+            log.info("Did not import {} tickers", tickersNotImported.size());
             if (tickersNotImported.size() <= MAX_TICKER_COUNT_PRINT) {
-                log.warn("{}", tickersNotImported);
+                log.info("{}", tickersNotImported);
             }
         } else {
-            log.warn("Imported {} tickers", dailyImportedPrices.size());
+            log.info("Imported {} tickers", dailyImportedPrices.size());
         }
 
         // cache Intraday Spike tickers (compares closing prices from dailyPrices and stocks cache, which was not updated yet)

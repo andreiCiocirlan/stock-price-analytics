@@ -44,7 +44,7 @@ public class EndOfDayScheduler {
         // update opening prices for first import of the week, month, quarter, year
         for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
             if (cacheService.isFirstImportFor(timeframe)) {
-                log.warn("Updating {} opening prices for stocks, OHLC tables", timeframe);
+                log.info("Updating {} opening prices for stocks, OHLC tables", timeframe);
                 discrepanciesService.updateHTFOpeningPricesDiscrepancyFor(timeframe);
                 discrepanciesService.updateStocksWithOpeningPriceDiscrepancyFor(timeframe);
                 priceGapsService.savePriceGapsTodayFor(cacheService.getCachedTickers(), timeframe);
