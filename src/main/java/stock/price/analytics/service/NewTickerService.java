@@ -187,9 +187,9 @@ public class NewTickerService {
         };
     }
 
-    private void saveHighLowPricesForPeriodFrom(List<AbstractPrice> htfPricesImported) {
+    private void saveHighLowPricesForPeriodFrom(List<AbstractPrice> weeklyPricesImported) {
         List<HighLowForPeriod> highLowForPeriodPrices = new ArrayList<>();
-        Map<String, List<AbstractPrice>> weeklyPricesByTicker = htfPricesImported.stream()
+        Map<String, List<AbstractPrice>> weeklyPricesByTicker = weeklyPricesImported.stream()
                 .filter(price -> price.getTimeframe() == StockTimeframe.WEEKLY)
                 .collect(Collectors.groupingBy(AbstractPrice::getTicker));
 
