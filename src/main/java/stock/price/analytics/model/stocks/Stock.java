@@ -8,7 +8,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import stock.price.analytics.model.BusinessEntity;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
-import stock.price.analytics.model.prices.ohlc.*;
+import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 
 import java.time.LocalDate;
 import java.util.Objects;

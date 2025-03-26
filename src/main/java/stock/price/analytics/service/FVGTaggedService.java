@@ -7,10 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
-import stock.price.analytics.model.prices.fvg.FairValueGap;
-import stock.price.analytics.model.prices.fvg.enums.FvgType;
 import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
+import stock.price.analytics.model.prices.fvg.FairValueGap;
+import stock.price.analytics.model.prices.fvg.enums.FvgType;
 
 import java.util.List;
 import java.util.Set;
