@@ -8,7 +8,6 @@ import stock.price.analytics.repository.stocks.StockRepository;
 import stock.price.analytics.service.StockService;
 import stock.price.analytics.service.TickerRenameService;
 
-import java.io.IOException;
 import java.util.List;
 
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
@@ -21,12 +20,6 @@ public class StockController {
     private final StockService stockService;
     private final StockRepository stockRepository;
     private final TickerRenameService tickerRenameService;
-
-    @PostMapping("/save_all")
-    @ResponseStatus(HttpStatus.OK)
-    public void saveStocksInDB() throws IOException {
-        stockService.saveStocks();
-    }
 
     @PostMapping("/save_stock")
     public void saveStockInDB(@RequestParam(value = "tickers") String tickers,

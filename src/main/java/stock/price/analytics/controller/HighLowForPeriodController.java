@@ -7,7 +7,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.cache.CacheService;
-import stock.price.analytics.model.prices.enums.StockPerformanceInterval;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.service.HighLowForPeriodService;
@@ -23,18 +22,6 @@ public class HighLowForPeriodController {
 
     private final HighLowForPeriodService highLowForPeriodService;
     private final CacheService cacheService;
-
-    @PostMapping("/save-52w-high-low")
-    @ResponseStatus(HttpStatus.OK)
-    public void save52WeekHighLowPrices() {
-        highLowForPeriodService.saveHighLowPricesForPeriod(StockPerformanceInterval.STOCK_PERF_INTERVAL_52W);
-    }
-
-    @PostMapping("/save-30d-high-low")
-    @ResponseStatus(HttpStatus.OK)
-    public void save30DayHighLowPrices() {
-        highLowForPeriodService.saveHighLowPricesForPeriod(StockPerformanceInterval.STOCK_PERF_INTERVAL_30D);
-    }
 
     @PostMapping("/save-all-hl-4w-52w-ticker")
     @ResponseStatus(HttpStatus.OK)

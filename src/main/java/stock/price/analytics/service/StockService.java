@@ -7,27 +7,18 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
-import stock.price.analytics.model.prices.ohlc.*;
+import stock.price.analytics.model.prices.ohlc.AbstractPrice;
+import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.stocks.StockRepository;
-import stock.price.analytics.util.Constants;
-import stock.price.analytics.util.FileUtils;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
-import java.util.stream.Stream;
 
-import static java.nio.file.Files.walk;
 import static stock.price.analytics.util.LoggingUtil.logTime;
-import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
-import static stock.price.analytics.util.PricesUtil.tickerFrom;
 
 @Slf4j
 @Service
@@ -36,27 +27,6 @@ public class StockService {
 
     private final StockRepository stockRepository;
     private final CacheService cacheService;
-
-    @Transactional
-    public void saveStocks() throws IOException {
-        List<String> tickersXTB = FileUtils.readTickersXTB().stream().map(s -> s.concat(".csv")).toList();
-        List<Stock> stocks = new ArrayList<>();
-        List<String> existingStocks = stockRepository.findAll().stream().map(Stock::getTicker).toList();
-        try (Stream<Path> walk = walk(Paths.get(Constants.STOCKS_LOCATION))) {
-            walk.filter(Files::isRegularFile)
-                    .filter(srcFile -> !existingStocks.contains(tickerFrom(srcFile)))
-                    .parallel().forEachOrdered(srcFile -> { // must be forEachOrdered
-                        String fileName = srcFile.getFileName().toString();
-                        String ticker = fileName.substring(0, fileName.length() - 4);
-                        boolean xtbStock = tickersXTB.contains(fileName);
-                        stocks.add(new Stock(ticker, LocalDate.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.FRIDAY)), xtbStock));
-                    });
-        }
-        boolean removed = stocks.removeAll(stockRepository.findAll());
-        log.info("remaining stocks {}", stocks);
-        log.info("removed {}", removed);
-        partitionDataAndSave(stocks, stockRepository);
-    }
 
     @Transactional
     public void saveStocks(String tickers, boolean xtbStock, boolean shortSell, double cfdMargin) {
