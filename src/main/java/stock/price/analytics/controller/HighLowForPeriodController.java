@@ -17,6 +17,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
+@RequestMapping("/high-low")
 @RequiredArgsConstructor
 public class HighLowForPeriodController {
 
