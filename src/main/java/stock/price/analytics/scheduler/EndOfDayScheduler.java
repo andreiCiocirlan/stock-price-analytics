@@ -11,6 +11,10 @@ import stock.price.analytics.service.DesktopNotificationService;
 import stock.price.analytics.service.DiscrepanciesService;
 import stock.price.analytics.service.PriceGapsService;
 
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -24,22 +28,25 @@ public class EndOfDayScheduler {
     // 0 45 16 * * MON-FRI
     @Scheduled(cron = "${cron.post.market.processing}", zone = "${cron.timezone}")
     public void postProcessingEndOfDay() {
-        String title = "Discrepancy Found";
-        if (!discrepanciesService.findStocksOpeningPriceDiscrepancies().isEmpty()) {
-            desktopNotificationService.broadcastDesktopNotification(title, "Stocks Opening Price Discrepancies found, check logs!");
-        }
-        if (!discrepanciesService.findStocksHighLowsOrHTFDiscrepancies().isEmpty()) {
-            desktopNotificationService.broadcastDesktopNotification(title, "Stocks High-Low/HTF Discrepancies found, check logs!");
-        }
-        if (!discrepanciesService.findFvgDateDiscrepancies().isEmpty()) {
-            desktopNotificationService.broadcastDesktopNotification(title, "FVG Date discrepancies found, check logs!");
-        }
-        if (!discrepanciesService.findWeeklyOpeningPriceDiscrepancies().isEmpty()) {
-            desktopNotificationService.broadcastDesktopNotification(title, "Weekly opening price discrepancies found, check logs!");
-        }
-        if (!discrepanciesService.findWeeklyHighLowPriceDiscrepancies().isEmpty()) {
-            desktopNotificationService.broadcastDesktopNotification(title, "Weekly High-Low price discrepancies found, check logs!");
-        }
+        log.info("EOD post-processing started");
+
+        Map<String, Supplier<List<String>>> discrepancyChecks = Map.of(
+                "Stocks Opening Price", discrepanciesService::findStocksOpeningPriceDiscrepancies,
+                "Stocks High-Low/HTF", discrepanciesService::findStocksHighLowsOrHTFDiscrepancies,
+                "FVG Date", discrepanciesService::findFvgDateDiscrepancies,
+                "Weekly Opening Price", discrepanciesService::findWeeklyOpeningPriceDiscrepancies,
+                "Weekly High-Low Price", discrepanciesService::findWeeklyHighLowPriceDiscrepancies
+        );
+
+        discrepancyChecks.forEach((discrepancyType, supplier) -> {
+            List<?> discrepancies = supplier.get();
+            if (!discrepancies.isEmpty()) {
+                desktopNotificationService.broadcastDesktopNotification(
+                        "Discrepancy Found",
+                        discrepancyType + " Discrepancies found, check logs! Discrepancies count: " + discrepancies.size()
+                );
+            }
+        });
 
         // update opening prices for first import of the week, month, quarter, year
         for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
