@@ -17,6 +17,18 @@ public class CacheController {
 
     private final CacheService cacheService;
 
+    @GetMapping("/new-high-lows")
+    @ResponseStatus(HttpStatus.OK)
+    public List<String> newDailyHighLowsForHLPeriods(@RequestParam("highLowPeriod") HighLowPeriod highLowPeriod) {
+        return cacheService.getNewHighLowsForHLPeriod(highLowPeriod);
+    }
+
+    @GetMapping("/equal-high-lows")
+    @ResponseStatus(HttpStatus.OK)
+    public List<String> equalHighLowsForHLPeriods(@RequestParam("highLowPeriod") HighLowPeriod highLowPeriod) {
+        return cacheService.getEqualHighLowsForHLPeriod(highLowPeriod);
+    }
+
     @GetMapping("/high-lows")
     @ResponseStatus(HttpStatus.OK)
     public List<? extends HighLowForPeriod> highLowsForTicker(@RequestParam("ticker") String ticker) {
