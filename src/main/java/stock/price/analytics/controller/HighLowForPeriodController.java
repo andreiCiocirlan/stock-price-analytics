@@ -45,14 +45,5 @@ public class HighLowForPeriodController {
         cacheService.logEqualHighLowsForHLPeriods();
     }
 
-    @GetMapping("/high-lows-for-ticker")
-    @ResponseStatus(HttpStatus.OK)
-    public List<? extends HighLowForPeriod> highLowsForTicker(@RequestParam("ticker") String ticker) {
-        List<HighLowForPeriod> result = new ArrayList<>();
-        result.add(cacheService.highLowForPeriodPricesFor(HighLowPeriod.HIGH_LOW_4W).stream().filter(hlp -> ticker.equals(hlp.getTicker())).findFirst().orElseThrow());
-        result.add(cacheService.highLowForPeriodPricesFor(HighLowPeriod.HIGH_LOW_52W).stream().filter(hlp -> ticker.equals(hlp.getTicker())).findFirst().orElseThrow());
-        result.add(cacheService.highLowForPeriodPricesFor(HighLowPeriod.HIGH_LOW_ALL_TIME).stream().filter(hlp -> ticker.equals(hlp.getTicker())).findFirst().orElseThrow());
-        return result;
-    }
 
 }
