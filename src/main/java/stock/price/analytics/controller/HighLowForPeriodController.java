@@ -7,12 +7,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.cache.CacheService;
-import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
-import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.service.HighLowForPeriodService;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
