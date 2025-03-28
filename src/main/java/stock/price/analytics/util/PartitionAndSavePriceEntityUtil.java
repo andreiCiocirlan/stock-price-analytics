@@ -15,6 +15,8 @@ import static stock.price.analytics.util.LoggingUtil.logTime;
 @Component
 public class PartitionAndSavePriceEntityUtil {
 
+    public static final int BATCH_SIZE = 250;
+
     public static <T, R extends BusinessEntity> void partitionDataAndSaveWithLogTime(List<T> entities, JpaRepository<R, Long> repository, String functionName) {
         logTime(() -> partitionAndSave(entities, repository), functionName);
     }
@@ -34,8 +36,8 @@ public class PartitionAndSavePriceEntityUtil {
             return;
         }
         List<List<T>> partitions = new ArrayList<>();
-        for (int i = 0; i < entities.size(); i += 250) { // default batchSize to 250 like in application.properties
-            partitions.add(entities.subList(i, Math.min(i + 250, entities.size())));
+        for (int i = 0; i < entities.size(); i += BATCH_SIZE) { // default batchSize to 250 like in application.properties
+            partitions.add(entities.subList(i, Math.min(i + BATCH_SIZE, entities.size())));
         }
         List<CompletableFuture<Void>> futures = partitions.parallelStream()
                 .map(partition -> CompletableFuture.runAsync(() -> {
