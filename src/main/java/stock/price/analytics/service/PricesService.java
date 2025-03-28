@@ -95,6 +95,7 @@ public class PricesService {
         return logTimeAndReturn(() -> updateHTF(importedDailyPrices), "updated prices for higher timeframes");
     }
 
+    @Transactional
     private List<AbstractPrice> updateHTF(List<DailyPrice> importedDailyPrices) {
         List<String> tickers = new ArrayList<>(importedDailyPrices.stream().map(DailyPrice::getTicker).toList());
 

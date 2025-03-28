@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.MutablePair;
@@ -66,6 +67,7 @@ public class DailyPricesJSONService {
         }
     }
 
+    @Transactional
     public List<DailyPricesJSON> extractDailyJSONPricesAndSave(List<DailyPricesJSON> dailyPricesJSON, List<DailyPricesJSON> recentJsonPrices) {
         List<String> sameDailyPrices = new ArrayList<>();
         List<DailyPricesJSON> dailyJSONPrices = new ArrayList<>();
@@ -221,6 +223,7 @@ public class DailyPricesJSONService {
         return new MutablePair<>(high, low);
     }
 
+    @Transactional
     public void saveDailyPricesJSONFrom(String fileName) {
         String[] split = fileName.split("a");
         Set<DailyPricesJSON> dailyPricesJSON = new HashSet<>();

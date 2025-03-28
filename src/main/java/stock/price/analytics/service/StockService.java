@@ -80,6 +80,7 @@ public class StockService {
         }
     }
 
+    @Transactional
     public void updateStocksHighLowsAndOHLCFrom(List<DailyPrice> dailyPrices, List<AbstractPrice> htfPrices) {
         Set<Stock> stocksUpdated = new HashSet<>();
         updateStocksFromOHLCPrices(dailyPrices, htfPrices, stocksUpdated);

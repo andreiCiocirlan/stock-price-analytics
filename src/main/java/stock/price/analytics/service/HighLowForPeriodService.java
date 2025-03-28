@@ -35,6 +35,7 @@ public class HighLowForPeriodService {
     private final HighLowForPeriodRepository highLowForPeriodRepository;
     private final CacheService cacheService;
 
+    @Transactional
     public void saveCurrentWeekHighLowPricesFrom(List<DailyPrice> dailyPrices) {
         List<String> tickers = dailyPrices.stream().map(DailyPrice::getTicker).toList();
         for (HighLowPeriod highLowPeriod : values()) {
