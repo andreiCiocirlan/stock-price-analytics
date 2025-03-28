@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.format.annotation.DateTimeFormat;
 import stock.price.analytics.model.BusinessEntity;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
@@ -15,6 +16,7 @@ import java.util.Objects;
 
 @Setter
 @Getter
+@DynamicUpdate
 @NoArgsConstructor
 @Entity
 @Table(name = "stocks")

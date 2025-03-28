@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
 import stock.price.analytics.model.BusinessEntity;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.fvg.FairValueGap;
@@ -15,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 
 @Getter
 @Setter
+@DynamicUpdate
 @MappedSuperclass
 @NoArgsConstructor
 public abstract class AbstractPrice implements BusinessEntity {

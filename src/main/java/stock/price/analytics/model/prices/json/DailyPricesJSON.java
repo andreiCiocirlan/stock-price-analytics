@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
 import stock.price.analytics.model.BusinessEntity;
 import stock.price.analytics.model.prices.ohlc.CandleOHLC;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
@@ -18,6 +19,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @Entity
+@DynamicUpdate
 @NoArgsConstructor
 @Table(name = "daily_prices_json")
 @JsonIgnoreProperties(ignoreUnknown=true)

@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.MutablePair;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.format.annotation.DateTimeFormat;
 import stock.price.analytics.model.BusinessEntity;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
@@ -15,10 +16,11 @@ import stock.price.analytics.model.stocks.Stock;
 import java.time.LocalDate;
 
 @Slf4j
-@MappedSuperclass
-@NoArgsConstructor
 @Setter
 @Getter
+@DynamicUpdate
+@MappedSuperclass
+@NoArgsConstructor
 public abstract class HighLowForPeriod implements BusinessEntity {
 
     @Id
