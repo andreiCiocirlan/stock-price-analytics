@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 import static java.nio.file.Files.readAllLines;
 import static stock.price.analytics.util.Constants.MAX_TICKER_COUNT_PRINT;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
-import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 @Slf4j
@@ -38,6 +37,7 @@ public class DailyPricesJSONService {
     private static final List<String> inconsistentHighs = new ArrayList<>();
     private static final List<String> inconsistentLows = new ArrayList<>();
     private final CacheService cacheService;
+    private final AsyncPersistenceService asyncPersistenceService;
     private final DailyPricesJSONRepository dailyPricesJSONRepository;
 
     public List<DailyPrice> dailyPricesFromFile(String fileName) {
@@ -107,7 +107,7 @@ public class DailyPricesJSONService {
         }
         List<DailyPricesJSON> dailyPricesJSONSInCache = cacheService.cacheAndReturnDailyPricesJSON(dailyJSONPrices);
         if (!dailyPricesJSONSInCache.isEmpty()) {
-            partitionDataAndSaveWithLogTime(dailyPricesJSONSInCache, dailyPricesJSONRepository, "saved " + dailyPricesJSONSInCache.size() +  " daily json prices");
+            asyncPersistenceService.partitionDataAndSaveWithLogTime(dailyPricesJSONSInCache, dailyPricesJSONRepository, "saved " + dailyPricesJSONSInCache.size() +  " daily json prices");
         }
 
         return dailyPricesJSONSInCache;
@@ -236,7 +236,7 @@ public class DailyPricesJSONService {
                 .toList();
 
         if (!dailyPricesJSON_toSave.isEmpty()) {
-            partitionDataAndSaveWithLogTime(dailyPricesJSON_toSave, dailyPricesJSONRepository, "saved " + dailyPricesJSON_toSave.size() + " daily json prices");
+            asyncPersistenceService.partitionDataAndSaveWithLogTime(dailyPricesJSON_toSave, dailyPricesJSONRepository, "saved " + dailyPricesJSON_toSave.size() + " daily json prices");
         }
     }
 

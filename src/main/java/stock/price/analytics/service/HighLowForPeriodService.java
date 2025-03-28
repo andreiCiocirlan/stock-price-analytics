@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 import static stock.price.analytics.model.prices.highlow.enums.HighLowPeriod.values;
 import static stock.price.analytics.util.Constants.NY_ZONE;
 import static stock.price.analytics.util.LoggingUtil.logTime;
-import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveNoLogging;
 
 @Slf4j
 @Service
@@ -34,6 +33,7 @@ public class HighLowForPeriodService {
     private final EntityManager entityManager;
     private final HighLowForPeriodRepository highLowForPeriodRepository;
     private final CacheService cacheService;
+    private final AsyncPersistenceService asyncPersistenceService;
 
     @Transactional
     public void saveCurrentWeekHighLowPricesFrom(List<DailyPrice> dailyPrices) {
@@ -41,7 +41,7 @@ public class HighLowForPeriodService {
         for (HighLowPeriod highLowPeriod : values()) {
             List<? extends HighLowForPeriod> hlPricesUpdated = cacheService.getUpdatedHighLowPricesForTickers(dailyPrices, tickers, highLowPeriod);
             if (!hlPricesUpdated.isEmpty()) {
-                partitionDataAndSaveNoLogging(hlPricesUpdated, highLowForPeriodRepository);
+                asyncPersistenceService.partitionDataAndSaveNoLogging(hlPricesUpdated, highLowForPeriodRepository);
                 cacheService.addHighLowPrices(hlPricesUpdated, highLowPeriod);
             }
         }

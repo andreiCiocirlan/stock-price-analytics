@@ -24,8 +24,6 @@ import java.util.stream.Collectors;
 import static stock.price.analytics.model.prices.enums.StockTimeframe.DAILY;
 import static stock.price.analytics.model.prices.enums.StockTimeframe.higherTimeframes;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
-import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
-import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
 import static stock.price.analytics.util.StockDateUtils.isWithinSameTimeframe;
 
 
@@ -44,6 +42,7 @@ public class PricesService {
     private final QuarterlyPricesRepository quarterlyPricesRepository;
     private final YearlyPricesRepository yearlyPricesRepository;
     private final CacheService cacheService;
+    private final AsyncPersistenceService asyncPersistenceService;
 
 
     @SuppressWarnings("unchecked")
@@ -107,7 +106,7 @@ public class PricesService {
             htfPricesUpdated.addAll(htfPricesWithPrevCloseUpdated.stream().map(PriceWithPrevClose::getPrice).toList());
             cacheService.addHtfPricesWithPrevClose(htfPricesWithPrevCloseUpdated);
         }
-        partitionDataAndSaveWithLogTime(htfPricesUpdated, pricesRepository, "saved HTF prices");
+        asyncPersistenceService.partitionDataAndSaveWithLogTime(htfPricesUpdated, pricesRepository, "saved HTF prices");
 
         return htfPricesUpdated;
     }
@@ -247,6 +246,6 @@ public class PricesService {
 
     @Transactional
     public void savePrices(List<? extends AbstractPrice> prices) {
-        partitionDataAndSave(prices, pricesRepository);
+        asyncPersistenceService.partitionDataAndSave(prices, pricesRepository);
     }
 }

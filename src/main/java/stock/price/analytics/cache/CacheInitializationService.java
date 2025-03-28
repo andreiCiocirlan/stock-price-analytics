@@ -14,6 +14,7 @@ import stock.price.analytics.repository.prices.highlow.HighLowForPeriodRepositor
 import stock.price.analytics.repository.prices.json.DailyPricesJSONRepository;
 import stock.price.analytics.repository.prices.ohlc.DailyPricesRepository;
 import stock.price.analytics.repository.stocks.StockRepository;
+import stock.price.analytics.service.AsyncPersistenceService;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -23,7 +24,6 @@ import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
 import static stock.price.analytics.model.stocks.enums.MarketState.REGULAR;
-import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 @Slf4j
@@ -41,6 +41,7 @@ public class CacheInitializationService {
     private final HighLowForPeriodRepository highLowForPeriodRepository;
     private final StocksCache stocksCache;
     private final CacheService cacheService;
+    private final AsyncPersistenceService asyncPersistenceService;
 
     public void initDailyJSONPricesCache() {
         LocalDate tradingDateNow = tradingDateNow();
@@ -100,7 +101,7 @@ public class CacheInitializationService {
             if (highLowPeriod == HighLowPeriod.HIGH_LOW_ALL_TIME) { // for all-time highs/lows simply copy the existing row on Mondays
                 List<HighestLowestPrices> highestLowestPrices = new ArrayList<>();
                 highLowForPeriodRepository.highestLowestPrices(startDate).forEach(hlp -> highestLowestPrices.add(hlp.copyWith(newWeekStartDate)));
-                partitionDataAndSave(highestLowestPrices, highLowForPeriodRepository);
+                asyncPersistenceService.partitionDataAndSave(highestLowestPrices, highLowForPeriodRepository);
                 highLowPricesCache.addHighLowPrices(highestLowestPrices, highLowPeriod);
             } else { // for 4w, 52w need sql select for the period (for all-time it would simply be a copy)
                 int weekCount = switch (highLowPeriod) {
@@ -112,7 +113,7 @@ public class CacheInitializationService {
                         .stream()
                         .map(dto -> convertToHighLowForPeriod(dto, newWeekStartDate, newWeekEndDate, highLowPeriod))
                         .toList();
-                partitionDataAndSave(highLowForPeriods, highLowForPeriodRepository);
+                asyncPersistenceService.partitionDataAndSave(highLowForPeriods, highLowForPeriodRepository);
                 highLowPricesCache.addHighLowPrices(highLowForPeriods, highLowPeriod);
             }
         } else {
@@ -151,7 +152,7 @@ public class CacheInitializationService {
                 .toList();
 
         if (!delistedStocks.isEmpty()) {
-            partitionDataAndSave(delistedStocks, stockRepository);
+            asyncPersistenceService.partitionDataAndSave(delistedStocks, stockRepository);
         }
     }
 

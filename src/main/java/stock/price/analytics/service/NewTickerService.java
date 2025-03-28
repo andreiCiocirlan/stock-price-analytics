@@ -39,7 +39,6 @@ import java.util.stream.Collectors;
 
 import static java.nio.file.Files.readAllLines;
 import static stock.price.analytics.util.Constants.USER_AGENT_VALUE;
-import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveNoLogging;
 import static stock.price.analytics.util.PricesUtil.htfPricesForTimeframe;
 
 @Slf4j
@@ -54,6 +53,7 @@ public class NewTickerService {
     private final PricesService pricesService;
     private final PriceGapsService priceGapsService;
     private final FairValueGapService fairValueGapService;
+    private final AsyncPersistenceService asyncPersistenceService;
     private final HighLowForPeriodRepository highLowForPeriodRepository;
     private String COOKIE;
 
@@ -232,7 +232,7 @@ public class NewTickerService {
 
             }
         }
-        partitionDataAndSaveNoLogging(highLowForPeriodPrices, highLowForPeriodRepository);
+        asyncPersistenceService.partitionDataAndSaveNoLogging(highLowForPeriodPrices, highLowForPeriodRepository);
     }
 
     private List<DailyPrice> extractDailyPricesFrom(String ticker, String jsonResponse) throws JsonProcessingException {

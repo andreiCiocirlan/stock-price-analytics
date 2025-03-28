@@ -24,7 +24,6 @@ import static stock.price.analytics.model.prices.enums.PricePerformanceMilestone
 import static stock.price.analytics.model.prices.fvg.enums.FvgType.BEARISH;
 import static stock.price.analytics.model.prices.fvg.enums.FvgType.BULLISH;
 import static stock.price.analytics.util.Constants.*;
-import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveNoLogging;
 
 @Slf4j
 @Service
@@ -34,6 +33,7 @@ public class FairValueGapService {
     private final FVGRepository fvgRepository;
     private final FVGTaggedService fvgTaggedService;
     private final CacheService cacheService;
+    private final AsyncPersistenceService asyncPersistenceService;
 
     private boolean updateUnfilledGapsHighLowAndStatus(FairValueGap fvg, List<AbstractPrice> pricesForTicker) {
         // copy original state and compare at the end
@@ -162,7 +162,7 @@ public class FairValueGapService {
     public void findNewFVGsAndSaveFor(List<String> tickers, StockTimeframe timeframe, boolean allHistoricalData) {
         List<FairValueGap> newFVGs = findNewFVGsFor(tickers, timeframe, allHistoricalData);
         if (!newFVGs.isEmpty()) {
-            partitionDataAndSaveNoLogging(newFVGs, fvgRepository);
+            asyncPersistenceService.partitionDataAndSaveNoLogging(newFVGs, fvgRepository);
         }
     }
 
@@ -204,7 +204,7 @@ public class FairValueGapService {
     public void updateFVGsHighLowAndClosedFor(StockTimeframe timeframe, boolean allHistoricalData) {
         List<FairValueGap> updatedFVGs = findUpdatedFVGsHighLowAndClosedFor(timeframe, allHistoricalData);
         if (!updatedFVGs.isEmpty()) {
-            partitionDataAndSaveNoLogging(updatedFVGs, fvgRepository);
+            asyncPersistenceService.partitionDataAndSaveNoLogging(updatedFVGs, fvgRepository);
         }
     }
 

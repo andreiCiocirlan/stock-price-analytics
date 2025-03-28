@@ -18,7 +18,6 @@ import static stock.price.analytics.util.Constants.MAX_TICKER_COUNT_PRINT;
 import static stock.price.analytics.util.FileUtils.writeToFile;
 import static stock.price.analytics.util.JsonUtils.mergedPricesJSONs;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
-import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateImported;
 
 @Slf4j
@@ -28,6 +27,7 @@ public class YahooQuoteService {
 
     private final YahooQuoteClient yahooQuoteClient;
     private final CacheService cacheService;
+    private final AsyncPersistenceService asyncPersistenceService;
     private final DailyPricesJSONService dailyPricesJSONService;
     private final PriceMilestoneService priceMilestoneService;
     private final DailyPricesRepository dailyPricesRepository;
@@ -53,7 +53,7 @@ public class YahooQuoteService {
             String fileName = tradingDateImported(dailyPricesExtractedFromJSON).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + ".json";
             String path = "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/" + fileName;
             writeToFile(path, pricesJSON);
-            partitionDataAndSaveWithLogTime(dailyImportedPrices, dailyPricesRepository, "saved " + dailyImportedPrices.size() + " daily prices");
+            asyncPersistenceService.partitionDataAndSaveWithLogTime(dailyImportedPrices, dailyPricesRepository, "saved " + dailyImportedPrices.size() + " daily prices");
         }
 
         if (!tickersNotImported.isEmpty()) {

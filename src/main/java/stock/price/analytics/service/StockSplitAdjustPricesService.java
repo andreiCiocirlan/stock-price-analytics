@@ -11,7 +11,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static java.time.temporal.TemporalAdjusters.*;
-import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSave;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +22,7 @@ public class StockSplitAdjustPricesService {
     private final MonthlyPricesRepository monthlyPricesRepository;
     private final QuarterlyPricesRepository quarterlyPricesRepository;
     private final YearlyPricesRepository yearlyPricesRepository;
+    private final AsyncPersistenceService asyncPersistenceService;
 
     public void adjustPricesFor(String ticker, LocalDate stockSplitDate, double priceMultiplier) {
         List<DailyPrice> dailyPricesToUpdate = dailyPricesRepository.findByTickerAndDateLessThan(ticker, stockSplitDate);
@@ -37,11 +37,11 @@ public class StockSplitAdjustPricesService {
         quarterlyPricesToUpdate.forEach(quarterlyPrices -> updatePrices(quarterlyPrices, priceMultiplier));
         yearlyPricesToUpdate.forEach(yearlyPrices -> updatePrices(yearlyPrices, priceMultiplier));
 
-        partitionDataAndSave(dailyPricesToUpdate, dailyPricesRepository);
-        partitionDataAndSave(weeklyPricesToUpdate, weeklyPricesRepository);
-        partitionDataAndSave(monthlyPricesToUpdate, monthlyPricesRepository);
-        partitionDataAndSave(quarterlyPricesToUpdate, quarterlyPricesRepository);
-        partitionDataAndSave(yearlyPricesToUpdate, yearlyPricesRepository);
+        asyncPersistenceService.partitionDataAndSave(dailyPricesToUpdate, dailyPricesRepository);
+        asyncPersistenceService.partitionDataAndSave(weeklyPricesToUpdate, weeklyPricesRepository);
+        asyncPersistenceService.partitionDataAndSave(monthlyPricesToUpdate, monthlyPricesRepository);
+        asyncPersistenceService.partitionDataAndSave(quarterlyPricesToUpdate, quarterlyPricesRepository);
+        asyncPersistenceService.partitionDataAndSave(yearlyPricesToUpdate, yearlyPricesRepository);
     }
 
     public List<? extends AbstractPrice> adjustPricesForDateAndTimeframe(String ticker, LocalDate date, double priceMultiplier, StockTimeframe timeframe, String ohlc) {
@@ -54,7 +54,7 @@ public class StockSplitAdjustPricesService {
         };
 
         pricesToUpdate.forEach(dailyPrice -> updatePrices(dailyPrice, ohlc, priceMultiplier));
-        partitionDataAndSave(pricesToUpdate, pricesRepository);
+        asyncPersistenceService.partitionDataAndSave(pricesToUpdate, pricesRepository);
         return pricesToUpdate;
     }
 

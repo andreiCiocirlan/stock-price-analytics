@@ -18,7 +18,6 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 
 import static stock.price.analytics.util.LoggingUtil.logTime;
-import static stock.price.analytics.util.PartitionAndSavePriceEntityUtil.partitionDataAndSaveWithLogTime;
 
 @Slf4j
 @Service
@@ -27,6 +26,7 @@ public class StockService {
 
     private final StockRepository stockRepository;
     private final CacheService cacheService;
+    private final AsyncPersistenceService asyncPersistenceService;
 
     @Transactional
     public void saveStocks(String tickers, boolean xtbStock, boolean shortSell, double cfdMargin) {
@@ -87,7 +87,7 @@ public class StockService {
         updateStocksFromHighLowCaches(stocksUpdated);
 
         List<Stock> stocks = new ArrayList<>(stocksUpdated);
-        partitionDataAndSaveWithLogTime(stocks, stockRepository, "saved " + stocks.size() + " stocks after OHLC higher-timeframe and high-lows 4w, 52w, all-time updates");
+        asyncPersistenceService.partitionDataAndSaveWithLogTime(stocks, stockRepository, "saved " + stocks.size() + " stocks after OHLC higher-timeframe and high-lows 4w, 52w, all-time updates");
         cacheService.addStocks(stocks);
     }
 
@@ -96,7 +96,7 @@ public class StockService {
         updateStocksFromHighLowCaches(stocksUpdated);
 
         List<Stock> stocks = new ArrayList<>(stocksUpdated);
-        partitionDataAndSaveWithLogTime(stocks, stockRepository, "saved stocks after generating high-lows 4w, 52w, all-time for the first import of the week");
+        asyncPersistenceService.partitionDataAndSaveWithLogTime(stocks, stockRepository, "saved stocks after generating high-lows 4w, 52w, all-time for the first import of the week");
         cacheService.addStocks(stocks);
     }
 
