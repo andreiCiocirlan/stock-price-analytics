@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
 import stock.price.analytics.model.BusinessEntity;
 import stock.price.analytics.model.prices.enums.GapStatus;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
@@ -13,6 +14,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Entity
+@DynamicUpdate
 @NoArgsConstructor
 @Table(name = "price_gaps")
 public class PriceGap implements BusinessEntity {
