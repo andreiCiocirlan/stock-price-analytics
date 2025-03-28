@@ -1,6 +1,5 @@
 package stock.price.analytics.controller;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,7 +25,6 @@ public class FinnhubController {
         return finnhubClient.intraDayPricesFor(ticker).orElseThrow();
     }
 
-    @Transactional
     @GetMapping("/daily-prices-all-xtb")
     public void finnhubIntraDayPricesTickersXTB() {
         List<DailyPrice> dailyPrices = finnhubClient.intraDayPricesXTB();

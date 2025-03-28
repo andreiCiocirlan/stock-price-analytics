@@ -1,6 +1,5 @@
 package stock.price.analytics.controller;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -22,7 +21,6 @@ public class DailyPricesJSONController {
         dailyPricesJSONService.exportDailyPricesToJson(tradingDate);
     }
 
-    @Transactional
     @PostMapping("/save-json-from-file")
     public void saveDailyPricesJSONFrom(@RequestParam("fileName") String fileName) {
         dailyPricesJSONService.saveDailyPricesJSONFrom(fileName);

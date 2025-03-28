@@ -1,6 +1,5 @@
 package stock.price.analytics.controller;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -23,7 +22,6 @@ public class HighLowForPeriodController {
 
     @PostMapping("/save-all-hl-4w-52w-ticker")
     @ResponseStatus(HttpStatus.OK)
-    @Transactional
     public void saveAllHistoricalHighLowPrices(@RequestParam("ticker") String ticker,
                                                        @RequestParam(name = "tradingDate")
                                                             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate tradingDate) {

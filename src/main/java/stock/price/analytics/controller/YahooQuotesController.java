@@ -1,6 +1,5 @@
 package stock.price.analytics.controller;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -32,7 +31,6 @@ public class YahooQuotesController {
     private final HighLowForPeriodService highLowForPeriodService;
     private final StockService stockService;
 
-    @Transactional
     @GetMapping("/import")
     @ResponseStatus(HttpStatus.OK)
     public List<DailyPrice> yahooQuotesImport() {
@@ -49,7 +47,6 @@ public class YahooQuotesController {
         return dailyImportedPrices;
     }
 
-    @Transactional
     @GetMapping("/from-file")
     @ResponseStatus(HttpStatus.OK)
     public List<DailyPrice> yahooQuotesImportFromFile(@RequestParam(value = "fileName", required = false) String fileNameStr) {
