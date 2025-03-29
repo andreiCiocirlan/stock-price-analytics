@@ -60,12 +60,6 @@
     "allDeclaredFields": true
   },
   {
-    "name": "stock.price.analytics.controller.FinnhubController",
-    "allDeclaredConstructors": true,
-    "allDeclaredMethods": true,
-    "allDeclaredFields": true
-  },
-  {
     "name": "stock.price.analytics.controller.HighLowForPeriodController",
     "allDeclaredConstructors": true,
     "allDeclaredMethods": true,
