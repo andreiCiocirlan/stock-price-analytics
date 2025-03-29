@@ -11,6 +11,7 @@ import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.stocks.StockRepository;
+import stock.price.analytics.repository.stocks.TickerRenameRepository;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -21,6 +22,7 @@ import java.util.*;
 public class StockService {
 
     private final StockRepository stockRepository;
+    private final TickerRenameRepository tickerRenameRepository;
     private final CacheService cacheService;
     private final AsyncPersistenceService asyncPersistenceService;
 
@@ -112,5 +114,20 @@ public class StockService {
         stockRepository.updateHighLow4wPricesFor(ticker);
         stockRepository.updateHighLow52wPricesFor(ticker);
         stockRepository.updateHighestLowestPricesFor(ticker);
+    }
+
+    public void renameTicker(String oldTicker, String newTicker) {
+        tickerRenameRepository.updateStock(oldTicker, newTicker);
+        tickerRenameRepository.updateDailyPrices(oldTicker, newTicker);
+        tickerRenameRepository.updateWeeklyPrices(oldTicker, newTicker);
+        tickerRenameRepository.updateMonthlyPrices(oldTicker, newTicker);
+        tickerRenameRepository.updateQuarterlyPrices(oldTicker, newTicker);
+        tickerRenameRepository.updateYearlyPrices(oldTicker, newTicker);
+        tickerRenameRepository.updateDailyPricesJSON(oldTicker, newTicker);
+        tickerRenameRepository.updateHighLow4w(oldTicker, newTicker);
+        tickerRenameRepository.updateHighLow52Week(oldTicker, newTicker);
+        tickerRenameRepository.updateHighestLowestPrices(oldTicker, newTicker);
+        tickerRenameRepository.updateFairValueGap(oldTicker, newTicker);
+        tickerRenameRepository.updatPriceGap(oldTicker, newTicker);
     }
 }

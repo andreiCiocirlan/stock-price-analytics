@@ -1,15 +1,13 @@
 package stock.price.analytics.repository.stocks;
 
 import jakarta.transaction.Transactional;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import stock.price.analytics.model.stocks.Stock;
 
 @Repository
-public interface TickerRenameRepository extends JpaRepository<Stock, Long> {
+public interface TickerRenameRepository extends StockRepository {
 
     @Modifying
     @Transactional
