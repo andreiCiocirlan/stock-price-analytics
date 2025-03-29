@@ -1,4 +1,4 @@
-package stock.price.analytics.model.prices.json;
+package stock.price.analytics.model.json;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;

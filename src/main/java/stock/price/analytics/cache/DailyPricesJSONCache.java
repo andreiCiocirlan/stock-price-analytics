@@ -2,7 +2,7 @@ package stock.price.analytics.cache;
 
 import lombok.Getter;
 import org.springframework.stereotype.Component;
-import stock.price.analytics.model.prices.json.DailyPricesJSON;
+import stock.price.analytics.model.json.DailyPricesJSON;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

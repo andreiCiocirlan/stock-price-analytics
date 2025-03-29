@@ -8,7 +8,7 @@ import stock.price.analytics.cache.model.*;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.highlow.*;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
-import stock.price.analytics.model.prices.json.DailyPricesJSON;
+import stock.price.analytics.model.json.DailyPricesJSON;
 import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.prices.highlow.HighLowForPeriodRepository;

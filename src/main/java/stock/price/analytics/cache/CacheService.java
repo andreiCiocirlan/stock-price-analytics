@@ -9,7 +9,7 @@ import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
-import stock.price.analytics.model.prices.json.DailyPricesJSON;
+import stock.price.analytics.model.json.DailyPricesJSON;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.Stock;

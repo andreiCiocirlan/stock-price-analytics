@@ -1,4 +1,4 @@
-package stock.price.analytics.model.prices.json;
+package stock.price.analytics.model.json;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
