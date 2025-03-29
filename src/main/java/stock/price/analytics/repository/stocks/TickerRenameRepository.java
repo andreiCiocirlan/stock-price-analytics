@@ -14,72 +14,72 @@ public interface TickerRenameRepository extends JpaRepository<Stock, Long> {
     @Modifying
     @Transactional
     @Query("UPDATE Stock s SET s.ticker = :newTicker WHERE s.ticker = :oldTicker")
-    void updateStockTicker(@Param("oldTicker") String oldTicker,
+    void updateStock(@Param("oldTicker") String oldTicker,
                             @Param("newTicker") String newTicker);
 
     @Modifying
     @Transactional
     @Query("UPDATE DailyPrice d SET d.ticker = :newTicker WHERE d.ticker = :oldTicker")
-    void updateDailyPricesTicker(@Param("oldTicker") String oldTicker, 
+    void updateDailyPrices(@Param("oldTicker") String oldTicker,
                                  @Param("newTicker") String newTicker);
 
     @Modifying
     @Transactional
     @Query("UPDATE WeeklyPrice w SET w.ticker = :newTicker WHERE w.ticker = :oldTicker")
-    void updateWeeklyPricesTicker(@Param("oldTicker") String oldTicker,
+    void updateWeeklyPrices(@Param("oldTicker") String oldTicker,
                                   @Param("newTicker") String newTicker);
 
     @Modifying
     @Transactional
     @Query("UPDATE MonthlyPrice w SET w.ticker = :newTicker WHERE w.ticker = :oldTicker")
-    void updateMonthlyPricesTicker(@Param("oldTicker") String oldTicker,
+    void updateMonthlyPrices(@Param("oldTicker") String oldTicker,
                                   @Param("newTicker") String newTicker);
 
     @Modifying
     @Transactional
     @Query("UPDATE QuarterlyPrice w SET w.ticker = :newTicker WHERE w.ticker = :oldTicker")
-    void updateQuarterlyPricesTicker(@Param("oldTicker") String oldTicker,
+    void updateQuarterlyPrices(@Param("oldTicker") String oldTicker,
                                   @Param("newTicker") String newTicker);
 
     @Modifying
     @Transactional
     @Query("UPDATE YearlyPrice w SET w.ticker = :newTicker WHERE w.ticker = :oldTicker")
-    void updateYearlyPricesTicker(@Param("oldTicker") String oldTicker,
+    void updateYearlyPrices(@Param("oldTicker") String oldTicker,
                                   @Param("newTicker") String newTicker);
 
     @Modifying
     @Transactional
     @Query("UPDATE DailyPricesJSON d SET d.symbol = :newTicker WHERE d.symbol = :oldTicker")
-    void updateDailyPricesJSONTicker(@Param("oldTicker") String oldTicker,
+    void updateDailyPricesJSON(@Param("oldTicker") String oldTicker,
                                  @Param("newTicker") String newTicker);
 
     @Modifying
     @Transactional
     @Query("UPDATE HighLow4w d SET d.ticker = :newTicker WHERE d.ticker = :oldTicker")
-    void updateHighLow4wTicker(@Param("oldTicker") String oldTicker,
+    void updateHighLow4w(@Param("oldTicker") String oldTicker,
                                @Param("newTicker") String newTicker);
 
     @Modifying
     @Transactional
     @Query("UPDATE HighLow52Week d SET d.ticker = :newTicker WHERE d.ticker = :oldTicker")
-    void updateHighLow52WeekTicker(@Param("oldTicker") String oldTicker,
+    void updateHighLow52Week(@Param("oldTicker") String oldTicker,
                                    @Param("newTicker") String newTicker);
 
     @Modifying
     @Transactional
     @Query("UPDATE HighestLowestPrices d SET d.ticker = :newTicker WHERE d.ticker = :oldTicker")
-    void updateHighestLowestPricesTicker(@Param("oldTicker") String oldTicker,
+    void updateHighestLowestPrices(@Param("oldTicker") String oldTicker,
                                          @Param("newTicker") String newTicker);
 
     @Modifying
     @Transactional
     @Query("UPDATE FairValueGap d SET d.ticker = :newTicker WHERE d.ticker = :oldTicker")
-    void updateFairValueGapTicker(@Param("oldTicker") String oldTicker,
+    void updateFairValueGap(@Param("oldTicker") String oldTicker,
                                          @Param("newTicker") String newTicker);
 
     @Modifying
     @Transactional
     @Query("UPDATE PriceGap d SET d.ticker = :newTicker WHERE d.ticker = :oldTicker")
-    void updatPriceGapTicker(@Param("oldTicker") String oldTicker,
+    void updatPriceGap(@Param("oldTicker") String oldTicker,
                                   @Param("newTicker") String newTicker);
 }
