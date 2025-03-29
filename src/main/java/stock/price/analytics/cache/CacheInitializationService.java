@@ -1,5 +1,6 @@
 package stock.price.analytics.cache;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,9 @@ import stock.price.analytics.repository.prices.json.DailyPricesJSONRepository;
 import stock.price.analytics.repository.prices.ohlc.DailyPricesRepository;
 import stock.price.analytics.repository.stocks.StockRepository;
 import stock.price.analytics.service.AsyncPersistenceService;
+import stock.price.analytics.service.HighLowForPeriodService;
+import stock.price.analytics.service.PricesService;
+import stock.price.analytics.service.StockService;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -24,6 +28,7 @@ import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
 import static stock.price.analytics.model.stocks.enums.MarketState.REGULAR;
+import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 @Slf4j
@@ -42,6 +47,34 @@ public class CacheInitializationService {
     private final StocksCache stocksCache;
     private final CacheService cacheService;
     private final AsyncPersistenceService asyncPersistenceService;
+    private final StockService stockService;
+    private final PricesService pricesService;
+    private final HighLowForPeriodService highLowForPeriodService;
+
+    @Transactional
+    public void initializeAllCaches() {
+        for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
+            boolean firstImportFor = pricesService.isFirstImportFor(timeframe);
+            System.out.println(timeframe + " isFirstImport: " + firstImportFor);
+            setFirstImportFor(timeframe, firstImportFor);
+        }
+
+        List<Stock> stocks = stockRepository.findByXtbStockIsTrueAndDelistedDateIsNull();
+        List<String> tickers = stocks.stream().map(Stock::getTicker).toList();
+        for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
+            logTime(() -> initHigherTimeframePricesCache(pricesService.previousThreePricesFor(tickers, timeframe)), "initialized " + timeframe + " prices cache");
+        }
+        logTime(() -> initializeStocks(stocks), "initialized xtb stocks cache");
+        LocalDate latestDailyPriceImportDate = stockService.findLastUpdate(); // find last update from stocksCache
+        boolean weeklyHighLowExists = highLowForPeriodService.weeklyHighLowExists();
+        logTime(() -> initHighLowPricesCache(latestDailyPriceImportDate, weeklyHighLowExists), "initialized high low prices cache");
+        if (!weeklyHighLowExists && cacheService.isFirstImportFor(StockTimeframe.WEEKLY)) {
+            stockService.updateHighLowForPeriodFromHLCachesAndAdjustWeekend();
+        }
+        logTime(this::initLatestDailyPricesCache, "initialized latest daily prices cache");
+        logTime(this::initDailyJSONPricesCache, "initialized daily JSON prices cache");
+        logTime(this::initializePreMarketDailyPrices, "initialized pre-market daily prices cache");
+    }
 
     public void initDailyJSONPricesCache() {
         LocalDate tradingDateNow = tradingDateNow();
