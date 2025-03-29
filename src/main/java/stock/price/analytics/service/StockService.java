@@ -128,6 +128,6 @@ public class StockService {
         tickerRenameRepository.updateHighLow52Week(oldTicker, newTicker);
         tickerRenameRepository.updateHighestLowestPrices(oldTicker, newTicker);
         tickerRenameRepository.updateFairValueGap(oldTicker, newTicker);
-        tickerRenameRepository.updatPriceGap(oldTicker, newTicker);
+        tickerRenameRepository.updatePriceGap(oldTicker, newTicker);
     }
 }

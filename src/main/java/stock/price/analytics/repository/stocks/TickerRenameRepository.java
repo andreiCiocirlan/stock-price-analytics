@@ -78,6 +78,6 @@ public interface TickerRenameRepository extends StockRepository {
     @Modifying
     @Transactional
     @Query("UPDATE PriceGap d SET d.ticker = :newTicker WHERE d.ticker = :oldTicker")
-    void updatPriceGap(@Param("oldTicker") String oldTicker,
+    void updatePriceGap(@Param("oldTicker") String oldTicker,
                                   @Param("newTicker") String newTicker);
 }
