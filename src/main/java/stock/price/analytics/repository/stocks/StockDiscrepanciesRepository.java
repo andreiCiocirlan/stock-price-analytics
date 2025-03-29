@@ -1,6 +1,5 @@
 package stock.price.analytics.repository.stocks;
 
-import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -12,7 +11,6 @@ import java.util.List;
 public interface StockDiscrepanciesRepository extends StockRepository {
 
     @Modifying
-    @Transactional
     @Query(value = """
             WITH discrepancies AS (
                 SELECT s.ticker, hl.high, hl.low
@@ -29,7 +27,6 @@ public interface StockDiscrepanciesRepository extends StockRepository {
     void updateStocksWithHighLow4wDiscrepancy();
 
     @Modifying
-    @Transactional
     @Query(value = """
             WITH discrepancies AS (
                 SELECT s.ticker, hl.high, hl.low
@@ -46,7 +43,6 @@ public interface StockDiscrepanciesRepository extends StockRepository {
     void updateStocksWithHighLow52wDiscrepancy();
 
     @Modifying
-    @Transactional
     @Query(value = """
             WITH discrepancies AS (
                 SELECT s.ticker, hl.high, hl.low
@@ -94,7 +90,6 @@ public interface StockDiscrepanciesRepository extends StockRepository {
     List<Stock> findStocksWithYearlyOpeningDiscrepancy();
 
     @Modifying
-    @Transactional
     @Query(value = """
             WITH discrepancies AS (
                 SELECT s.ticker, wp.open
@@ -109,7 +104,6 @@ public interface StockDiscrepanciesRepository extends StockRepository {
     void updateStocksWithWeeklyOpeningDiscrepancy();
 
     @Modifying
-    @Transactional
     @Query(value = """
             WITH discrepancies AS (
                 SELECT s.ticker, mp.open
@@ -124,7 +118,6 @@ public interface StockDiscrepanciesRepository extends StockRepository {
     void updateStocksWithMonthlyOpeningDiscrepancy();
 
     @Modifying
-    @Transactional
     @Query(value = """
             WITH discrepancies AS (
                 SELECT s.ticker, qp.open
@@ -139,7 +132,6 @@ public interface StockDiscrepanciesRepository extends StockRepository {
     void updateStocksWithQuarterlyOpeningDiscrepancy();
 
     @Modifying
-    @Transactional
     @Query(value = """
             WITH discrepancies AS (
                 SELECT s.ticker, yp.open

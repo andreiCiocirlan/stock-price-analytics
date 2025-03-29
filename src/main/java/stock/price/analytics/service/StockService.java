@@ -83,6 +83,7 @@ public class StockService {
         cacheService.addStocks(stocks);
     }
 
+    @Transactional
     public void updateHighLowForPeriodFromHLCachesAndAdjustWeekend() {
         Set<Stock> stocksUpdated = new HashSet<>();
         updateStocksFromHighLowCaches(stocksUpdated);
@@ -99,10 +100,12 @@ public class StockService {
                 .orElseThrow();
     }
 
+    @Transactional
     public void updateStockDailyPricesFor(String ticker) {
         stockRepository.updateStockDailyPricesFor(ticker);
     }
 
+    @Transactional
     public void updateStockHigherTimeframePricesFor(String ticker) {
         stockRepository.updateStockWeeklyPricesFor(ticker);
         stockRepository.updateStockMonthlyPricesFor(ticker);
@@ -110,12 +113,14 @@ public class StockService {
         stockRepository.updateStockYearlyPricesFor(ticker);
     }
 
+    @Transactional
     public void updateHighLowForPeriodPrices(String ticker) {
         stockRepository.updateHighLow4wPricesFor(ticker);
         stockRepository.updateHighLow52wPricesFor(ticker);
         stockRepository.updateHighestLowestPricesFor(ticker);
     }
 
+    @Transactional
     public void renameTicker(String oldTicker, String newTicker) {
         log.info("Renamed ticker for Stock. Updated {} rows", tickerRenameRepository.updateStock(oldTicker, newTicker));
         log.info("Renamed ticker for DailyPrices. Updated {} rows", tickerRenameRepository.updateDailyPrices(oldTicker, newTicker));

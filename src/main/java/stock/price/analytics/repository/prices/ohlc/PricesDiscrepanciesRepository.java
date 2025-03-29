@@ -1,6 +1,5 @@
 package stock.price.analytics.repository.prices.ohlc;
 
-import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -57,7 +56,6 @@ public interface PricesDiscrepanciesRepository extends PricesRepository {
     List<Object[]> findWeeklyHighLowPriceDiscrepancies();
 
     @Modifying
-    @Transactional
     @Query(value = """
             WITH daily_grouped AS (
                 SELECT
@@ -87,7 +85,6 @@ public interface PricesDiscrepanciesRepository extends PricesRepository {
     void updateWeeklyPricesWithOpeningPriceDiscrepancy();
 
     @Modifying
-    @Transactional
     @Query(value = """
             WITH daily_grouped AS (
                 SELECT
@@ -117,7 +114,6 @@ public interface PricesDiscrepanciesRepository extends PricesRepository {
     void updateMonthlyPricesWithOpeningPriceDiscrepancy();
 
     @Modifying
-    @Transactional
     @Query(value = """
             WITH daily_grouped AS (
                 SELECT
@@ -147,7 +143,6 @@ public interface PricesDiscrepanciesRepository extends PricesRepository {
     void updateQuarterlyPricesWithOpeningPriceDiscrepancy();
 
     @Modifying
-    @Transactional
     @Query(value = """
             WITH daily_grouped AS (
                 SELECT

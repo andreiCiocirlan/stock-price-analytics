@@ -1,5 +1,6 @@
 package stock.price.analytics.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -99,6 +100,7 @@ public class DiscrepanciesService {
         }).stream().map(Stock::getTicker).toList();
     }
 
+    @Transactional
     public void updateHTFOpeningPricesDiscrepancyFor(StockTimeframe timeframe) {
         switch (timeframe) {
             case WEEKLY -> pricesDiscrepanciesRepository.updateWeeklyPricesWithOpeningPriceDiscrepancy();
@@ -109,6 +111,7 @@ public class DiscrepanciesService {
 
     }
 
+    @Transactional
     public void updateStocksWithOpeningPriceDiscrepancyFor(StockTimeframe timeframe) {
         switch (timeframe) {
             case WEEKLY -> stockDiscrepanciesRepository.updateStocksWithWeeklyOpeningDiscrepancy();
@@ -118,6 +121,7 @@ public class DiscrepanciesService {
         }
     }
 
+    @Transactional
     public void updateStocksWithHighLowDiscrepancyFor(HighLowPeriod period) {
         switch (period) {
             case HIGH_LOW_4W -> stockDiscrepanciesRepository.updateStocksWithHighLow4wDiscrepancy();
