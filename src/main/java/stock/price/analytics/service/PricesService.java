@@ -36,7 +36,6 @@ public class PricesService {
     private final EntityManager entityManager;
 
     private final PricesRepository pricesRepository;
-    private final DailyPricesRepository dailyPricesRepository;
     private final WeeklyPricesRepository weeklyPricesRepository;
     private final MonthlyPricesRepository monthlyPricesRepository;
     private final QuarterlyPricesRepository quarterlyPricesRepository;
