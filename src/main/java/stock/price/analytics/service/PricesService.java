@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 import static stock.price.analytics.model.prices.enums.StockTimeframe.DAILY;
 import static stock.price.analytics.model.prices.enums.StockTimeframe.higherTimeframes;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
-import static stock.price.analytics.util.StockDateUtils.isWithinSameTimeframe;
+import static stock.price.analytics.util.TradingDateUtil.isWithinSameTimeframe;
 
 
 @Slf4j
