@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
 import stock.price.analytics.model.BusinessEntity;
-import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.gaps.FairValueGap;
+import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.stocks.Stock;
 
 import java.time.LocalDate;

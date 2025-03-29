@@ -5,11 +5,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
+import stock.price.analytics.model.gaps.FairValueGap;
+import stock.price.analytics.model.gaps.enums.FvgType;
 import stock.price.analytics.model.gaps.enums.GapStatus;
 import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.model.gaps.FairValueGap;
-import stock.price.analytics.model.gaps.enums.FvgType;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.repository.gaps.FVGRepository;
 
@@ -20,9 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static stock.price.analytics.model.prices.enums.PricePerformanceMilestone.*;
 import static stock.price.analytics.model.gaps.enums.FvgType.BEARISH;
 import static stock.price.analytics.model.gaps.enums.FvgType.BULLISH;
+import static stock.price.analytics.model.prices.enums.PricePerformanceMilestone.*;
 import static stock.price.analytics.util.Constants.*;
 
 @Slf4j
