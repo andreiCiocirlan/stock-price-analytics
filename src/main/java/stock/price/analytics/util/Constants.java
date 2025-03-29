@@ -10,7 +10,6 @@ public class Constants {
     public static final ZoneId NY_ZONE = ZoneId.of("America/New_York");
     public static final LocalTime START_MARKET_HOURS_NYSE = LocalTime.of(9, 30);
     public static final LocalTime END_MARKET_HOURS_NYSE = LocalTime.of(16, 0);
-    public static final String CLASSPATH_TICKERS_XTB_TXT = "classpath:tickers_XTB.txt";
     public static final String HIGHER_TIMEFRAMES_PATTERN = "^[WMQYwmqy]{1,4}$";
     public static final int MAX_TICKER_COUNT_PRINT = 100;
     public static final String FVG_95TH_PERCENTILE_4W = "95% 4w";
