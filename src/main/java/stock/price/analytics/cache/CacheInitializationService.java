@@ -76,12 +76,12 @@ public class CacheInitializationService {
         logTime(this::initializePreMarketDailyPrices, "initialized pre-market daily prices cache");
     }
 
-    public void initDailyJSONPricesCache() {
+    private void initDailyJSONPricesCache() {
         LocalDate tradingDateNow = tradingDateNow();
         dailyPricesJSONCache.addDailyJSONPrices(dailyPricesJSONRepository.findByDateBetween(tradingDateNow.minusDays(7), tradingDateNow));
     }
 
-    public void initializePreMarketDailyPrices() {
+    private void initializePreMarketDailyPrices() {
         Map<String, List<DailyPricesJSON>> dailyPricesJSONByTicker = dailyPricesJSONCache.getDailyPricesJSONByTicker().values().stream()
                 .sorted(Comparator.comparing(DailyPricesJSON::getDate).reversed()) // order by date desc
                 .collect(Collectors.groupingBy(DailyPricesJSON::getSymbol));
@@ -97,15 +97,15 @@ public class CacheInitializationService {
         dailyPricesCache.addDailyPrices(latestPreMarketDailyPrices, PRE);
     }
 
-    public void initLatestDailyPricesCache() {
+    private void initLatestDailyPricesCache() {
         dailyPricesCache.addDailyPrices(dailyPricesRepository.findLatestDailyPrices(), REGULAR);
     }
 
-    public void setFirstImportFor(StockTimeframe timeframe, Boolean isFirstImport) {
+    private void setFirstImportFor(StockTimeframe timeframe, Boolean isFirstImport) {
         dailyPricesCache.getFirstImportForTimeframe().put(timeframe, isFirstImport);
     }
 
-    public void initHighLowPricesCache(LocalDate latestDailyPriceImportDate, boolean weeklyHighLowExists) {
+    private void initHighLowPricesCache(LocalDate latestDailyPriceImportDate, boolean weeklyHighLowExists) {
         for (HighLowPeriod highLowPeriod : HighLowPeriod.values()) {
             initHighLowPriceCache(highLowPeriod, latestDailyPriceImportDate, weeklyHighLowExists);
             initPrevWeekHighLowPricesCache(highLowPeriod, latestDailyPriceImportDate, weeklyHighLowExists);
@@ -170,7 +170,7 @@ public class CacheInitializationService {
         return highLowForPeriod;
     }
 
-    public void initializeStocks(List<Stock> stocks) {
+    private void initializeStocks(List<Stock> stocks) {
         stocksCache.addStocks(stocks);
         findDelistedStocksAndUpdate();
     }
@@ -189,11 +189,11 @@ public class CacheInitializationService {
         }
     }
 
-    public void initHigherTimeframePricesCache(List<AbstractPrice> previousThreePrices) {
+    private void initHigherTimeframePricesCache(List<AbstractPrice> previousThreePrices) {
         addHtfPricesWithPrevCloseFrom(previousThreePrices);
     }
 
-    public void addHtfPricesWithPrevCloseFrom(List<AbstractPrice> prevThreePrices) {
+    private void addHtfPricesWithPrevCloseFrom(List<AbstractPrice> prevThreePrices) {
         List<PriceWithPrevClose> pricesWithPrevClose = pricesWithPrevCloseByTickerFrom(prevThreePrices);
         higherTimeframePricesCache.addPricesWithPrevClose(pricesWithPrevClose, prevThreePrices.getFirst().getTimeframe());
     }
