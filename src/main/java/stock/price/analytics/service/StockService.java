@@ -12,12 +12,8 @@ import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.stocks.StockRepository;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
 import java.util.*;
-
-import static stock.price.analytics.util.LoggingUtil.logTime;
 
 @Slf4j
 @Service
@@ -35,12 +31,6 @@ public class StockService {
                 stockRepository.save(new Stock(ticker, xtbStock, shortSell, cfdMargin));
             }
         }
-    }
-
-    @Transactional
-    public void updateStocksHighLow(LocalDate tradingDate) {
-        logTime(() -> stockRepository.updateStocksHighLow(tradingDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))),
-                "updated stocks high low 4w, 52w, all-time");
     }
 
     private void updateStocksFromOHLCPrices(List<DailyPrice> dailyPrices, List<AbstractPrice> htfPrices, Set<Stock> stocksUpdated) {

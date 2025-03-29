@@ -10,8 +10,6 @@ import stock.price.analytics.service.TickerRenameService;
 
 import java.util.List;
 
-import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
-
 @RestController
 @RequestMapping("/stocks")
 @RequiredArgsConstructor
@@ -34,11 +32,6 @@ public class StockController {
     @ResponseStatus(HttpStatus.OK)
     public List<Stock> getStocks() {
         return stockRepository.findAll();
-    }
-
-    @PutMapping("/update-high-low")
-    public void updateStocksHighLow() {
-        stockService.updateStocksHighLow(tradingDateNow());
     }
 
     @PutMapping("/rename-ticker")
