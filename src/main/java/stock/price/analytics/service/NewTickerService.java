@@ -23,11 +23,7 @@ import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.repository.prices.highlow.HighLowForPeriodRepository;
 import stock.price.analytics.util.TradingDateUtil;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.DayOfWeek;
 import java.time.Instant;
@@ -39,6 +35,7 @@ import java.util.stream.Collectors;
 
 import static java.nio.file.Files.readAllLines;
 import static stock.price.analytics.util.Constants.USER_AGENT_VALUE;
+import static stock.price.analytics.util.FileUtils.writeToFile;
 import static stock.price.analytics.util.PricesUtil.htfPricesForTimeframe;
 
 @Slf4j
@@ -325,17 +322,5 @@ public class NewTickerService {
         };
     }
 
-    private void writeToFile(String filePath, String jsonData) {
-        try {
-            File jsonFile = new File(filePath);
-
-            try (OutputStream outputStream = new FileOutputStream(jsonFile)) {
-                outputStream.write(jsonData.getBytes(StandardCharsets.UTF_8));
-            }
-            log.info("saved daily prices file {}", jsonFile.getAbsolutePath());
-        } catch (IOException e) {
-            log.error("Error writing to file: {}", filePath, e);
-        }
-    }
 
 }
