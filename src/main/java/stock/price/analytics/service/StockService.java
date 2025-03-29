@@ -117,17 +117,17 @@ public class StockService {
     }
 
     public void renameTicker(String oldTicker, String newTicker) {
-        tickerRenameRepository.updateStock(oldTicker, newTicker);
-        tickerRenameRepository.updateDailyPrices(oldTicker, newTicker);
-        tickerRenameRepository.updateWeeklyPrices(oldTicker, newTicker);
-        tickerRenameRepository.updateMonthlyPrices(oldTicker, newTicker);
-        tickerRenameRepository.updateQuarterlyPrices(oldTicker, newTicker);
-        tickerRenameRepository.updateYearlyPrices(oldTicker, newTicker);
-        tickerRenameRepository.updateDailyPricesJSON(oldTicker, newTicker);
-        tickerRenameRepository.updateHighLow4w(oldTicker, newTicker);
-        tickerRenameRepository.updateHighLow52Week(oldTicker, newTicker);
-        tickerRenameRepository.updateHighestLowestPrices(oldTicker, newTicker);
-        tickerRenameRepository.updateFairValueGap(oldTicker, newTicker);
-        tickerRenameRepository.updatePriceGap(oldTicker, newTicker);
+        log.info("Renamed ticker for Stock. Updated {} rows", tickerRenameRepository.updateStock(oldTicker, newTicker));
+        log.info("Renamed ticker for DailyPrices. Updated {} rows", tickerRenameRepository.updateDailyPrices(oldTicker, newTicker));
+        log.info("Renamed ticker for WeeklyPrices. Updated {} rows", tickerRenameRepository.updateWeeklyPrices(oldTicker, newTicker));
+        log.info("Renamed ticker for MonthlyPrices. Updated {} rows", tickerRenameRepository.updateMonthlyPrices(oldTicker, newTicker));
+        log.info("Renamed ticker for QuarterlyPrices. Updated {} rows", tickerRenameRepository.updateQuarterlyPrices(oldTicker, newTicker));
+        log.info("Renamed ticker for YearlyPrices. Updated {} rows", tickerRenameRepository.updateYearlyPrices(oldTicker, newTicker));
+        log.info("Renamed ticker for DailyPricesJSON. Updated {} rows", tickerRenameRepository.updateDailyPricesJSON(oldTicker, newTicker));
+        log.info("Renamed ticker for HighLow4w. Updated {} rows", tickerRenameRepository.updateHighLow4w(oldTicker, newTicker));
+        log.info("Renamed ticker for HighLow52Week. Updated {} rows", tickerRenameRepository.updateHighLow52Week(oldTicker, newTicker));
+        log.info("Renamed ticker for HighestLowestPrices. Updated {} rows", tickerRenameRepository.updateHighestLowestPrices(oldTicker, newTicker));
+        log.info("Renamed ticker for FairValueGap. Updated {} rows", tickerRenameRepository.updateFairValueGap(oldTicker, newTicker));
+        log.info("Renamed ticker for PriceGap. Updated {} rows", tickerRenameRepository.updatePriceGap(oldTicker, newTicker));
     }
 }
