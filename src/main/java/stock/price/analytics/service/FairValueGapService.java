@@ -11,7 +11,7 @@ import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.gaps.FairValueGap;
 import stock.price.analytics.model.gaps.enums.FvgType;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
-import stock.price.analytics.repository.fvg.FVGRepository;
+import stock.price.analytics.repository.gaps.FVGRepository;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

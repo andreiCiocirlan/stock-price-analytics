@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.model.stocks.Stock;
-import stock.price.analytics.repository.fvg.FVGRepository;
+import stock.price.analytics.repository.gaps.FVGRepository;
 import stock.price.analytics.repository.prices.ohlc.PricesDiscrepanciesRepository;
 import stock.price.analytics.repository.stocks.StockDiscrepanciesRepository;
 

@@ -1,4 +1,4 @@
-package stock.price.analytics.repository.prices.gaps;
+package stock.price.analytics.repository.gaps;
 
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
