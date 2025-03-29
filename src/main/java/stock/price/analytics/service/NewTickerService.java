@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import stock.price.analytics.client.yahoo.YahooQuoteClient;
+import stock.price.analytics.client.YahooQuotesClient;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.highlow.HighLow4w;
 import stock.price.analytics.model.prices.highlow.HighLow52Week;
@@ -44,7 +44,7 @@ import static stock.price.analytics.util.PricesUtil.htfPricesForTimeframe;
 public class NewTickerService {
 
     private static final String YAHOO_BASE_URL = "https://query1.finance.yahoo.com/v7/finance";
-    private final YahooQuoteClient yahooQuoteClient;
+    private final YahooQuotesClient yahooQuotesClient;
     private final RestTemplate restTemplate;
     private final StockService stockService;
     private final PricesService pricesService;
@@ -70,7 +70,7 @@ public class NewTickerService {
     public void importAllDataFor(String tickers, Double cfdMargin, Boolean shortSell) {
         List<String> tickerList = Arrays.stream(tickers.split(",")).toList();
         stockService.saveStocks(tickers, Boolean.TRUE, Boolean.TRUE.equals(shortSell), cfdMargin);
-        COOKIE = yahooQuoteClient.cookieFromFcYahoo();
+        COOKIE = yahooQuotesClient.cookieFromFcYahoo();
         getYahooQuotesAndSaveJSONFileFor(tickers);
         List<DailyPrice> dailyPricesImported = getDailyPricesFor(tickerList);
         pricesService.savePrices(dailyPricesImported);

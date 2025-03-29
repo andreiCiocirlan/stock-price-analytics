@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
-import stock.price.analytics.client.yahoo.YahooQuoteClient;
+import stock.price.analytics.client.YahooQuotesClient;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.repository.prices.ohlc.DailyPricesRepository;
 
@@ -25,7 +25,7 @@ import static stock.price.analytics.util.TradingDateUtil.tradingDateImported;
 @RequiredArgsConstructor
 public class YahooQuoteService {
 
-    private final YahooQuoteClient yahooQuoteClient;
+    private final YahooQuotesClient yahooQuotesClient;
     private final CacheService cacheService;
     private final AsyncPersistenceService asyncPersistenceService;
     private final DailyPricesJSONService dailyPricesJSONService;
@@ -41,7 +41,7 @@ public class YahooQuoteService {
     public List<DailyPrice> yahooQuotesImport() {
         List<String> cachedTickers = cacheService.getCachedTickers();
         List<String> tickersNotImported = cacheService.getCachedTickers();
-        List<String> pricesJSONs = logTimeAndReturn(() -> yahooQuoteClient.quotePricesFor(cachedTickers), "Yahoo API call and JSON result");
+        List<String> pricesJSONs = logTimeAndReturn(() -> yahooQuotesClient.quotePricesFor(cachedTickers), "Yahoo API call and JSON result");
         String pricesJSON = mergedPricesJSONs(pricesJSONs);
         List<DailyPrice> dailyPricesExtractedFromJSON = dailyPricesJSONService.extractDailyPricesFromJSON(pricesJSON);
         List<DailyPrice> dailyImportedPrices = cacheService.cacheAndReturnDailyPrices(dailyPricesExtractedFromJSON);

@@ -1,4 +1,4 @@
-package stock.price.analytics.client.yahoo;
+package stock.price.analytics.client;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,7 @@ import static stock.price.analytics.util.Constants.USER_AGENT_VALUE;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class YahooQuoteClient {
+public class YahooQuotesClient {
 
     private static final CloseableHttpClient httpClient;
     private static final int MAX_RETRIES_CRUMB = 5;
