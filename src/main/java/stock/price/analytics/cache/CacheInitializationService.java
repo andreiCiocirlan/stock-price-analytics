@@ -55,6 +55,7 @@ public class CacheInitializationService {
     public void initializeAllCaches() {
         for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
             boolean firstImportFor = pricesService.isFirstImportFor(timeframe);
+            log.info("{} isFirstImport: {}", timeframe, firstImportFor);
             System.out.println(timeframe + " isFirstImport: " + firstImportFor);
             setFirstImportFor(timeframe, firstImportFor);
         }
