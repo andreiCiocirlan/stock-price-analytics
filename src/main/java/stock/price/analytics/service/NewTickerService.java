@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 
 import static java.nio.file.Files.readAllLines;
 import static stock.price.analytics.util.Constants.USER_AGENT_VALUE;
-import static stock.price.analytics.util.FileUtils.writeToFile;
+import static stock.price.analytics.util.FileUtil.writeToFile;
 import static stock.price.analytics.util.PricesUtil.htfPricesForTimeframe;
 
 @Slf4j

@@ -15,8 +15,8 @@ import java.util.List;
 import static stock.price.analytics.model.prices.enums.IntradayPriceSpike.intradaySpikes;
 import static stock.price.analytics.util.Constants.CFD_MARGINS_5X_4X_3X;
 import static stock.price.analytics.util.Constants.MAX_TICKER_COUNT_PRINT;
-import static stock.price.analytics.util.FileUtils.writeToFile;
-import static stock.price.analytics.util.JsonUtils.mergedPricesJSONs;
+import static stock.price.analytics.util.FileUtil.writeToFile;
+import static stock.price.analytics.util.JsonUtil.mergedPricesJSONs;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateImported;
 
