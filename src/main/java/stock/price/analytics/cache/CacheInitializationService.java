@@ -64,7 +64,7 @@ public class CacheInitializationService {
         for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
             logTime(() -> initHigherTimeframePricesCache(pricesService.previousThreePricesFor(tickers, timeframe)), "initialized " + timeframe + " prices cache");
         }
-        logTime(() -> initializeStocks(stocks), "initialized xtb stocks cache");
+        logTime(() -> initializeStocksCache(stocks), "initialized xtb stocks cache");
         LocalDate latestDailyPriceImportDate = stockService.findLastUpdate(); // find last update from stocksCache
         boolean weeklyHighLowExists = highLowForPeriodService.weeklyHighLowExists();
         logTime(() -> initHighLowPricesCache(latestDailyPriceImportDate, weeklyHighLowExists), "initialized high low prices cache");
@@ -171,7 +171,7 @@ public class CacheInitializationService {
         return highLowForPeriod;
     }
 
-    private void initializeStocks(List<Stock> stocks) {
+    private void initializeStocksCache(List<Stock> stocks) {
         stocksCache.addStocks(stocks);
         findDelistedStocksAndUpdate();
     }
