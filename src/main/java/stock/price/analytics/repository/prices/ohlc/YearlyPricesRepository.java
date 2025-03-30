@@ -10,8 +10,6 @@ import java.util.List;
 
 public interface YearlyPricesRepository extends JpaRepository<YearlyPrice, Long> {
 
-    List<YearlyPrice> findByTickerIn(List<String> tickers);
-
     @Query(value = """
                 SELECT *
                 FROM yearly_prices
