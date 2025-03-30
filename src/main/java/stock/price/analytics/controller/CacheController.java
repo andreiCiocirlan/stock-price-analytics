@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
+import static stock.price.analytics.model.stocks.enums.MarketState.REGULAR;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,6 +25,12 @@ public class CacheController {
     @ResponseStatus(HttpStatus.OK)
     public List<DailyPrice> getPreMarketDailyPricesCache() {
         return cacheService.getCachedDailyPrices(PRE);
+    }
+
+    @GetMapping("/intraday-prices")
+    @ResponseStatus(HttpStatus.OK)
+    public List<DailyPrice> getIntradayDailyPricesCache() {
+        return cacheService.getCachedDailyPrices(REGULAR);
     }
 
     @GetMapping("/new-high-lows")
