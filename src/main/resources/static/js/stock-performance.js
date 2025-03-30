@@ -32,9 +32,6 @@ function handleTimeFrameButtonClick(timeFrame) {
     selectedButton.classList.add('active');
 
     currentTimeFrame = timeFrame;
-    const url = new URL(window.location);
-    url.searchParams.set('timeFrame', timeFrame);
-    window.history.pushState({}, '', url.toString());
     updateStockPerformanceChart(currentTimeFrame);
 }
 
