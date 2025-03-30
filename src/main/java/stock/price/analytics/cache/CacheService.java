@@ -1,6 +1,8 @@
 package stock.price.analytics.cache;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.model.PriceWithPrevClose;
@@ -34,6 +36,8 @@ public class CacheService {
     private final HigherTimeframePricesCache higherTimeframePricesCache;
     private final HighLowPricesCache highLowPricesCache;
     private final PriceMilestoneCache priceMilestoneCache;
+    @Getter @Setter
+    private volatile long lastUpdateTimestamp = 0;
 
 
     public List<DailyPricesJSON> dailyPricesJSONCache() {

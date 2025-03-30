@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.service.HighLowForPeriodService;
@@ -30,6 +31,7 @@ public class YahooQuotesController {
     private final PricesService pricesService;
     private final HighLowForPeriodService highLowForPeriodService;
     private final StockService stockService;
+    private final CacheService cacheService;
 
     @GetMapping("/import")
     @ResponseStatus(HttpStatus.OK)
@@ -42,6 +44,7 @@ public class YahooQuotesController {
             logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices), "saved current week HighLow prices");
             logTime(() -> stockService.updateStocksHighLowsAndOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks highs-lows 4w,52w,all-time and higher-timeframe OHLC prices");
         }
+        cacheService.setLastUpdateTimestamp(System.nanoTime());
         long duration = (System.nanoTime() - start) / 1_000_000;
         log.info("Real-time import done in {} ms", duration);
         return dailyImportedPrices;
