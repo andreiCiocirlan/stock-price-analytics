@@ -1,10 +1,15 @@
+let lastKnownUpdateTimestamp = 0;
+
 function pollForHeatmapUpdates() {
     setInterval(() => {
-        fetch('/stock-performance-heatmap/refresh-ui')
+        fetch('/cache/last-update-timestamp')
             .then(response => response.json())
-            .then(isUpdated => {
-                if (isUpdated) {
-                    updateStockPerformanceChartCurrentTimeFrame();
+            .then(timestamp => {
+                if (lastKnownUpdateTimestamp === 0) {
+                    lastKnownUpdateTimestamp = timestamp;
+                } else if (timestamp > lastKnownUpdateTimestamp) {
+                    lastKnownUpdateTimestamp = timestamp;
+                    updateStockPerformanceChartCurrentTimeframe();
                 }
             })
             .catch(error => console.error('Error checking for updates:', error));
