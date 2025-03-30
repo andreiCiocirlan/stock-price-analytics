@@ -10,15 +10,12 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
+import static stock.price.analytics.util.Constants.*;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class YahooQuotesImportScheduler {
-
-    public static final String HTTP_LOCALHOST = "http://localhost:";
-    public static final String YAHOO_QUOTES_IMPORT_ENDPOINT = "/yahoo-quotes/import";
-    public static final String INTRADAY_LOG_PREFIX = "INTRADAY";
-    public static final String PREMARKET_LOG_PREFIX = "PRE-MARKET";
 
     private final RestTemplate restTemplate;
     @Value("${server.port}")
