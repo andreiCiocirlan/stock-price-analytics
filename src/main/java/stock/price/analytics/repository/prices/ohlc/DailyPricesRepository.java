@@ -12,16 +12,6 @@ import java.util.List;
 @Repository
 public interface DailyPricesRepository extends JpaRepository<DailyPrice, Long> {
 
-    long countByDateBefore(LocalDate date);
-    long countByDateAfter(LocalDate date);
-    long countByDateBetween(LocalDate startDate, LocalDate endDate);
-
-    List<DailyPrice> findByTickerIn(List<String> tickerList);
-    List<DailyPrice> findByDate(LocalDate date);
-    List<DailyPrice> findByDateBefore(LocalDate date);
-    List<DailyPrice> findByDateAfterOrderByDate(LocalDate date);
-    List<DailyPrice> findByDateBetween(LocalDate startDate, LocalDate endDate);
-
     @Query(value = """
             WITH latest_prices AS (
                 SELECT *,
