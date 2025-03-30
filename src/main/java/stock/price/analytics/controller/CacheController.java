@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.cache.CacheService;
+import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
+import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.Stock;
 
@@ -44,6 +46,13 @@ public class CacheController {
     @ResponseStatus(HttpStatus.OK)
     public List<DailyPrice> getIntradayDailyPricesCache() {
         return cacheService.getCachedDailyPrices(REGULAR);
+    }
+
+    @GetMapping("/htf-prices")
+    public List<AbstractPrice> htfPricesFor(@RequestParam(required = false, value = "ticker") String ticker, @RequestParam("timeFrame") String timeFrame) {
+        return cacheService.htfPricesFor(StockTimeframe.valueOf(timeFrame)).stream()
+                .filter(p -> ticker == null || p.getTicker().equals(ticker))
+                .toList();
     }
 
     @GetMapping("/new-high-lows")
