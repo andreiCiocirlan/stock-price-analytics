@@ -6,10 +6,12 @@ import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
+import stock.price.analytics.model.prices.ohlc.DailyPrice;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+
+import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,6 +19,12 @@ import java.util.List;
 public class CacheController {
 
     private final CacheService cacheService;
+
+    @GetMapping("/pre-market-prices")
+    @ResponseStatus(HttpStatus.OK)
+    public List<DailyPrice> getPreMarketDailyPricesCache() {
+        return cacheService.getCachedDailyPrices(PRE);
+    }
 
     @GetMapping("/new-high-lows")
     @ResponseStatus(HttpStatus.OK)
