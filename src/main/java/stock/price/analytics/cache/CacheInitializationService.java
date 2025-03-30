@@ -52,7 +52,7 @@ public class CacheInitializationService {
     private final HighLowForPeriodService highLowForPeriodService;
 
     @Transactional
-    public void initializeAllCaches() {
+    public void initAllCaches() {
         for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
             boolean firstImportFor = pricesService.isFirstImportFor(timeframe);
             log.info("{} isFirstImport: {}", timeframe, firstImportFor);
@@ -64,7 +64,7 @@ public class CacheInitializationService {
         for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
             logTime(() -> initHigherTimeframePricesCache(pricesService.previousThreePricesFor(tickers, timeframe)), "initialized " + timeframe + " prices cache");
         }
-        logTime(() -> initializeStocksCache(stocks), "initialized xtb stocks cache");
+        logTime(() -> initStocksCache(stocks), "initialized xtb stocks cache");
         LocalDate latestDailyPriceImportDate = stockService.findLastUpdate(); // find last update from stocksCache
         boolean weeklyHighLowExists = highLowForPeriodService.weeklyHighLowExists();
         logTime(() -> initHighLowPricesCache(latestDailyPriceImportDate, weeklyHighLowExists), "initialized high low prices cache");
@@ -73,7 +73,7 @@ public class CacheInitializationService {
         }
         logTime(this::initLatestDailyPricesCache, "initialized latest daily prices cache");
         logTime(this::initDailyJSONPricesCache, "initialized daily JSON prices cache");
-        logTime(this::initializePreMarketDailyPrices, "initialized pre-market daily prices cache");
+        logTime(this::initPreMarketDailyPrices, "initialized pre-market daily prices cache");
         cacheService.setLastUpdateTimestamp(System.nanoTime());
     }
 
@@ -82,7 +82,7 @@ public class CacheInitializationService {
         dailyPricesJSONCache.addDailyJSONPrices(dailyPricesJSONRepository.findByDateBetween(tradingDateNow.minusDays(7), tradingDateNow));
     }
 
-    private void initializePreMarketDailyPrices() {
+    private void initPreMarketDailyPrices() {
         Map<String, List<DailyPricesJSON>> dailyPricesJSONByTicker = dailyPricesJSONCache.getDailyPricesJSONByTicker().values().stream()
                 .sorted(Comparator.comparing(DailyPricesJSON::getDate).reversed()) // order by date desc
                 .collect(Collectors.groupingBy(DailyPricesJSON::getSymbol));
@@ -171,7 +171,7 @@ public class CacheInitializationService {
         return highLowForPeriod;
     }
 
-    private void initializeStocksCache(List<Stock> stocks) {
+    private void initStocksCache(List<Stock> stocks) {
         stocksCache.addStocks(stocks);
         findDelistedStocksAndUpdate();
     }

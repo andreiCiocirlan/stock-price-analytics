@@ -28,9 +28,9 @@ public class PreMarketScheduler {
                 .forEach((priceMilestone, tickers) -> desktopNotificationService.broadcastDesktopNotification("Pre-Market alert", String.join(" ", priceMilestone.toString(), tickers.toString())));
     }
 
-    @Scheduled(cron = "${cron.pre.market.initialize.caches}", zone = "${cron.timezone}")  // 10 15,30,45 8 * * MON-FRI
-    public void initializeAllCaches() {
-        cacheInitializationService.initializeAllCaches();
+    @Scheduled(cron = "${cron.pre.market.init.caches}", zone = "${cron.timezone}")  // 10 15,30,45 8 * * MON-FRI
+    public void initAllCaches() {
+        cacheInitializationService.initAllCaches();
     }
 
 }

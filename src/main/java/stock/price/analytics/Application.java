@@ -19,6 +19,6 @@ public class Application implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        cacheInitializationService.initializeAllCaches();
+        cacheInitializationService.initAllCaches();
     }
 }
