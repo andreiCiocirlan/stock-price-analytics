@@ -8,6 +8,7 @@ import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -33,9 +34,9 @@ public class CacheController {
     @ResponseStatus(HttpStatus.OK)
     public List<? extends HighLowForPeriod> highLowsForTicker(@RequestParam("ticker") String ticker) {
         List<HighLowForPeriod> result = new ArrayList<>();
-        result.add(cacheService.highLowForPeriodPricesFor(HighLowPeriod.HIGH_LOW_4W).stream().filter(hlp -> ticker.equals(hlp.getTicker())).findFirst().orElseThrow());
-        result.add(cacheService.highLowForPeriodPricesFor(HighLowPeriod.HIGH_LOW_52W).stream().filter(hlp -> ticker.equals(hlp.getTicker())).findFirst().orElseThrow());
-        result.add(cacheService.highLowForPeriodPricesFor(HighLowPeriod.HIGH_LOW_ALL_TIME).stream().filter(hlp -> ticker.equals(hlp.getTicker())).findFirst().orElseThrow());
+        for (HighLowPeriod highLowPeriod : HighLowPeriod.values()) {
+            result.add(cacheService.highLowForPeriodPricesFor(highLowPeriod).stream().filter(hlp -> ticker.equals(hlp.getTicker())).findFirst().orElseThrow());
+        }
         return result;
     }
 
