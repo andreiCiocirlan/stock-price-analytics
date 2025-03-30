@@ -139,7 +139,8 @@ public class CacheInitializationService {
                 highLowPricesCache.addHighLowPrices(highestLowestPrices, highLowPeriod);
             } else { // for 4w, 52w need sql select for the period (for all-time it would simply be a copy)
                 int weekCount = switch (highLowPeriod) {
-                    case HIGH_LOW_4W -> 3; // last imported date was Friday -> new week -> look back 3 instead of 4 weeks
+                    case HIGH_LOW_4W ->
+                            3; // last imported date was Friday -> new week -> look back 3 instead of 4 weeks
                     case HIGH_LOW_52W -> 51;
                     case HIGH_LOW_ALL_TIME -> throw new IllegalArgumentException("HIGH_LOW_ALL_TIME is not supported.");
                 };
@@ -217,10 +218,14 @@ public class CacheInitializationService {
         return latestPrices.stream()
                 .map(price -> (PriceWithPrevClose) switch (price.getTimeframe()) {
                     case DAILY -> throw new IllegalStateException("Unexpected timeframe DAILY");
-                    case WEEKLY -> new WeeklyPriceWithPrevClose((WeeklyPrice) price, previousCloseByTicker.get(price.getTicker()));
-                    case MONTHLY -> new MonthlyPriceWithPrevClose((MonthlyPrice) price, previousCloseByTicker.get(price.getTicker()));
-                    case QUARTERLY -> new QuarterlyPriceWithPrevClose((QuarterlyPrice) price, previousCloseByTicker.get(price.getTicker()));
-                    case YEARLY -> new YearlyPriceWithPrevClose((YearlyPrice) price, previousCloseByTicker.get(price.getTicker()));
+                    case WEEKLY ->
+                            new WeeklyPriceWithPrevClose((WeeklyPrice) price, previousCloseByTicker.get(price.getTicker()));
+                    case MONTHLY ->
+                            new MonthlyPriceWithPrevClose((MonthlyPrice) price, previousCloseByTicker.get(price.getTicker()));
+                    case QUARTERLY ->
+                            new QuarterlyPriceWithPrevClose((QuarterlyPrice) price, previousCloseByTicker.get(price.getTicker()));
+                    case YEARLY ->
+                            new YearlyPriceWithPrevClose((YearlyPrice) price, previousCloseByTicker.get(price.getTicker()));
                 })
                 .toList();
     }
