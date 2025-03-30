@@ -47,22 +47,6 @@ public class TradingDateUtil {
         }
     }
 
-    public static boolean isFirstImportFor(StockTimeframe timeframe, LocalDate previousImportDate) {
-        return switch (timeframe) {
-            case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
-            case WEEKLY, YEARLY, QUARTERLY, MONTHLY -> !isWithinSameTimeframe(LocalDate.now(NY_ZONE), previousImportDate, timeframe);
-        };
-    }
-
-    public static LocalDate previousTradingDate(LocalDate date) {
-        if (date.getDayOfWeek().equals(DayOfWeek.SATURDAY) || date.getDayOfWeek().equals(DayOfWeek.SUNDAY)
-                || (date.getDayOfWeek().equals(DayOfWeek.MONDAY))) {
-            return date.with(TemporalAdjusters.previous(DayOfWeek.FRIDAY));
-        }
-
-        return date.minusDays(1);
-    }
-
     // returns the trading date being imported (highest count, as for some tickers it might import previous days)
     public static LocalDate tradingDateImported(List<? extends AbstractPrice> importedPrices) {
         return importedPrices.stream()
