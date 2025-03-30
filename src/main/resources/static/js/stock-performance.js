@@ -38,20 +38,6 @@ function handleTimeFrameButtonClick(timeFrame) {
     updateStockPerformanceChart(currentTimeFrame);
 }
 
-function updatePricesIntraday() {
-    const url = `/yahoo-quotes/import`;
-    fetch(url)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-        })
-        .then(() => {
-            updateStockPerformanceChart(currentTimeFrame);
-        })
-        .catch(error => console.error(error));
-}
-
 function getMarketState() {
     let now = new Date();
     let nytzString = now.toLocaleString("en-US", { timeZone: "America/New_York" });
