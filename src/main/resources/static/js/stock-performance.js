@@ -63,7 +63,7 @@ function updateStockPerformanceChart(timeFrame) {
         timeFrame = 'WEEKLY';
     }
     const limit = numRows * numCols;
-    url = `/stock-performance-json?timeFrame=${timeFrame}&positivePerfFirst=${positivePerfFirst}&limit=${limit}&marketState=${marketState}`;
+    let url = `/stock-performance-json?timeFrame=${timeFrame}&positivePerfFirst=${positivePerfFirst}&limit=${limit}&marketState=${marketState}`;
 
     // set cfdMargins from multi-select
     cfdMarginValues.forEach(margin => { url += '&cfdMargin=' + margin; });
