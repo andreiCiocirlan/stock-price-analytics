@@ -156,7 +156,7 @@ public class PricesService {
     }
 
     @Transactional
-    public void updateAllHigherTimeframesPricesForTickers(LocalDate date, String tickers) {
+    public void updateAllHigherTimeframesFor(LocalDate date, String tickers) {
         updateHigherTimeframesPricesFor(date, higherTimeframes(), tickers);
     }
 
