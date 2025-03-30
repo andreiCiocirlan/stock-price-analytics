@@ -7,6 +7,7 @@ import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
+import stock.price.analytics.model.stocks.Stock;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,18 @@ import static stock.price.analytics.model.stocks.enums.MarketState.REGULAR;
 public class CacheController {
 
     private final CacheService cacheService;
+
+    @GetMapping("/stocks")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Stock> getCachedStocks() {
+        return cacheService.getCachedStocks();
+    }
+
+    @GetMapping("/tickers")
+    @ResponseStatus(HttpStatus.OK)
+    public List<String> getCachedTickers() {
+        return cacheService.getCachedTickers();
+    }
 
     @GetMapping("/pre-market-prices")
     @ResponseStatus(HttpStatus.OK)
