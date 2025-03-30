@@ -47,6 +47,10 @@ function getMarketState() {
     return weekday && hours ? "PRE" : "REGULAR";
 }
 
+function updateStockPerformanceChartCurrentTimeframe() {
+    updateStockPerformanceChart(currentTimeFrame);
+}
+
 function updateStockPerformanceChart(timeFrame) {
     const numRows = document.getElementById('numRows').value || 5;
     const numCols = document.getElementById('numCols').value || 5;

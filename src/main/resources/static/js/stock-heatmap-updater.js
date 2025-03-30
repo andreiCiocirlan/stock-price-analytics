@@ -4,7 +4,7 @@ function pollForHeatmapUpdates() {
             .then(response => response.json())
             .then(isUpdated => {
                 if (isUpdated) {
-                    updateStockPerformanceChart(currentTimeFrame);
+                    updateStockPerformanceChartCurrentTimeFrame();
                 }
             })
             .catch(error => console.error('Error checking for updates:', error));
