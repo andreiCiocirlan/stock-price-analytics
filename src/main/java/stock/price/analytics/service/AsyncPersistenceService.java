@@ -1,6 +1,5 @@
 package stock.price.analytics.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.scheduling.annotation.Async;
@@ -15,7 +14,6 @@ import static stock.price.analytics.util.LoggingUtil.logTime;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class AsyncPersistenceService {
 
     public static final int BATCH_SIZE = 250;
