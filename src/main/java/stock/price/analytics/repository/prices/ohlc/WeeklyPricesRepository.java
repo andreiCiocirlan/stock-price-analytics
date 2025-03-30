@@ -10,8 +10,6 @@ import java.util.List;
 
 public interface WeeklyPricesRepository extends JpaRepository<WeeklyPrice, Long> {
 
-    List<WeeklyPrice> findByTickerIn(List<String> tickers);
-
     @Query(value = """
                 SELECT *
                 FROM weekly_prices
