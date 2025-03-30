@@ -74,6 +74,7 @@ public class CacheInitializationService {
         logTime(this::initLatestDailyPricesCache, "initialized latest daily prices cache");
         logTime(this::initDailyJSONPricesCache, "initialized daily JSON prices cache");
         logTime(this::initializePreMarketDailyPrices, "initialized pre-market daily prices cache");
+        cacheService.setLastUpdateTimestamp(System.nanoTime());
     }
 
     private void initDailyJSONPricesCache() {
