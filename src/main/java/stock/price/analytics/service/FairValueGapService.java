@@ -159,6 +159,7 @@ public class FairValueGapService {
         };
     }
 
+    @Transactional
     public void findNewFVGsAndSaveFor(List<String> tickers, StockTimeframe timeframe, boolean allHistoricalData) {
         List<FairValueGap> newFVGs = findNewFVGsFor(tickers, timeframe, allHistoricalData);
         if (!newFVGs.isEmpty()) {
@@ -258,6 +259,7 @@ public class FairValueGapService {
         updateFVGsHighLowAndClosedFor(timeframe, false);
     }
 
+    @Transactional
     public void updateFVGPricesForStockSplit(String ticker, LocalDate stockSplitDate, double stockSplitMultiplier) {
         int updatedRows = fvgRepository.updateFVGPricesForStockSplit(ticker, stockSplitDate, stockSplitMultiplier);
         log.info("updated {} FVG rows for {} and stockSplitDate {}", updatedRows, ticker, stockSplitDate);

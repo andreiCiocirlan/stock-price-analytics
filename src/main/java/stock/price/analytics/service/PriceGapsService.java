@@ -98,6 +98,7 @@ public class PriceGapsService {
         log.info("saved {} rows for {} price gaps", rowsAffected, timeframe);
     }
 
+    @Transactional
     public void closePriceGaps() {
         int rowsAffected = priceGapsRepository.closePriceGaps();
         if (rowsAffected != 0) {

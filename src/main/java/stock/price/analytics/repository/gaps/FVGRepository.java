@@ -1,6 +1,5 @@
 package stock.price.analytics.repository.gaps;
 
-import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -415,7 +414,6 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
     List<FairValueGap> findAllDailyFVGsForTickersAfter(List<String> tickers, LocalDate date);
 
     @Modifying
-    @Transactional
     @Query(value = """
             UPDATE fvg
                    SET high = high * :multiplier,

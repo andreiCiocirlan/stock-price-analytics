@@ -1,6 +1,5 @@
 package stock.price.analytics.repository.gaps;
 
-import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -11,7 +10,6 @@ import stock.price.analytics.model.gaps.PriceGap;
 public interface PriceGapsRepository extends JpaRepository<PriceGap, Long> {
 
     @Modifying
-    @Transactional
     @Query(value = """
             with closed_gaps as (
             	select pg.id from price_gaps pg
