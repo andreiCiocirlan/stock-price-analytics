@@ -66,7 +66,6 @@ public class CacheInitializationService {
         boolean weeklyHighLowExists = highLowForPeriodService.weeklyHighLowExists();
         logTime(() -> initHighLowPricesCache(latestDailyPriceImportDate, weeklyHighLowExists), "initialized high low prices cache");
         if (!weeklyHighLowExists && cacheService.isFirstImportFor(StockTimeframe.WEEKLY)) {
-            System.out.println("here");
             stockService.updateHighLowForPeriodFromHLCachesAndAdjustWeekend();
         }
         logTime(this::initLatestDailyPricesCache, "initialized latest daily prices cache");
@@ -77,7 +76,7 @@ public class CacheInitializationService {
 
     private void initDailyJSONPricesCache() {
         LocalDate tradingDateNow = tradingDateNow();
-        dailyPricesJSONCache.addDailyJSONPrices(dailyPricesJSONRepository.findByStartDateBetween(tradingDateNow.minusDays(7), tradingDateNow));
+        dailyPricesJSONCache.addDailyJSONPrices(dailyPricesJSONRepository.findByDateBetween(tradingDateNow.minusDays(7), tradingDateNow));
     }
 
     private void initPreMarketDailyPrices() {
