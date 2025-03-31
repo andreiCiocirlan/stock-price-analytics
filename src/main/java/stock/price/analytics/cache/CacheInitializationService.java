@@ -15,10 +15,7 @@ import stock.price.analytics.repository.prices.highlow.HighLowForPeriodRepositor
 import stock.price.analytics.repository.prices.json.DailyPricesJSONRepository;
 import stock.price.analytics.repository.prices.ohlc.DailyPricesRepository;
 import stock.price.analytics.repository.stocks.StockRepository;
-import stock.price.analytics.service.AsyncPersistenceService;
-import stock.price.analytics.service.HighLowForPeriodService;
-import stock.price.analytics.service.PricesService;
-import stock.price.analytics.service.StockService;
+import stock.price.analytics.service.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -46,7 +43,7 @@ public class CacheInitializationService {
     private final HighLowForPeriodRepository highLowForPeriodRepository;
     private final StocksCache stocksCache;
     private final CacheService cacheService;
-    private final AsyncPersistenceService asyncPersistenceService;
+    private final SyncPersistenceService syncPersistenceService;
     private final StockService stockService;
     private final PricesService pricesService;
     private final HighLowForPeriodService highLowForPeriodService;
@@ -69,6 +66,7 @@ public class CacheInitializationService {
         boolean weeklyHighLowExists = highLowForPeriodService.weeklyHighLowExists();
         logTime(() -> initHighLowPricesCache(latestDailyPriceImportDate, weeklyHighLowExists), "initialized high low prices cache");
         if (!weeklyHighLowExists && cacheService.isFirstImportFor(StockTimeframe.WEEKLY)) {
+            System.out.println("here");
             stockService.updateHighLowForPeriodFromHLCachesAndAdjustWeekend();
         }
         logTime(this::initLatestDailyPricesCache, "initialized latest daily prices cache");
@@ -79,7 +77,7 @@ public class CacheInitializationService {
 
     private void initDailyJSONPricesCache() {
         LocalDate tradingDateNow = tradingDateNow();
-        dailyPricesJSONCache.addDailyJSONPrices(dailyPricesJSONRepository.findByDateBetween(tradingDateNow.minusDays(7), tradingDateNow));
+        dailyPricesJSONCache.addDailyJSONPrices(dailyPricesJSONRepository.findByStartDateBetween(tradingDateNow.minusDays(7), tradingDateNow));
     }
 
     private void initPreMarketDailyPrices() {
@@ -135,7 +133,7 @@ public class CacheInitializationService {
             if (highLowPeriod == HighLowPeriod.HIGH_LOW_ALL_TIME) { // for all-time highs/lows simply copy the existing row on Mondays
                 List<HighestLowestPrices> highestLowestPrices = new ArrayList<>();
                 highLowForPeriodRepository.highestLowestPrices(startDate).forEach(hlp -> highestLowestPrices.add(hlp.copyWith(newWeekStartDate)));
-                asyncPersistenceService.partitionDataAndSave(highestLowestPrices, highLowForPeriodRepository);
+                syncPersistenceService.partitionDataAndSave(highestLowestPrices, highLowForPeriodRepository);
                 highLowPricesCache.addHighLowPrices(highestLowestPrices, highLowPeriod);
             } else { // for 4w, 52w need sql select for the period (for all-time it would simply be a copy)
                 int weekCount = switch (highLowPeriod) {
@@ -148,7 +146,7 @@ public class CacheInitializationService {
                         .stream()
                         .map(dto -> convertToHighLowForPeriod(dto, newWeekStartDate, newWeekEndDate, highLowPeriod))
                         .toList();
-                asyncPersistenceService.partitionDataAndSave(highLowForPeriods, highLowForPeriodRepository);
+                syncPersistenceService.partitionDataAndSave(highLowForPeriods, highLowForPeriodRepository);
                 highLowPricesCache.addHighLowPrices(highLowForPeriods, highLowPeriod);
             }
         } else {
@@ -187,7 +185,7 @@ public class CacheInitializationService {
                 .toList();
 
         if (!delistedStocks.isEmpty()) {
-            asyncPersistenceService.partitionDataAndSave(delistedStocks, stockRepository);
+            syncPersistenceService.partitionDataAndSave(delistedStocks, stockRepository);
         }
     }
 

@@ -25,6 +25,7 @@ public class StockService {
     private final TickerRenameRepository tickerRenameRepository;
     private final CacheService cacheService;
     private final AsyncPersistenceService asyncPersistenceService;
+    private final SyncPersistenceService syncPersistenceService;
 
     @Transactional
     public void saveStocks(String tickers, boolean xtbStock, boolean shortSell, double cfdMargin) {
@@ -89,7 +90,7 @@ public class StockService {
         updateStocksFromHighLowCaches(stocksUpdated);
 
         List<Stock> stocks = new ArrayList<>(stocksUpdated);
-        asyncPersistenceService.partitionDataAndSaveWithLogTime(stocks, stockRepository, "saved stocks after generating high-lows 4w, 52w, all-time for the first import of the week");
+        syncPersistenceService.partitionDataAndSaveWithLogTime(stocks, stockRepository, "saved stocks after generating high-lows 4w, 52w, all-time for the first import of the week");
         cacheService.addStocks(stocks);
     }
 
