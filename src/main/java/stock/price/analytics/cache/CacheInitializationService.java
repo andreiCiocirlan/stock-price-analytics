@@ -15,7 +15,10 @@ import stock.price.analytics.repository.prices.highlow.HighLowForPeriodRepositor
 import stock.price.analytics.repository.prices.json.DailyPricesJSONRepository;
 import stock.price.analytics.repository.prices.ohlc.DailyPricesRepository;
 import stock.price.analytics.repository.stocks.StockRepository;
-import stock.price.analytics.service.*;
+import stock.price.analytics.service.HighLowForPeriodService;
+import stock.price.analytics.service.PricesService;
+import stock.price.analytics.service.StockService;
+import stock.price.analytics.service.SyncPersistenceService;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
