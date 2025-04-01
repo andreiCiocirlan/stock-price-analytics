@@ -12,7 +12,7 @@ import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.prices.highlow.HighLowForPeriodRepository;
-import stock.price.analytics.repository.prices.json.DailyPriceJSONRepository;
+import stock.price.analytics.repository.json.DailyPriceJSONRepository;
 import stock.price.analytics.repository.prices.ohlc.DailyPriceRepository;
 import stock.price.analytics.repository.stocks.StockRepository;
 import stock.price.analytics.service.HighLowForPeriodService;

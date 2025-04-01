@@ -1,4 +1,4 @@
-package stock.price.analytics.repository.prices.json;
+package stock.price.analytics.repository.json;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

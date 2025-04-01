@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.json.*;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
-import stock.price.analytics.repository.prices.json.DailyPriceJSONRepository;
+import stock.price.analytics.repository.json.DailyPriceJSONRepository;
 
 import java.io.File;
 import java.io.IOException;
