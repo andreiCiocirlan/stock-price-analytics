@@ -20,6 +20,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PricesUtil {
 
+    public static <T extends AbstractPrice> List<T> pricesWithPerformance(List<T> prices) {
+        for (int i = prices.size() - 1; i >= 1; i--) {
+            double previousClose = prices.get(i - 1).getClose();
+            double performance = ((prices.get(i).getClose() - previousClose) / previousClose) * 100;
+            prices.get(i).setPerformance(Math.round(performance * 100.0) / 100.0);
+        }
+        return prices;
+    }
+
     public static List<AbstractPrice> htfPricesForTimeframe(List<DailyPrice> dailyPrices, StockTimeframe stockTimeframe) {
         return new ArrayList<>(
                 dailyPrices.stream()
