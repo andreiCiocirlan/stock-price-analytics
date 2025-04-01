@@ -47,7 +47,7 @@ public class YahooQuotesClient {
     }
 
     public List<String> quotePricesFor(List<String> tickerStrings) {
-        int maxTickersPerRequest = 100;
+        int maxTickersPerRequest = 1700;
 
         List<String> res = new ArrayList<>();
         List<String> partitions = new ArrayList<>();
@@ -73,6 +73,8 @@ public class YahooQuotesClient {
         String quoteResponse = null;
         int maxRetries = 3;
         int retryCount = 0;
+
+        log.info("quotePricesJSON called");
 
         while (quoteResponse == null || quoteResponse.isEmpty()) {
             if (retryCount >= maxRetries) {
