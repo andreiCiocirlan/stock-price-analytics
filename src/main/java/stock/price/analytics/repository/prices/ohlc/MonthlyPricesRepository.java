@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface MonthlyPricesRepository extends JpaRepository<MonthlyPrice, Long> {
 
-    List<MonthlyPrice> findByStartDateBetween(LocalDate from, LocalDate to);
+    List<MonthlyPrice> findByTickerAndStartDateBetween(String ticker, LocalDate from, LocalDate to);
 
     @Query(value = """
                 SELECT *
