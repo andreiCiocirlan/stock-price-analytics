@@ -37,7 +37,7 @@ public class StockSplitAdjustPricesController {
                            @RequestParam("stockSplitDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate stockSplitDate,
                            @RequestParam("priceMultiplier") double priceMultiplier) {
         stockSplitAdjustPricesService.adjustPricesFor(ticker, stockSplitDate, priceMultiplier);
-        pricesService.updateAllHigherTimeframesFor(stockSplitDate, STR."'\{ticker}'");
+        pricesService.updateHtfPricesPerformanceFor(stockSplitDate, ticker);
         highLowForPeriodService.saveAllHistoricalHighLowPrices(List.of(ticker), stockSplitDate);
         fairValueGapService.updateFVGPricesForStockSplit(ticker, stockSplitDate, priceMultiplier);
 

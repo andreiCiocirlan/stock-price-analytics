@@ -14,9 +14,11 @@ import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.repository.prices.ohlc.*;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 import static stock.price.analytics.model.prices.enums.StockTimeframe.DAILY;
 import static stock.price.analytics.model.prices.enums.StockTimeframe.higherTimeframes;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
+import static stock.price.analytics.util.PricesUtil.pricesWithPerformance;
 import static stock.price.analytics.util.TradingDateUtil.isWithinSameTimeframe;
 
 
@@ -156,91 +159,43 @@ public class PricesService {
     }
 
     @Transactional
-    public void updateAllHigherTimeframesFor(LocalDate date, String tickers) {
-        updateHigherTimeframesPricesFor(date, higherTimeframes(), tickers);
+    public void updateHtfPricesPerformanceFor(LocalDate date, String ticker) {
+        List<AbstractPrice> updatedPrices = new ArrayList<>();
+        for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
+            List<? extends AbstractPrice> currentAndPreviousPriceForTimeframeSorted = findCurrentAndPrevHTFPricesFor(date, timeframe, ticker).stream()
+                    .sorted(Comparator.comparing(AbstractPrice::getStartDate)).toList();
+            // updates only the price performance within timeframe of date
+            List<? extends AbstractPrice> updated = pricesWithPerformance(currentAndPreviousPriceForTimeframeSorted);
+            updatedPrices.addAll(updated);
+        }
+        asyncPersistenceService.partitionDataAndSave(updatedPrices, pricesRepository);
     }
 
-    @Transactional
-    public void updateHigherTimeframesPricesFor(LocalDate date, List<StockTimeframe> timeframes, String tickers) {
-        for (StockTimeframe timeframe : timeframes) {
-            updateHigherTimeframeHistPrices(timeframe.toDateTruncPeriod(), timeframe.sequenceName(), timeframe.toSQLInterval(), timeframe.dbTableOHLC(), timeframe.htfDateFrom(date), tickers);
-        }
-    }
+    public List<? extends AbstractPrice> findCurrentAndPrevHTFPricesFor(LocalDate date, StockTimeframe timeframe, String ticker) {
+        LocalDate from;
+        LocalDate to;
 
-    private void updateHigherTimeframeHistPrices(String dateTruncPeriod, String sequenceName, String sqlInterval, String tableName, LocalDate date, String tickers) {
-        String dateFormatted = date.format(DateTimeFormatter.ISO_LOCAL_DATE);
-        int savedOrUpdatedCount = entityManager.createNativeQuery(
-                queryFrom(tickers, dateTruncPeriod, sequenceName, sqlInterval, tableName, dateFormatted)
-        ).executeUpdate();
-        if (savedOrUpdatedCount != 0) {
-            log.info("saved/updated {} {} rows for date {} and tickers {}", savedOrUpdatedCount, dateTruncPeriod, dateFormatted, tickers);
-        }
-    }
-
-    private String queryFrom(String tickers, String dateTruncPeriod, String sequenceName, String sqlInterval, String tableName, String dateFormatted) {
-        String query = STR."""
-            WITH interval_data AS (
-            SELECT
-                ticker,
-                MIN(date) AS start_date,
-                MAX(date) AS end_date,
-                MAX(high) AS high,
-                MIN(low) AS low
-            FROM daily_prices
-            WHERE date BETWEEN '\{dateFormatted}'::date - INTERVAL '\{sqlInterval}' AND '\{dateFormatted}'
-            """;
-
-        if (!tickers.isEmpty()) {
-            query = query.concat(
-                    STR."""
-                    AND ticker in (\{tickers})
-                    """);
-        }
-
-        query = query.concat(STR."""
-            GROUP BY ticker, DATE_TRUNC('\{dateTruncPeriod}', date)
-            ),
-            last_week AS (
-                SELECT
-                    dp_o.ticker,
-                    start_date,
-                    end_date,
-                    interval_data.high,
-                    interval_data.low,
-                    dp_o.open,
-                    dp_c.close,
-                    CASE
-                        WHEN (LAG(dp_c.close, 1) OVER (PARTITION BY dp_o.ticker ORDER BY start_date) IS NULL) THEN
-                            CASE
-                                WHEN (dp_o.open <> 0) THEN ROUND((100.0 * (dp_c.close - dp_o.open) / dp_o.open)::numeric, 2)
-                                ELSE NULL
-                            END
-                        ELSE
-                            ROUND(((dp_c.close - LAG(dp_c.close) OVER (PARTITION BY dp_o.ticker ORDER BY start_date)) / LAG(dp_c.close) OVER (PARTITION BY dp_o.ticker ORDER BY start_date) * 100)::numeric, 2)
-                    END AS performance
-                FROM interval_data
-                JOIN daily_prices dp_o ON dp_o.ticker = interval_data.ticker AND dp_o.date = interval_data.start_date
-                JOIN daily_prices dp_c ON dp_c.ticker = interval_data.ticker AND dp_c.date = interval_data.end_date
-            ),
-            final_result AS (
-                SELECT *
-                FROM last_week
-                    WHERE start_date >= DATE_TRUNC('\{dateTruncPeriod}', '\{dateFormatted}'::date)
-            )
-            INSERT INTO \{tableName} (id, ticker, start_date, end_date, high, low, open, close, performance)
-            SELECT nextval('\{sequenceName}') AS id, ticker, DATE_TRUNC('\{dateTruncPeriod}', start_date), end_date, high, low, open, close, performance
-            FROM final_result
-            ON CONFLICT (ticker, start_date)
-                DO UPDATE SET
-                    open = EXCLUDED.open,
-                    high = EXCLUDED.high,
-                    low = EXCLUDED.low,
-                    close = EXCLUDED.close,
-                    performance = EXCLUDED.performance,
-                    end_date = EXCLUDED.end_date
-            """);
-
-        return query;
+        return switch (timeframe) {
+            case WEEKLY:
+                from = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).minusWeeks(1);
+                to = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
+                yield weeklyPricesRepository.findByTickerAndStartDateBetween(ticker, from, to);
+            case MONTHLY:
+                from = date.with(TemporalAdjusters.firstDayOfMonth()).minusMonths(1);
+                to = date.with(TemporalAdjusters.firstDayOfMonth());
+                yield monthlyPricesRepository.findByTickerAndStartDateBetween(ticker, from, to);
+            case QUARTERLY:
+                int firstMonthOfQuarter = date.getMonth().firstMonthOfQuarter().getValue();
+                from = LocalDate.of(date.getYear(), firstMonthOfQuarter, 1).minusMonths(3);
+                to = LocalDate.of(date.getYear(), firstMonthOfQuarter, 1);
+                yield quarterlyPricesRepository.findByTickerAndStartDateBetween(ticker, from, to);
+            case YEARLY:
+                from = date.with(TemporalAdjusters.firstDayOfYear()).minusYears(1);
+                to = date.with(TemporalAdjusters.firstDayOfYear());
+                yield yearlyPricesRepository.findByTickerAndStartDateBetween(ticker, from, to);
+            case DAILY:
+                throw new IllegalArgumentException("Unsupported timeframe: DAILY");
+        };
     }
 
     @Transactional
