@@ -37,6 +37,7 @@ import static java.nio.file.Files.readAllLines;
 import static stock.price.analytics.util.Constants.USER_AGENT_VALUE;
 import static stock.price.analytics.util.FileUtil.writeToFile;
 import static stock.price.analytics.util.PricesUtil.htfPricesForTimeframe;
+import static stock.price.analytics.util.PricesUtil.pricesWithPerformance;
 
 @Slf4j
 @Service
@@ -301,15 +302,6 @@ public class NewTickerService {
 //            dailyPrice.setClose(Math.round(dailyPrice.getClose() * 1000.0) / 1000.0);
 //        }
         return dailyPrice;
-    }
-
-    private <T extends AbstractPrice> List<T> pricesWithPerformance(List<T> prices) {
-        for (int i = prices.size() - 1; i >= 1; i--) {
-            double previousClose = prices.get(i - 1).getClose();
-            double performance = ((prices.get(i).getClose() - previousClose) / previousClose) * 100;
-            prices.get(i).setPerformance(Math.round(performance * 100.0) / 100.0);
-        }
-        return prices;
     }
 
     private String timeframeToQParam(StockTimeframe timeframe) {
