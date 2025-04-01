@@ -48,8 +48,8 @@ public class NewTickerService {
     private final YahooQuotesClient yahooQuotesClient;
     private final RestTemplate restTemplate;
     private final StockService stockService;
-    private final PricesService pricesService;
-    private final PriceGapsService priceGapsService;
+    private final PriceService priceService;
+    private final PriceGapService priceGapService;
     private final FairValueGapService fairValueGapService;
     private final AsyncPersistenceService asyncPersistenceService;
     private final HighLowForPeriodRepository highLowForPeriodRepository;
@@ -59,11 +59,11 @@ public class NewTickerService {
         List<String> tickerList = Arrays.stream(tickers.split(",")).toList();
         List<DailyPrice> dailyPricesImported = getDailyPricesFor(tickerList);
         List<AbstractPrice> htfPricesImported = getHigherTimeframePricesFor(dailyPricesImported);
-        pricesService.savePrices(dailyPricesImported);
-        pricesService.savePrices(htfPricesImported);
+        priceService.savePrices(dailyPricesImported);
+        priceService.savePrices(htfPricesImported);
         saveHighLowPricesForPeriodFrom(htfPricesImported);
         saveAndUpdateStocksFor(dailyPricesImported, htfPricesImported);
-        priceGapsService.saveAllPriceGapsFor(tickerList);
+        priceGapService.saveAllPriceGapsFor(tickerList);
         fairValueGapService.findNewFVGsAndSaveForAllTimeframes(tickerList, true);
     }
 
@@ -74,12 +74,12 @@ public class NewTickerService {
         COOKIE = yahooQuotesClient.cookieFromFcYahoo();
         getYahooQuotesAndSaveJSONFileFor(tickers);
         List<DailyPrice> dailyPricesImported = getDailyPricesFor(tickerList);
-        pricesService.savePrices(dailyPricesImported);
+        priceService.savePrices(dailyPricesImported);
         List<AbstractPrice> htfPricesImported = getHigherTimeframePricesFor(dailyPricesImported);
-        pricesService.savePrices(htfPricesImported);
+        priceService.savePrices(htfPricesImported);
         saveHighLowPricesForPeriodFrom(htfPricesImported);
         saveAndUpdateStocksFor(dailyPricesImported, htfPricesImported);
-        priceGapsService.saveAllPriceGapsFor(tickerList);
+        priceGapService.saveAllPriceGapsFor(tickerList);
         fairValueGapService.findNewFVGsAndSaveForAllTimeframes(tickerList, true);
     }
 

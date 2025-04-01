@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.repository.gaps.PriceGapsRepository;
+import stock.price.analytics.repository.gaps.PriceGapRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,9 +16,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PriceGapsService {
+public class PriceGapService {
 
-    private final PriceGapsRepository priceGapsRepository;
+    private final PriceGapRepository priceGapRepository;
     private final CacheService cacheService;
 
     @PersistenceContext
@@ -100,7 +100,7 @@ public class PriceGapsService {
 
     @Transactional
     public void closePriceGaps() {
-        int rowsAffected = priceGapsRepository.closePriceGaps();
+        int rowsAffected = priceGapRepository.closePriceGaps();
         if (rowsAffected != 0) {
             log.info("Closed {} price gaps", rowsAffected);
         }

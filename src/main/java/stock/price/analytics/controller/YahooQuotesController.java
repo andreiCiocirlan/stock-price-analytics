@@ -8,7 +8,7 @@ import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.service.HighLowForPeriodService;
-import stock.price.analytics.service.PricesService;
+import stock.price.analytics.service.PriceService;
 import stock.price.analytics.service.StockService;
 import stock.price.analytics.service.YahooQuoteService;
 
@@ -28,7 +28,7 @@ import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 public class YahooQuotesController {
 
     private final YahooQuoteService yahooQuoteService;
-    private final PricesService pricesService;
+    private final PriceService priceService;
     private final HighLowForPeriodService highLowForPeriodService;
     private final StockService stockService;
     private final CacheService cacheService;
@@ -39,7 +39,7 @@ public class YahooQuotesController {
         long start = System.nanoTime();
         List<DailyPrice> dailyImportedPrices = logTimeAndReturn(yahooQuoteService::yahooQuotesImport, "imported daily prices");
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
-            List<AbstractPrice> htfPricesUpdated = pricesService.updatePricesForHigherTimeframes(dailyImportedPrices);
+            List<AbstractPrice> htfPricesUpdated = priceService.updatePricesForHigherTimeframes(dailyImportedPrices);
 
             logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices), "saved current week HighLow prices");
             logTime(() -> stockService.updateStocksHighLowsAndOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks highs-lows 4w,52w,all-time and higher-timeframe OHLC prices");
@@ -57,8 +57,8 @@ public class YahooQuotesController {
         String fileName = Objects.requireNonNullElseGet(fileNameStr, () -> tradingDateNow().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
         List<DailyPrice> dailyImportedPrices = logTimeAndReturn(() -> yahooQuoteService.yahooQuotesFromFile(fileName), "imported daily prices");
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
-            pricesService.savePrices(dailyImportedPrices);
-            List<AbstractPrice> htfPricesUpdated = pricesService.updatePricesForHigherTimeframes(dailyImportedPrices);
+            priceService.savePrices(dailyImportedPrices);
+            List<AbstractPrice> htfPricesUpdated = priceService.updatePricesForHigherTimeframes(dailyImportedPrices);
 
             logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices), "saved current week HighLow prices");
             logTime(() -> stockService.updateStocksHighLowsAndOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks highs-lows 4w,52w,all-time and higher-timeframe OHLC prices");

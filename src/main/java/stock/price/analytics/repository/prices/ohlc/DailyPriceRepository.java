@@ -10,7 +10,7 @@ import java.util.List;
 
 
 @Repository
-public interface DailyPricesRepository extends JpaRepository<DailyPrice, Long> {
+public interface DailyPriceRepository extends JpaRepository<DailyPrice, Long> {
 
     @Query(value = """
             WITH latest_prices AS (

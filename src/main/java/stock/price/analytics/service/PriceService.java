@@ -33,16 +33,16 @@ import static stock.price.analytics.util.TradingDateUtil.isWithinSameTimeframe;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class PricesService {
+public class PriceService {
 
     @PersistenceContext
     private final EntityManager entityManager;
 
-    private final PricesRepository pricesRepository;
-    private final WeeklyPricesRepository weeklyPricesRepository;
-    private final MonthlyPricesRepository monthlyPricesRepository;
-    private final QuarterlyPricesRepository quarterlyPricesRepository;
-    private final YearlyPricesRepository yearlyPricesRepository;
+    private final PriceRepository priceRepository;
+    private final WeeklyPriceRepository weeklyPriceRepository;
+    private final MonthlyPriceRepository monthlyPriceRepository;
+    private final QuarterlyPriceRepository quarterlyPriceRepository;
+    private final YearlyPriceRepository yearlyPriceRepository;
     private final CacheService cacheService;
     private final AsyncPersistenceService asyncPersistenceService;
 
@@ -51,10 +51,10 @@ public class PricesService {
     public List<stock.price.analytics.model.prices.ohlc.AbstractPrice> previousThreePricesFor(List<String> tickers, StockTimeframe timeframe) {
         return (List<stock.price.analytics.model.prices.ohlc.AbstractPrice>) (switch (timeframe) {
             case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
-            case WEEKLY -> weeklyPricesRepository.findPreviousThreeWeeklyPricesForTickers(tickers);
-            case MONTHLY -> monthlyPricesRepository.findPreviousThreeMonthlyPricesForTickers(tickers);
-            case QUARTERLY -> quarterlyPricesRepository.findPreviousThreeQuarterlyPricesForTickers(tickers);
-            case YEARLY -> yearlyPricesRepository.findPreviousThreeYearlyPricesForTickers(tickers);
+            case WEEKLY -> weeklyPriceRepository.findPreviousThreeWeeklyPricesForTickers(tickers);
+            case MONTHLY -> monthlyPriceRepository.findPreviousThreeMonthlyPricesForTickers(tickers);
+            case QUARTERLY -> quarterlyPriceRepository.findPreviousThreeQuarterlyPricesForTickers(tickers);
+            case YEARLY -> yearlyPriceRepository.findPreviousThreeYearlyPricesForTickers(tickers);
         });
     }
 
@@ -108,7 +108,7 @@ public class PricesService {
             htfPricesUpdated.addAll(htfPricesWithPrevCloseUpdated.stream().map(PriceWithPrevClose::getPrice).toList());
             cacheService.addHtfPricesWithPrevClose(htfPricesWithPrevCloseUpdated);
         }
-        asyncPersistenceService.partitionDataAndSaveWithLogTime(htfPricesUpdated, pricesRepository, "saved HTF prices");
+        asyncPersistenceService.partitionDataAndSaveWithLogTime(htfPricesUpdated, priceRepository, "saved HTF prices");
 
         return htfPricesUpdated;
     }
@@ -168,7 +168,7 @@ public class PricesService {
             List<? extends AbstractPrice> updated = pricesWithPerformance(currentAndPreviousPriceForTimeframeSorted);
             updatedPrices.addAll(updated);
         }
-        asyncPersistenceService.partitionDataAndSave(updatedPrices, pricesRepository);
+        asyncPersistenceService.partitionDataAndSave(updatedPrices, priceRepository);
     }
 
     public List<? extends AbstractPrice> findCurrentAndPrevHTFPricesFor(LocalDate date, StockTimeframe timeframe, String ticker) {
@@ -179,20 +179,20 @@ public class PricesService {
             case WEEKLY:
                 from = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).minusWeeks(1);
                 to = date.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
-                yield weeklyPricesRepository.findByTickerAndStartDateBetween(ticker, from, to);
+                yield weeklyPriceRepository.findByTickerAndStartDateBetween(ticker, from, to);
             case MONTHLY:
                 from = date.with(TemporalAdjusters.firstDayOfMonth()).minusMonths(1);
                 to = date.with(TemporalAdjusters.firstDayOfMonth());
-                yield monthlyPricesRepository.findByTickerAndStartDateBetween(ticker, from, to);
+                yield monthlyPriceRepository.findByTickerAndStartDateBetween(ticker, from, to);
             case QUARTERLY:
                 int firstMonthOfQuarter = date.getMonth().firstMonthOfQuarter().getValue();
                 from = LocalDate.of(date.getYear(), firstMonthOfQuarter, 1).minusMonths(3);
                 to = LocalDate.of(date.getYear(), firstMonthOfQuarter, 1);
-                yield quarterlyPricesRepository.findByTickerAndStartDateBetween(ticker, from, to);
+                yield quarterlyPriceRepository.findByTickerAndStartDateBetween(ticker, from, to);
             case YEARLY:
                 from = date.with(TemporalAdjusters.firstDayOfYear()).minusYears(1);
                 to = date.with(TemporalAdjusters.firstDayOfYear());
-                yield yearlyPricesRepository.findByTickerAndStartDateBetween(ticker, from, to);
+                yield yearlyPriceRepository.findByTickerAndStartDateBetween(ticker, from, to);
             case DAILY:
                 throw new IllegalArgumentException("Unsupported timeframe: DAILY");
         };
@@ -200,6 +200,6 @@ public class PricesService {
 
     @Transactional
     public void savePrices(List<? extends AbstractPrice> prices) {
-        asyncPersistenceService.partitionDataAndSave(prices, pricesRepository);
+        asyncPersistenceService.partitionDataAndSave(prices, priceRepository);
     }
 }

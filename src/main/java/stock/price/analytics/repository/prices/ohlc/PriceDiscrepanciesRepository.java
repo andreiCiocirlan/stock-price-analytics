@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface PricesDiscrepanciesRepository extends PricesRepository {
+public interface PriceDiscrepanciesRepository extends PriceRepository {
 
     @Query(value = """
             WITH daily_grouped AS (

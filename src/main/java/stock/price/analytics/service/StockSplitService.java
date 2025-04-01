@@ -14,22 +14,22 @@ import static java.time.temporal.TemporalAdjusters.*;
 
 @Service
 @RequiredArgsConstructor
-public class StockSplitAdjustPricesService {
+public class StockSplitService {
 
-    private final PricesRepository pricesRepository;
-    private final DailyPricesRepository dailyPricesRepository;
-    private final WeeklyPricesRepository weeklyPricesRepository;
-    private final MonthlyPricesRepository monthlyPricesRepository;
-    private final QuarterlyPricesRepository quarterlyPricesRepository;
-    private final YearlyPricesRepository yearlyPricesRepository;
+    private final PriceRepository priceRepository;
+    private final DailyPriceRepository dailyPriceRepository;
+    private final WeeklyPriceRepository weeklyPriceRepository;
+    private final MonthlyPriceRepository monthlyPriceRepository;
+    private final QuarterlyPriceRepository quarterlyPriceRepository;
+    private final YearlyPriceRepository yearlyPriceRepository;
     private final AsyncPersistenceService asyncPersistenceService;
 
     public void adjustPricesFor(String ticker, LocalDate stockSplitDate, double priceMultiplier) {
-        List<DailyPrice> dailyPricesToUpdate = dailyPricesRepository.findByTickerAndDateLessThan(ticker, stockSplitDate);
-        List<WeeklyPrice> weeklyPricesToUpdate = weeklyPricesRepository.findWeeklyByTickerAndStartDateBefore(ticker, stockSplitDate.with(previousOrSame(DayOfWeek.MONDAY)));
-        List<MonthlyPrice> monthlyPricesToUpdate = monthlyPricesRepository.findMonthlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfMonth()));
-        List<QuarterlyPrice> quarterlyPricesToUpdate = quarterlyPricesRepository.findQuarterlyByTickerAndStartDateBefore(ticker, LocalDate.of(stockSplitDate.getYear(), stockSplitDate.getMonth().firstMonthOfQuarter().getValue(), 1));
-        List<YearlyPrice> yearlyPricesToUpdate = yearlyPricesRepository.findYearlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfYear()));
+        List<DailyPrice> dailyPricesToUpdate = dailyPriceRepository.findByTickerAndDateLessThan(ticker, stockSplitDate);
+        List<WeeklyPrice> weeklyPricesToUpdate = weeklyPriceRepository.findWeeklyByTickerAndStartDateBefore(ticker, stockSplitDate.with(previousOrSame(DayOfWeek.MONDAY)));
+        List<MonthlyPrice> monthlyPricesToUpdate = monthlyPriceRepository.findMonthlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfMonth()));
+        List<QuarterlyPrice> quarterlyPricesToUpdate = quarterlyPriceRepository.findQuarterlyByTickerAndStartDateBefore(ticker, LocalDate.of(stockSplitDate.getYear(), stockSplitDate.getMonth().firstMonthOfQuarter().getValue(), 1));
+        List<YearlyPrice> yearlyPricesToUpdate = yearlyPriceRepository.findYearlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfYear()));
 
         dailyPricesToUpdate.forEach(dailyPrice -> updatePrices(dailyPrice, priceMultiplier));
         weeklyPricesToUpdate.forEach(weeklyPrices -> updatePrices(weeklyPrices, priceMultiplier));
@@ -37,24 +37,24 @@ public class StockSplitAdjustPricesService {
         quarterlyPricesToUpdate.forEach(quarterlyPrices -> updatePrices(quarterlyPrices, priceMultiplier));
         yearlyPricesToUpdate.forEach(yearlyPrices -> updatePrices(yearlyPrices, priceMultiplier));
 
-        asyncPersistenceService.partitionDataAndSave(dailyPricesToUpdate, dailyPricesRepository);
-        asyncPersistenceService.partitionDataAndSave(weeklyPricesToUpdate, weeklyPricesRepository);
-        asyncPersistenceService.partitionDataAndSave(monthlyPricesToUpdate, monthlyPricesRepository);
-        asyncPersistenceService.partitionDataAndSave(quarterlyPricesToUpdate, quarterlyPricesRepository);
-        asyncPersistenceService.partitionDataAndSave(yearlyPricesToUpdate, yearlyPricesRepository);
+        asyncPersistenceService.partitionDataAndSave(dailyPricesToUpdate, dailyPriceRepository);
+        asyncPersistenceService.partitionDataAndSave(weeklyPricesToUpdate, weeklyPriceRepository);
+        asyncPersistenceService.partitionDataAndSave(monthlyPricesToUpdate, monthlyPriceRepository);
+        asyncPersistenceService.partitionDataAndSave(quarterlyPricesToUpdate, quarterlyPriceRepository);
+        asyncPersistenceService.partitionDataAndSave(yearlyPricesToUpdate, yearlyPriceRepository);
     }
 
     public List<? extends AbstractPrice> adjustPricesForDateAndTimeframe(String ticker, LocalDate date, double priceMultiplier, StockTimeframe timeframe, String ohlc) {
         List<? extends AbstractPrice> pricesToUpdate = switch (timeframe) {
-            case DAILY -> dailyPricesRepository.findByTickerAndDate(ticker, date);
-            case WEEKLY -> weeklyPricesRepository.findWeeklyByTickerAndStartDate(ticker, date);
-            case MONTHLY -> monthlyPricesRepository.findMonthlyByTickerAndStartDate(ticker, date);
-            case QUARTERLY -> quarterlyPricesRepository.findQuarterlyByTickerAndStartDate(ticker, date);
-            case YEARLY -> yearlyPricesRepository.findYearlyByTickerAndStartDate(ticker, date);
+            case DAILY -> dailyPriceRepository.findByTickerAndDate(ticker, date);
+            case WEEKLY -> weeklyPriceRepository.findWeeklyByTickerAndStartDate(ticker, date);
+            case MONTHLY -> monthlyPriceRepository.findMonthlyByTickerAndStartDate(ticker, date);
+            case QUARTERLY -> quarterlyPriceRepository.findQuarterlyByTickerAndStartDate(ticker, date);
+            case YEARLY -> yearlyPriceRepository.findYearlyByTickerAndStartDate(ticker, date);
         };
 
         pricesToUpdate.forEach(dailyPrice -> updatePrices(dailyPrice, ohlc, priceMultiplier));
-        asyncPersistenceService.partitionDataAndSave(pricesToUpdate, pricesRepository);
+        asyncPersistenceService.partitionDataAndSave(pricesToUpdate, priceRepository);
         return pricesToUpdate;
     }
 

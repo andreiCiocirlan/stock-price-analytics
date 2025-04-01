@@ -6,7 +6,7 @@ import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 
 
 @Repository
-public interface PricesRepository extends JpaRepository<AbstractPrice, Long> {
+public interface PriceRepository extends JpaRepository<AbstractPrice, Long> {
 
 
 }

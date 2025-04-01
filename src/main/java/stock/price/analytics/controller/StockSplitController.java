@@ -24,10 +24,10 @@ import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 @Validated
 @RequiredArgsConstructor
 @RequestMapping("/stock-split")
-public class StockSplitAdjustPricesController {
+public class StockSplitController {
 
-    private final StockSplitAdjustPricesService stockSplitAdjustPricesService;
-    private final PricesService pricesService;
+    private final StockSplitService stockSplitService;
+    private final PriceService priceService;
     private final HighLowForPeriodService highLowForPeriodService;
     private final FairValueGapService fairValueGapService;
     private final StockService stockService;
@@ -36,8 +36,8 @@ public class StockSplitAdjustPricesController {
     void splitAdjustPrices(@RequestParam("ticker") String ticker,
                            @RequestParam("stockSplitDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate stockSplitDate,
                            @RequestParam("priceMultiplier") double priceMultiplier) {
-        stockSplitAdjustPricesService.adjustPricesFor(ticker, stockSplitDate, priceMultiplier);
-        pricesService.updateHtfPricesPerformanceFor(stockSplitDate, ticker);
+        stockSplitService.adjustPricesFor(ticker, stockSplitDate, priceMultiplier);
+        priceService.updateHtfPricesPerformanceFor(stockSplitDate, ticker);
         highLowForPeriodService.saveAllHistoricalHighLowPrices(List.of(ticker), stockSplitDate);
         fairValueGapService.updateFVGPricesForStockSplit(ticker, stockSplitDate, priceMultiplier);
 
@@ -57,7 +57,7 @@ public class StockSplitAdjustPricesController {
                                                                        @RequestParam("priceMultiplier") double priceMultiplier,
                                                                        @RequestParam("timeframe") StockTimeframe timeframe,
                                                                        @RequestParam("ohlc") @Valid @Pattern(regexp = "^[OHLCohlc]{1,4}$", message = "Invalid OHLC") String ohlc) {
-        return stockSplitAdjustPricesService.adjustPricesForDateAndTimeframe(ticker, date, priceMultiplier, timeframe, ohlc);
+        return stockSplitService.adjustPricesForDateAndTimeframe(ticker, date, priceMultiplier, timeframe, ohlc);
     }
 
 }

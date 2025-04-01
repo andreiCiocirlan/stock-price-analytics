@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import stock.price.analytics.model.gaps.PriceGap;
 
 @Repository
-public interface PriceGapsRepository extends JpaRepository<PriceGap, Long> {
+public interface PriceGapRepository extends JpaRepository<PriceGap, Long> {
 
     @Modifying
     @Query(value = """

@@ -8,7 +8,7 @@ import stock.price.analytics.model.prices.ohlc.YearlyPrice;
 import java.time.LocalDate;
 import java.util.List;
 
-public interface YearlyPricesRepository extends JpaRepository<YearlyPrice, Long> {
+public interface YearlyPriceRepository extends JpaRepository<YearlyPrice, Long> {
 
     List<YearlyPrice> findByTickerAndStartDateBetween(String ticker, LocalDate from, LocalDate to);
 

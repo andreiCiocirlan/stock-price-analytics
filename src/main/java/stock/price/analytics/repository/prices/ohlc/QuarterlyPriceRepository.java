@@ -8,7 +8,7 @@ import stock.price.analytics.model.prices.ohlc.QuarterlyPrice;
 import java.time.LocalDate;
 import java.util.List;
 
-public interface QuarterlyPricesRepository extends JpaRepository<QuarterlyPrice, Long> {
+public interface QuarterlyPriceRepository extends JpaRepository<QuarterlyPrice, Long> {
 
     List<QuarterlyPrice> findByTickerAndStartDateBetween(String ticker, LocalDate from, LocalDate to);
 

@@ -8,7 +8,7 @@ import stock.price.analytics.model.prices.ohlc.WeeklyPrice;
 import java.time.LocalDate;
 import java.util.List;
 
-public interface WeeklyPricesRepository extends JpaRepository<WeeklyPrice, Long> {
+public interface WeeklyPriceRepository extends JpaRepository<WeeklyPrice, Long> {
 
     List<WeeklyPrice> findByTickerAndStartDateBetween(String ticker, LocalDate from, LocalDate to);
 

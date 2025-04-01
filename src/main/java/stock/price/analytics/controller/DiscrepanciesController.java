@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
-import stock.price.analytics.service.DiscrepanciesService;
+import stock.price.analytics.service.DiscrepancieService;
 
 import java.util.List;
 
@@ -13,36 +13,36 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DiscrepanciesController {
 
-    private final DiscrepanciesService discrepanciesService;
+    private final DiscrepancieService discrepancieService;
 
     @GetMapping("/stocks/find-all")
     public List<String> findAllStockDiscrepancies() {
-        return discrepanciesService.findAllStocksDiscrepancies();
+        return discrepancieService.findAllStocksDiscrepancies();
     }
 
     @GetMapping("/weekly-prices/find-all")
     public List<String> findAllWeeklyPriceDiscrepancies() {
-        return discrepanciesService.findAllWeeklyPriceDiscrepancies();
+        return discrepancieService.findAllWeeklyPriceDiscrepancies();
     }
 
     @PutMapping("/stocks/high-low-for-period")
     public void updateStocksWithHighLowDiscrepancy(@RequestParam(value = "period") HighLowPeriod period) {
-        discrepanciesService.updateStocksWithHighLowDiscrepancyFor(period);
+        discrepancieService.updateStocksWithHighLowDiscrepancyFor(period);
     }
 
     @PutMapping("/weekly-prices/opening-prices")
     public void updateHTFPricesWithOpeningPriceDiscrepancy(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
-        discrepanciesService.updateHTFOpeningPricesDiscrepancyFor(timeframe);
+        discrepancieService.updateHTFOpeningPricesDiscrepancyFor(timeframe);
     }
 
     @GetMapping("/stocks/opening-price")
     public List<String> findStocksWithOpeningPriceDiscrepancy(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
-        return discrepanciesService.findStocksWithOpeningPriceDiscrepancyFor(timeframe);
+        return discrepancieService.findStocksWithOpeningPriceDiscrepancyFor(timeframe);
     }
 
     @PutMapping("/stocks/opening-price")
     public void updateStocksWithOpeningPriceDiscrepancyFor(@RequestParam(value = "timeframe") StockTimeframe timeframe) {
-        discrepanciesService.updateStocksWithOpeningPriceDiscrepancyFor(timeframe);
+        discrepancieService.updateStocksWithOpeningPriceDiscrepancyFor(timeframe);
     }
 
 }

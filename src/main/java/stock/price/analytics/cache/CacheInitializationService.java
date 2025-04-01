@@ -12,11 +12,11 @@ import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.prices.highlow.HighLowForPeriodRepository;
-import stock.price.analytics.repository.prices.json.DailyPricesJSONRepository;
-import stock.price.analytics.repository.prices.ohlc.DailyPricesRepository;
+import stock.price.analytics.repository.prices.json.DailyPriceJSONRepository;
+import stock.price.analytics.repository.prices.ohlc.DailyPriceRepository;
 import stock.price.analytics.repository.stocks.StockRepository;
 import stock.price.analytics.service.HighLowForPeriodService;
-import stock.price.analytics.service.PricesService;
+import stock.price.analytics.service.PriceService;
 import stock.price.analytics.service.StockService;
 import stock.price.analytics.service.SyncPersistenceService;
 
@@ -39,8 +39,8 @@ public class CacheInitializationService {
     private final DailyPricesJSONCache dailyPricesJSONCache;
     private final DailyPricesCache dailyPricesCache;
     private final StockRepository stockRepository;
-    private final DailyPricesJSONRepository dailyPricesJSONRepository;
-    private final DailyPricesRepository dailyPricesRepository;
+    private final DailyPriceJSONRepository dailyPriceJSONRepository;
+    private final DailyPriceRepository dailyPriceRepository;
     private final HigherTimeframePricesCache higherTimeframePricesCache;
     private final HighLowPricesCache highLowPricesCache;
     private final HighLowForPeriodRepository highLowForPeriodRepository;
@@ -48,13 +48,13 @@ public class CacheInitializationService {
     private final CacheService cacheService;
     private final SyncPersistenceService syncPersistenceService;
     private final StockService stockService;
-    private final PricesService pricesService;
+    private final PriceService priceService;
     private final HighLowForPeriodService highLowForPeriodService;
 
     @Transactional
     public void initAllCaches() {
         for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
-            boolean firstImportFor = pricesService.isFirstImportFor(timeframe);
+            boolean firstImportFor = priceService.isFirstImportFor(timeframe);
             log.info("{} isFirstImport: {}", timeframe, firstImportFor);
             setFirstImportFor(timeframe, firstImportFor);
         }
@@ -62,7 +62,7 @@ public class CacheInitializationService {
         List<Stock> stocks = stockRepository.findByXtbStockIsTrueAndDelistedDateIsNull();
         List<String> tickers = stocks.stream().map(Stock::getTicker).toList();
         for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
-            logTime(() -> initHigherTimeframePricesCache(pricesService.previousThreePricesFor(tickers, timeframe)), "initialized " + timeframe + " prices cache");
+            logTime(() -> initHigherTimeframePricesCache(priceService.previousThreePricesFor(tickers, timeframe)), "initialized " + timeframe + " prices cache");
         }
         logTime(() -> initStocksCache(stocks), "initialized xtb stocks cache");
         LocalDate latestDailyPriceImportDate = stockService.findLastUpdate(); // find last update from stocksCache
@@ -79,7 +79,7 @@ public class CacheInitializationService {
 
     private void initDailyJSONPricesCache() {
         LocalDate tradingDateNow = tradingDateNow();
-        dailyPricesJSONCache.addDailyJSONPrices(dailyPricesJSONRepository.findByDateBetween(tradingDateNow.minusDays(7), tradingDateNow));
+        dailyPricesJSONCache.addDailyJSONPrices(dailyPriceJSONRepository.findByDateBetween(tradingDateNow.minusDays(7), tradingDateNow));
     }
 
     private void initPreMarketDailyPrices() {
@@ -99,7 +99,7 @@ public class CacheInitializationService {
     }
 
     private void initLatestDailyPricesCache() {
-        dailyPricesCache.addDailyPrices(dailyPricesRepository.findLatestDailyPrices(), REGULAR);
+        dailyPricesCache.addDailyPrices(dailyPriceRepository.findLatestDailyPrices(), REGULAR);
     }
 
     private void setFirstImportFor(StockTimeframe timeframe, Boolean isFirstImport) {

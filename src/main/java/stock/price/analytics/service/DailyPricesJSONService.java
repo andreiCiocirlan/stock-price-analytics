@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.json.*;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
-import stock.price.analytics.repository.prices.json.DailyPricesJSONRepository;
+import stock.price.analytics.repository.prices.json.DailyPriceJSONRepository;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,7 +38,7 @@ public class DailyPricesJSONService {
     private static final List<String> inconsistentLows = new ArrayList<>();
     private final CacheService cacheService;
     private final AsyncPersistenceService asyncPersistenceService;
-    private final DailyPricesJSONRepository dailyPricesJSONRepository;
+    private final DailyPriceJSONRepository dailyPriceJSONRepository;
 
     public List<DailyPrice> dailyPricesFromFile(String fileName) {
         try {
@@ -107,7 +107,7 @@ public class DailyPricesJSONService {
         }
         List<DailyPricesJSON> dailyPricesJSONSInCache = cacheService.cacheAndReturnDailyPricesJSON(dailyJSONPrices);
         if (!dailyPricesJSONSInCache.isEmpty()) {
-            asyncPersistenceService.partitionDataAndSaveWithLogTime(dailyPricesJSONSInCache, dailyPricesJSONRepository, "saved " + dailyPricesJSONSInCache.size() +  " daily json prices");
+            asyncPersistenceService.partitionDataAndSaveWithLogTime(dailyPricesJSONSInCache, dailyPriceJSONRepository, "saved " + dailyPricesJSONSInCache.size() + " daily json prices");
         }
 
         return dailyPricesJSONSInCache;
@@ -129,7 +129,7 @@ public class DailyPricesJSONService {
             LocalDate to = LocalDate.parse(fileName.split("_")[0], DateTimeFormatter.ofPattern("dd-MM-yyyy"));
             LocalDate from = to.minusDays(10);
 
-            return extractAllDailyPricesJSONFrom(dailyPricesJSON, dailyPricesJSONRepository.findByDateBetween(from, to));
+            return extractAllDailyPricesJSONFrom(dailyPricesJSON, dailyPriceJSONRepository.findByDateBetween(from, to));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -236,12 +236,12 @@ public class DailyPricesJSONService {
                 .toList();
 
         if (!dailyPricesJSON_toSave.isEmpty()) {
-            asyncPersistenceService.partitionDataAndSaveWithLogTime(dailyPricesJSON_toSave, dailyPricesJSONRepository, "saved " + dailyPricesJSON_toSave.size() + " daily json prices");
+            asyncPersistenceService.partitionDataAndSaveWithLogTime(dailyPricesJSON_toSave, dailyPriceJSONRepository, "saved " + dailyPricesJSON_toSave.size() + " daily json prices");
         }
     }
 
     public void exportDailyPricesToJson(LocalDate date) {
-        List<DailyPricesJSON> dailyPrices = dailyPricesJSONRepository.findByDate(date);
+        List<DailyPricesJSON> dailyPrices = dailyPriceJSONRepository.findByDate(date);
         QuoteResponse quoteResponse = new QuoteResponse();
         quoteResponse.setResult(dailyPrices);
 

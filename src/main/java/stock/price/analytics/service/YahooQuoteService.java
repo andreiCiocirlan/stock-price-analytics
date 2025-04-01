@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.client.YahooQuotesClient;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
-import stock.price.analytics.repository.prices.ohlc.DailyPricesRepository;
+import stock.price.analytics.repository.prices.ohlc.DailyPriceRepository;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -30,7 +30,7 @@ public class YahooQuoteService {
     private final AsyncPersistenceService asyncPersistenceService;
     private final DailyPricesJSONService dailyPricesJSONService;
     private final PriceMilestoneService priceMilestoneService;
-    private final DailyPricesRepository dailyPricesRepository;
+    private final DailyPriceRepository dailyPriceRepository;
 
     public List<DailyPrice> yahooQuotesFromFile(String fileName) {
         List<DailyPrice> dailyPrices = dailyPricesJSONService.dailyPricesFromFile(fileName);
@@ -53,7 +53,7 @@ public class YahooQuoteService {
             String fileName = tradingDateImported(dailyPricesExtractedFromJSON).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + ".json";
             String path = "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/" + fileName;
             writeToFile(path, pricesJSON);
-            asyncPersistenceService.partitionDataAndSaveWithLogTime(dailyImportedPrices, dailyPricesRepository, "saved " + dailyImportedPrices.size() + " daily prices");
+            asyncPersistenceService.partitionDataAndSaveWithLogTime(dailyImportedPrices, dailyPriceRepository, "saved " + dailyImportedPrices.size() + " daily prices");
         }
 
         if (!tickersNotImported.isEmpty()) {
