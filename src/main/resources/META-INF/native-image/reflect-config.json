@@ -108,9 +108,15 @@
     "allDeclaredFields": true
   },
   {
-  "name": "stock.price.analytics.controller.YahooQuotesController",
-  "allDeclaredConstructors": true,
-  "allDeclaredMethods": true,
-  "allDeclaredFields": true
+    "name": "stock.price.analytics.controller.YahooQuotesController",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "stock.price.analytics.controller.CacheController",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
   }
 ]
