@@ -72,7 +72,7 @@
     "allDeclaredFields": true
   },
   {
-    "name": "stock.price.analytics.controller.StockSplitAdjustPricesController",
+    "name": "stock.price.analytics.controller.StockSplitController",
     "allDeclaredConstructors": true,
     "allDeclaredMethods": true,
     "allDeclaredFields": true
