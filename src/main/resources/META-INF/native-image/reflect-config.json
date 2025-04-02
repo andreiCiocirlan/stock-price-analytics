@@ -36,7 +36,7 @@
     "allDeclaredFields": true
   },
   {
-    "name": "stock.price.analytics.controller.DesktopNotificationsController",
+    "name": "stock.price.analytics.controller.DesktopNotificationRestController",
     "allDeclaredConstructors": true,
     "allDeclaredMethods": true,
     "allDeclaredFields": true
