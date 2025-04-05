@@ -12,6 +12,7 @@ import java.time.YearMonth;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -20,8 +21,22 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PricesUtil {
 
+    public static List<AbstractPrice> getHigherTimeframePricesFor(List<DailyPrice> dailyPricesImported) {
+        List<AbstractPrice> htfPrices = new ArrayList<>();
+        List<WeeklyPrice> weeklyPrices = htfPricesForTimeframe(dailyPricesImported, StockTimeframe.WEEKLY).stream().map(WeeklyPrice.class::cast).toList();
+        List<MonthlyPrice> monthlyPrices = htfPricesForTimeframe(dailyPricesImported, StockTimeframe.MONTHLY).stream().map(MonthlyPrice.class::cast).toList();
+        List<QuarterlyPrice> quarterlyPrices = htfPricesForTimeframe(dailyPricesImported, StockTimeframe.QUARTERLY).stream().map(QuarterlyPrice.class::cast).toList();
+        List<YearlyPrice> yearlyPrices = htfPricesForTimeframe(dailyPricesImported, StockTimeframe.YEARLY).stream().map(YearlyPrice.class::cast).toList();
 
-    public static List<AbstractPrice> htfPricesForTimeframe(List<DailyPrice> dailyPrices, StockTimeframe stockTimeframe) {
+        htfPrices.addAll(pricesWithPerformance(weeklyPrices.stream().sorted(Comparator.comparing(WeeklyPrice::getStartDate)).toList()));
+        htfPrices.addAll(pricesWithPerformance(monthlyPrices.stream().sorted(Comparator.comparing(MonthlyPrice::getStartDate)).toList()));
+        htfPrices.addAll(pricesWithPerformance(quarterlyPrices.stream().sorted(Comparator.comparing(QuarterlyPrice::getStartDate)).toList()));
+        htfPrices.addAll(pricesWithPerformance(yearlyPrices.stream().sorted(Comparator.comparing(YearlyPrice::getStartDate)).toList()));
+
+        return htfPrices;
+    }
+
+    private static List<AbstractPrice> htfPricesForTimeframe(List<DailyPrice> dailyPrices, StockTimeframe stockTimeframe) {
         return new ArrayList<>(
                 dailyPrices.stream()
                         .collect(Collectors.groupingBy(

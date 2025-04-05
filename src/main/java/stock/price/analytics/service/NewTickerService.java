@@ -36,8 +36,7 @@ import java.util.stream.Collectors;
 import static java.nio.file.Files.readAllLines;
 import static stock.price.analytics.util.Constants.USER_AGENT_VALUE;
 import static stock.price.analytics.util.FileUtil.writeToFile;
-import static stock.price.analytics.util.PricesUtil.htfPricesForTimeframe;
-import static stock.price.analytics.util.PricesUtil.pricesWithPerformance;
+import static stock.price.analytics.util.PricesUtil.*;
 
 @Slf4j
 @Service
@@ -141,21 +140,6 @@ public class NewTickerService {
             throw new RuntimeException(e);
         }
         return dailyPricesImported;
-    }
-
-    private List<AbstractPrice> getHigherTimeframePricesFor(List<DailyPrice> dailyPricesImported) {
-        List<AbstractPrice> htfPrices = new ArrayList<>();
-        List<WeeklyPrice> weeklyPrices = htfPricesForTimeframe(dailyPricesImported, StockTimeframe.WEEKLY).stream().map(WeeklyPrice.class::cast).toList();
-        List<MonthlyPrice> monthlyPrices = htfPricesForTimeframe(dailyPricesImported, StockTimeframe.MONTHLY).stream().map(MonthlyPrice.class::cast).toList();
-        List<QuarterlyPrice> quarterlyPrices = htfPricesForTimeframe(dailyPricesImported, StockTimeframe.QUARTERLY).stream().map(QuarterlyPrice.class::cast).toList();
-        List<YearlyPrice> yearlyPrices = htfPricesForTimeframe(dailyPricesImported, StockTimeframe.YEARLY).stream().map(YearlyPrice.class::cast).toList();
-
-        htfPrices.addAll(pricesWithPerformance(weeklyPrices.stream().sorted(Comparator.comparing(WeeklyPrice::getStartDate)).toList()));
-        htfPrices.addAll(pricesWithPerformance(monthlyPrices.stream().sorted(Comparator.comparing(MonthlyPrice::getStartDate)).toList()));
-        htfPrices.addAll(pricesWithPerformance(quarterlyPrices.stream().sorted(Comparator.comparing(QuarterlyPrice::getStartDate)).toList()));
-        htfPrices.addAll(pricesWithPerformance(yearlyPrices.stream().sorted(Comparator.comparing(YearlyPrice::getStartDate)).toList()));
-
-        return htfPrices;
     }
 
     private void saveAndUpdateStocksFor(List<DailyPrice> dailyPricesImported, List<AbstractPrice> htfPricesImported) {
