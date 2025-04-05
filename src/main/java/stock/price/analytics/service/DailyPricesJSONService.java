@@ -3,6 +3,7 @@ package stock.price.analytics.service;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.transaction.Transactional;
@@ -57,7 +58,9 @@ public class DailyPricesJSONService {
             objectMapper.registerModule(new JavaTimeModule());
             SimpleModule module = new SimpleModule();
             module.addDeserializer(LocalDate.class, new UnixTimestampToLocalDateDeserializer());
+            module.addDeserializer(Response.class, new ResponseDeserializer());
             objectMapper.registerModule(module);
+            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
             Response response = objectMapper.readValue(jsonData, Response.class);
             List<DailyPricesJSON> dailyPricesJSON = response.getQuoteResponse().getResult();
 

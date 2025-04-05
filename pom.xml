@@ -103,8 +103,9 @@
                             <buildArgs>
                                 <buildArg>--enable-preview</buildArg>
                                 <buildArg>--no-fallback</buildArg>
-                                <buildArg>--no-server</buildArg>
+                                <buildArg>-H:+UnlockExperimentalVMOptions</buildArg>
                                 <buildArg>-H:ReflectionConfigurationFiles=src/main/resources/META-INF/native-image/reflect-config.json</buildArg>
+                                <buildArg>--initialize-at-run-time=stock.price.analytics.model.json.Response</buildArg>
                             </buildArgs>
                         </configuration>
                     </plugin>
