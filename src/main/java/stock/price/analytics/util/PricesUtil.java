@@ -36,7 +36,7 @@ public class PricesUtil {
         return htfPrices;
     }
 
-    private static List<AbstractPrice> htfPricesForTimeframe(List<DailyPrice> dailyPrices, StockTimeframe stockTimeframe) {
+    public static List<AbstractPrice> htfPricesForTimeframe(List<DailyPrice> dailyPrices, StockTimeframe stockTimeframe) {
         return pricesWithPerformance(dailyPrices.stream()
                 .collect(Collectors.groupingBy(
                         shp -> groupingFunctionFor(stockTimeframe).apply(shp.getDate()),
