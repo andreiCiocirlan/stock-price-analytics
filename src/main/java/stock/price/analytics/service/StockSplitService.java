@@ -8,9 +8,10 @@ import stock.price.analytics.repository.prices.ohlc.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
-import static java.time.temporal.TemporalAdjusters.*;
+import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +23,27 @@ public class StockSplitService {
     private final MonthlyPriceRepository monthlyPriceRepository;
     private final QuarterlyPriceRepository quarterlyPriceRepository;
     private final YearlyPriceRepository yearlyPriceRepository;
+    private final PriceService priceService;
+    private final HighLowForPeriodService highLowForPeriodService;
+    private final FairValueGapService fairValueGapService;
+    private final StockService stockService;
     private final AsyncPersistenceService asyncPersistenceService;
+
+    public void splitAdjustFor(String ticker, LocalDate stockSplitDate, double priceMultiplier) {
+        priceService.adjustPricesFor(ticker, stockSplitDate, priceMultiplier);
+        priceService.updateHtfPricesPerformanceFor(stockSplitDate, ticker);
+        highLowForPeriodService.saveAllHistoricalHighLowPrices(List.of(ticker), stockSplitDate);
+        fairValueGapService.updateFVGPricesForStockSplit(ticker, stockSplitDate, priceMultiplier);
+
+        // stockSplitDate within the last_updated week
+        if (stockSplitDate.isAfter(tradingDateNow().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)))) {
+            stockService.updateStockHigherTimeframePricesFor(ticker);
+            stockService.updateHighLowForPeriodPrices(ticker);
+            if (stockSplitDate.isEqual(tradingDateNow())) {
+                stockService.updateStockDailyPricesFor(ticker);
+            }
+        }
+    }
 
     public List<? extends AbstractPrice> adjustPricesForDateAndTimeframe(String ticker, LocalDate date, double priceMultiplier, StockTimeframe timeframe, String ohlc) {
         List<? extends AbstractPrice> pricesToUpdate = switch (timeframe) {
