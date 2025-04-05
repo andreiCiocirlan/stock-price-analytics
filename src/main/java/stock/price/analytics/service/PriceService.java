@@ -40,6 +40,7 @@ public class PriceService {
     private final EntityManager entityManager;
 
     private final PriceRepository priceRepository;
+    private final DailyPriceRepository dailyPriceRepository;
     private final WeeklyPriceRepository weeklyPriceRepository;
     private final MonthlyPriceRepository monthlyPriceRepository;
     private final QuarterlyPriceRepository quarterlyPriceRepository;
