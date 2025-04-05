@@ -16,6 +16,6 @@ public class QuoteResponse {
 	private List<DailyPricesJSON> result;
 
 	@JsonProperty("error")
-	private Object error;
+	private String error;
 
 }
