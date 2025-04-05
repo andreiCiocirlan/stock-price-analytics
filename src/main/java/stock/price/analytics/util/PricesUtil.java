@@ -28,24 +28,23 @@ public class PricesUtil {
         List<QuarterlyPrice> quarterlyPrices = htfPricesForTimeframe(dailyPricesImported, StockTimeframe.QUARTERLY).stream().map(QuarterlyPrice.class::cast).toList();
         List<YearlyPrice> yearlyPrices = htfPricesForTimeframe(dailyPricesImported, StockTimeframe.YEARLY).stream().map(YearlyPrice.class::cast).toList();
 
-        htfPrices.addAll(pricesWithPerformance(weeklyPrices.stream().sorted(Comparator.comparing(WeeklyPrice::getStartDate)).toList()));
-        htfPrices.addAll(pricesWithPerformance(monthlyPrices.stream().sorted(Comparator.comparing(MonthlyPrice::getStartDate)).toList()));
-        htfPrices.addAll(pricesWithPerformance(quarterlyPrices.stream().sorted(Comparator.comparing(QuarterlyPrice::getStartDate)).toList()));
-        htfPrices.addAll(pricesWithPerformance(yearlyPrices.stream().sorted(Comparator.comparing(YearlyPrice::getStartDate)).toList()));
+        htfPrices.addAll(weeklyPrices.stream().sorted(Comparator.comparing(WeeklyPrice::getStartDate)).toList());
+        htfPrices.addAll(monthlyPrices.stream().sorted(Comparator.comparing(MonthlyPrice::getStartDate)).toList());
+        htfPrices.addAll(quarterlyPrices.stream().sorted(Comparator.comparing(QuarterlyPrice::getStartDate)).toList());
+        htfPrices.addAll(yearlyPrices.stream().sorted(Comparator.comparing(YearlyPrice::getStartDate)).toList());
 
         return htfPrices;
     }
 
     private static List<AbstractPrice> htfPricesForTimeframe(List<DailyPrice> dailyPrices, StockTimeframe stockTimeframe) {
-        return new ArrayList<>(
-                dailyPrices.stream()
-                        .collect(Collectors.groupingBy(
-                                shp -> groupingFunctionFor(stockTimeframe).apply(shp.getDate()),
-                                Collectors.collectingAndThen(
-                                        Collectors.toList(),
-                                        prices -> extractPriceForTimeframe(prices, stockTimeframe)
-                                )
-                        )).values());
+        return pricesWithPerformance(dailyPrices.stream()
+                .collect(Collectors.groupingBy(
+                        shp -> groupingFunctionFor(stockTimeframe).apply(shp.getDate()),
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                prices -> extractPriceForTimeframe(prices, stockTimeframe)
+                        )
+                )).values().stream().toList());
     }
 
     private static Function<LocalDate, ? extends Temporal> groupingFunctionFor(StockTimeframe stockTimeframe) {
