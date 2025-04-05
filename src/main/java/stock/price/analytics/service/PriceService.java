@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.time.temporal.TemporalAdjusters.*;
 import static stock.price.analytics.model.prices.enums.StockTimeframe.DAILY;
 import static stock.price.analytics.model.prices.enums.StockTimeframe.higherTimeframes;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
@@ -45,7 +46,34 @@ public class PriceService {
     private final YearlyPriceRepository yearlyPriceRepository;
     private final CacheService cacheService;
     private final AsyncPersistenceService asyncPersistenceService;
+    private final SyncPersistenceService syncPersistenceService;
 
+    public void adjustPricesFor(String ticker, LocalDate stockSplitDate, double priceMultiplier) {
+        List<DailyPrice> dailyPricesToUpdate = dailyPriceRepository.findByTickerAndDateLessThan(ticker, stockSplitDate);
+        List<WeeklyPrice> weeklyPricesToUpdate = weeklyPriceRepository.findWeeklyByTickerAndStartDateBefore(ticker, stockSplitDate.with(previousOrSame(DayOfWeek.MONDAY)));
+        List<MonthlyPrice> monthlyPricesToUpdate = monthlyPriceRepository.findMonthlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfMonth()));
+        List<QuarterlyPrice> quarterlyPricesToUpdate = quarterlyPriceRepository.findQuarterlyByTickerAndStartDateBefore(ticker, LocalDate.of(stockSplitDate.getYear(), stockSplitDate.getMonth().firstMonthOfQuarter().getValue(), 1));
+        List<YearlyPrice> yearlyPricesToUpdate = yearlyPriceRepository.findYearlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfYear()));
+
+        dailyPricesToUpdate.forEach(dailyPrice -> updatePrices(dailyPrice, priceMultiplier));
+        weeklyPricesToUpdate.forEach(weeklyPrices -> updatePrices(weeklyPrices, priceMultiplier));
+        monthlyPricesToUpdate.forEach(monthlyPrices -> updatePrices(monthlyPrices, priceMultiplier));
+        quarterlyPricesToUpdate.forEach(quarterlyPrices -> updatePrices(quarterlyPrices, priceMultiplier));
+        yearlyPricesToUpdate.forEach(yearlyPrices -> updatePrices(yearlyPrices, priceMultiplier));
+
+        syncPersistenceService.partitionDataAndSave(dailyPricesToUpdate, dailyPriceRepository);
+        syncPersistenceService.partitionDataAndSave(weeklyPricesToUpdate, weeklyPriceRepository);
+        syncPersistenceService.partitionDataAndSave(monthlyPricesToUpdate, monthlyPriceRepository);
+        syncPersistenceService.partitionDataAndSave(quarterlyPricesToUpdate, quarterlyPriceRepository);
+        syncPersistenceService.partitionDataAndSave(yearlyPricesToUpdate, yearlyPriceRepository);
+    }
+
+    private void updatePrices(AbstractPrice price, double priceMultiplier) {
+        price.setOpen(Math.round((priceMultiplier * price.getOpen()) * 100.0) / 100.0);
+        price.setHigh(Math.round((priceMultiplier * price.getHigh()) * 100.0) / 100.0);
+        price.setLow(Math.round((priceMultiplier * price.getLow()) * 100.0) / 100.0);
+        price.setClose(Math.round((priceMultiplier * price.getClose()) * 100.0) / 100.0);
+    }
 
     @SuppressWarnings("unchecked")
     public List<AbstractPrice> previousThreePricesFor(List<String> tickers, StockTimeframe timeframe) {
