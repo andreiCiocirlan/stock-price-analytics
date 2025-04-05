@@ -3,7 +3,7 @@ package stock.price.analytics.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.model.prices.ohlc.*;
+import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.repository.prices.ohlc.*;
 
 import java.time.DayOfWeek;
