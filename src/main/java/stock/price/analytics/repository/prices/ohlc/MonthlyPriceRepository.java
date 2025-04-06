@@ -10,8 +10,6 @@ import java.util.List;
 
 public interface MonthlyPriceRepository extends JpaRepository<MonthlyPrice, Long> {
 
-    List<MonthlyPrice> findByTickerAndStartDateBetween(String ticker, LocalDate from, LocalDate to);
-
     @Query(value = """
                 SELECT *
                 FROM monthly_prices
@@ -21,6 +19,6 @@ public interface MonthlyPriceRepository extends JpaRepository<MonthlyPrice, Long
             """, nativeQuery = true)
     List<MonthlyPrice> findPreviousThreeMonthlyPricesForTickers(@Param("tickers") List<String> tickers);
 
-    List<MonthlyPrice> findByTickerAndStartDateBefore(String ticker, LocalDate date);
+    List<MonthlyPrice> findByTickerAndStartDateLessThanEqual(String ticker, LocalDate date);
 
 }

@@ -10,8 +10,6 @@ import java.util.List;
 
 public interface WeeklyPriceRepository extends JpaRepository<WeeklyPrice, Long> {
 
-    List<WeeklyPrice> findByTickerAndStartDateBetween(String ticker, LocalDate from, LocalDate to);
-
     @Query(value = """
                 SELECT *
                 FROM weekly_prices
@@ -21,6 +19,6 @@ public interface WeeklyPriceRepository extends JpaRepository<WeeklyPrice, Long> 
             """, nativeQuery = true)
     List<WeeklyPrice> findPreviousThreeWeeklyPricesForTickers(@Param("tickers") List<String> tickers);
 
-    List<WeeklyPrice> findByTickerAndStartDateBefore(String ticker, LocalDate date);
+    List<WeeklyPrice> findByTickerAndStartDateLessThanEqual(String ticker, LocalDate date);
 
 }

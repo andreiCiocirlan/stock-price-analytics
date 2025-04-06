@@ -10,8 +10,6 @@ import java.util.List;
 
 public interface QuarterlyPriceRepository extends JpaRepository<QuarterlyPrice, Long> {
 
-    List<QuarterlyPrice> findByTickerAndStartDateBetween(String ticker, LocalDate from, LocalDate to);
-
     @Query(value = """
                 SELECT *
                 FROM quarterly_prices
@@ -21,7 +19,7 @@ public interface QuarterlyPriceRepository extends JpaRepository<QuarterlyPrice, 
             """, nativeQuery = true)
     List<QuarterlyPrice> findPreviousThreeQuarterlyPricesForTickers(List<String> tickers);
 
-    List<QuarterlyPrice> findByTickerAndStartDateBefore(String ticker, LocalDate date);
+    List<QuarterlyPrice> findByTickerAndStartDateLessThanEqual(String ticker, LocalDate date);
 
     @Modifying
     @Query(value = """
