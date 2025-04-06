@@ -27,6 +27,4 @@ public interface DailyPriceRepository extends JpaRepository<DailyPrice, Long> {
 
     List<DailyPrice> findByTickerAndDateLessThan(String ticker, LocalDate date);
 
-    List<DailyPrice> findByTickerAndDate(String ticker, LocalDate date);
-
 }
