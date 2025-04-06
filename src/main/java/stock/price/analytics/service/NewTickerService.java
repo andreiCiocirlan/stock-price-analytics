@@ -19,7 +19,9 @@ import stock.price.analytics.model.prices.highlow.HighLow52Week;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.highlow.HighestLowestPrices;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
-import stock.price.analytics.model.prices.ohlc.*;
+import stock.price.analytics.model.prices.ohlc.AbstractPrice;
+import stock.price.analytics.model.prices.ohlc.CandleOHLC;
+import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.repository.prices.highlow.HighLowForPeriodRepository;
 import stock.price.analytics.util.TradingDateUtil;
 
@@ -36,7 +38,8 @@ import java.util.stream.Collectors;
 import static java.nio.file.Files.readAllLines;
 import static stock.price.analytics.util.Constants.USER_AGENT_VALUE;
 import static stock.price.analytics.util.FileUtil.writeToFile;
-import static stock.price.analytics.util.PricesUtil.*;
+import static stock.price.analytics.util.PricesUtil.getHigherTimeframePricesFor;
+import static stock.price.analytics.util.PricesUtil.pricesWithPerformance;
 
 @Slf4j
 @Service

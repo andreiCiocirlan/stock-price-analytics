@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.annotation.Schedules;
 import org.springframework.stereotype.Component;
-import stock.price.analytics.cache.CacheInitializationService;
 import stock.price.analytics.service.DesktopNotificationService;
 import stock.price.analytics.service.PriceMilestoneService;
 
