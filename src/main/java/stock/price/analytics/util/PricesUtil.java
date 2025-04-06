@@ -28,10 +28,10 @@ public class PricesUtil {
         List<QuarterlyPrice> quarterlyPrices = htfPricesForTimeframe(dailyPricesImported, StockTimeframe.QUARTERLY).stream().map(QuarterlyPrice.class::cast).toList();
         List<YearlyPrice> yearlyPrices = htfPricesForTimeframe(dailyPricesImported, StockTimeframe.YEARLY).stream().map(YearlyPrice.class::cast).toList();
 
-        htfPrices.addAll(weeklyPrices.stream().sorted(Comparator.comparing(WeeklyPrice::getStartDate)).toList());
-        htfPrices.addAll(monthlyPrices.stream().sorted(Comparator.comparing(MonthlyPrice::getStartDate)).toList());
-        htfPrices.addAll(quarterlyPrices.stream().sorted(Comparator.comparing(QuarterlyPrice::getStartDate)).toList());
-        htfPrices.addAll(yearlyPrices.stream().sorted(Comparator.comparing(YearlyPrice::getStartDate)).toList());
+        htfPrices.addAll(weeklyPrices);
+        htfPrices.addAll(monthlyPrices);
+        htfPrices.addAll(quarterlyPrices);
+        htfPrices.addAll(yearlyPrices);
 
         return htfPrices;
     }
@@ -44,7 +44,7 @@ public class PricesUtil {
                                 Collectors.toList(),
                                 prices -> extractPriceForTimeframe(prices, stockTimeframe)
                         )
-                )).values().stream().toList());
+                )).values().stream().sorted(Comparator.comparing(AbstractPrice::getStartDate)).toList());
     }
 
     private static Function<LocalDate, ? extends Temporal> groupingFunctionFor(StockTimeframe stockTimeframe) {
