@@ -67,6 +67,9 @@ public class PriceService {
         syncPersistenceService.partitionDataAndSave(monthlyPricesToUpdate, monthlyPriceRepository);
         syncPersistenceService.partitionDataAndSave(quarterlyPricesToUpdate, quarterlyPriceRepository);
         syncPersistenceService.partitionDataAndSave(yearlyPricesToUpdate, yearlyPriceRepository);
+
+        // update the week, month, quarter, year of the stockSplitDate (based on dailyPrices)
+        updateHtfPricesPerformanceFor(stockSplitDate, ticker);
     }
 
     private void updatePrices(AbstractPrice price, double priceMultiplier) {

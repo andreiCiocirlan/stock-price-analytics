@@ -31,7 +31,6 @@ public class StockSplitService {
 
     public void splitAdjustFor(String ticker, LocalDate stockSplitDate, double priceMultiplier) {
         priceService.adjustPricesFor(ticker, stockSplitDate, priceMultiplier);
-        priceService.updateHtfPricesPerformanceFor(stockSplitDate, ticker);
         highLowForPeriodService.saveAllHistoricalHighLowPrices(List.of(ticker), stockSplitDate);
         fairValueGapService.updateFVGPricesForStockSplit(ticker, stockSplitDate, priceMultiplier);
 
