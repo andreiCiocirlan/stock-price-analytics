@@ -64,6 +64,14 @@ public abstract class AbstractPrice implements BusinessEntity {
         return getTicker() + "_" + getTimeframe() + "_" + getStartDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
     }
 
+    public void updateFrom(AbstractPrice that) {
+        this.setOpen(that.getOpen());
+        this.setHigh(that.getHigh());
+        this.setLow(that.getLow());
+        this.setClose(that.getClose());
+        this.setPerformance(that.getPerformance());
+    }
+
     public AbstractPrice convertFrom(DailyPrice dailyPrice, Double previousClose) {
         this.setClose(dailyPrice.getClose());
         this.setLow(Math.min(getLow(), dailyPrice.getLow()));
