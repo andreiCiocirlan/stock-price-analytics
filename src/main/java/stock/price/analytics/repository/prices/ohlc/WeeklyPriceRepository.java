@@ -21,7 +21,6 @@ public interface WeeklyPriceRepository extends JpaRepository<WeeklyPrice, Long> 
             """, nativeQuery = true)
     List<WeeklyPrice> findPreviousThreeWeeklyPricesForTickers(@Param("tickers") List<String> tickers);
 
-    @Query("SELECT w FROM WeeklyPrice w WHERE w.ticker = :ticker AND w.startDate < :date")
-    List<WeeklyPrice> findWeeklyByTickerAndStartDateBefore(String ticker, LocalDate date);
+    List<WeeklyPrice> findByTickerAndStartDateBefore(String ticker, LocalDate date);
 
 }

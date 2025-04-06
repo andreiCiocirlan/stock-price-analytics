@@ -50,11 +50,11 @@ public class PriceService {
     private final SyncPersistenceService syncPersistenceService;
 
     public void adjustPricesFor(String ticker, LocalDate stockSplitDate, double priceMultiplier) {
-        List<DailyPrice> dailyPricesToUpdate = dailyPriceRepository.findByTickerAndDateLessThan(ticker, stockSplitDate);
-        List<WeeklyPrice> weeklyPricesToUpdate = weeklyPriceRepository.findWeeklyByTickerAndStartDateBefore(ticker, stockSplitDate.with(previousOrSame(DayOfWeek.MONDAY)));
-        List<MonthlyPrice> monthlyPricesToUpdate = monthlyPriceRepository.findMonthlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfMonth()));
-        List<QuarterlyPrice> quarterlyPricesToUpdate = quarterlyPriceRepository.findQuarterlyByTickerAndStartDateBefore(ticker, LocalDate.of(stockSplitDate.getYear(), stockSplitDate.getMonth().firstMonthOfQuarter().getValue(), 1));
-        List<YearlyPrice> yearlyPricesToUpdate = yearlyPriceRepository.findYearlyByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfYear()));
+        List<DailyPrice> dailyPricesToUpdate = dailyPriceRepository.findByTickerAndDateBefore(ticker, stockSplitDate);
+        List<WeeklyPrice> weeklyPricesToUpdate = weeklyPriceRepository.findByTickerAndStartDateBefore(ticker, stockSplitDate.with(previousOrSame(DayOfWeek.MONDAY)));
+        List<MonthlyPrice> monthlyPricesToUpdate = monthlyPriceRepository.findByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfMonth()));
+        List<QuarterlyPrice> quarterlyPricesToUpdate = quarterlyPriceRepository.findByTickerAndStartDateBefore(ticker, LocalDate.of(stockSplitDate.getYear(), stockSplitDate.getMonth().firstMonthOfQuarter().getValue(), 1));
+        List<YearlyPrice> yearlyPricesToUpdate = yearlyPriceRepository.findByTickerAndStartDateBefore(ticker, stockSplitDate.with(firstDayOfYear()));
 
         dailyPricesToUpdate.forEach(dailyPrice -> updatePrices(dailyPrice, priceMultiplier));
         weeklyPricesToUpdate.forEach(weeklyPrices -> updatePrices(weeklyPrices, priceMultiplier));

@@ -21,8 +21,7 @@ public interface QuarterlyPriceRepository extends JpaRepository<QuarterlyPrice, 
             """, nativeQuery = true)
     List<QuarterlyPrice> findPreviousThreeQuarterlyPricesForTickers(List<String> tickers);
 
-    @Query("SELECT q FROM QuarterlyPrice q WHERE q.ticker = :ticker AND q.startDate < :date")
-    List<QuarterlyPrice> findQuarterlyByTickerAndStartDateBefore(String ticker, LocalDate date);
+    List<QuarterlyPrice> findByTickerAndStartDateBefore(String ticker, LocalDate date);
 
     @Modifying
     @Query(value = """

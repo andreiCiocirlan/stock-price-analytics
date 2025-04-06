@@ -21,7 +21,6 @@ public interface MonthlyPriceRepository extends JpaRepository<MonthlyPrice, Long
             """, nativeQuery = true)
     List<MonthlyPrice> findPreviousThreeMonthlyPricesForTickers(@Param("tickers") List<String> tickers);
 
-    @Query("SELECT m FROM MonthlyPrice m WHERE m.ticker = :ticker AND m.startDate < :date")
-    List<MonthlyPrice> findMonthlyByTickerAndStartDateBefore(String ticker, LocalDate date);
+    List<MonthlyPrice> findByTickerAndStartDateBefore(String ticker, LocalDate date);
 
 }

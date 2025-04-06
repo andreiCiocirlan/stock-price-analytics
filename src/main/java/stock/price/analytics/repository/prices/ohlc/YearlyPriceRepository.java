@@ -21,7 +21,6 @@ public interface YearlyPriceRepository extends JpaRepository<YearlyPrice, Long> 
             """, nativeQuery = true)
     List<YearlyPrice> findPreviousThreeYearlyPricesForTickers(@Param("tickers") List<String> tickers);
 
-    @Query("SELECT y FROM YearlyPrice y WHERE y.ticker = :ticker AND y.startDate < :date")
-    List<YearlyPrice> findYearlyByTickerAndStartDateBefore(String ticker, LocalDate date);
+    List<YearlyPrice> findByTickerAndStartDateBefore(String ticker, LocalDate date);
 
 }
