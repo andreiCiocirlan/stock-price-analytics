@@ -27,10 +27,4 @@ public interface MonthlyPriceRepository extends JpaRepository<MonthlyPrice, Long
     @Query("SELECT m FROM MonthlyPrice m WHERE m.ticker = :ticker AND m.startDate = :date")
     List<MonthlyPrice> findMonthlyByTickerAndStartDate(String ticker, LocalDate date);
 
-    @Query(value = """
-                SELECT *
-                FROM monthly_prices
-                ORDER BY start_date desc
-            """, nativeQuery = true)
-    List<MonthlyPrice> findAllMonthlyPrices();
 }
