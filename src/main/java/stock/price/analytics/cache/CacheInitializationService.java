@@ -61,9 +61,7 @@ public class CacheInitializationService {
 
         List<Stock> stocks = stockRepository.findByXtbStockIsTrueAndDelistedDateIsNull();
         List<String> tickers = stocks.stream().map(Stock::getTicker).toList();
-        for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
-            logTime(() -> initHigherTimeframePricesCache(priceService.previousThreePricesFor(tickers, timeframe)), "initialized " + timeframe + " prices cache");
-        }
+        logTime(() -> initHigherTimeframePricesCache(tickers), "initialized HTF prices cache");
         logTime(() -> initStocksCache(stocks), "initialized xtb stocks cache");
         LocalDate latestDailyPriceImportDate = stockService.findLastUpdate(); // find last update from stocksCache
         boolean weeklyHighLowExists = highLowForPeriodService.weeklyHighLowExists();
@@ -191,8 +189,10 @@ public class CacheInitializationService {
         }
     }
 
-    private void initHigherTimeframePricesCache(List<AbstractPrice> previousThreePrices) {
-        addHtfPricesWithPrevCloseFrom(previousThreePrices);
+    private void initHigherTimeframePricesCache(List<String> tickers) {
+        for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
+            addHtfPricesWithPrevCloseFrom(priceService.previousThreePricesFor(tickers, timeframe));
+        }
     }
 
     private void addHtfPricesWithPrevCloseFrom(List<AbstractPrice> prevThreePrices) {
