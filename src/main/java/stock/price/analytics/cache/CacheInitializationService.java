@@ -54,18 +54,24 @@ public class CacheInitializationService {
     @Transactional
     public void initAllCaches() {
         initFirstImportForTimeframes();
+        initHighLowExists();
 
         List<Stock> stocks = stockRepository.findByXtbStockIsTrueAndDelistedDateIsNull();
         List<String> tickers = stocks.stream().map(Stock::getTicker).toList();
         logTime(() -> initHigherTimeframePricesCache(tickers), "initialized HTF prices cache");
         logTime(() -> initStocksCache(stocks), "initialized xtb stocks cache");
         LocalDate latestDailyPriceImportDate = stockService.findLastUpdate(); // find last update from stocksCache
-        boolean weeklyHighLowExists = highLowForPeriodService.weeklyHighLowExists();
-        logTime(() -> initHighLowPricesCache(latestDailyPriceImportDate, weeklyHighLowExists), "initialized high low prices cache");
+        logTime(() -> initHighLowPricesCache(latestDailyPriceImportDate), "initialized high low prices cache");
         logTime(this::initLatestDailyPricesCache, "initialized latest daily prices cache");
         logTime(this::initDailyJSONPricesCache, "initialized daily JSON prices cache");
         logTime(this::initPreMarketDailyPrices, "initialized pre-market daily prices cache");
         cacheService.setLastUpdateTimestamp(System.nanoTime());
+    }
+
+    private void initHighLowExists() {
+        boolean weeklyHighLowExists = highLowForPeriodService.weeklyHighLowExists();
+        log.info("initialized weeklyHighLowExists {}", weeklyHighLowExists);
+        highLowPricesCache.setWeeklyHighLowExists(weeklyHighLowExists);
     }
 
     private void initFirstImportForTimeframes() {
@@ -105,19 +111,19 @@ public class CacheInitializationService {
         dailyPricesCache.getFirstImportForTimeframe().put(timeframe, isFirstImport);
     }
 
-    private void initHighLowPricesCache(LocalDate latestDailyPriceImportDate, boolean weeklyHighLowExists) {
+    private void initHighLowPricesCache(LocalDate latestDailyPriceImportDate) {
         for (HighLowPeriod highLowPeriod : HighLowPeriod.values()) {
-            initHighLowPriceCache(highLowPeriod, latestDailyPriceImportDate, weeklyHighLowExists);
-            initPrevWeekHighLowPricesCache(highLowPeriod, latestDailyPriceImportDate, weeklyHighLowExists);
+            initHighLowPriceCache(highLowPeriod, latestDailyPriceImportDate);
+            initPrevWeekHighLowPricesCache(highLowPeriod, latestDailyPriceImportDate);
         }
-        if (!weeklyHighLowExists && cacheService.isFirstImportFor(StockTimeframe.WEEKLY)) {
+        if (!cacheService.weeklyHighLowExists() && cacheService.isFirstImportFor(StockTimeframe.WEEKLY)) {
             stockService.updateHighLowForPeriodFromHLCachesAndAdjustWeekend();
         }
     }
 
-    private void initPrevWeekHighLowPricesCache(HighLowPeriod highLowPeriod, LocalDate latestDailyPriceImportDate, boolean weeklyHighLowExists) {
+    private void initPrevWeekHighLowPricesCache(HighLowPeriod highLowPeriod, LocalDate latestDailyPriceImportDate) {
         LocalDate prevWeekStartDate = latestDailyPriceImportDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-        if (weeklyHighLowExists && !cacheService.isFirstImportFor(StockTimeframe.WEEKLY)) { // on first import of the week need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
+        if (cacheService.weeklyHighLowExists() && !cacheService.isFirstImportFor(StockTimeframe.WEEKLY)) { // on first import of the week need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
             prevWeekStartDate = prevWeekStartDate.minusWeeks(1);
         }
         List<? extends HighLowForPeriod> prevWeekHighLowPrices = switch (highLowPeriod) {
@@ -128,10 +134,10 @@ public class CacheInitializationService {
         highLowPricesCache.addPrevWeekHighLowPrices(prevWeekHighLowPrices, highLowPeriod);
     }
 
-    private void initHighLowPriceCache(HighLowPeriod highLowPeriod, LocalDate latestDailyPriceImportDate, boolean weeklyHighLowExists) {
+    private void initHighLowPriceCache(HighLowPeriod highLowPeriod, LocalDate latestDailyPriceImportDate) {
         LocalDate startDate = latestDailyPriceImportDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         LocalDate endDate = latestDailyPriceImportDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
-        if (!weeklyHighLowExists && cacheService.isFirstImportFor(StockTimeframe.WEEKLY)) { // on first import of the week need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
+        if (!cacheService.weeklyHighLowExists() && cacheService.isFirstImportFor(StockTimeframe.WEEKLY)) { // on first import of the week need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
             LocalDate newWeekStartDate = startDate.plusWeeks(1);
             LocalDate newWeekEndDate = endDate.plusWeeks(1);
             if (highLowPeriod == HighLowPeriod.HIGH_LOW_ALL_TIME) { // for all-time highs/lows simply copy the existing row on Mondays
@@ -153,6 +159,7 @@ public class CacheInitializationService {
                 syncPersistenceService.partitionDataAndSave(highLowForPeriods, highLowForPeriodRepository);
                 highLowPricesCache.addHighLowPrices(highLowForPeriods, highLowPeriod);
             }
+            highLowPricesCache.setWeeklyHighLowExists(true);
         } else {
             List<? extends HighLowForPeriod> highLowPrices = switch (highLowPeriod) {
                 case HIGH_LOW_4W -> highLowForPeriodRepository.highLow4wPricesFor(startDate);

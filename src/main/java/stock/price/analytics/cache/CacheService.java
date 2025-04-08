@@ -64,6 +64,10 @@ public class CacheService {
         return dailyPricesCache.dailyPrices(marketState);
     }
 
+    public boolean weeklyHighLowExists() {
+        return highLowPricesCache.getWeeklyHighLowExists();
+    }
+
     public List<? extends HighLowForPeriod> highLowForPeriodPricesFor(HighLowPeriod period) {
         return highLowPricesCache.cacheForHighLowPeriod(period);
     }

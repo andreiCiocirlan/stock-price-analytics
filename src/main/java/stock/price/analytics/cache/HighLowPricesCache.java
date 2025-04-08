@@ -1,6 +1,7 @@
 package stock.price.analytics.cache;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
@@ -17,6 +18,8 @@ import java.util.stream.Collectors;
 @Component
 class HighLowPricesCache {
 
+    @Getter @Setter
+    private Boolean weeklyHighLowExists;
     private final Map<String, HighLow4w> highLow4wMap = new HashMap<>();
     private final Map<String, HighLow52Week> highLow52wMap = new HashMap<>();
     private final Map<String, HighestLowestPrices> highestLowestMap = new HashMap<>();
