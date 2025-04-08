@@ -53,11 +53,7 @@ public class CacheInitializationService {
 
     @Transactional
     public void initAllCaches() {
-        for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
-            boolean firstImportFor = priceService.isFirstImportFor(timeframe);
-            log.info("{} isFirstImport: {}", timeframe, firstImportFor);
-            setFirstImportFor(timeframe, firstImportFor);
-        }
+        initFirstImportForTimeframes();
 
         List<Stock> stocks = stockRepository.findByXtbStockIsTrueAndDelistedDateIsNull();
         List<String> tickers = stocks.stream().map(Stock::getTicker).toList();
@@ -70,6 +66,14 @@ public class CacheInitializationService {
         logTime(this::initDailyJSONPricesCache, "initialized daily JSON prices cache");
         logTime(this::initPreMarketDailyPrices, "initialized pre-market daily prices cache");
         cacheService.setLastUpdateTimestamp(System.nanoTime());
+    }
+
+    private void initFirstImportForTimeframes() {
+        for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
+            boolean firstImportFor = priceService.isFirstImportFor(timeframe);
+            log.info("{} isFirstImport: {}", timeframe, firstImportFor);
+            setFirstImportFor(timeframe, firstImportFor);
+        }
     }
 
     private void initDailyJSONPricesCache() {
