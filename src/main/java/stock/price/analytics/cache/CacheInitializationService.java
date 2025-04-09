@@ -60,8 +60,7 @@ public class CacheInitializationService {
         List<String> tickers = stocks.stream().map(Stock::getTicker).toList();
         logTime(() -> initHigherTimeframePricesCache(tickers), "initialized HTF prices cache");
         logTime(() -> initStocksCache(stocks), "initialized xtb stocks cache");
-        LocalDate latestDailyPriceImportDate = stockService.findLastUpdate(); // find last update from stocksCache
-        logTime(() -> initHighLowPricesCache(latestDailyPriceImportDate), "initialized high low prices cache");
+        logTime(this::initHighLowPricesCache, "initialized high low prices cache");
         logTime(this::initLatestDailyPricesCache, "initialized latest daily prices cache");
         logTime(this::initDailyJSONPricesCache, "initialized daily JSON prices cache");
         logTime(this::initPreMarketDailyPrices, "initialized pre-market daily prices cache");
@@ -111,7 +110,8 @@ public class CacheInitializationService {
         dailyPricesCache.getFirstImportForTimeframe().put(timeframe, isFirstImport);
     }
 
-    private void initHighLowPricesCache(LocalDate latestDailyPriceImportDate) {
+    private void initHighLowPricesCache() {
+        LocalDate latestDailyPriceImportDate = stockService.findLastUpdate();
         for (HighLowPeriod highLowPeriod : HighLowPeriod.values()) {
             initHighLowPriceCache(highLowPeriod, latestDailyPriceImportDate);
             initPrevWeekHighLowPricesCache(highLowPeriod, latestDailyPriceImportDate);
