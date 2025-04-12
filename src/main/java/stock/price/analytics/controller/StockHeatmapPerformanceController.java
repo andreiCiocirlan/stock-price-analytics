@@ -34,7 +34,7 @@ public class StockHeatmapPerformanceController {
     public List<StockPerformanceDTO> getStockPerformance(@RequestParam(required = false, value = "timeFrame") String timeFrame,
                                                          @RequestParam(required = false, value = "positivePerfFirst") Boolean positivePerfFirst,
                                                          @RequestParam(required = false, value = "limit") Integer limit,
-                                                         @RequestParam(required = false, value = "cfdMargin") List<Double> cfdMargins,
+                                                         @RequestParam(required = false, value = "cfdMargins") List<Double> cfdMargins,
                                                          @RequestParam(required = false, value = "priceMilestone") String priceMilestone,
                                                          @RequestParam(required = false, value = "milestoneType") String milestoneType,
                                                          @RequestParam(required = false, value = "marketState") MarketState marketState) {
