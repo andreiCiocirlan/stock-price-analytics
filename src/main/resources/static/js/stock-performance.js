@@ -78,6 +78,7 @@ function updateStockPerformanceChart(timeFrame) {
             'none-option': 'none',
             'pre-market-option': 'premarket',
             'performance-option': 'performance',
+            'sma-milestone-option': 'sma-milestone',
             'intraday-spike-option': 'intraday-spike'
         };
 
