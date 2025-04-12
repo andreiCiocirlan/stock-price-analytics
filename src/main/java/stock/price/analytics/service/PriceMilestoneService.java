@@ -43,7 +43,7 @@ public class PriceMilestoneService {
     }
 
     public List<String> findTickersForMilestone(String priceMilestone, String milestoneType, List<Double> cfdMargins) {
-        if (!isValidTypeMapping(priceMilestone, milestoneType)) {
+        if (isInvalidTypeMapping(priceMilestone, milestoneType)) {
             throw new IllegalArgumentException("Invalid milestone type combination");
         }
 
@@ -170,20 +170,20 @@ public class PriceMilestoneService {
         };
     }
 
-    private boolean isValidTypeMapping(String priceMilestone, String milestoneType) {
+    private boolean isInvalidTypeMapping(String priceMilestone, String milestoneType) {
         return switch (milestoneType) {
             case "premarket" -> Arrays.stream(PreMarketPriceMilestone.values())
                     .map(Enum::name)
-                    .anyMatch(pm -> pm.equals(priceMilestone));
+                    .noneMatch(pm -> pm.equals(priceMilestone));
             case "performance" -> Arrays.stream(PricePerformanceMilestone.values())
                     .map(Enum::name)
-                    .anyMatch(pm -> pm.equals(priceMilestone));
+                    .noneMatch(pm -> pm.equals(priceMilestone));
             case "intraday-spike" -> Arrays.stream(IntradayPriceSpike.values())
                     .map(Enum::name)
-                    .anyMatch(pm -> pm.equals(priceMilestone));
+                    .noneMatch(pm -> pm.equals(priceMilestone));
             case "sma-milestone" -> Arrays.stream(SimpleMovingAverageMilestone.values())
                     .map(Enum::name)
-                    .anyMatch(pm -> pm.equals(priceMilestone));
+                    .noneMatch(pm -> pm.equals(priceMilestone));
             default -> false;
         };
     }
