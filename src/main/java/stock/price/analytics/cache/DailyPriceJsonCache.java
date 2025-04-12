@@ -2,7 +2,7 @@ package stock.price.analytics.cache;
 
 import lombok.Getter;
 import org.springframework.stereotype.Component;
-import stock.price.analytics.model.json.DailyPricesJSON;
+import stock.price.analytics.model.json.DailyPriceJSON;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -12,22 +12,22 @@ import java.util.Map;
 
 @Getter
 @Component
-class DailyPricesJSONCache {
+class DailyPriceJsonCache {
 
-    private final Map<String, DailyPricesJSON> dailyPricesJSONByTicker = new HashMap<>();
+    private final Map<String, DailyPriceJSON> dailyPriceJSONByTicker = new HashMap<>();
 
-    void addDailyJSONPrices(List<DailyPricesJSON> dailyPricesJSON) {
-        dailyPricesJSON.forEach(price -> dailyPricesJSONByTicker.put(createKey(price.getSymbol(), price.getDate()), price));
+    void addDailyJSONPrices(List<DailyPriceJSON> dailyPriceJSONs) {
+        dailyPriceJSONs.forEach(price -> dailyPriceJSONByTicker.put(createKey(price.getSymbol(), price.getDate()), price));
     }
 
-    List<DailyPricesJSON> addDailyPricesJSONInCacheAndReturn(List<DailyPricesJSON> dailyPrices) {
-        List<DailyPricesJSON> addedPrices = new ArrayList<>();
+    List<DailyPriceJSON> addDailyPriceJSONsInCacheAndReturn(List<DailyPriceJSON> dailyPrices) {
+        List<DailyPriceJSON> addedPrices = new ArrayList<>();
         dailyPrices.forEach(price -> addToMap(price, addedPrices));
         return addedPrices;
     }
 
-    private void addToMap(DailyPricesJSON newPrice, List<DailyPricesJSON> addedPrices) {
-        DailyPricesJSON existingPrice = dailyPricesJSONByTicker.get(createKey(newPrice.getSymbol(), newPrice.getDate()));
+    private void addToMap(DailyPriceJSON newPrice, List<DailyPriceJSON> addedPrices) {
+        DailyPriceJSON existingPrice = dailyPriceJSONByTicker.get(createKey(newPrice.getSymbol(), newPrice.getDate()));
 
         if (existingPrice != null) { // intraday update
             existingPrice.setRegularMarketOpen(newPrice.getRegularMarketOpen());
@@ -38,7 +38,7 @@ class DailyPricesJSONCache {
 
             addedPrices.add(existingPrice);
         } else { // first import of the day
-            dailyPricesJSONByTicker.put(createKey(newPrice.getSymbol(), newPrice.getDate()), newPrice);
+            dailyPriceJSONByTicker.put(createKey(newPrice.getSymbol(), newPrice.getDate()), newPrice);
             addedPrices.add(newPrice);
         }
     }

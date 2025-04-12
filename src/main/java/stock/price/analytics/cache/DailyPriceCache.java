@@ -19,7 +19,7 @@ import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
 
 @Slf4j
 @Component
-class DailyPricesCache {
+class DailyPriceCache {
 
     @Setter @Getter
     private Map<StockTimeframe, Boolean> firstImportForTimeframe = new HashMap<>();

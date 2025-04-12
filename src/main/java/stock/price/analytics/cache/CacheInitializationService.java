@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.model.*;
-import stock.price.analytics.model.json.DailyPricesJSON;
+import stock.price.analytics.model.json.DailyPriceJSON;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.highlow.*;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
@@ -36,8 +36,8 @@ import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 @RequiredArgsConstructor
 public class CacheInitializationService {
 
-    private final DailyPricesJSONCache dailyPricesJSONCache;
-    private final DailyPricesCache dailyPricesCache;
+    private final DailyPriceJsonCache dailyPriceJsonCache;
+    private final DailyPriceCache dailyPriceCache;
     private final StockRepository stockRepository;
     private final DailyPriceJSONRepository dailyPriceJSONRepository;
     private final DailyPriceRepository dailyPriceRepository;
@@ -83,31 +83,31 @@ public class CacheInitializationService {
 
     private void initDailyJSONPricesCache() {
         LocalDate tradingDateNow = tradingDateNow();
-        dailyPricesJSONCache.addDailyJSONPrices(dailyPriceJSONRepository.findByDateBetween(tradingDateNow.minusDays(7), tradingDateNow));
+        dailyPriceJsonCache.addDailyJSONPrices(dailyPriceJSONRepository.findByDateBetween(tradingDateNow.minusDays(7), tradingDateNow));
     }
 
     private void initPreMarketDailyPrices() {
-        Map<String, List<DailyPricesJSON>> dailyPricesJSONByTicker = dailyPricesJSONCache.getDailyPricesJSONByTicker().values().stream()
-                .sorted(Comparator.comparing(DailyPricesJSON::getDate).reversed()) // order by date desc
-                .collect(Collectors.groupingBy(DailyPricesJSON::getSymbol));
+        Map<String, List<DailyPriceJSON>> dailyPriceJSONsByTicker = dailyPriceJsonCache.getDailyPriceJSONByTicker().values().stream()
+                .sorted(Comparator.comparing(DailyPriceJSON::getDate).reversed()) // order by date desc
+                .collect(Collectors.groupingBy(DailyPriceJSON::getSymbol));
 
         List<DailyPrice> latestPreMarketDailyPrices = new ArrayList<>();
 
-        for (List<DailyPricesJSON> dailyPricesJSONs : dailyPricesJSONByTicker.values()) {
-            DailyPricesJSON latestPrice = dailyPricesJSONs.getFirst(); // take the first (latest) daily price per ticker
+        for (List<DailyPriceJSON> dailyPriceJSONs : dailyPriceJSONsByTicker.values()) {
+            DailyPriceJSON latestPrice = dailyPriceJSONs.getFirst(); // take the first (latest) daily price per ticker
             if (latestPrice.getPreMarketPrice() != 0d) {
                 latestPreMarketDailyPrices.add(latestPrice.convertToDailyPrice(true));
             }
         }
-        dailyPricesCache.addDailyPrices(latestPreMarketDailyPrices, PRE);
+        dailyPriceCache.addDailyPrices(latestPreMarketDailyPrices, PRE);
     }
 
     private void initLatestDailyPricesCache() {
-        dailyPricesCache.addDailyPrices(dailyPriceRepository.findLatestDailyPrices(), REGULAR);
+        dailyPriceCache.addDailyPrices(dailyPriceRepository.findLatestDailyPrices(), REGULAR);
     }
 
     private void setFirstImportFor(StockTimeframe timeframe, Boolean isFirstImport) {
-        dailyPricesCache.getFirstImportForTimeframe().put(timeframe, isFirstImport);
+        dailyPriceCache.getFirstImportForTimeframe().put(timeframe, isFirstImport);
     }
 
     private void initHighLowPricesCache() {

@@ -23,7 +23,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Table(name = "daily_prices_json")
 @JsonIgnoreProperties(ignoreUnknown=true)
-public class DailyPricesJSON implements BusinessEntity {
+public class DailyPriceJSON implements BusinessEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "daily_prices_json_gen")
@@ -348,109 +348,109 @@ public class DailyPricesJSON implements BusinessEntity {
 		return new DailyPrice(this.getSymbol(), this.getDate(), percentChange, new CandleOHLC(open, high, low, close));
 	}
 
-	public DailyPricesJSON updateFrom(DailyPricesJSON dailyPricesJSON) {
-		this.symbol = dailyPricesJSON.getSymbol();
-		this.twoHundredDayAverageChangePercent = dailyPricesJSON.getTwoHundredDayAverageChangePercent();
-		this.averageAnalystRating = dailyPricesJSON.getAverageAnalystRating();
-		this.fiftyTwoWeekLowChangePercent = dailyPricesJSON.getFiftyTwoWeekLowChangePercent();
-		this.isEarningsDateEstimate = dailyPricesJSON.isEarningsDateEstimate();
-		this.language = dailyPricesJSON.getLanguage();
-		this.regularMarketDayRange = dailyPricesJSON.getRegularMarketDayRange();
-		this.earningsTimestampEnd = dailyPricesJSON.getEarningsTimestampEnd();
-		this.epsForward = dailyPricesJSON.getEpsForward();
-		this.twoHundredDayAverageChange = dailyPricesJSON.getTwoHundredDayAverageChange();
-		this.askSize = dailyPricesJSON.getAskSize();
-		this.twoHundredDayAverage = dailyPricesJSON.getTwoHundredDayAverage();
-		this.bookValue = dailyPricesJSON.getBookValue();
-		this.fiftyTwoWeekHighChange = dailyPricesJSON.getFiftyTwoWeekHighChange();
-		this.marketCap = dailyPricesJSON.getMarketCap();
-		this.esgPopulated = dailyPricesJSON.isEsgPopulated();
-		this.fiftyTwoWeekRange = dailyPricesJSON.getFiftyTwoWeekRange();
-		this.fiftyDayAverageChange = dailyPricesJSON.getFiftyDayAverageChange();
-		this.exchangeDataDelayedBy = dailyPricesJSON.getExchangeDataDelayedBy();
-		this.firstTradeDateMilliseconds = dailyPricesJSON.getFirstTradeDateMilliseconds();
-		this.averageDailyVolume3Month = dailyPricesJSON.getAverageDailyVolume3Month();
-		this.fiftyTwoWeekChangePercent = dailyPricesJSON.getFiftyTwoWeekChangePercent();
-		this.trailingAnnualDividendRate = dailyPricesJSON.getTrailingAnnualDividendRate();
-		this.hasPrePostMarketData = dailyPricesJSON.isHasPrePostMarketData();
-		this.fiftyTwoWeekLow = dailyPricesJSON.getFiftyTwoWeekLow();
-		this.market = dailyPricesJSON.getMarket();
-		this.regularMarketVolume = dailyPricesJSON.getRegularMarketVolume();
-		this.postMarketPrice = dailyPricesJSON.getPostMarketPrice();
-		this.quoteSourceName = dailyPricesJSON.getQuoteSourceName();
-		this.messageBoardId = dailyPricesJSON.getMessageBoardId();
-		this.priceHint = dailyPricesJSON.getPriceHint();
-		this.exchange = dailyPricesJSON.getExchange();
-		this.sourceInterval = dailyPricesJSON.getSourceInterval();
-		this.region = dailyPricesJSON.getRegion();
-		this.shortName = dailyPricesJSON.getShortName();
-		this.fiftyDayAverageChangePercent = dailyPricesJSON.getFiftyDayAverageChangePercent();
-		this.fullExchangeName = dailyPricesJSON.getFullExchangeName();
-		this.earningsTimestampStart = dailyPricesJSON.getEarningsTimestampStart();
-		this.financialCurrency = dailyPricesJSON.getFinancialCurrency();
-		this.displayName = dailyPricesJSON.getDisplayName();
-		this.gmtOffSetMilliseconds = dailyPricesJSON.getGmtOffSetMilliseconds();
-		this.regularMarketOpen = dailyPricesJSON.getRegularMarketOpen();
-		this.date = dailyPricesJSON.getDate();
-		this.regularMarketChangePercent = dailyPricesJSON.getRegularMarketChangePercent();
-		this.quoteType = dailyPricesJSON.getQuoteType();
-		this.trailingAnnualDividendYield = dailyPricesJSON.getTrailingAnnualDividendYield();
-		this.averageDailyVolume10Day = dailyPricesJSON.getAverageDailyVolume10Day();
-		this.fiftyTwoWeekLowChange = dailyPricesJSON.getFiftyTwoWeekLowChange();
-		this.fiftyTwoWeekHighChangePercent = dailyPricesJSON.getFiftyTwoWeekHighChangePercent();
-		this.earningsCallTimestampEnd = dailyPricesJSON.getEarningsCallTimestampEnd();
-		this.typeDisp = dailyPricesJSON.getTypeDisp();
-		this.trailingPE = dailyPricesJSON.getTrailingPE();
-		this.tradeable = dailyPricesJSON.isTradeable();
-		this.postMarketTime = dailyPricesJSON.getPostMarketTime();
-		this.currency = dailyPricesJSON.getCurrency();
-		this.sharesOutstanding = dailyPricesJSON.getSharesOutstanding();
-		this.regularMarketPreviousClose = dailyPricesJSON.getRegularMarketPreviousClose();
-		this.fiftyTwoWeekHigh = dailyPricesJSON.getFiftyTwoWeekHigh();
-		this.exchangeTimezoneName = dailyPricesJSON.getExchangeTimezoneName();
-		this.postMarketChangePercent = dailyPricesJSON.getPostMarketChangePercent();
-		this.regularMarketChange = dailyPricesJSON.getRegularMarketChange();
-		this.bidSize = dailyPricesJSON.getBidSize();
-		this.priceEpsCurrentYear = dailyPricesJSON.getPriceEpsCurrentYear();
-		this.cryptoTradeable = dailyPricesJSON.isCryptoTradeable();
-		this.fiftyDayAverage = dailyPricesJSON.getFiftyDayAverage();
-		this.exchangeTimezoneShortName = dailyPricesJSON.getExchangeTimezoneShortName();
-		this.epsCurrentYear = dailyPricesJSON.getEpsCurrentYear();
-		this.customPriceAlertConfidence = dailyPricesJSON.getCustomPriceAlertConfidence();
-		this.regularMarketPrice = dailyPricesJSON.getRegularMarketPrice();
-		this.marketState = dailyPricesJSON.getMarketState();
-		this.postMarketChange = dailyPricesJSON.getPostMarketChange();
-		this.forwardPE = dailyPricesJSON.getForwardPE();
-		this.earningsTimestamp = dailyPricesJSON.getEarningsTimestamp();
-		this.ask = dailyPricesJSON.getAsk();
-		this.epsTrailingTwelveMonths = dailyPricesJSON.getEpsTrailingTwelveMonths();
-		this.bid = dailyPricesJSON.getBid();
-		this.triggerable = dailyPricesJSON.isTriggerable();
-		this.earningsCallTimestampStart = dailyPricesJSON.getEarningsCallTimestampStart();
-		this.priceToBook = dailyPricesJSON.getPriceToBook();
-		this.longName = dailyPricesJSON.getLongName();
-		this.dividendDate = dailyPricesJSON.getDividendDate();
-		this.dividendYield = dailyPricesJSON.getDividendYield();
-		this.dividendRate = dailyPricesJSON.getDividendRate();
-		this.prevName = dailyPricesJSON.getPrevName();
-		this.prevExchange = dailyPricesJSON.getPrevExchange();
-		this.exchangeTransferDate = dailyPricesJSON.getExchangeTransferDate();
-		this.preMarketTime = dailyPricesJSON.getPreMarketTime();
-		this.preMarketPrice = dailyPricesJSON.getPreMarketPrice();
-		this.preMarketChange = dailyPricesJSON.getPreMarketChange();
-		this.preMarketChangePercent = dailyPricesJSON.getPreMarketChangePercent();
-		this.nameChangeDate = dailyPricesJSON.getNameChangeDate();
-		this.ipoExpectedDate = dailyPricesJSON.getIpoExpectedDate();
-		this.openInterest = dailyPricesJSON.getOpenInterest();
-		this.prevTicker = dailyPricesJSON.getPrevTicker();
-		this.newListingDate = dailyPricesJSON.getNewListingDate();
-		this.tickerChangeDate = dailyPricesJSON.getTickerChangeDate();
-		this.delistingDate = dailyPricesJSON.getDelistingDate();
+	public DailyPriceJSON updateFrom(DailyPriceJSON dailyPriceJSON) {
+		this.symbol = dailyPriceJSON.getSymbol();
+		this.twoHundredDayAverageChangePercent = dailyPriceJSON.getTwoHundredDayAverageChangePercent();
+		this.averageAnalystRating = dailyPriceJSON.getAverageAnalystRating();
+		this.fiftyTwoWeekLowChangePercent = dailyPriceJSON.getFiftyTwoWeekLowChangePercent();
+		this.isEarningsDateEstimate = dailyPriceJSON.isEarningsDateEstimate();
+		this.language = dailyPriceJSON.getLanguage();
+		this.regularMarketDayRange = dailyPriceJSON.getRegularMarketDayRange();
+		this.earningsTimestampEnd = dailyPriceJSON.getEarningsTimestampEnd();
+		this.epsForward = dailyPriceJSON.getEpsForward();
+		this.twoHundredDayAverageChange = dailyPriceJSON.getTwoHundredDayAverageChange();
+		this.askSize = dailyPriceJSON.getAskSize();
+		this.twoHundredDayAverage = dailyPriceJSON.getTwoHundredDayAverage();
+		this.bookValue = dailyPriceJSON.getBookValue();
+		this.fiftyTwoWeekHighChange = dailyPriceJSON.getFiftyTwoWeekHighChange();
+		this.marketCap = dailyPriceJSON.getMarketCap();
+		this.esgPopulated = dailyPriceJSON.isEsgPopulated();
+		this.fiftyTwoWeekRange = dailyPriceJSON.getFiftyTwoWeekRange();
+		this.fiftyDayAverageChange = dailyPriceJSON.getFiftyDayAverageChange();
+		this.exchangeDataDelayedBy = dailyPriceJSON.getExchangeDataDelayedBy();
+		this.firstTradeDateMilliseconds = dailyPriceJSON.getFirstTradeDateMilliseconds();
+		this.averageDailyVolume3Month = dailyPriceJSON.getAverageDailyVolume3Month();
+		this.fiftyTwoWeekChangePercent = dailyPriceJSON.getFiftyTwoWeekChangePercent();
+		this.trailingAnnualDividendRate = dailyPriceJSON.getTrailingAnnualDividendRate();
+		this.hasPrePostMarketData = dailyPriceJSON.isHasPrePostMarketData();
+		this.fiftyTwoWeekLow = dailyPriceJSON.getFiftyTwoWeekLow();
+		this.market = dailyPriceJSON.getMarket();
+		this.regularMarketVolume = dailyPriceJSON.getRegularMarketVolume();
+		this.postMarketPrice = dailyPriceJSON.getPostMarketPrice();
+		this.quoteSourceName = dailyPriceJSON.getQuoteSourceName();
+		this.messageBoardId = dailyPriceJSON.getMessageBoardId();
+		this.priceHint = dailyPriceJSON.getPriceHint();
+		this.exchange = dailyPriceJSON.getExchange();
+		this.sourceInterval = dailyPriceJSON.getSourceInterval();
+		this.region = dailyPriceJSON.getRegion();
+		this.shortName = dailyPriceJSON.getShortName();
+		this.fiftyDayAverageChangePercent = dailyPriceJSON.getFiftyDayAverageChangePercent();
+		this.fullExchangeName = dailyPriceJSON.getFullExchangeName();
+		this.earningsTimestampStart = dailyPriceJSON.getEarningsTimestampStart();
+		this.financialCurrency = dailyPriceJSON.getFinancialCurrency();
+		this.displayName = dailyPriceJSON.getDisplayName();
+		this.gmtOffSetMilliseconds = dailyPriceJSON.getGmtOffSetMilliseconds();
+		this.regularMarketOpen = dailyPriceJSON.getRegularMarketOpen();
+		this.date = dailyPriceJSON.getDate();
+		this.regularMarketChangePercent = dailyPriceJSON.getRegularMarketChangePercent();
+		this.quoteType = dailyPriceJSON.getQuoteType();
+		this.trailingAnnualDividendYield = dailyPriceJSON.getTrailingAnnualDividendYield();
+		this.averageDailyVolume10Day = dailyPriceJSON.getAverageDailyVolume10Day();
+		this.fiftyTwoWeekLowChange = dailyPriceJSON.getFiftyTwoWeekLowChange();
+		this.fiftyTwoWeekHighChangePercent = dailyPriceJSON.getFiftyTwoWeekHighChangePercent();
+		this.earningsCallTimestampEnd = dailyPriceJSON.getEarningsCallTimestampEnd();
+		this.typeDisp = dailyPriceJSON.getTypeDisp();
+		this.trailingPE = dailyPriceJSON.getTrailingPE();
+		this.tradeable = dailyPriceJSON.isTradeable();
+		this.postMarketTime = dailyPriceJSON.getPostMarketTime();
+		this.currency = dailyPriceJSON.getCurrency();
+		this.sharesOutstanding = dailyPriceJSON.getSharesOutstanding();
+		this.regularMarketPreviousClose = dailyPriceJSON.getRegularMarketPreviousClose();
+		this.fiftyTwoWeekHigh = dailyPriceJSON.getFiftyTwoWeekHigh();
+		this.exchangeTimezoneName = dailyPriceJSON.getExchangeTimezoneName();
+		this.postMarketChangePercent = dailyPriceJSON.getPostMarketChangePercent();
+		this.regularMarketChange = dailyPriceJSON.getRegularMarketChange();
+		this.bidSize = dailyPriceJSON.getBidSize();
+		this.priceEpsCurrentYear = dailyPriceJSON.getPriceEpsCurrentYear();
+		this.cryptoTradeable = dailyPriceJSON.isCryptoTradeable();
+		this.fiftyDayAverage = dailyPriceJSON.getFiftyDayAverage();
+		this.exchangeTimezoneShortName = dailyPriceJSON.getExchangeTimezoneShortName();
+		this.epsCurrentYear = dailyPriceJSON.getEpsCurrentYear();
+		this.customPriceAlertConfidence = dailyPriceJSON.getCustomPriceAlertConfidence();
+		this.regularMarketPrice = dailyPriceJSON.getRegularMarketPrice();
+		this.marketState = dailyPriceJSON.getMarketState();
+		this.postMarketChange = dailyPriceJSON.getPostMarketChange();
+		this.forwardPE = dailyPriceJSON.getForwardPE();
+		this.earningsTimestamp = dailyPriceJSON.getEarningsTimestamp();
+		this.ask = dailyPriceJSON.getAsk();
+		this.epsTrailingTwelveMonths = dailyPriceJSON.getEpsTrailingTwelveMonths();
+		this.bid = dailyPriceJSON.getBid();
+		this.triggerable = dailyPriceJSON.isTriggerable();
+		this.earningsCallTimestampStart = dailyPriceJSON.getEarningsCallTimestampStart();
+		this.priceToBook = dailyPriceJSON.getPriceToBook();
+		this.longName = dailyPriceJSON.getLongName();
+		this.dividendDate = dailyPriceJSON.getDividendDate();
+		this.dividendYield = dailyPriceJSON.getDividendYield();
+		this.dividendRate = dailyPriceJSON.getDividendRate();
+		this.prevName = dailyPriceJSON.getPrevName();
+		this.prevExchange = dailyPriceJSON.getPrevExchange();
+		this.exchangeTransferDate = dailyPriceJSON.getExchangeTransferDate();
+		this.preMarketTime = dailyPriceJSON.getPreMarketTime();
+		this.preMarketPrice = dailyPriceJSON.getPreMarketPrice();
+		this.preMarketChange = dailyPriceJSON.getPreMarketChange();
+		this.preMarketChangePercent = dailyPriceJSON.getPreMarketChangePercent();
+		this.nameChangeDate = dailyPriceJSON.getNameChangeDate();
+		this.ipoExpectedDate = dailyPriceJSON.getIpoExpectedDate();
+		this.openInterest = dailyPriceJSON.getOpenInterest();
+		this.prevTicker = dailyPriceJSON.getPrevTicker();
+		this.newListingDate = dailyPriceJSON.getNewListingDate();
+		this.tickerChangeDate = dailyPriceJSON.getTickerChangeDate();
+		this.delistingDate = dailyPriceJSON.getDelistingDate();
 
 		return this;
 	}
 
-	public boolean differentPrices(DailyPricesJSON p1) {
+	public boolean differentPrices(DailyPriceJSON p1) {
 		return p1.getRegularMarketPrice() != this.getRegularMarketPrice() || p1.getRegularMarketOpen() != this.getRegularMarketOpen()
 				|| p1.getRegularMarketDayHigh() != this.getRegularMarketDayHigh() || p1.getRegularMarketDayLow() != this.getRegularMarketDayLow()
 				|| p1.getRegularMarketChangePercent() != this.getRegularMarketChangePercent();
@@ -461,7 +461,7 @@ public class DailyPricesJSON implements BusinessEntity {
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
-		DailyPricesJSON that = (DailyPricesJSON) o;
+		DailyPriceJSON that = (DailyPriceJSON) o;
 		return Double.compare(getRegularMarketDayHigh(), that.getRegularMarketDayHigh()) == 0 && Double.compare(getRegularMarketDayLow(), that.getRegularMarketDayLow()) == 0 && Double.compare(getRegularMarketOpen(), that.getRegularMarketOpen()) == 0 && Double.compare(getRegularMarketPrice(), that.getRegularMarketPrice()) == 0 && Objects.equals(getSymbol(), that.getSymbol()) && Objects.equals(getDate(), that.getDate());
 	}
 
@@ -472,7 +472,7 @@ public class DailyPricesJSON implements BusinessEntity {
 
 	@Override
 	public String toString() {
-		return "DailyPricesJSON{" +
+		return "DailyPriceJSON{" +
 				"symbol='" + symbol + '\'' +
 				", date=" + date +
 				", regularMarketOpen=" + regularMarketOpen +

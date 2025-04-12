@@ -13,7 +13,7 @@ import java.util.List;
 public class QuoteResponse {
 
 	@JsonProperty("result")
-	private List<DailyPricesJSON> result;
+	private List<DailyPriceJSON> result;
 
 	@JsonProperty("error")
 	private String error;

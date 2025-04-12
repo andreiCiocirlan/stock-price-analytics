@@ -3,7 +3,7 @@ package stock.price.analytics.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
-import stock.price.analytics.model.json.DailyPricesJSON;
+import stock.price.analytics.model.json.DailyPriceJSON;
 import stock.price.analytics.model.prices.PriceMilestone;
 import stock.price.analytics.model.prices.enums.IntradayPriceSpike;
 import stock.price.analytics.model.prices.enums.PreMarketPriceMilestone;
@@ -96,10 +96,10 @@ public class PriceMilestoneService {
     }
 
     private List<String> findTickersForSimpleMovingAvgMilestone(SimpleMovingAverageMilestone smaMilestone, List<Double> cfdMargins) {
-        Map<String, DailyPricesJSON> dailyPricesJsonCache = cacheService.dailyPricesJSONCache()
+        Map<String, DailyPriceJSON> dailyPriceJsonCache = cacheService.dailyPriceJsonCache()
                 .stream()
                 .collect(Collectors.toMap(
-                        DailyPricesJSON::getSymbol,
+                        DailyPriceJSON::getSymbol,
                         Function.identity(),
                         (dp1, dp2) -> dp1.getDate().isAfter(dp2.getDate()) ? dp1 : dp2
                 ));
@@ -107,8 +107,8 @@ public class PriceMilestoneService {
         return cacheService.getCachedStocks().stream()
                 .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
                 .map(Stock::getTicker)
-                .filter(dailyPricesJsonCache::containsKey)
-                .filter(ticker -> withinSimpleMovingAvgMilestone(dailyPricesJsonCache.get(ticker), smaMilestone))
+                .filter(dailyPriceJsonCache::containsKey)
+                .filter(ticker -> withinSimpleMovingAvgMilestone(dailyPriceJsonCache.get(ticker), smaMilestone))
                 .toList();
     }
 
@@ -160,12 +160,12 @@ public class PriceMilestoneService {
         };
     }
 
-    private boolean withinSimpleMovingAvgMilestone(DailyPricesJSON dailyPricesJSON, SimpleMovingAverageMilestone milestone) {
+    private boolean withinSimpleMovingAvgMilestone(DailyPriceJSON dailyPriceJSON, SimpleMovingAverageMilestone milestone) {
         return switch (milestone) {
-            case ABOVE_200_SMA -> dailyPricesJSON.getRegularMarketPrice() > dailyPricesJSON.getTwoHundredDayAverage();
-            case ABOVE_50_SMA -> dailyPricesJSON.getRegularMarketPrice() > dailyPricesJSON.getFiftyDayAverage();
-            case BELOW_200_SMA -> dailyPricesJSON.getRegularMarketPrice() < dailyPricesJSON.getTwoHundredDayAverage();
-            case BELOW_50_SMA -> dailyPricesJSON.getRegularMarketPrice() < dailyPricesJSON.getFiftyDayAverage();
+            case ABOVE_200_SMA -> dailyPriceJSON.getRegularMarketPrice() > dailyPriceJSON.getTwoHundredDayAverage();
+            case ABOVE_50_SMA -> dailyPriceJSON.getRegularMarketPrice() > dailyPriceJSON.getFiftyDayAverage();
+            case BELOW_200_SMA -> dailyPriceJSON.getRegularMarketPrice() < dailyPriceJSON.getTwoHundredDayAverage();
+            case BELOW_50_SMA -> dailyPriceJSON.getRegularMarketPrice() < dailyPriceJSON.getFiftyDayAverage();
             case NONE -> false;
         };
     }

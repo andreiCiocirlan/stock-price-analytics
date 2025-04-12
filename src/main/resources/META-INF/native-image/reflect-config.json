@@ -18,13 +18,13 @@
     "allDeclaredFields": true
   },
   {
-    "name": "stock.price.analytics.model.prices.json.DailyPricesJSON",
+    "name": "stock.price.analytics.model.prices.json.DailyPriceJSON",
     "allDeclaredConstructors": true,
     "allDeclaredMethods": true,
     "allDeclaredFields": true
   },
   {
-    "name": "stock.price.analytics.controller.DailyPricesJSONController",
+    "name": "stock.price.analytics.controller.DailyPriceJSONController",
     "allDeclaredConstructors": true,
     "allDeclaredMethods": true,
     "allDeclaredFields": true

@@ -6,7 +6,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.model.PriceWithPrevClose;
-import stock.price.analytics.model.json.DailyPricesJSON;
+import stock.price.analytics.model.json.DailyPriceJSON;
 import stock.price.analytics.model.prices.PriceMilestone;
 import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
@@ -30,8 +30,8 @@ import static stock.price.analytics.model.stocks.enums.MarketState.REGULAR;
 @RequiredArgsConstructor
 public class CacheService {
 
-    private final DailyPricesJSONCache dailyPricesJSONCache;
-    private final DailyPricesCache dailyPricesCache;
+    private final DailyPriceJsonCache dailyPriceJsonCache;
+    private final DailyPriceCache dailyPriceCache;
     private final StocksCache stocksCache;
     private final HigherTimeframePricesCache higherTimeframePricesCache;
     private final HighLowPricesCache highLowPricesCache;
@@ -40,28 +40,28 @@ public class CacheService {
     private volatile long lastUpdateTimestamp = 0;
 
 
-    public List<DailyPricesJSON> dailyPricesJSONCache() {
-        return dailyPricesJSONCache.getDailyPricesJSONByTicker().values().stream().toList();
+    public List<DailyPriceJSON> dailyPriceJsonCache() {
+        return dailyPriceJsonCache.getDailyPriceJSONByTicker().values().stream().toList();
     }
 
-    public List<DailyPricesJSON> cacheAndReturnDailyPricesJSON(List<DailyPricesJSON> dailyPricesJSON) {
-        return dailyPricesJSONCache.addDailyPricesJSONInCacheAndReturn(dailyPricesJSON);
+    public List<DailyPriceJSON> cacheAndReturnDailyPriceJSONs(List<DailyPriceJSON> dailyPriceJSONs) {
+        return dailyPriceJsonCache.addDailyPriceJSONsInCacheAndReturn(dailyPriceJSONs);
     }
 
     public boolean isFirstImportFor(StockTimeframe timeframe) {
-        return dailyPricesCache.getFirstImportForTimeframe().get(timeframe);
+        return dailyPriceCache.getFirstImportForTimeframe().get(timeframe);
     }
 
     public List<DailyPrice> cacheAndReturnDailyPrices(List<DailyPrice> dailyPrices) {
-        return dailyPricesCache.addDailyPricesInCacheAndReturn(dailyPrices);
+        return dailyPriceCache.addDailyPricesInCacheAndReturn(dailyPrices);
     }
 
     public void addPreMarketDailyPrices(List<DailyPrice> preMarketPrices) {
-        dailyPricesCache.addDailyPrices(preMarketPrices, PRE);
+        dailyPriceCache.addDailyPrices(preMarketPrices, PRE);
     }
 
     public List<DailyPrice> getCachedDailyPrices(MarketState marketState) {
-        return dailyPricesCache.dailyPrices(marketState);
+        return dailyPriceCache.dailyPrices(marketState);
     }
 
     public boolean weeklyHighLowExists() {
