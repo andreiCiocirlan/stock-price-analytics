@@ -3,10 +3,12 @@ package stock.price.analytics.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
+import stock.price.analytics.model.json.DailyPricesJSON;
 import stock.price.analytics.model.prices.PriceMilestone;
 import stock.price.analytics.model.prices.enums.IntradayPriceSpike;
 import stock.price.analytics.model.prices.enums.PreMarketPriceMilestone;
 import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
+import stock.price.analytics.model.prices.enums.SimpleMovingAverageMilestone;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.Stock;
@@ -15,6 +17,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
@@ -48,6 +51,7 @@ public class PriceMilestoneService {
             case "performance" -> findTickersForMilestone(PricePerformanceMilestone.valueOf(priceMilestone), cfdMargins);
             case "premarket" -> findTickersForPreMarketMilestone(PreMarketPriceMilestone.valueOf(priceMilestone), cfdMargins);
             case "intraday-spike" -> findTickersForIntradaySpikeMilestone(IntradayPriceSpike.valueOf(priceMilestone), cfdMargins);
+            case "sma-milestone" -> findTickersForSimpleMovingAvgMilestone(SimpleMovingAverageMilestone.valueOf(priceMilestone), cfdMargins);
             default -> throw new IllegalArgumentException("Invalid milestone type");
         };
     }
@@ -88,6 +92,23 @@ public class PriceMilestoneService {
                 .filter(stock -> intradayPricesCache.containsKey(stock.getTicker()))
                 .filter(stock -> withinIntradaySpikeMilestone(stock, intradayPricesCache.get(stock.getTicker()), milestone))
                 .map(Stock::getTicker)
+                .toList();
+    }
+
+    private List<String> findTickersForSimpleMovingAvgMilestone(SimpleMovingAverageMilestone smaMilestone, List<Double> cfdMargins) {
+        Map<String, DailyPricesJSON> dailyPricesJsonCache = cacheService.dailyPricesJSONCache()
+                .stream()
+                .collect(Collectors.toMap(
+                        DailyPricesJSON::getSymbol,
+                        Function.identity(),
+                        (dp1, dp2) -> dp1.getDate().isAfter(dp2.getDate()) ? dp1 : dp2
+                ));
+
+        return cacheService.getCachedStocks().stream()
+                .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
+                .map(Stock::getTicker)
+                .filter(dailyPricesJsonCache::containsKey)
+                .filter(ticker -> withinSimpleMovingAvgMilestone(dailyPricesJsonCache.get(ticker), smaMilestone))
                 .toList();
     }
 
@@ -139,6 +160,16 @@ public class PriceMilestoneService {
         };
     }
 
+    private boolean withinSimpleMovingAvgMilestone(DailyPricesJSON dailyPricesJSON, SimpleMovingAverageMilestone milestone) {
+        return switch (milestone) {
+            case ABOVE_200_SMA -> dailyPricesJSON.getRegularMarketPrice() > dailyPricesJSON.getTwoHundredDayAverage();
+            case ABOVE_50_SMA -> dailyPricesJSON.getRegularMarketPrice() > dailyPricesJSON.getFiftyDayAverage();
+            case BELOW_200_SMA -> dailyPricesJSON.getRegularMarketPrice() < dailyPricesJSON.getTwoHundredDayAverage();
+            case BELOW_50_SMA -> dailyPricesJSON.getRegularMarketPrice() < dailyPricesJSON.getFiftyDayAverage();
+            case NONE -> false;
+        };
+    }
+
     private boolean isValidTypeMapping(String priceMilestone, String milestoneType) {
         return switch (milestoneType) {
             case "premarket" -> Arrays.stream(PreMarketPriceMilestone.values())
@@ -148,6 +179,9 @@ public class PriceMilestoneService {
                     .map(Enum::name)
                     .anyMatch(pm -> pm.equals(priceMilestone));
             case "intraday-spike" -> Arrays.stream(IntradayPriceSpike.values())
+                    .map(Enum::name)
+                    .anyMatch(pm -> pm.equals(priceMilestone));
+            case "sma-milestone" -> Arrays.stream(SimpleMovingAverageMilestone.values())
                     .map(Enum::name)
                     .anyMatch(pm -> pm.equals(priceMilestone));
             default -> false;
