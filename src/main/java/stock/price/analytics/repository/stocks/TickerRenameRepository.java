@@ -40,8 +40,8 @@ public interface TickerRenameRepository extends StockRepository {
 
     @Modifying
     @Query("UPDATE DailyPriceJSON d SET d.symbol = :newTicker WHERE d.symbol = :oldTicker")
-    int updateDailyPriceJSONs(@Param("oldTicker") String oldTicker,
-                                 @Param("newTicker") String newTicker);
+    int updateDailyPriceJson(@Param("oldTicker") String oldTicker,
+                             @Param("newTicker") String newTicker);
 
     @Modifying
     @Query("UPDATE HighLow4w d SET d.ticker = :newTicker WHERE d.ticker = :oldTicker")

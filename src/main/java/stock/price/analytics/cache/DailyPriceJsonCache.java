@@ -20,9 +20,9 @@ class DailyPriceJsonCache {
         dailyPriceJSONs.forEach(price -> dailyPriceJSONByTicker.put(createKey(price.getSymbol(), price.getDate()), price));
     }
 
-    List<DailyPriceJSON> addDailyPriceJSONsInCacheAndReturn(List<DailyPriceJSON> dailyPrices) {
+    List<DailyPriceJSON> addDailyPriceJSONsInCacheAndReturn(List<DailyPriceJSON> dailyPriceJSONs) {
         List<DailyPriceJSON> addedPrices = new ArrayList<>();
-        dailyPrices.forEach(price -> addToMap(price, addedPrices));
+        dailyPriceJSONs.forEach(price -> addToMap(price, addedPrices));
         return addedPrices;
     }
 

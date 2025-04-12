@@ -129,7 +129,7 @@ public class StockService {
         log.info("Renamed ticker for MonthlyPrices. Updated {} rows", tickerRenameRepository.updateMonthlyPrices(oldTicker, newTicker));
         log.info("Renamed ticker for QuarterlyPrices. Updated {} rows", tickerRenameRepository.updateQuarterlyPrices(oldTicker, newTicker));
         log.info("Renamed ticker for YearlyPrices. Updated {} rows", tickerRenameRepository.updateYearlyPrices(oldTicker, newTicker));
-        log.info("Renamed ticker for DailyPriceJSON. Updated {} rows", tickerRenameRepository.updateDailyPriceJSONs(oldTicker, newTicker));
+        log.info("Renamed ticker for DailyPriceJSON. Updated {} rows", tickerRenameRepository.updateDailyPriceJson(oldTicker, newTicker));
         log.info("Renamed ticker for HighLow4w. Updated {} rows", tickerRenameRepository.updateHighLow4w(oldTicker, newTicker));
         log.info("Renamed ticker for HighLow52Week. Updated {} rows", tickerRenameRepository.updateHighLow52Week(oldTicker, newTicker));
         log.info("Renamed ticker for HighestLowestPrices. Updated {} rows", tickerRenameRepository.updateHighestLowestPrices(oldTicker, newTicker));
