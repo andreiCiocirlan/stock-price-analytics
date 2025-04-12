@@ -48,15 +48,15 @@ public class PriceMilestoneService {
         }
 
         return switch (milestoneType) {
-            case "performance" -> findTickersForMilestone(PricePerformanceMilestone.valueOf(priceMilestone), cfdMargins);
-            case "premarket" -> findTickersForPreMarketMilestone(PreMarketPriceMilestone.valueOf(priceMilestone), cfdMargins);
-            case "intraday-spike" -> findTickersForIntradaySpikeMilestone(IntradayPriceSpike.valueOf(priceMilestone), cfdMargins);
-            case "sma-milestone" -> findTickersForSimpleMovingAvgMilestone(SimpleMovingAverageMilestone.valueOf(priceMilestone), cfdMargins);
+            case "performance" -> filterByPerformanceMilestone(PricePerformanceMilestone.valueOf(priceMilestone), cfdMargins);
+            case "premarket" -> filterByPreMarketMilestone(PreMarketPriceMilestone.valueOf(priceMilestone), cfdMargins);
+            case "intraday-spike" -> filterByIntradaySpikeMilestone(IntradayPriceSpike.valueOf(priceMilestone), cfdMargins);
+            case "sma-milestone" -> filterBySimpleMovingAvgMilestone(SimpleMovingAverageMilestone.valueOf(priceMilestone), cfdMargins);
             default -> throw new IllegalArgumentException("Invalid milestone type");
         };
     }
 
-    private List<String> findTickersForMilestone(PricePerformanceMilestone pricePerformanceMilestone, List<Double> cfdMargins) {
+    private List<String> filterByPerformanceMilestone(PricePerformanceMilestone pricePerformanceMilestone, List<Double> cfdMargins) {
         Map<String, HighLowForPeriod> hlPricesCache = cacheService.highLowForPeriodPricesForMilestone(pricePerformanceMilestone)
                 .stream()
                 .collect(Collectors.toMap(HighLowForPeriod::getTicker, p -> p));
@@ -69,7 +69,7 @@ public class PriceMilestoneService {
                 .toList();
     }
 
-    private List<String> findTickersForPreMarketMilestone(PreMarketPriceMilestone milestone, List<Double> cfdMargins) {
+    private List<String> filterByPreMarketMilestone(PreMarketPriceMilestone milestone, List<Double> cfdMargins) {
         Map<String, DailyPrice> preMarketPricesCache = cacheService.getCachedDailyPrices(PRE)
                 .stream()
                 .collect(Collectors.toMap(DailyPrice::getTicker, p -> p));
@@ -82,7 +82,7 @@ public class PriceMilestoneService {
                 .toList();
     }
 
-    private List<String> findTickersForIntradaySpikeMilestone(IntradayPriceSpike milestone, List<Double> cfdMargins) {
+    private List<String> filterByIntradaySpikeMilestone(IntradayPriceSpike milestone, List<Double> cfdMargins) {
         Map<String, DailyPrice> intradayPricesCache = cacheService.getCachedDailyPrices(REGULAR)
                 .stream()
                 .collect(Collectors.toMap(DailyPrice::getTicker, p -> p));
@@ -95,7 +95,7 @@ public class PriceMilestoneService {
                 .toList();
     }
 
-    private List<String> findTickersForSimpleMovingAvgMilestone(SimpleMovingAverageMilestone smaMilestone, List<Double> cfdMargins) {
+    private List<String> filterBySimpleMovingAvgMilestone(SimpleMovingAverageMilestone smaMilestone, List<Double> cfdMargins) {
         Map<String, DailyPriceJSON> dailyPriceJsonCache = cacheService.dailyPriceJsonCache()
                 .stream()
                 .collect(Collectors.toMap(
