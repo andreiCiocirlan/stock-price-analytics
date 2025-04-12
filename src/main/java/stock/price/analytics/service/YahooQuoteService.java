@@ -34,7 +34,7 @@ public class YahooQuoteService {
 
     public List<DailyPrice> yahooQuotesFromFile(String fileName) {
         List<DailyPrice> dailyPrices = dailyPriceJSONService.dailyPricesFromFile(fileName);
-        return cacheService.cacheAndReturnDailyPrices(dailyPrices);
+        return cacheService.cacheAndReturn(dailyPrices);
     }
 
     @Transactional
@@ -44,7 +44,7 @@ public class YahooQuoteService {
         List<String> pricesJSONs = logTimeAndReturn(() -> yahooQuotesClient.quotePricesFor(cachedTickers), "Yahoo API call and JSON result");
         String pricesJSON = mergedPricesJSONs(pricesJSONs);
         List<DailyPrice> dailyPricesExtractedFromJSON = dailyPriceJSONService.extractDailyPricesFromJSON(pricesJSON);
-        List<DailyPrice> dailyImportedPrices = cacheService.cacheAndReturnDailyPrices(dailyPricesExtractedFromJSON);
+        List<DailyPrice> dailyImportedPrices = cacheService.cacheAndReturn(dailyPricesExtractedFromJSON);
 
         // keep track of which tickers were imported
         tickersNotImported.removeAll(dailyImportedPrices.stream().map(DailyPrice::getTicker).toList());

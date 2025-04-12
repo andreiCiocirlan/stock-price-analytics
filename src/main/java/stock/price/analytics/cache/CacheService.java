@@ -44,16 +44,21 @@ public class CacheService {
         return dailyPriceJsonCache.getDailyPriceJSONByTicker().values().stream().toList();
     }
 
-    public List<DailyPriceJSON> cacheAndReturnDailyPriceJSONs(List<DailyPriceJSON> dailyPriceJSONs) {
-        return dailyPriceJsonCache.addDailyPriceJSONsInCacheAndReturn(dailyPriceJSONs);
+    @SuppressWarnings("unchecked")
+    public <T> List<T> cacheAndReturn(List<T> entities) {
+        if (entities.isEmpty()) {
+            return entities;
+        }
+
+        return switch (entities.getFirst()) {
+            case DailyPrice _ -> (List<T>) dailyPriceCache.cacheAndReturn((List<DailyPrice>) entities);
+            case DailyPriceJSON _ -> (List<T>) dailyPriceJsonCache.cacheAndReturn((List<DailyPriceJSON>) entities);
+            default -> throw new IllegalArgumentException("Unsupported type: " + entities.getFirst().getClass());
+        };
     }
 
     public boolean isFirstImportFor(StockTimeframe timeframe) {
         return dailyPriceCache.getFirstImportForTimeframe().get(timeframe);
-    }
-
-    public List<DailyPrice> cacheAndReturnDailyPrices(List<DailyPrice> dailyPrices) {
-        return dailyPriceCache.addDailyPricesInCacheAndReturn(dailyPrices);
     }
 
     public void addPreMarketDailyPrices(List<DailyPrice> preMarketPrices) {

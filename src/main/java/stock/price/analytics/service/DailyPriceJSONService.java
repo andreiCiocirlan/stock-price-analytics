@@ -108,7 +108,7 @@ public class DailyPriceJSONService {
                 log.info("{}", sameDailyPrices);
             }
         }
-        List<DailyPriceJSON> dailyPriceJsonCache = cacheService.cacheAndReturnDailyPriceJSONs(dailyJSONPrices);
+        List<DailyPriceJSON> dailyPriceJsonCache = cacheService.cacheAndReturn(dailyJSONPrices);
         if (!dailyPriceJsonCache.isEmpty()) {
             asyncPersistenceService.partitionDataAndSaveWithLogTime(dailyPriceJsonCache, dailyPriceJSONRepository, "saved " + dailyPriceJsonCache.size() + " daily json prices");
         }

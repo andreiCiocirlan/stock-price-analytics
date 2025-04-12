@@ -36,7 +36,7 @@ class DailyPriceCache {
         }
     }
 
-    List<DailyPrice> addDailyPricesInCacheAndReturn(List<DailyPrice> dailyPrices) {
+    List<DailyPrice> cacheAndReturn(List<DailyPrice> dailyPrices) {
         List<DailyPrice> addedPrices = new ArrayList<>();
         dailyPrices.forEach(price -> addToMap(price, addedPrices));
         logInconsistentHighLowImportedPrices();
