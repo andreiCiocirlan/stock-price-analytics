@@ -33,11 +33,6 @@ body, html {
 
 @media (orientation: landscape) {
     @media (max-height: 500px) {
-        #numCols option[value="30"],
-        #numRows option[value="15"],
-        #numRows option[value="20"] {
-            display: none;
-        }
         body, html {
             font-size: 10px;
         }
@@ -46,12 +41,6 @@ body, html {
 
 @media (orientation: portrait) {
     @media (max-width: 500px) {
-        #numCols option[value="15"],
-        #numCols option[value="20"],
-        #numCols option[value="25"],
-        #numCols option[value="30"] {
-            display: none;
-        }
         body, html {
             font-size: 10px;
         }
