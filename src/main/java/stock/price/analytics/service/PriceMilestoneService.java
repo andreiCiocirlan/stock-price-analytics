@@ -71,6 +71,9 @@ public class PriceMilestoneService {
                 tickers = tickers.stream()
                         .filter(filteredTickers::contains)
                         .toList();
+
+                // if no overlap return emptyList
+                if (tickers.isEmpty()) return Collections.emptyList();
             }
         }
 
