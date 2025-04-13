@@ -1,13 +1,13 @@
 body, html {
     height: 100%;
     background-color: #171B26;
-    overflow-y: scroll;
-    font-size: 15px;
+    font-size: 12px;
     font-weight: bold;
+    color: white;
 }
 
 .row {
-    justify-content: center;
+    align-items: center;
 }
 
 .form-group {
@@ -19,6 +19,7 @@ body, html {
 
 .dropdown-label {
     color: white;
+    font-size: 10px;
 }
 
 #heatmap-container {
@@ -48,9 +49,6 @@ body, html {
 }
 
 #cfdMargin {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
 }
 
 #cfdMargin .btn {
@@ -61,7 +59,6 @@ body, html {
     border-radius: 0.25rem;
     margin-right: 2px;
     cursor: pointer;
-    font-size: 18px;
 }
 
 .select-item #cfdMargin .btn.active {
@@ -71,13 +68,12 @@ body, html {
 
 .select-item {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-right: 5px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .select-item label {
-    margin-bottom: 5px;
 }
 .form-control {
     background-color: #171B26; /* Dark background color */
@@ -118,7 +114,6 @@ body, html {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 5px;
 }
 
 .checkbox-item input[type="checkbox"] {
@@ -131,11 +126,9 @@ body, html {
     flex-direction: column;
     align-items: center;
     margin-top: 2px;
-    margin-right: 5px;
 }
 
 .time-frame-label-container label {
-    position: absolute;
     color: #FFFFFF;
 }
 
@@ -145,7 +138,6 @@ body, html {
     border: 1px solid #FFFFFF;
     overflow: hidden;
     padding: 2px 5px;
-    margin-top: 35px;
 }
 
 .time-frame-button-group button {
@@ -154,6 +146,7 @@ body, html {
     color: #FFFFFF;
     border: none;
     cursor: pointer;
+    font-size: 15px;
 }
 
 .time-frame-button-group button:hover {
@@ -166,9 +159,7 @@ body, html {
 }
 
 .time-frame-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    display: inline-flex;
 }
 
 .time-frame-buttons select,
@@ -184,9 +175,13 @@ body, html {
     background-color: #171B26;
     color: #FFFFFF;
     border: 5;
-    margin: 4px 2px;
+    margin-top: 4px;
     cursor: pointer;
     border-radius: 7px;
+}
+
+.time-frame-buttons button {
+    font-size: 15px;
 }
 
 .time-frame-buttons label {
@@ -202,7 +197,6 @@ body, html {
 }
 
 .checkbox-item label {
-    margin-left: 5px;
 }
 
 .checkbox-item input[type="checkbox"] {
@@ -217,7 +211,7 @@ body, html {
 }
 
 .checkbox-item input[type="checkbox"]::before {
-    content: "✓";
+    content: "↗";
     color: #00B24D;
     position: absolute;
     top: 50%;
@@ -229,7 +223,7 @@ body, html {
 }
 
 .checkbox-item input[type="checkbox"]::after {
-    content: "X";
+    content: "↘";
     color: #de0e54;
     position: absolute;
     top: 50%;
