@@ -18,12 +18,16 @@ public class StockHeatmapPerformanceService {
 
     private final CacheService cacheService;
 
-    private static void addPreMarketPriceOrStockPrice(Stock stock, StockTimeframe timeFrame, Map<String, StockPerformanceDTO> preMarketMap, List<StockPerformanceDTO> result) {
+    private static void addPreMarketPriceOrStockPrice(Stock stock, MarketState marketState, StockTimeframe timeFrame, Map<String, StockPerformanceDTO> preMarketMap, List<StockPerformanceDTO> result) {
         String ticker = stock.getTicker();
         StockPerformanceDTO preMarketPrice = preMarketMap.get(ticker);
 
-        // If the ticker is found in preMarketPrices, use that; otherwise, use the stock's performance
-        result.add(Objects.requireNonNullElseGet(preMarketPrice, () -> new StockPerformanceDTO(ticker, stock.performanceFor(timeFrame))));
+        if (marketState == MarketState.PRE) {
+            // If the ticker is found in preMarketPrices, use that; otherwise, use the stock's performance
+            result.add(Objects.requireNonNullElseGet(preMarketPrice, () -> new StockPerformanceDTO(ticker, stock.performanceFor(timeFrame))));
+        } else {
+            result.add(new StockPerformanceDTO(ticker, stock.performanceFor(timeFrame)));
+        }
     }
 
     public List<StockPerformanceDTO> stockPerformanceFor(StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, List<Double> cfdMargins, List<String> tickers, MarketState marketState) {
@@ -35,7 +39,7 @@ public class StockHeatmapPerformanceService {
         List<StockPerformanceDTO> result = new ArrayList<>();
         cacheService.getStocksMap().values().stream()
                 .filter(stockFilterPredicate(tickers, cfdMargins))
-                .forEach(stock -> addPreMarketPriceOrStockPrice(stock, timeFrame, dailyPricesCache, result)); // pre-market price takes precedence
+                .forEach(stock -> addPreMarketPriceOrStockPrice(stock, marketState, timeFrame, dailyPricesCache, result)); // pre-market price takes precedence
 
         List<StockPerformanceDTO> performanceDTOs = result.stream()
                 .sorted(Comparator.comparingDouble(StockPerformanceDTO::performance)
