@@ -2,13 +2,11 @@ package stock.price.analytics.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import stock.price.analytics.controller.dto.StockHeatmapRequest;
 import stock.price.analytics.controller.dto.StockPerformanceDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.model.stocks.enums.MarketState;
 import stock.price.analytics.service.PriceMilestoneService;
 import stock.price.analytics.service.StockHeatmapPerformanceService;
 
@@ -29,28 +27,26 @@ public class StockHeatmapPerformanceController {
         return new ModelAndView("stock-performance");
     }
 
-    @GetMapping("/stock-performance-json")
+    @PostMapping("/stock-performance-json")
     @ResponseBody
-    public List<StockPerformanceDTO> getStockPerformance(@RequestParam(required = false, value = "timeFrame") String timeFrame,
-                                                         @RequestParam(required = false, value = "positivePerfFirst") Boolean positivePerfFirst,
-                                                         @RequestParam(required = false, value = "limit") Integer limit,
-                                                         @RequestParam(required = false, value = "cfdMargins") List<Double> cfdMargins,
-                                                         @RequestParam(required = false, value = "priceMilestone") String priceMilestone,
-                                                         @RequestParam(required = false, value = "milestoneType") String milestoneType,
-                                                         @RequestParam(required = false, value = "marketState") MarketState marketState) {
-        StockTimeframe stockTimeframe = ("undefined".equals(timeFrame)) ? StockTimeframe.MONTHLY : StockTimeframe.valueOf(timeFrame);
+    public List<StockPerformanceDTO> getStockPerformance(@RequestBody StockHeatmapRequest request) {
+        StockTimeframe stockTimeframe = ("undefined".equals(request.getTimeFrame())) ? StockTimeframe.MONTHLY : StockTimeframe.valueOf(request.getTimeFrame());
         List<String> tickers = emptyList();
-        if (!isNoneMilestoneType(milestoneType)) {
-            tickers = priceMilestoneService.findTickersForMilestone(priceMilestone, milestoneType, cfdMargins);
+        if (!request.getMilestoneTypes().isEmpty()) {
+            tickers = priceMilestoneService.findTickersForMilestones(request.getPriceMilestones(), request.getMilestoneTypes(), request.getCfdMargins());
+
             if (tickers.isEmpty()) {
                 return emptyList();
             }
         }
-        return stockHeatmapPerformanceService.stockPerformanceFor(stockTimeframe, positivePerfFirst, limit, cfdMargins, tickers, marketState);
-    }
-
-    private boolean isNoneMilestoneType(String milestoneType) {
-        return "none".equals(milestoneType);
+        return stockHeatmapPerformanceService.stockPerformanceFor(
+                stockTimeframe,
+                request.getPositivePerfFirst(),
+                request.getLimit(),
+                request.getCfdMargins(),
+                tickers,
+                request.getMarketState()
+        );
     }
 
 }

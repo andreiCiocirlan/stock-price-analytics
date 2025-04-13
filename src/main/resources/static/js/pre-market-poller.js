@@ -8,17 +8,13 @@ function updatePremarketOptionVisibility(isVisible) {
 
     let selectElement;
     try {
-        selectElement = document.getElementById('priceMilestone');
+        selectElement = document.getElementById('pre-market-dropdown');
         if (!selectElement) throw new Error("Select element not found");
     } catch (e) {
         console.error(e);
         return;
     }
-    const preMarketOptions = selectElement.querySelectorAll('.pre-market-option');
-
-    preMarketOptions.forEach(option => {
-        option.style.display = isVisible ? "" : "none";
-    });
+    selectElement.style.display = isVisible ? "" : "none";
 }
 
 function checkAndSetPremarketVisibility() {

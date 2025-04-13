@@ -9,88 +9,137 @@
 </head>
 <body>
 <div class="container-fluid">
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-10 col-lg-8">
-            <div class="time-frame-buttons d-flex flex-wrap">
-                <div class="select-item m-2">
-                    <label for="numRows">Rows</label>
-                    <select class="form-control" id="numRows" onchange="dispatchTimeFrameChangeEvent()">
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="15">15</option>
-                        <option value="20" selected>20</option>
-                    </select>
+    <div>
+        <div class="time-frame-buttons d-flex flex-wrap">
+            <div class="select-item m-2">
+                <label for="numRows">Rows</label>
+                <select class="form-control" id="numRows" onchange="dispatchTimeFrameChangeEvent()">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                    <option value="20" selected>20</option>
+                </select>
+            </div>
+            <div class="select-item m-2">
+                <label for="numCols">Cols</label>
+                <select class="form-control" id="numCols" onchange="dispatchTimeFrameChangeEvent()">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                    <option value="20">20</option>
+                    <option value="25">25</option>
+                    <option value="30" selected>30</option>
+                </select>
+            </div>
+            <div class="select-item m-2">
+                <label for="cfdMargin">CFD Leverage</label>
+                <div id="cfdMargin">
+                    <button value="0.2" class="btn active">5x</button>
+                    <button value="0.25" class="btn">4x</button>
+                    <button value="0.33" class="btn">3x</button>
+                    <button value="0.5" class="btn">2x</button>
+                    <button value="0" class="btn">1x</button>
+                    <input type="hidden" id="cfdMarginValues" name="cfdMargin" value="0.2">
                 </div>
-                <div class="select-item m-2">
-                    <label for="numCols">Cols</label>
-                    <select class="form-control" id="numCols" onchange="dispatchTimeFrameChangeEvent()">
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="15">15</option>
-                        <option value="20">20</option>
-                        <option value="25">25</option>
-                        <option value="30" selected>30</option>
-                    </select>
+            </div>
+            <div class="time-frame-label-container">
+                <label for="timeFrameGroup">Timeframe</label>
+                <div id="timeFrameGroup" class="time-frame-button-group">
+                    <button class="btn btn-primary" onclick="handleTimeFrameButtonClick('DAILY')">Daily</button>
+                    <button class="btn btn-primary" onclick="handleTimeFrameButtonClick('WEEKLY')">Weekly</button>
+                    <button class="btn btn-primary" onclick="handleTimeFrameButtonClick('MONTHLY')">Monthly</button>
+                    <button class="btn btn-primary" onclick="handleTimeFrameButtonClick('QUARTERLY')">Quarterly</button>
+                    <button class="btn btn-primary" onclick="handleTimeFrameButtonClick('YEARLY')">Yearly</button>
                 </div>
-                <div class="select-item m-2">
-                    <label for="cfdMargin">CFD Leverage</label>
-                    <div id="cfdMargin">
-                        <button value="0.2" class="btn active">5x</button>
-                        <button value="0.25" class="btn">4x</button>
-                        <button value="0.33" class="btn">3x</button>
-                        <button value="0.5" class="btn">2x</button>
-                        <button value="0" class="btn">1x</button>
-                        <input type="hidden" id="cfdMarginValues" name="cfdMargin" value="0.2">
-                    </div>
+            </div>
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <label for="positivePerfFirst">Positive First</label>
+                    <input type="checkbox" id="positivePerfFirst" onchange="dispatchTimeFrameChangeEvent()" checked>
                 </div>
-                <div class="select-item m-2">
-                    <label for="priceMilestone">Weekly Milestone</label>
-                    <select class="form-control" id="priceMilestone" onchange="dispatchTimeFrameChangeEvent()">
-                        <option value="NONE" class="none-option">NONE</option>
-                        <option value="GAP_UP" class="pre-market-option">GAP UP</option>
-                        <option value="GAP_DOWN" class="pre-market-option">GAP DOWN</option>
-                        <option value="GAP_UP_10_PERCENT" class="pre-market-option">GAP UP 10%</option>
-                        <option value="GAP_DOWN_10_PERCENT" class="pre-market-option">GAP DOWN 10%</option>
-                        <option value="GAP_UP_AND_GO" class="pre-market-option">GAP UP & GO</option>
-                        <option value="GAP_DOWN_AND_GO" class="pre-market-option">GAP DOWN & GO</option>
-                        <option value="KICKING_CANDLE_UP" class="pre-market-option">KICKING CANDLE UP</option>
-                        <option value="KICKING_CANDLE_DOWN" class="pre-market-option">KICKING CANDLE DOWN</option>
-                        <option value="PRE_NEW_ALL_TIME_LOW" class="pre-market-option">PRE NEW ATL</option>
-                        <option value="PRE_NEW_ALL_TIME_HIGH" class="pre-market-option">PRE NEW ATH</option>
-                        <option value="NEW_4W_HIGH" class="performance-option">NEW 4W HIGH</option>
-                        <option value="NEW_52W_HIGH" class="performance-option">NEW 52W HIGH</option>
-                        <option value="NEW_ALL_TIME_HIGH" class="performance-option">NEW ALL TIME HIGH</option>
-                        <option value="NEW_4W_LOW" class="performance-option">NEW 4W LOW</option>
-                        <option value="NEW_52W_LOW" class="performance-option">NEW 52W LOW</option>
-                        <option value="NEW_ALL_TIME_LOW" class="performance-option">NEW ALL TIME LOW</option>
-                        <option value="HIGH_4W_95" class="performance-option">HIGH 4W 95%</option>
-                        <option value="HIGH_52W_95" class="performance-option">HIGH 52W 95%</option>
-                        <option value="HIGH_ALL_TIME_95" class="performance-option">HIGH ALL TIME 95%</option>
-                        <option value="LOW_4W_95" class="performance-option">LOW 4W 95%</option>
-                        <option value="LOW_52W_95" class="performance-option">LOW 52W 95%</option>
-                        <option value="LOW_ALL_TIME_95" class="performance-option">LOW ALL TIME 95%</option>
-                        <option value="ABOVE_200_SMA" class="sma-milestone-option">> 200 SMA</option>
-                        <option value="ABOVE_50_SMA" class="sma-milestone-option">> 50 SMA</option>
-                        <option value="BELOW_200_SMA" class="sma-milestone-option">< 200 SMA</option>
-                        <option value="BELOW_50_SMA" class="sma-milestone-option">< 50 SMA</option>
-                    </select>
-                </div>
-                <div class="time-frame-label-container">
-                    <label for="timeFrameGroup">Timeframe</label>
-                    <div id="timeFrameGroup" class="time-frame-button-group">
-                        <button class="btn btn-primary" onclick="handleTimeFrameButtonClick('DAILY')">Daily</button>
-                        <button class="btn btn-primary" onclick="handleTimeFrameButtonClick('WEEKLY')">Weekly</button>
-                        <button class="btn btn-primary" onclick="handleTimeFrameButtonClick('MONTHLY')">Monthly</button>
-                        <button class="btn btn-primary" onclick="handleTimeFrameButtonClick('QUARTERLY')">Quarterly</button>
-                        <button class="btn btn-primary" onclick="handleTimeFrameButtonClick('YEARLY')">Yearly</button>
-                    </div>
-                </div>
-                <div class="checkbox-group">
-                    <div class="checkbox-item">
-                        <label for="positivePerfFirst">Positive First</label>
-                        <input type="checkbox" id="positivePerfFirst" onchange="dispatchTimeFrameChangeEvent()" checked>
-                    </div>
-                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="priceMilestone" class="row">
+        <div class="col-md-2">
+            <div id="pre-market-dropdown" class="form-group">
+                <label for="pre-market" class="dropdown-label">Pre-market</label>
+                <select class="form-control" id="pre-market" milestone-type="pre-market" onchange="dispatchTimeFrameChangeEvent()">
+                    <option value="ANY">Any</option>
+                    <option value="GAP_UP">GAP UP</option>
+                    <option value="GAP_DOWN">GAP DOWN</option>
+                    <option value="GAP_UP_10_PERCENT">GAP UP 10%</option>
+                    <option value="GAP_DOWN_10_PERCENT">GAP DOWN 10%</option>
+                    <option value="GAP_UP_AND_GO">GAP UP & GO</option>
+                    <option value="GAP_DOWN_AND_GO">GAP DOWN & GO</option>
+                    <option value="KICKING_CANDLE_UP">KICKING CANDLE UP</option>
+                    <option value="KICKING_CANDLE_DOWN">KICKING CANDLE DOWN</option>
+                    <option value="PRE_NEW_ALL_TIME_LOW">PRE NEW ATL</option>
+                    <option value="PRE_NEW_ALL_TIME_HIGH">PRE NEW ATH</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="new-milestone" class="dropdown-label">New Milestone</label>
+                <select class="form-control" id="new-milestone" milestone-type="new-milestone" onchange="dispatchTimeFrameChangeEvent()">
+                    <option value="ANY">Any</option>
+                    <option value="NEW_4W_HIGH">New 4-Week High</option>
+                    <option value="NEW_52W_HIGH">New 52-Week High</option>
+                    <option value="NEW_ALL_TIME_HIGH">New All-Time High</option>
+                    <option value="NEW_4W_LOW">New 4-Week Low</option>
+                    <option value="NEW_52W_LOW">New 52-Week Low</option>
+                    <option value="NEW_ALL_TIME_LOW">New All-Time Low</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="form-group">
+                <label for="all-time" class="dropdown-label">All-Time High/Low</label>
+                <select class="form-control" id="all-time" milestone-type="all-time" onchange="dispatchTimeFrameChangeEvent()">
+                    <option value="ANY">Any</option>
+                    <option value="HIGH_ALL_TIME_95">0-5% below All-Time High</option>
+                    <option value="LOW_ALL_TIME_95">0-5% above All-Time Low</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="52-week" class="dropdown-label">52-Week High/Low</label>
+                <select class="form-control" id="52-week" milestone-type="52-week" onchange="dispatchTimeFrameChangeEvent()">
+                    <option value="ANY">Any</option>
+                    <option value="HIGH_52W_95">0-5% below 52 week High</option>
+                    <option value="LOW_52W_95">0-5% above 52 week Low</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="4-week" class="dropdown-label">4-Week High/Low</label>
+                <select class="form-control" id="4-week" milestone-type="4-week" onchange="dispatchTimeFrameChangeEvent()">
+                    <option value="ANY">Any</option>
+                    <option value="HIGH_4W_95">0-5% below 4 week High</option>
+                    <option value="LOW_4W_95">0-5% above 4 week Low</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="form-group">
+                <label for="sma-200" class="dropdown-label">200-Day SMA</label>
+                <select class="form-control" id="sma-200" milestone-type="sma-200" onchange="dispatchTimeFrameChangeEvent()">
+                    <option value="ANY">Any</option>
+                    <option value="ABOVE_200_SMA">Above</option>
+                    <option value="BELOW_200_SMA">Below</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="sma-50" class="dropdown-label">50-Day SMA</label>
+                <select class="form-control" id="sma-50" milestone-type="sma-50" onchange="dispatchTimeFrameChangeEvent()">
+                    <option value="ANY">Any</option>
+                    <option value="ABOVE_50_SMA">Above</option>
+                    <option value="BELOW_50_SMA">Below</option>
+                </select>
             </div>
         </div>
     </div>

@@ -63,34 +63,54 @@ function updateStockPerformanceChart(timeFrame) {
         timeFrame = 'WEEKLY';
     }
     const limit = numRows * numCols;
-    let url = `/stock-performance-json?timeFrame=${timeFrame}&positivePerfFirst=${positivePerfFirst}&limit=${limit}&marketState=${marketState}`;
 
-    // set cfdMargins from multi-select
-    cfdMarginValues.forEach(margin => { url += '&cfdMargins=' + margin; });
+    const requestBody = {
+        timeFrame,
+        positivePerfFirst,
+        limit,
+        marketState,
+        cfdMargins: cfdMarginValues
+    };
 
     if (priceMilestone) {
-        url += '&priceMilestone=' + priceMilestone.value;
-
-        const selectedOption = priceMilestone.options[priceMilestone.selectedIndex];
-        const milestoneType = selectedOption.className.split(' ')[0];
+        const dropdowns = priceMilestone.querySelectorAll('select[milestone-type]');
 
         const typeMap = {
-            'none-option': 'none',
-            'pre-market-option': 'premarket',
-            'performance-option': 'performance',
-            'sma-milestone-option': 'sma-milestone',
-            'intraday-spike-option': 'intraday-spike'
+            'pre-market': 'premarket',
+            'new-milestone': 'performance',
+            'all-time': 'performance',
+            '52-week': 'performance',
+            '4-week': 'performance',
+            'sma-200': 'sma-milestone',
+            'sma-50': 'sma-milestone'
         };
 
-        url += '&milestoneType=' + typeMap[milestoneType];
+        const priceMilestones = [];
+        const milestoneTypes = [];
+
+        dropdowns.forEach(dropdown => {
+            const selectedValue = dropdown.value;
+            if (selectedValue !== "ANY") {
+                priceMilestones.push(selectedValue);
+                milestoneTypes.push(typeMap[dropdown.getAttribute('milestone-type')]);
+            }
+        });
+        requestBody.priceMilestones = priceMilestones;
+        requestBody.milestoneTypes = milestoneTypes;
     }
 
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, positivePerfFirst);
-        })
-        .catch(error => console.error(error));
+    fetch('/stock-performance-json', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+    })
+    .then(response => response.json())
+    .then(data => {
+        updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, positivePerfFirst);
+    })
+    .catch(error => console.error(error));
 }
 
 function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, positivePerfFirst) {

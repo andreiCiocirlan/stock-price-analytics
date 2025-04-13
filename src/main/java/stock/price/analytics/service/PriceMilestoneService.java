@@ -13,10 +13,7 @@ import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.Stock;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -40,6 +37,44 @@ public class PriceMilestoneService {
             }
         });
         return tickersByPriceMilestones;
+    }
+
+    public List<String> findTickersForMilestones(List<String> priceMilestones, List<String> milestoneTypes, List<Double> cfdMargins) {
+        if (priceMilestones.size() != milestoneTypes.size()) {
+            throw new IllegalArgumentException("Number of price milestones and milestone types must match");
+        }
+
+        List<String> tickers = new ArrayList<>();
+        for (int i = 0; i < priceMilestones.size(); i++) {
+            String priceMilestone = priceMilestones.get(i);
+            String milestoneType = milestoneTypes.get(i);
+
+            if (isInvalidTypeMapping(priceMilestone, milestoneType)) {
+                throw new IllegalArgumentException("Invalid milestone type combination for " + priceMilestone + " and " + milestoneType);
+            }
+
+            List<String> filteredTickers = switch (milestoneType) {
+                case "performance" ->
+                        filterByPerformanceMilestone(PricePerformanceMilestone.valueOf(priceMilestone), cfdMargins);
+                case "premarket" ->
+                        filterByPreMarketMilestone(PreMarketPriceMilestone.valueOf(priceMilestone), cfdMargins);
+                case "intraday-spike" ->
+                        filterByIntradaySpikeMilestone(IntradayPriceSpike.valueOf(priceMilestone), cfdMargins);
+                case "sma-milestone" ->
+                        filterBySimpleMovingAvgMilestone(SimpleMovingAverageMilestone.valueOf(priceMilestone), cfdMargins);
+                default -> throw new IllegalArgumentException("Invalid milestone type");
+            };
+
+            if (tickers.isEmpty()) {
+                tickers = filteredTickers;
+            } else {
+                tickers = tickers.stream()
+                        .filter(filteredTickers::contains)
+                        .toList();
+            }
+        }
+
+        return tickers;
     }
 
     public List<String> findTickersForMilestone(String priceMilestone, String milestoneType, List<Double> cfdMargins) {

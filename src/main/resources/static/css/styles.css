@@ -6,6 +6,21 @@ body, html {
     font-weight: bold;
 }
 
+.row {
+    justify-content: center;
+}
+
+.form-group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    justify-content: flex-end;
+}
+
+.dropdown-label {
+    color: white;
+}
+
 #heatmap-container {
     width: 100%;
     height: 87vh;
@@ -82,6 +97,9 @@ body, html {
     border-radius: 0.25rem; /* Rounded corners */
     padding: 0.375rem 0.75rem; /* Padding */
     font-size: 1rem; /* Font size */
+    width: 100px;
+    max-width: 200px;
+    min-width: 100px;
 }
 
 /* Styles for the select element when focused */
