@@ -161,8 +161,8 @@ function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, 
                 enabled: true,
                 color: '#FFFFFF',
                 formatter: function() {
-                    const squareSize = Math.min(this.point.shapeArgs.width, this.point.shapeArgs.height);
-                    const fontSize = `${Math.max(12.5, squareSize * 0.1)}px`; // Adjust the scaling factor as needed
+                    const squareSize = Math.max(this.point.shapeArgs.width, this.point.shapeArgs.height);
+                    const fontSize = `${Math.min(11.5, squareSize * 0.2)}px`; // Adjust the scaling factor as needed
                     return `<span style="font-size: ${fontSize};">${data[this.point.index].ticker}<br>${data[this.point.index].performance}%</span>`;
                 }
             },
