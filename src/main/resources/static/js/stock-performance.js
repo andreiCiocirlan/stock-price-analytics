@@ -52,8 +52,8 @@ function updateStockPerformanceChartCurrentTimeframe() {
 }
 
 function updateStockPerformanceChart(timeFrame) {
-    const numRows = document.getElementById('numRows').value || 5;
-    const numCols = document.getElementById('numCols').value || 5;
+    const numRows = 20;
+    const numCols = 30;
     const positivePerfFirst = document.getElementById('positivePerfFirst').checked || false;
     const cfdMarginValues = document.getElementById('cfdMarginValues').value === '' ? [] : document.getElementById('cfdMarginValues').value.split(',');
     const priceMilestone = document.getElementById('priceMilestone');
