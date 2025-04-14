@@ -32,7 +32,6 @@ public class IntradayScheduler {
     public void alertIntradayPriceSpikes() {
         cacheService.tickersByPriceMilestones()
                 .forEach((priceMilestone, tickers) -> desktopNotificationService.broadcastDesktopNotification(priceMilestone.toString(), tickers.toString()));
-        cacheService.clearTickersByPriceMilestone(); // clear map for next quotes import
     }
 
 }
