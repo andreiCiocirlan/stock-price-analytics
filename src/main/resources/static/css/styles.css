@@ -202,7 +202,6 @@ body, html {
 .checkbox-item input[type="checkbox"] {
     width: 25px;
     height: 25px;
-    background-color: #4A5166;
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -211,26 +210,22 @@ body, html {
 }
 
 .checkbox-item input[type="checkbox"]::before {
-    content: "↗";
-    color: #00B24D;
-    position: absolute;
+    content: "\1F4C8";
+    font-size: 20px;
+    position: relative;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 20px;
-    font-weight: bold;
     display: none;
 }
 
 .checkbox-item input[type="checkbox"]::after {
-    content: "↘";
-    color: #de0e54;
-    position: absolute;
+    content: "\1F4C9";
+    font-size: 20px;
+    position: relative;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 20px;
-    font-weight: bold;
     display: none;
 }
 
