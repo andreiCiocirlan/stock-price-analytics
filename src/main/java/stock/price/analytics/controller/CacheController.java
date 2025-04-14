@@ -87,4 +87,14 @@ public class CacheController {
         return result;
     }
 
+    @GetMapping("/prev-week-high-lows")
+    @ResponseStatus(HttpStatus.OK)
+    public List<? extends HighLowForPeriod> prevWeekHighLowsForTicker(@RequestParam("ticker") String ticker) {
+        List<HighLowForPeriod> result = new ArrayList<>();
+        for (HighLowPeriod highLowPeriod : HighLowPeriod.values()) {
+            result.add(cacheService.prevWeekHighLowForPeriodPricesFor(highLowPeriod).stream().filter(hlp -> ticker.equals(hlp.getTicker())).findFirst().orElseThrow());
+        }
+        return result;
+    }
+
 }
