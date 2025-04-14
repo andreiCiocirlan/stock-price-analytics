@@ -47,13 +47,25 @@ function getMarketState() {
     return weekday && hours ? "PRE" : "REGULAR";
 }
 
+function calculateGridSize(mapSize) {
+    const maxRows = 20;
+    const maxColumns = 30;
+
+    const scalingFactor = Math.sqrt(mapSize / 600);
+    const numRows = Math.round(maxRows * scalingFactor);
+    const numCols = Math.round(maxColumns * scalingFactor);
+
+    return {
+        numRows: Math.min(numRows, maxRows),
+        numCols: Math.min(numCols, maxColumns),
+    };
+}
+
 function updateStockPerformanceChartCurrentTimeframe() {
     updateStockPerformanceChart(currentTimeFrame);
 }
 
 function updateStockPerformanceChart(timeFrame) {
-    const numRows = 20;
-    const numCols = 30;
     const positivePerfFirst = document.getElementById('positivePerfFirst').checked || false;
     const cfdMarginValues = document.getElementById('cfdMarginValues').value === '' ? [] : document.getElementById('cfdMarginValues').value.split(',');
     const priceMilestone = document.getElementById('priceMilestone');
@@ -62,7 +74,7 @@ function updateStockPerformanceChart(timeFrame) {
     if (timeFrame == undefined) {
         timeFrame = 'WEEKLY';
     }
-    const limit = numRows * numCols;
+    const limit = 600;
 
     const requestBody = {
         timeFrame,
@@ -108,6 +120,7 @@ function updateStockPerformanceChart(timeFrame) {
     })
     .then(response => response.json())
     .then(data => {
+        const { numRows, numCols } = calculateGridSize(data.length);
         updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, positivePerfFirst);
     })
     .catch(error => console.error(error));
@@ -161,8 +174,8 @@ function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, 
                 enabled: true,
                 color: '#FFFFFF',
                 formatter: function() {
-                    const squareSize = Math.max(this.point.shapeArgs.width, this.point.shapeArgs.height);
-                    const fontSize = `${Math.max(11.5, squareSize * 0.1)}px`; // Adjust the scaling factor as needed
+                    const squareSize = Math.min(this.point.shapeArgs.width, this.point.shapeArgs.height);
+                    const fontSize = `${Math.max(11.5, squareSize * 0.11)}px`; // Adjust the scaling factor as needed
                     return `<span style="font-size: ${fontSize};">${data[this.point.index].ticker}<br>${data[this.point.index].performance}%</span>`;
                 }
             },
