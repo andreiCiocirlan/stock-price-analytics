@@ -65,6 +65,10 @@ public class PriceMilestoneService {
                 default -> throw new IllegalArgumentException("Invalid milestone type");
             };
 
+            if (filteredTickers.isEmpty()) {
+                return Collections.emptyList();
+            }
+
             if (tickers.isEmpty()) {
                 tickers = filteredTickers;
             } else {
