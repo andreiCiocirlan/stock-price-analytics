@@ -158,6 +158,10 @@ public class CacheService {
         return priceMilestoneCache.tickersByPriceMilestones();
     }
 
+    public List<String> tickersFor(PriceMilestone priceMilestone) {
+        return priceMilestoneCache.tickersFor(priceMilestone);
+    }
+
     public void clearTickersByPriceMilestone() {
         priceMilestoneCache.clearTickersByPriceMilestone();
     }
