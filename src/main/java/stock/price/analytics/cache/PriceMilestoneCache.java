@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.model.prices.PriceMilestone;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,7 @@ class PriceMilestoneCache {
     }
 
     List<String> tickersFor(PriceMilestone priceMilestone) {
-        return tickersByPriceMilestones.get(priceMilestone);
+        return tickersByPriceMilestones.getOrDefault(priceMilestone, Collections.emptyList());
     }
 
     public void clearTickersByPriceMilestone() {
