@@ -118,6 +118,7 @@ public class CacheInitializationService {
         }
         if (!cacheService.weeklyHighLowExists() && cacheService.isFirstImportFor(StockTimeframe.WEEKLY)) {
             stockService.updateHighLowForPeriodFromHLCachesAndAdjustWeekend();
+            highLowPricesCache.setWeeklyHighLowExists(true);
         }
     }
 
@@ -159,7 +160,6 @@ public class CacheInitializationService {
                 syncPersistenceService.partitionDataAndSave(highLowForPeriods, highLowForPeriodRepository);
                 highLowPricesCache.addHighLowPrices(highLowForPeriods, highLowPeriod);
             }
-            highLowPricesCache.setWeeklyHighLowExists(true);
         } else {
             List<? extends HighLowForPeriod> highLowPrices = switch (highLowPeriod) {
                 case HIGH_LOW_4W -> highLowForPeriodRepository.highLow4wPricesFor(startDate);
