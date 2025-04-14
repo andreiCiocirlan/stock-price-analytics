@@ -89,7 +89,6 @@ function updateStockPerformanceChart(timeFrame) {
 
         const typeMap = {
             'pre-market': 'premarket',
-            'new-milestone': 'performance',
             'intraday-spike': 'intraday-spike',
             'all-time': 'performance',
             '52-week': 'performance',
