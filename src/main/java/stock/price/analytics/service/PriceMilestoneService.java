@@ -121,6 +121,13 @@ public class PriceMilestoneService {
     }
 
     private List<String> filterByIntradaySpikeMilestone(IntradayPriceSpike milestone, List<Double> cfdMargins) {
+        if (!cacheService.tickersFor(milestone).isEmpty()) {
+            return cacheService.getCachedStocks().stream()
+                    .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
+                    .map(Stock::getTicker)
+                    .filter(ticker -> cacheService.tickersFor(milestone).contains(ticker))
+                    .toList();
+        }
         Map<String, DailyPrice> intradayPricesCache = cacheService.getCachedDailyPrices(REGULAR)
                 .stream()
                 .collect(Collectors.toMap(DailyPrice::getTicker, p -> p));
