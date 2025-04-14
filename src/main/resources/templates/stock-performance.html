@@ -43,15 +43,11 @@
         <div class="col-md-7 d-inline-flex mt-2" id="priceMilestone">
             <div>
                 <div class="form-group">
-                    <label for="new-milestone" class="dropdown-label">Milestone</label>
-                    <select class="form-control" id="new-milestone" milestone-type="new-milestone" onchange="dispatchTimeFrameChangeEvent()">
+                    <label for="intraday-spike" class="dropdown-label">Intraday Spike</label>
+                    <select class="form-control" id="intraday-spike" milestone-type="intraday-spike" onchange="dispatchTimeFrameChangeEvent()">
                         <option value="ANY">Any</option>
-                        <option value="NEW_4W_HIGH">New 4-Week High</option>
-                        <option value="NEW_52W_HIGH">New 52-Week High</option>
-                        <option value="NEW_ALL_TIME_HIGH">New All-Time High</option>
-                        <option value="NEW_4W_LOW">New 4-Week Low</option>
-                        <option value="NEW_52W_LOW">New 52-Week Low</option>
-                        <option value="NEW_ALL_TIME_LOW">New All-Time Low</option>
+                        <option value="INTRADAY_SPIKE_UP">Intraday Spike Up</option>
+                        <option value="INTRADAY_SPIKE_DOWN">Intraday Spike Down</option>
                     </select>
                 </div>
                 <div id="pre-market-dropdown" class="form-group">
@@ -77,6 +73,8 @@
                     <label for="all-time" class="dropdown-label">All-Time High/Low</label>
                     <select class="form-control" id="all-time" milestone-type="all-time" onchange="dispatchTimeFrameChangeEvent()">
                         <option value="ANY">Any</option>
+                        <option value="NEW_ALL_TIME_HIGH">New High</option>
+                        <option value="NEW_ALL_TIME_LOW">New Low</option>
                         <option value="HIGH_ALL_TIME_95">0-5% below All-Time High</option>
                         <option value="LOW_ALL_TIME_95">0-5% above All-Time Low</option>
                     </select>
@@ -96,6 +94,8 @@
                     <label for="52-week" class="dropdown-label">52-Week High/Low</label>
                     <select class="form-control" id="52-week" milestone-type="52-week" onchange="dispatchTimeFrameChangeEvent()">
                         <option value="ANY">Any</option>
+                        <option value="NEW_52W_HIGH">New High</option>
+                        <option value="NEW_52W_LOW">New Low</option>
                         <option value="HIGH_52W_95">0-5% below 52 week High</option>
                         <option value="LOW_52W_95">0-5% above 52 week Low</option>
                     </select>
@@ -114,6 +114,8 @@
                     <label for="4-week" class="dropdown-label">4-Week High/Low</label>
                     <select class="form-control" id="4-week" milestone-type="4-week" onchange="dispatchTimeFrameChangeEvent()">
                         <option value="ANY">Any</option>
+                        <option value="NEW_4W_HIGH">New High</option>
+                        <option value="NEW_4W_LOW">New Low</option>
                         <option value="HIGH_4W_95">0-5% below 4 week High</option>
                         <option value="LOW_4W_95">0-5% above 4 week Low</option>
                     </select>
