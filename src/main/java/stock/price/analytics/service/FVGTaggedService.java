@@ -31,7 +31,7 @@ public class FVGTaggedService {
             case HIGH_52W_95, LOW_52W_95 -> new MutablePair<>("low52w", "high52w");
             case HIGH_4W_95, LOW_4W_95 -> new MutablePair<>("low4w", "high4w");
             case HIGH_ALL_TIME_95, LOW_ALL_TIME_95 -> new MutablePair<>("lowest", "highest");
-            case NEW_ALL_TIME_HIGH, NEW_52W_HIGH, NEW_4W_HIGH, NEW_52W_LOW, NEW_4W_LOW, NEW_ALL_TIME_LOW, NONE ->
+            case NEW_ALL_TIME_HIGH, NEW_52W_HIGH, NEW_4W_HIGH, NEW_52W_LOW, NEW_4W_LOW, NEW_ALL_TIME_LOW ->
                     throw new IllegalStateException("Unexpected value " + pricePerformanceMilestone.name());
         };
         String lowField = queryFields.getLeft();

@@ -17,12 +17,6 @@ public enum IntradayPriceSpike implements PriceMilestone {
         public String toString() {
             return "Intraday Spike Down";
         }
-    },
-    NONE("intraday-spike") {
-        @Override
-        public String toString() {
-            return "None";
-        }
     };
 
     private final String type;

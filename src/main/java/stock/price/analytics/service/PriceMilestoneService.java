@@ -158,7 +158,6 @@ public class PriceMilestoneService {
                     highLowForPeriod.getLow() != highLowForPeriod.getHigh() && (1 - (1 - (s.getClose() - highLowForPeriod.getLow()) / (highLowForPeriod.getHigh() - highLowForPeriod.getLow()))) > 0.95;
             case LOW_52W_95, LOW_4W_95, LOW_ALL_TIME_95 ->
                     highLowForPeriod.getLow() != highLowForPeriod.getHigh() && (1 - (s.getClose() - highLowForPeriod.getLow()) / (highLowForPeriod.getHigh() - highLowForPeriod.getLow())) > 0.95;
-            case NONE -> throw new IllegalStateException("Unexpected value NONE");
         };
     }
 
@@ -185,7 +184,6 @@ public class PriceMilestoneService {
             case PRE_NEW_52W_LOW -> preMarketPrice.getClose() < s.getLow52w();
             case PRE_NEW_ALL_TIME_HIGH -> preMarketPrice.getClose() > s.getHighest();
             case PRE_NEW_ALL_TIME_LOW -> preMarketPrice.getClose() < s.getLowest();
-            case NONE -> throw new IllegalStateException("Unexpected value NONE");
         };
     }
 
@@ -194,7 +192,6 @@ public class PriceMilestoneService {
         return switch (milestone) {
             case INTRADAY_SPIKE_UP -> dailyPrice.getClose() > s.getClose() * (1 + INTRADAY_SPIKE_PERCENTAGE);
             case INTRADAY_SPIKE_DOWN -> dailyPrice.getClose() < s.getClose() * (1 - INTRADAY_SPIKE_PERCENTAGE);
-            case NONE -> throw new IllegalStateException("Unexpected value NONE");
         };
     }
 
@@ -204,7 +201,6 @@ public class PriceMilestoneService {
             case ABOVE_50_SMA -> dailyPriceJSON.getRegularMarketPrice() > dailyPriceJSON.getFiftyDayAverage();
             case BELOW_200_SMA -> dailyPriceJSON.getRegularMarketPrice() < dailyPriceJSON.getTwoHundredDayAverage();
             case BELOW_50_SMA -> dailyPriceJSON.getRegularMarketPrice() < dailyPriceJSON.getFiftyDayAverage();
-            case NONE -> false;
         };
     }
 

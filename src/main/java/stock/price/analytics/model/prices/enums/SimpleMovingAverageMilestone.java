@@ -29,12 +29,6 @@ public enum SimpleMovingAverageMilestone implements PriceMilestone {
         public String toString() {
             return "< 50 SMA";
         }
-    },
-    NONE("sma-milestone") {
-        @Override
-        public String toString() {
-            return "None";
-        }
     };
 
     private final String type;

@@ -88,12 +88,6 @@ public enum PreMarketPriceMilestone implements PriceMilestone {
         public String toString() {
             return "New All-time High";
         }
-    },
-    NONE("premarket") {
-        @Override
-        public String toString() {
-            return "None";
-        }
     };
 
     private final String type;
