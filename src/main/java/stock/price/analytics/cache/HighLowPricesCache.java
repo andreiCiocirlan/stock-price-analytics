@@ -108,11 +108,11 @@ class HighLowPricesCache {
         return isNewHighLow;
     }
 
-    List<? extends HighLowForPeriod> cacheForHighLowPeriod(HighLowPeriod highLowPeriod) {
+    List<? extends HighLowForPeriod> cacheForHighLowPeriod(HighLowPeriod highLowPeriod, boolean prevWeek) {
         return new ArrayList<>(switch (highLowPeriod) {
-            case HIGH_LOW_4W -> highLow4wMap.values();
-            case HIGH_LOW_52W -> highLow52wMap.values();
-            case HIGH_LOW_ALL_TIME -> highestLowestMap.values();
+            case HIGH_LOW_4W -> prevWeek ? prevWeekHighLow4wMap.values() : highLow4wMap.values();
+            case HIGH_LOW_52W -> prevWeek ? prevWeekHighLow52wMap.values() : highLow52wMap.values();
+            case HIGH_LOW_ALL_TIME -> prevWeek ? prevWeekHighestLowestMap.values() : highestLowestMap.values();
         });
     }
 
