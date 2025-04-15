@@ -5,7 +5,6 @@ import lombok.Setter;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.model.prices.enums.NewHighLowMilestone;
-import stock.price.analytics.model.prices.enums.PerformanceMilestone;
 import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
 import stock.price.analytics.model.prices.highlow.HighLow4w;
 import stock.price.analytics.model.prices.highlow.HighLow52Week;
