@@ -63,7 +63,6 @@ public class CacheInitializationService {
         logTime(this::initDailyJSONPricesCache, "initialized daily JSON prices cache");
         logTime(this::initPreMarketDailyPrices, "initialized pre-market daily prices cache");
         logTime(this::initTickersForPriceMilestoneCache, "initialized tickers for price milestone cache");
-        cacheService.setLastUpdateTimestamp(System.nanoTime());
     }
 
     private void initTickersForPriceMilestoneCache() {

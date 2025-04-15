@@ -19,5 +19,9 @@ public class WebSocketNotificationService {
         this.template.convertAndSend("/topic/desktop-notification", Map.of("title", title, "message", message));
     }
 
+    public void broadcastStockChartUpdate() {
+        log.info("Broadcasting stock chart update signal");
+        this.template.convertAndSend("/topic/stock-updates", "update"); // simple signal message
+    }
 
 }

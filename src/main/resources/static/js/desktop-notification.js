@@ -5,9 +5,16 @@ function connect() {
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
         console.log('Connected: ' + frame);
+
+        // Subscribe to desktop notifications
         stompClient.subscribe('/topic/desktop-notification', function (message) {
             const notification = JSON.parse(message.body);
             showAlert(notification.title, notification.message);
+        });
+
+        // Subscribe to stock updates
+        stompClient.subscribe('/topic/stock-updates', function (message) {
+            updateStockPerformanceChartCurrentTimeframe();
         });
     });
 }

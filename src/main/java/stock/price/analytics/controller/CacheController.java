@@ -24,16 +24,6 @@ public class CacheController {
 
     private final CacheService cacheService;
 
-    @GetMapping("/last-update-timestamp")
-    public long getLastUpdateTimestamp() {
-        return cacheService.getLastUpdateTimestamp();
-    }
-
-    @PostMapping("/last-update-timestamp")
-    public void setLastUpdateTimestamp() {
-        cacheService.setLastUpdateTimestamp(System.nanoTime());
-    }
-
     @GetMapping("/stocks")
     @ResponseStatus(HttpStatus.OK)
     public List<Stock> getCachedStocks() {
