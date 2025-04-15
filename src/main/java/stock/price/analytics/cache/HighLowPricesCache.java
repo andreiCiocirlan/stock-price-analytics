@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
+import stock.price.analytics.model.prices.enums.NewHighLowMilestone;
+import stock.price.analytics.model.prices.enums.PerformanceMilestone;
 import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
 import stock.price.analytics.model.prices.highlow.HighLow4w;
 import stock.price.analytics.model.prices.highlow.HighLow52Week;
@@ -116,14 +118,19 @@ class HighLowPricesCache {
         });
     }
 
-    List<? extends HighLowForPeriod> cacheForMilestone(PricePerformanceMilestone pricePerformanceMilestone) {
+    List<? extends HighLowForPeriod> cacheForNewHighLowMilestone(NewHighLowMilestone newHighLowMilestone) {
+        return new ArrayList<>(switch (newHighLowMilestone) {
+            case NEW_4W_HIGH, NEW_4W_LOW -> prevWeekHighLow4wMap.values();
+            case NEW_52W_HIGH, NEW_52W_LOW -> prevWeekHighLow52wMap.values();
+            case NEW_ALL_TIME_HIGH, NEW_ALL_TIME_LOW -> prevWeekHighestLowestMap.values();
+        });
+    }
+
+    List<? extends HighLowForPeriod> cacheForPricePerformanceMilestone(PricePerformanceMilestone pricePerformanceMilestone) {
         return new ArrayList<>(switch (pricePerformanceMilestone) {
             case HIGH_4W_95, LOW_4W_95 -> highLow4wMap.values();
-            case NEW_4W_HIGH, NEW_4W_LOW -> prevWeekHighLow4wMap.values();
             case HIGH_52W_95, LOW_52W_95 -> highLow52wMap.values();
-            case NEW_52W_HIGH, NEW_52W_LOW -> prevWeekHighLow52wMap.values();
             case HIGH_ALL_TIME_95, LOW_ALL_TIME_95 -> highestLowestMap.values();
-            case NEW_ALL_TIME_HIGH, NEW_ALL_TIME_LOW -> prevWeekHighestLowestMap.values();
         });
     }
 }

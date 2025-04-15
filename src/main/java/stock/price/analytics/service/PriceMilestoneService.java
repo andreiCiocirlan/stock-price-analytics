@@ -5,10 +5,7 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.json.DailyPriceJSON;
 import stock.price.analytics.model.prices.PriceMilestone;
-import stock.price.analytics.model.prices.enums.IntradayPriceSpike;
-import stock.price.analytics.model.prices.enums.PreMarketPriceMilestone;
-import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
-import stock.price.analytics.model.prices.enums.SimpleMovingAverageMilestone;
+import stock.price.analytics.model.prices.enums.*;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.Stock;
@@ -68,6 +65,7 @@ public class PriceMilestoneService {
         }
 
         return switch (milestoneType) {
+            case "new-high-low" -> filterByNewHighLowMilestone(NewHighLowMilestone.valueOf(priceMilestone), cfdMargins);
             case "performance" -> filterByPerformanceMilestone(PricePerformanceMilestone.valueOf(priceMilestone), cfdMargins);
             case "premarket" -> filterByPreMarketMilestone(PreMarketPriceMilestone.valueOf(priceMilestone), cfdMargins);
             case "intraday-spike" -> filterByIntradaySpikeMilestone(IntradayPriceSpike.valueOf(priceMilestone), cfdMargins);
@@ -77,7 +75,7 @@ public class PriceMilestoneService {
     }
 
     private List<String> filterByPerformanceMilestone(PricePerformanceMilestone pricePerformanceMilestone, List<Double> cfdMargins) {
-        Map<String, HighLowForPeriod> hlPricesCache = cacheService.highLowForPeriodPricesForMilestone(pricePerformanceMilestone)
+        Map<String, HighLowForPeriod> hlPricesCache = cacheService.highLowForPeriodPricesForPricePerformanceMilestone(pricePerformanceMilestone)
                 .stream()
                 .collect(Collectors.toMap(HighLowForPeriod::getTicker, p -> p));
 
@@ -85,6 +83,19 @@ public class PriceMilestoneService {
                 .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
                 .filter(stock -> hlPricesCache.containsKey(stock.getTicker()))
                 .filter(stock -> withinPerformanceMilestone(stock, hlPricesCache.get(stock.getTicker()), pricePerformanceMilestone))
+                .map(Stock::getTicker)
+                .toList();
+    }
+
+    private List<String> filterByNewHighLowMilestone(NewHighLowMilestone newHighLowMilestone, List<Double> cfdMargins) {
+        Map<String, HighLowForPeriod> hlPricesCache = cacheService.highLowForPeriodPricesForNewHighLowMilestone(newHighLowMilestone)
+                .stream()
+                .collect(Collectors.toMap(HighLowForPeriod::getTicker, p -> p));
+
+        return cacheService.getCachedStocks().stream()
+                .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
+                .filter(stock -> hlPricesCache.containsKey(stock.getTicker()))
+                .filter(stock -> withinNewHighLowMilestone(stock, hlPricesCache.get(stock.getTicker()), newHighLowMilestone))
                 .map(Stock::getTicker)
                 .toList();
     }
@@ -134,12 +145,17 @@ public class PriceMilestoneService {
 
     private boolean withinPerformanceMilestone(Stock s, HighLowForPeriod highLowForPeriod, PricePerformanceMilestone pricePerformanceMilestone) {
         return switch (pricePerformanceMilestone) {
-            case NEW_52W_HIGH, NEW_ALL_TIME_HIGH, NEW_4W_HIGH -> s.getWeeklyHigh() > highLowForPeriod.getHigh();
-            case NEW_52W_LOW, NEW_4W_LOW, NEW_ALL_TIME_LOW -> s.getWeeklyLow() < highLowForPeriod.getLow();
             case HIGH_52W_95, HIGH_4W_95, HIGH_ALL_TIME_95 ->
                     highLowForPeriod.getLow() != highLowForPeriod.getHigh() && (1 - (1 - (s.getClose() - highLowForPeriod.getLow()) / (highLowForPeriod.getHigh() - highLowForPeriod.getLow()))) > 0.95;
             case LOW_52W_95, LOW_4W_95, LOW_ALL_TIME_95 ->
                     highLowForPeriod.getLow() != highLowForPeriod.getHigh() && (1 - (s.getClose() - highLowForPeriod.getLow()) / (highLowForPeriod.getHigh() - highLowForPeriod.getLow())) > 0.95;
+        };
+    }
+
+    private boolean withinNewHighLowMilestone(Stock s, HighLowForPeriod highLowForPeriod, NewHighLowMilestone newHighLowMilestone) {
+        return switch (newHighLowMilestone) {
+            case NEW_52W_HIGH, NEW_ALL_TIME_HIGH, NEW_4W_HIGH -> s.getWeeklyHigh() > highLowForPeriod.getHigh();
+            case NEW_52W_LOW, NEW_4W_LOW, NEW_ALL_TIME_LOW -> s.getWeeklyLow() < highLowForPeriod.getLow();
         };
     }
 
@@ -213,6 +229,9 @@ public class PriceMilestoneService {
         }
         for (SimpleMovingAverageMilestone simpleMovingAverageMilestone : SimpleMovingAverageMilestone.values()) {
             cacheService.cachePriceMilestoneTickers(simpleMovingAverageMilestone, findTickersForMilestone(simpleMovingAverageMilestone.name(), simpleMovingAverageMilestone.getType(), CFD_MARGINS_5X_4X_3X_2X_1X));
+        }
+        for (NewHighLowMilestone newHighLowMilestone : NewHighLowMilestone.values()) {
+            cacheService.cachePriceMilestoneTickers(newHighLowMilestone, findTickersForMilestone(newHighLowMilestone.name(), newHighLowMilestone.getType(), CFD_MARGINS_5X_4X_3X_2X_1X));
         }
     }
 }

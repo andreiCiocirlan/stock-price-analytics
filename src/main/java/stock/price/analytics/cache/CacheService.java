@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.model.PriceWithPrevClose;
 import stock.price.analytics.model.json.DailyPriceJSON;
 import stock.price.analytics.model.prices.PriceMilestone;
+import stock.price.analytics.model.prices.enums.NewHighLowMilestone;
 import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
@@ -81,8 +82,12 @@ public class CacheService {
         return highLowPricesCache.cacheForHighLowPeriod(period, true);
     }
 
-    public List<? extends HighLowForPeriod> highLowForPeriodPricesForMilestone(PricePerformanceMilestone pricePerformanceMilestone) {
-        return highLowPricesCache.cacheForMilestone(pricePerformanceMilestone);
+    public List<? extends HighLowForPeriod> highLowForPeriodPricesForNewHighLowMilestone(NewHighLowMilestone newHighLowMilestone) {
+        return highLowPricesCache.cacheForNewHighLowMilestone(newHighLowMilestone);
+    }
+
+    public List<? extends HighLowForPeriod> highLowForPeriodPricesForPricePerformanceMilestone(PricePerformanceMilestone pricePerformanceMilestone) {
+        return highLowPricesCache.cacheForPricePerformanceMilestone(pricePerformanceMilestone);
     }
 
     public List<? extends HighLowForPeriod> getUpdatedHighLowPricesForTickers(List<DailyPrice> dailyPrices, List<String> tickers, HighLowPeriod highLowPeriod) {

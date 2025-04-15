@@ -4,10 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import stock.price.analytics.model.prices.PriceMilestone;
-import stock.price.analytics.model.prices.enums.IntradayPriceSpike;
-import stock.price.analytics.model.prices.enums.PreMarketPriceMilestone;
-import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
-import stock.price.analytics.model.prices.enums.SimpleMovingAverageMilestone;
+import stock.price.analytics.model.prices.enums.*;
 import stock.price.analytics.model.stocks.enums.MarketState;
 
 import java.util.ArrayList;
@@ -31,7 +28,8 @@ public class StockHeatmapRequest {
             String priceMilestoneStr = this.getPriceMilestones().get(i);
             String milestoneType = this.getMilestoneTypes().get(i);
             priceMilestones.add(switch (milestoneType) {
-                case "performance" -> PricePerformanceMilestone.valueOf(priceMilestoneStr);
+                case "performance" ->
+                        priceMilestoneStr.startsWith("NEW") ? NewHighLowMilestone.valueOf(priceMilestoneStr) : PricePerformanceMilestone.valueOf(priceMilestoneStr);
                 case "premarket" -> PreMarketPriceMilestone.valueOf(priceMilestoneStr);
                 case "intraday-spike" -> IntradayPriceSpike.valueOf(priceMilestoneStr);
                 case "sma-milestone" -> SimpleMovingAverageMilestone.valueOf(priceMilestoneStr);

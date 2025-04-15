@@ -294,8 +294,6 @@ public class FairValueGapService {
             case HIGH_52W_95, LOW_52W_95 -> FVG_95TH_PERCENTILE_52W;
             case HIGH_4W_95, LOW_4W_95 -> FVG_95TH_PERCENTILE_4W;
             case HIGH_ALL_TIME_95, LOW_ALL_TIME_95 -> FVG_95TH_PERCENTILE_ALL_TIME;
-            case NEW_ALL_TIME_HIGH, NEW_52W_HIGH, NEW_4W_HIGH, NEW_52W_LOW, NEW_4W_LOW, NEW_ALL_TIME_LOW ->
-                    throw new IllegalStateException("Unexpected value " + pricePerformanceMilestone.name());
         };
         return String.join(" ", stockTimeframe.name(), fvgType.name(), mainFvgLabel, highLowLabel, "FVGs:");
     }
