@@ -27,19 +27,9 @@ public class PriceMilestoneService {
 
     private final CacheService cacheService;
 
-    public List<String> tickersFor(List<String> priceMilestones, List<String> milestoneTypes, List<Double> cfdMargins) {
+    public List<String> tickersFor(List<PriceMilestone> priceMilestones, List<Double> cfdMargins) {
         List<String> tickers = new ArrayList<>();
-        for (int i = 0; i < priceMilestones.size(); i++) {
-            String priceMilestoneStr = priceMilestones.get(i);
-            String milestoneType = milestoneTypes.get(i);
-
-            PriceMilestone priceMilestone = switch (milestoneType) {
-                case "performance" -> PricePerformanceMilestone.valueOf(priceMilestoneStr);
-                case "premarket" -> PreMarketPriceMilestone.valueOf(priceMilestoneStr);
-                case "intraday-spike" -> IntradayPriceSpike.valueOf(priceMilestoneStr);
-                case "sma-milestone" -> SimpleMovingAverageMilestone.valueOf(priceMilestoneStr);
-                default -> throw new IllegalArgumentException("Invalid milestone type");
-            };
+        for (PriceMilestone priceMilestone : priceMilestones) {
             List<String> filteredTickers = cacheService.tickersFor(priceMilestone, cfdMargins);
 
             if (filteredTickers.isEmpty()) {
