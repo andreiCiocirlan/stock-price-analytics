@@ -15,10 +15,7 @@ import stock.price.analytics.repository.json.DailyPriceJSONRepository;
 import stock.price.analytics.repository.prices.highlow.HighLowForPeriodRepository;
 import stock.price.analytics.repository.prices.ohlc.DailyPriceRepository;
 import stock.price.analytics.repository.stocks.StockRepository;
-import stock.price.analytics.service.HighLowForPeriodService;
-import stock.price.analytics.service.PriceService;
-import stock.price.analytics.service.StockService;
-import stock.price.analytics.service.SyncPersistenceService;
+import stock.price.analytics.service.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -50,6 +47,7 @@ public class CacheInitializationService {
     private final StockService stockService;
     private final PriceService priceService;
     private final HighLowForPeriodService highLowForPeriodService;
+    private final PriceMilestoneService priceMilestoneService;
 
     @Transactional
     public void initAllCaches() {
@@ -64,7 +62,12 @@ public class CacheInitializationService {
         logTime(this::initLatestDailyPricesCache, "initialized latest daily prices cache");
         logTime(this::initDailyJSONPricesCache, "initialized daily JSON prices cache");
         logTime(this::initPreMarketDailyPrices, "initialized pre-market daily prices cache");
+        logTime(this::initTickersForPriceMilestoneCache, "initialized tickers for price milestone cache");
         cacheService.setLastUpdateTimestamp(System.nanoTime());
+    }
+
+    private void initTickersForPriceMilestoneCache() {
+        priceMilestoneService.cacheTickersForMilestones();
     }
 
     private void initHighLowExists() {
