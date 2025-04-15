@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import stock.price.analytics.service.DesktopNotificationService;
+import stock.price.analytics.service.WebSocketNotificationService;
 
 @Slf4j
 @RequestMapping("/desktop-notification")
@@ -14,11 +14,11 @@ import stock.price.analytics.service.DesktopNotificationService;
 @RequiredArgsConstructor
 public class DesktopNotificationRestController {
 
-    private final DesktopNotificationService desktopNotificationService;
+    private final WebSocketNotificationService webSocketNotificationService;
 
     @PostMapping("/send")
     public void sendDesktopNotification(@RequestParam String title, @RequestParam String message) {
-        desktopNotificationService.broadcastDesktopNotification(title, message);
+        webSocketNotificationService.broadcastDesktopNotification(title, message);
         log.info("Desktop notification {} sent with message: {}", title, message);
     }
 

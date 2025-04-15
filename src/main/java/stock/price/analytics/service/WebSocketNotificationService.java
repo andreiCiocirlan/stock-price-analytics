@@ -10,7 +10,7 @@ import java.util.Map;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DesktopNotificationService {
+public class WebSocketNotificationService {
 
     private final SimpMessagingTemplate template;
 

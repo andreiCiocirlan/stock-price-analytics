@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.cache.CacheService;
-import stock.price.analytics.service.DesktopNotificationService;
+import stock.price.analytics.service.WebSocketNotificationService;
 import stock.price.analytics.service.FairValueGapService;
 import stock.price.analytics.service.PriceGapService;
 
@@ -14,7 +14,7 @@ public class IntradayScheduler {
 
     private final FairValueGapService fairValueGapService;
     private final CacheService cacheService;
-    private final DesktopNotificationService desktopNotificationService;
+    private final WebSocketNotificationService webSocketNotificationService;
     private final PriceGapService priceGapService;
 
     // 10 15,35,55 9-16 * * MON-FRI

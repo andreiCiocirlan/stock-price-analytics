@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.service.DesktopNotificationService;
+import stock.price.analytics.service.WebSocketNotificationService;
 import stock.price.analytics.service.DiscrepancieService;
 import stock.price.analytics.service.PriceGapService;
 
@@ -22,7 +22,7 @@ public class EndOfDayScheduler {
 
     private final CacheService cacheService;
     private final DiscrepancieService discrepancieService;
-    private final DesktopNotificationService desktopNotificationService;
+    private final WebSocketNotificationService webSocketNotificationService;
     private final PriceGapService priceGapService;
 
     // 0 45 16 * * MON-FRI
@@ -41,7 +41,7 @@ public class EndOfDayScheduler {
         discrepancyChecks.forEach((discrepancyType, supplier) -> {
             List<?> discrepancies = supplier.get();
             if (!discrepancies.isEmpty()) {
-                desktopNotificationService.broadcastDesktopNotification(
+                webSocketNotificationService.broadcastDesktopNotification(
                         "Discrepancy Found",
                         discrepancyType + " Discrepancies found, check logs! Discrepancies count: " + discrepancies.size()
                 );
