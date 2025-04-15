@@ -7,10 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
-import stock.price.analytics.service.HighLowForPeriodService;
-import stock.price.analytics.service.PriceService;
-import stock.price.analytics.service.StockService;
-import stock.price.analytics.service.YahooQuoteService;
+import stock.price.analytics.service.*;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -32,6 +29,7 @@ public class YahooQuotesController {
     private final HighLowForPeriodService highLowForPeriodService;
     private final StockService stockService;
     private final CacheService cacheService;
+    private final PriceMilestoneService priceMilestoneService;
 
     @GetMapping("/import")
     @ResponseStatus(HttpStatus.OK)
@@ -45,6 +43,7 @@ public class YahooQuotesController {
             logTime(() -> stockService.updateStocksHighLowsAndOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks highs-lows 4w,52w,all-time and higher-timeframe OHLC prices");
         }
         cacheService.setLastUpdateTimestamp(System.nanoTime());
+        logTime(priceMilestoneService::cacheTickersForMilestones, "cached tickers for price milestones");
         long duration = (System.nanoTime() - start) / 1_000_000;
         log.info("Real-time import done in {} ms", duration);
         return dailyImportedPrices;

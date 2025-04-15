@@ -151,6 +151,7 @@ public class CacheService {
     }
 
     public void cachePriceMilestoneTickers(PriceMilestone priceMilestone, List<String> tickers) {
+        priceMilestoneCache.clearTickersByPriceMilestone(priceMilestone);
         priceMilestoneCache.cachePriceMilestoneTickers(priceMilestone, tickers);
     }
 
@@ -158,11 +159,11 @@ public class CacheService {
         return priceMilestoneCache.tickersByPriceMilestones();
     }
 
-    public List<String> tickersFor(PriceMilestone priceMilestone) {
-        return priceMilestoneCache.tickersFor(priceMilestone);
+    public List<String> tickersFor(PriceMilestone priceMilestone, List<Double> cfdMargins) {
+        return getCachedStocks().stream()
+                .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
+                .map(Stock::getTicker)
+                .filter(priceMilestoneCache.tickersFor(priceMilestone)::contains).toList();
     }
 
-    public void clearTickersByPriceMilestone() {
-        priceMilestoneCache.clearTickersByPriceMilestone();
-    }
 }
