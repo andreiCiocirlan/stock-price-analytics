@@ -60,22 +60,6 @@ public class DailyPrice extends AbstractPrice {
         return StockTimeframe.DAILY;
     }
 
-    // used for real-time import and update (create new daily price if dates do not match, update otherwise)
-    public DailyPrice updateFrom(DailyPrice newPrice) {
-        if (getDate().equals(newPrice.getDate())) {
-            // Update properties of the existing object
-            setOpen(newPrice.getOpen());
-            setHigh(newPrice.getHigh());
-            setLow(newPrice.getLow());
-            setClose(newPrice.getClose());
-            setPerformance(newPrice.getPerformance());
-            return this;
-        } else if (newPrice.getDate().isAfter(getDate())) { // newPrice must be newer compared to DB existing price (first daily import)
-            return newPrice;
-        }
-        return this; // sometimes DB price is newer, default to existing price
-    }
-
     public String getCompositeId() {
         return getTicker() + "_" + getDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
     }
