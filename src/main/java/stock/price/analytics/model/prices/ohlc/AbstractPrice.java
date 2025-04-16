@@ -109,9 +109,10 @@ public abstract class AbstractPrice implements BusinessEntity {
         double bodySize = Math.abs(close - open);
         double upperWick = high - Math.max(open, close);
         double lowerWick = Math.min(open, close) - low;
+        double totalRange = high - low;
 
         // Check for doji first
-        if (bodySize < (high - low) * 0.05) { // Assuming a doji if body is less than 5% of the total range
+        if (bodySize < (totalRange) * 0.05) { // Assuming a doji if body is less than 5% of the total range
             if (upperWick > lowerWick * 2) {
                 return CandleStickType.GRAVESTONE_DOJI;
             } else if (lowerWick > upperWick * 2) {
@@ -121,8 +122,23 @@ public abstract class AbstractPrice implements BusinessEntity {
             }
         }
 
-        if (upperWick > bodySize * 2 && bodySize > 0) {
-            return CandleStickType.INVERTED_HAMMER;
+        double epsilon = totalRange * 0.05; // small margin for hammer candles (closing at the lows/highs)
+        double bodyThreshold = totalRange * 0.3;  // body smaller than 30% of range
+        double wickThreshold = totalRange * 0.6;  // wick larger than 60% of range
+
+        // inverted hammer (small body, long upper wick, close at the lows)
+        if (lowerWick < bodyThreshold && upperWick > wickThreshold && bodySize < bodyThreshold) {
+            if (Math.abs(close - low) < epsilon || Math.abs(open - low) < epsilon) {
+                return CandleStickType.INVERTED_HAMMER;
+            }
+        }
+
+        // hammer (small body, long lower wick, close at the highs)
+        if (upperWick < bodyThreshold && lowerWick > 2 * bodySize && bodySize < bodyThreshold) {
+            // close at the lows, within small margin
+            if (Math.abs(close - high) < epsilon || Math.abs(open - high) < epsilon) {
+                return CandleStickType.HAMMER;
+            }
         }
 
         return CandleStickType.ANY;
