@@ -125,7 +125,7 @@ public abstract class AbstractPrice implements BusinessEntity {
             return CandleStickType.INVERTED_HAMMER;
         }
 
-        return CandleStickType.NONE;
+        return CandleStickType.ANY;
     }
 
     @Override
