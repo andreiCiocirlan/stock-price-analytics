@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
 import stock.price.analytics.model.BusinessEntity;
+import stock.price.analytics.model.candlestick.CandleStickType;
 import stock.price.analytics.model.gaps.FairValueGap;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.stocks.Stock;
@@ -102,6 +103,29 @@ public abstract class AbstractPrice implements BusinessEntity {
             case QUARTERLY -> this.getStartDate().minusMonths(3);
             case YEARLY -> this.getStartDate().minusYears(1);
         }).isEqual(fvg.getDate());
+    }
+
+    public CandleStickType toCandleStickType() {
+        double bodySize = Math.abs(close - open);
+        double upperWick = high - Math.max(open, close);
+        double lowerWick = Math.min(open, close) - low;
+
+        // Check for doji first
+        if (bodySize < (high - low) * 0.05) { // Assuming a doji if body is less than 5% of the total range
+            if (upperWick > lowerWick * 2) {
+                return CandleStickType.GRAVESTONE_DOJI;
+            } else if (lowerWick > upperWick * 2) {
+                return CandleStickType.DRAGONFLY_DOJI;
+            } else {
+                return CandleStickType.DOJI;
+            }
+        }
+
+        if (upperWick > bodySize * 2 && bodySize > 0) {
+            return CandleStickType.INVERTED_HAMMER;
+        }
+
+        return CandleStickType.NONE;
     }
 
     @Override
