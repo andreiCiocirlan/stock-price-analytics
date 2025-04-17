@@ -26,7 +26,7 @@ public class PriceMilestoneService {
     private final CacheService cacheService;
 
     public List<String> tickersFor(List<PriceMilestone> priceMilestones, List<Double> cfdMargins, CandleStickType candleStickType) {
-        List<String> tickers = candleStickType != CandleStickType.ANY ? cacheService.getCandleStickType(candleStickType) : new ArrayList<>();
+        List<String> tickers = candleStickType != CandleStickType.ANY ? cacheService.tickersWith(candleStickType) : new ArrayList<>();
 
         for (PriceMilestone priceMilestone : priceMilestones) {
             List<String> filteredTickers = cacheService.tickersFor(priceMilestone, cfdMargins);
