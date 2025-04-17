@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.cache.CacheService;
+import stock.price.analytics.cache.model.PriceWithPrevClose;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
@@ -53,6 +54,11 @@ public class CacheController {
         return cacheService.htfPricesFor(StockTimeframe.valueOf(timeFrame)).stream()
                 .filter(p -> ticker == null || p.getTicker().equals(ticker))
                 .toList();
+    }
+
+    @GetMapping("/htf-prices-with-prev-close")
+    public List<PriceWithPrevClose> htfPricesWithPrevCloseFor(@RequestParam(required = false, value = "ticker") String ticker, @RequestParam("timeFrame") String timeFrame) {
+        return cacheService.htfPricesWithPrevCloseFor(List.of(ticker), StockTimeframe.valueOf(timeFrame));
     }
 
     @GetMapping("/new-high-lows")
