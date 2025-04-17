@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.model.PriceWithPrevClose;
+import stock.price.analytics.model.candlestick.CandleStickType;
 import stock.price.analytics.model.json.DailyPriceJSON;
 import stock.price.analytics.model.prices.PriceMilestone;
 import stock.price.analytics.model.prices.enums.NewHighLowMilestone;
@@ -167,4 +168,10 @@ public class CacheService {
                 .filter(priceMilestoneCache.tickersFor(priceMilestone)::contains).toList();
     }
 
+    public List<String> getCandleStickType(CandleStickType candleStickType) {
+        return getCachedDailyPrices(REGULAR).stream()
+                .filter(dp -> dp.toCandleStickType() == candleStickType)
+                .map(DailyPrice::getTicker)
+                .toList();
+    }
 }
