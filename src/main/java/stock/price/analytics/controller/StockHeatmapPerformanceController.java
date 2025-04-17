@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import stock.price.analytics.controller.dto.StockHeatmapRequest;
 import stock.price.analytics.controller.dto.StockPerformanceDTO;
+import stock.price.analytics.model.candlestick.CandleStickType;
 import stock.price.analytics.model.prices.enums.*;
 import stock.price.analytics.service.PriceMilestoneService;
 import stock.price.analytics.service.StockHeatmapPerformanceService;
@@ -32,8 +33,8 @@ public class StockHeatmapPerformanceController {
     public List<StockPerformanceDTO> getStockPerformance(@RequestBody StockHeatmapRequest request) {
         StockTimeframe stockTimeframe = ("undefined".equals(request.getTimeFrame())) ? StockTimeframe.MONTHLY : StockTimeframe.valueOf(request.getTimeFrame());
         List<String> tickers = emptyList();
-        if (!request.getMilestoneTypes().isEmpty()) {
-            tickers = priceMilestoneService.tickersFor(request.priceMilestones(), request.getCfdMargins());
+        if (!request.getMilestoneTypes().isEmpty() || request.getCandleStickType() != CandleStickType.ANY) {
+            tickers = priceMilestoneService.tickersFor(request.priceMilestones(), request.getCfdMargins(), request.getCandleStickType());
 
             if (tickers.isEmpty()) {
                 return emptyList();

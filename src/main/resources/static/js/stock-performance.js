@@ -68,7 +68,7 @@ function updateStockPerformanceChartCurrentTimeframe() {
 function updateStockPerformanceChart(timeFrame) {
     const positivePerfFirst = document.getElementById('positivePerfFirst').checked || false;
     const cfdMarginValues = document.getElementById('cfdMarginValues').value === '' ? [] : document.getElementById('cfdMarginValues').value.split(',');
-    const priceMilestone = document.getElementById('priceMilestone');
+    const stockFilters = document.getElementById('stock-filters');
     const marketState = getMarketState();
 
     if (timeFrame == undefined) {
@@ -84,8 +84,9 @@ function updateStockPerformanceChart(timeFrame) {
         cfdMargins: cfdMarginValues
     };
 
-    if (priceMilestone) {
-        const dropdowns = priceMilestone.querySelectorAll('select[milestone-type]');
+    if (stockFilters) {
+        const dropdownsMilestone = stockFilters.querySelectorAll('select[milestone-type]');
+        const dropdownCandleStick = stockFilters.querySelector('select[candlestick-type]');
 
         const typeMap = {
             'pre-market': 'premarket',
@@ -100,7 +101,7 @@ function updateStockPerformanceChart(timeFrame) {
         const priceMilestones = [];
         const milestoneTypes = [];
 
-        dropdowns.forEach(dropdown => {
+        dropdownsMilestone.forEach(dropdown => {
             const selectedValue = dropdown.value;
             if (selectedValue !== "ANY") {
                 priceMilestones.push(selectedValue);
@@ -109,6 +110,7 @@ function updateStockPerformanceChart(timeFrame) {
         });
         requestBody.priceMilestones = priceMilestones;
         requestBody.milestoneTypes = milestoneTypes;
+        requestBody.candleStickType = dropdownCandleStick.value;
     }
 
     fetch('/stock-performance-json', {

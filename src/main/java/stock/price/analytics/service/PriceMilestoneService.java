@@ -3,6 +3,7 @@ package stock.price.analytics.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
+import stock.price.analytics.model.candlestick.CandleStickType;
 import stock.price.analytics.model.json.DailyPriceJSON;
 import stock.price.analytics.model.prices.PriceMilestone;
 import stock.price.analytics.model.prices.enums.*;
@@ -24,8 +25,9 @@ public class PriceMilestoneService {
 
     private final CacheService cacheService;
 
-    public List<String> tickersFor(List<PriceMilestone> priceMilestones, List<Double> cfdMargins) {
-        List<String> tickers = new ArrayList<>();
+    public List<String> tickersFor(List<PriceMilestone> priceMilestones, List<Double> cfdMargins, CandleStickType candleStickType) {
+        List<String> tickers = candleStickType != CandleStickType.ANY ? cacheService.getCandleStickType(candleStickType) : new ArrayList<>();
+
         for (PriceMilestone priceMilestone : priceMilestones) {
             List<String> filteredTickers = cacheService.tickersFor(priceMilestone, cfdMargins);
 

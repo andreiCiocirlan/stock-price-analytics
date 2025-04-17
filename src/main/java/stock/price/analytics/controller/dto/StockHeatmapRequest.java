@@ -3,6 +3,7 @@ package stock.price.analytics.controller.dto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import stock.price.analytics.model.candlestick.CandleStickType;
 import stock.price.analytics.model.prices.PriceMilestone;
 import stock.price.analytics.model.prices.enums.*;
 import stock.price.analytics.model.stocks.enums.MarketState;
@@ -21,6 +22,7 @@ public class StockHeatmapRequest {
     private List<String> priceMilestones;
     private List<String> milestoneTypes;
     private MarketState marketState;
+    private CandleStickType candleStickType;
 
     public List<PriceMilestone> priceMilestones() {
         List<PriceMilestone> priceMilestones = new ArrayList<>();
