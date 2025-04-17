@@ -15,16 +15,11 @@ import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
 @Component
 class HigherTimeframePricesCache {
 
-    private final Map<String, PriceWithPrevClose> weeklyPricesWithPrevCloseByTicker = new HashMap<>();
-    private final Map<String, PriceWithPrevClose> monthlyPricesWithPrevCloseByTicker = new HashMap<>();
-    private final Map<String, PriceWithPrevClose> quarterlyPricesWithPrevCloseByTicker = new HashMap<>();
-    private final Map<String, PriceWithPrevClose> yearlyPricesWithPrevCloseByTicker = new HashMap<>();
-
     private final Map<StockTimeframe, Map<String, PriceWithPrevClose>> pricesWithPrevCloseByTimeframe = Map.of(
-            WEEKLY, weeklyPricesWithPrevCloseByTicker,
-            MONTHLY, monthlyPricesWithPrevCloseByTicker,
-            QUARTERLY, quarterlyPricesWithPrevCloseByTicker,
-            YEARLY, yearlyPricesWithPrevCloseByTicker
+            WEEKLY, new HashMap<>(),
+            MONTHLY, new HashMap<>(),
+            QUARTERLY, new HashMap<>(),
+            YEARLY, new HashMap<>()
     );
 
     void addPricesWithPrevClose(List<PriceWithPrevClose> pricesWithPrevClose, StockTimeframe timeframe) {
