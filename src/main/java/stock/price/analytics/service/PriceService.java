@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.cache.model.*;
-import stock.price.analytics.controller.dto.CandleWithDateDTO;
+import stock.price.analytics.model.dto.CandleWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.repository.prices.ohlc.*;

@@ -1,4 +1,4 @@
-package stock.price.analytics.controller.dto;
+package stock.price.analytics.model.dto;
 
 
 import lombok.extern.slf4j.Slf4j;

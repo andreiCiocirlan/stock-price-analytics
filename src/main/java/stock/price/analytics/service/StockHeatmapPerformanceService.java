@@ -3,7 +3,7 @@ package stock.price.analytics.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
-import stock.price.analytics.controller.dto.StockPerformanceDTO;
+import stock.price.analytics.model.dto.StockPerformanceDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.model.stocks.enums.MarketState;
