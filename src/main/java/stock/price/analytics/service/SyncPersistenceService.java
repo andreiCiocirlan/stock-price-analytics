@@ -21,7 +21,7 @@ public class SyncPersistenceService {
         try {
             partitionAndSave(entities, repository);
         } catch (Exception e) {
-            log.error("Error saving entities asynchronously", e);
+            log.error("Error saving entities synchronously", e);
         }
     }
 
@@ -29,7 +29,7 @@ public class SyncPersistenceService {
         try {
             logTime(() -> partitionAndSave(entities, repository), functionName);
         } catch (Exception e) {
-            log.error("Error saving entities asynchronously", e);
+            log.error("Error saving entities synchronously", e);
         }
     }
 
@@ -38,7 +38,7 @@ public class SyncPersistenceService {
             partitionAndSave(entities, repository);
             log.info("Saved {} rows of type: {} ", entities.size(), entities.getFirst().getClass().getName());
         } catch (Exception e) {
-            log.error("Error saving entities asynchronously", e);
+            log.error("Error saving entities synchronously", e);
         }
     }
 
