@@ -157,10 +157,6 @@ public class CacheService {
         priceMilestoneCache.cachePriceMilestoneTickers(priceMilestone, tickers);
     }
 
-    public Map<PriceMilestone, List<String>> tickersByPriceMilestones() {
-        return priceMilestoneCache.tickersByPriceMilestones();
-    }
-
     public List<String> tickersFor(PriceMilestone priceMilestone, List<Double> cfdMargins) {
         return getCachedStocks().stream()
                 .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
