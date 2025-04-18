@@ -43,7 +43,7 @@ public class PriceGapService {
         String dateTruncPeriod = timeframe.toDateTruncPeriod();
         String interval = timeframe.toInterval();
         String intervalPeriod = timeframe.toIntervalPeriod();
-        int lookBackCount = timeframe == StockTimeframe.DAILY && priceService.isFirstImportFor(StockTimeframe.WEEKLY) ? 3 : 1;
+        int lookBackCount = timeframe == StockTimeframe.DAILY && priceService.isFirstImportDoneFor(StockTimeframe.WEEKLY) ? 3 : 1;
         if (allHistoricalData) {
             lookBackCount = switch (timeframe) {
                 case DAILY -> 1000;

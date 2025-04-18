@@ -52,7 +52,7 @@ public class EndOfDayScheduler {
 
         // update opening prices for first import of the week, month, quarter, year
         for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
-            if (priceService.isFirstImportFor(timeframe)) {
+            if (priceService.isFirstImportDoneFor(timeframe)) {
                 if (discrepancyChecks.containsKey("Weekly Opening Price")) {
                     log.info("Updating {} opening prices for stocks, OHLC tables", timeframe);
                     discrepancieService.updateHTFOpeningPricesDiscrepancyFor(timeframe);
