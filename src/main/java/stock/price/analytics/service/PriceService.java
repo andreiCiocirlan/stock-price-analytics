@@ -111,11 +111,21 @@ public class PriceService {
         });
     }
 
+    public boolean isFirstImportDoneFor(StockTimeframe timeframe) {
+        return checkImportStatusFor(timeframe, false);
+    }
+
     public boolean isFirstImportFor(StockTimeframe timeframe) {
+        return checkImportStatusFor(timeframe, true);
+    }
+
+    // checkFirstImport false -> first import not done for timeframe
+    // checkFirstImport true -> first import done for timeframe
+    private boolean checkImportStatusFor(StockTimeframe timeframe, boolean checkFirstImport) {
         String timeframePeriod = timeframe.toDateTruncPeriod();
         String query = STR."""
                 SELECT
-                    COUNT(*) = 0
+                    COUNT(*) = \{checkFirstImport ? "0" : "1"}
                 FROM
                     daily_prices
                 WHERE
