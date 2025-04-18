@@ -30,8 +30,8 @@ public class StockHeatmapRequest {
             String priceMilestoneStr = this.getPriceMilestones().get(i);
             String milestoneType = this.getMilestoneTypes().get(i);
             priceMilestones.add(switch (milestoneType) {
-                case "performance" ->
-                        priceMilestoneStr.startsWith("NEW") ? NewHighLowMilestone.valueOf(priceMilestoneStr) : PricePerformanceMilestone.valueOf(priceMilestoneStr);
+                case "performance" -> PricePerformanceMilestone.valueOf(priceMilestoneStr);
+                case "new-high-low" -> NewHighLowMilestone.valueOf(priceMilestoneStr);
                 case "premarket" -> PreMarketPriceMilestone.valueOf(priceMilestoneStr);
                 case "intraday-spike" -> IntradayPriceSpike.valueOf(priceMilestoneStr);
                 case "sma-milestone" -> SimpleMovingAverageMilestone.valueOf(priceMilestoneStr);

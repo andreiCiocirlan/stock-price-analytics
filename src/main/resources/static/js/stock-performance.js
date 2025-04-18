@@ -85,7 +85,7 @@ function updateStockPerformanceChart(timeFrame) {
     };
 
     if (stockFilters) {
-        const dropdownsMilestone = stockFilters.querySelectorAll('select[milestone-type]');
+        const dropdownsMilestone = stockFilters.querySelectorAll('select');
         const dropdownCandleStick = stockFilters.querySelector('select[candlestick-type]');
 
         const typeMap = {
@@ -94,6 +94,7 @@ function updateStockPerformanceChart(timeFrame) {
             'all-time': 'performance',
             '52-week': 'performance',
             '4-week': 'performance',
+            'new-hl': 'new-high-low',
             'sma-200': 'sma-milestone',
             'sma-50': 'sma-milestone'
         };
@@ -104,8 +105,12 @@ function updateStockPerformanceChart(timeFrame) {
         dropdownsMilestone.forEach(dropdown => {
             const selectedValue = dropdown.value;
             if (selectedValue !== "ANY") {
-                priceMilestones.push(selectedValue);
-                milestoneTypes.push(typeMap[dropdown.getAttribute('milestone-type')]);
+                const selectedOption = dropdown.options[dropdown.selectedIndex];
+                const milestoneType = selectedOption.getAttribute('milestone-type');
+                if (milestoneType) { // only process if milestone-type attribute is present
+                    priceMilestones.push(selectedOption.value);
+                    milestoneTypes.push(typeMap[milestoneType]);
+                }
             }
         });
         requestBody.priceMilestones = priceMilestones;
