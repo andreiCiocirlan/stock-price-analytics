@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.candlestick.CandleStickType;
+import stock.price.analytics.model.dto.StockHeatmapRequest;
 import stock.price.analytics.model.json.DailyPriceJSON;
 import stock.price.analytics.model.prices.PriceMilestone;
 import stock.price.analytics.model.prices.enums.*;
@@ -25,11 +26,11 @@ public class PriceMilestoneService {
 
     private final CacheService cacheService;
 
-    public List<String> tickersFor(List<PriceMilestone> priceMilestones, List<Double> cfdMargins, CandleStickType candleStickType) {
-        List<String> tickers = candleStickType != CandleStickType.ANY ? cacheService.tickersWith(candleStickType) : new ArrayList<>();
+    public List<String> tickersFor(StockHeatmapRequest request) {
+        List<String> tickers = request.getCandleStickType() != CandleStickType.ANY ? cacheService.tickersWith(request.getCandleStickType()) : new ArrayList<>();
 
-        for (PriceMilestone priceMilestone : priceMilestones) {
-            List<String> filteredTickers = cacheService.tickersFor(priceMilestone, cfdMargins);
+        for (PriceMilestone priceMilestone : request.priceMilestones()) {
+            List<String> filteredTickers = cacheService.tickersFor(priceMilestone, request.getCfdMargins());
 
             if (filteredTickers.isEmpty()) {
                 return Collections.emptyList();
