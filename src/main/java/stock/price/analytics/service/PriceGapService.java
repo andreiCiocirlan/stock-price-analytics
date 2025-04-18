@@ -41,6 +41,8 @@ public class PriceGapService {
         String dbTable = timeframe.dbTableOHLC();
         String dateColumn = timeframe == StockTimeframe.DAILY ? "date" : "start_date";
         String dateTruncPeriod = timeframe.toDateTruncPeriod();
+        String interval = timeframe.toInterval();
+        String intervalPeriod = timeframe.toIntervalPeriod();
         int lookBackCount = timeframe == StockTimeframe.DAILY && priceService.isFirstImportFor(StockTimeframe.WEEKLY) ? 3 : 1;
         if (allHistoricalData) {
             lookBackCount = switch (timeframe) {
@@ -54,7 +56,7 @@ public class PriceGapService {
 
         String query = STR."""
             WITH max_date_cte AS (
-                select date_trunc('\{dateTruncPeriod}', (select max(last_updated) from stocks)) - INTERVAL '1 \{dateTruncPeriod}' as max_date
+                select date_trunc('\{dateTruncPeriod}', (select max(last_updated) from stocks)) - INTERVAL '\{interval}' as max_date
             ),
             ranked_prices AS (
                 SELECT
@@ -65,7 +67,7 @@ public class PriceGapService {
                 FROM \{dbTable}
                 WHERE ticker in (\{tickersFormatted})
             	    AND ticker in (select ticker from stocks where cfd_margin in (0.2, 0.25, 0.33))
-                    AND \{dateColumn} between CURRENT_DATE - INTERVAL '\{lookBackCount} \{dateTruncPeriod}' and (SELECT max_date from max_date_cte)
+                    AND \{dateColumn} between CURRENT_DATE - INTERVAL '\{lookBackCount} \{intervalPeriod}' and (SELECT max_date from max_date_cte)
             ),
             unfilled_gaps AS (
                 SELECT
