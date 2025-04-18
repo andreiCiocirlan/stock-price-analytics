@@ -115,10 +115,7 @@ public class PriceService {
         String timeframePeriod = timeframe.toDateTruncPeriod();
         String query = STR."""
                 SELECT
-                    CASE
-                        WHEN COUNT(*) = 0 THEN TRUE
-                        ELSE FALSE
-                    END AS result
+                    COUNT(*) = 0
                 FROM
                     daily_prices
                 WHERE
