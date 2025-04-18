@@ -6,7 +6,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.repository.gaps.PriceGapRepository;
 
@@ -19,7 +18,7 @@ import java.util.stream.Collectors;
 public class PriceGapService {
 
     private final PriceGapRepository priceGapRepository;
-    private final CacheService cacheService;
+    private final PriceService priceService;
 
     @PersistenceContext
     private final EntityManager entityManager;
@@ -43,7 +42,7 @@ public class PriceGapService {
         String dbTable = timeframe.dbTableOHLC();
         String dateColumn = timeframe == StockTimeframe.DAILY ? "date" : "start_date";
         String dateTruncPeriod = timeframe.toDateTruncPeriod();
-        int lookBackCount = timeframe == StockTimeframe.DAILY && cacheService.isFirstImportFor(StockTimeframe.WEEKLY) ? 3 : 1;
+        int lookBackCount = timeframe == StockTimeframe.DAILY && priceService.isFirstImportFor(StockTimeframe.WEEKLY) ? 3 : 1;
         if (allHistoricalData) {
             lookBackCount = switch (timeframe) {
                 case DAILY -> 1000;
