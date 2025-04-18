@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
+import stock.price.analytics.service.PriceService;
 import stock.price.analytics.service.WebSocketNotificationService;
 import stock.price.analytics.service.DiscrepancieService;
 import stock.price.analytics.service.PriceGapService;
@@ -20,6 +21,7 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class EndOfDayScheduler {
 
+    private final PriceService priceService;
     private final CacheService cacheService;
     private final DiscrepancieService discrepancieService;
     private final WebSocketNotificationService webSocketNotificationService;
@@ -50,7 +52,7 @@ public class EndOfDayScheduler {
 
         // update opening prices for first import of the week, month, quarter, year
         for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
-            if (cacheService.isFirstImportFor(timeframe)) {
+            if (priceService.isFirstImportFor(timeframe)) {
                 if (discrepancyChecks.containsKey("Weekly Opening Price")) {
                     log.info("Updating {} opening prices for stocks, OHLC tables", timeframe);
                     discrepancieService.updateHTFOpeningPricesDiscrepancyFor(timeframe);
