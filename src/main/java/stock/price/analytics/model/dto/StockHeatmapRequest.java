@@ -40,4 +40,8 @@ public class StockHeatmapRequest {
         }
         return priceMilestones;
     }
+
+    public boolean hasMilestonesOrCandlestickFilters() {
+        return !this.getMilestoneTypes().isEmpty() || this.getCandleStickType() != CandleStickType.ANY;
+    }
 }
