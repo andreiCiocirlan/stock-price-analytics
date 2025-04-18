@@ -52,8 +52,10 @@ public class EndOfDayScheduler {
         for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
             if (cacheService.isFirstImportFor(timeframe)) {
                 log.info("Updating {} opening prices for stocks, OHLC tables", timeframe);
-                discrepancieService.updateHTFOpeningPricesDiscrepancyFor(timeframe);
-                discrepancieService.updateStocksWithOpeningPriceDiscrepancyFor(timeframe);
+                if (discrepancyChecks.containsKey("Weekly Opening Price")) {
+                    discrepancieService.updateHTFOpeningPricesDiscrepancyFor(timeframe);
+                    discrepancieService.updateStocksWithOpeningPriceDiscrepancyFor(timeframe);
+                }
                 priceGapService.savePriceGapsTodayFor(cacheService.getCachedTickers(), timeframe);
             }
         }
