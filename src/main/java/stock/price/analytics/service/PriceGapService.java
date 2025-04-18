@@ -25,9 +25,8 @@ public class PriceGapService {
 
     @Transactional
     public void saveAllPriceGapsFor(List<String> tickers) {
-        boolean allHistoricalData = true;
         for (StockTimeframe timeframe : StockTimeframe.values()) {
-            savePriceGapsFor(tickers, timeframe, allHistoricalData);
+            savePriceGapsFor(tickers, timeframe, true);
         }
     }
 
