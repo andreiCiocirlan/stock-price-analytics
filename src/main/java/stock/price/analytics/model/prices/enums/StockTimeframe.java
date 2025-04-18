@@ -40,6 +40,25 @@ public enum StockTimeframe {
         };
     }
 
+    public String toIntervalPeriod() {
+        return switch (this) {
+            case DAILY -> "DAY";
+            case WEEKLY -> "WEEK";
+            case MONTHLY, QUARTERLY -> "MONTH";
+            case YEARLY -> "YEAR";
+        };
+    }
+
+    public String toInterval() {
+        return switch (this) {
+            case DAILY -> "1 DAY";
+            case WEEKLY -> "1 WEEK";
+            case MONTHLY -> "1 MONTH";
+            case QUARTERLY -> "3 MONTH";
+            case YEARLY -> "1 YEAR";
+        };
+    }
+
     public String toSQLInterval() {
         return switch (this) {
             case DAILY -> "2 DAY";
