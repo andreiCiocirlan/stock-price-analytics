@@ -88,7 +88,7 @@ function updateStockPerformanceChart(timeFrame) {
         const dropdownsMilestone = stockFilters.querySelectorAll('select');
         const dropdownCandleStick = stockFilters.querySelector('select[candlestick-type]');
 
-        const typeMap = {
+        const milestoneTypeMap = {
             'pre-market': 'premarket',
             'intraday-spike': 'intraday-spike',
             'all-time': 'performance',
@@ -106,10 +106,10 @@ function updateStockPerformanceChart(timeFrame) {
             const selectedValue = dropdown.value;
             if (selectedValue !== "ANY") {
                 const selectedOption = dropdown.options[dropdown.selectedIndex];
-                const milestoneType = selectedOption.getAttribute('milestone-type');
-                if (milestoneType) { // only process if milestone-type attribute is present
+                const dataType = selectedOption.getAttribute('data-type');
+                if (dataType) { // only process if milestone-type attribute is present
                     priceMilestones.push(selectedOption.value);
-                    milestoneTypes.push(typeMap[milestoneType]);
+                    milestoneTypes.push(milestoneTypeMap[dataType]);
                 }
             }
         });

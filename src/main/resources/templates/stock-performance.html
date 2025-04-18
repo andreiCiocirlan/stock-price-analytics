@@ -45,24 +45,24 @@
                     <label for="intraday-spike" class="dropdown-label">Intraday Spike</label>
                     <select class="form-control" id="intraday-spike" onchange="dispatchTimeFrameChangeEvent()">
                         <option value="ANY">Any</option>
-                        <option value="INTRADAY_SPIKE_UP" milestone-type="intraday-spike">Spike Up</option>
-                        <option value="INTRADAY_SPIKE_DOWN" milestone-type="intraday-spike">Spike Down</option>
+                        <option value="INTRADAY_SPIKE_UP" data-type="intraday-spike">Spike Up</option>
+                        <option value="INTRADAY_SPIKE_DOWN" data-type="intraday-spike">Spike Down</option>
                     </select>
                 </div>
                 <div id="pre-market-dropdown" class="form-group">
                     <label for="pre-market" class="dropdown-label">Pre-market</label>
                     <select class="form-control" id="pre-market" onchange="dispatchTimeFrameChangeEvent()">
                         <option value="ANY">Any</option>
-                        <option value="GAP_UP" milestone-type="pre-market">GAP UP</option>
-                        <option value="GAP_DOWN" milestone-type="pre-market">GAP DOWN</option>
-                        <option value="GAP_UP_10_PERCENT" milestone-type="pre-market">GAP UP 10%</option>
-                        <option value="GAP_DOWN_10_PERCENT" milestone-type="pre-market">GAP DOWN 10%</option>
-                        <option value="GAP_UP_AND_GO" milestone-type="pre-market">GAP UP & GO</option>
-                        <option value="GAP_DOWN_AND_GO" milestone-type="pre-market">GAP DOWN & GO</option>
-                        <option value="KICKING_CANDLE_UP" milestone-type="pre-market">KICKING CANDLE UP</option>
-                        <option value="KICKING_CANDLE_DOWN" milestone-type="pre-market">KICKING CANDLE DOWN</option>
-                        <option value="PRE_NEW_ALL_TIME_LOW" milestone-type="pre-market">PRE NEW ATL</option>
-                        <option value="PRE_NEW_ALL_TIME_HIGH" milestone-type="pre-market">PRE NEW ATH</option>
+                        <option value="GAP_UP" data-type="pre-market">GAP UP</option>
+                        <option value="GAP_DOWN" data-type="pre-market">GAP DOWN</option>
+                        <option value="GAP_UP_10_PERCENT" data-type="pre-market">GAP UP 10%</option>
+                        <option value="GAP_DOWN_10_PERCENT" data-type="pre-market">GAP DOWN 10%</option>
+                        <option value="GAP_UP_AND_GO" data-type="pre-market">GAP UP & GO</option>
+                        <option value="GAP_DOWN_AND_GO" data-type="pre-market">GAP DOWN & GO</option>
+                        <option value="KICKING_CANDLE_UP" data-type="pre-market">KICKING CANDLE UP</option>
+                        <option value="KICKING_CANDLE_DOWN" data-type="pre-market">KICKING CANDLE DOWN</option>
+                        <option value="PRE_NEW_ALL_TIME_LOW" data-type="pre-market">PRE NEW ATL</option>
+                        <option value="PRE_NEW_ALL_TIME_HIGH" data-type="pre-market">PRE NEW ATH</option>
                     </select>
                 </div>
             </div>
@@ -72,20 +72,20 @@
                     <label for="all-time" class="dropdown-label">All-Time High/Low</label>
                     <select class="form-control" id="all-time" onchange="dispatchTimeFrameChangeEvent()">
                         <option value="ANY">Any</option>
-                        <option value="NEW_ALL_TIME_HIGH" milestone-type="new-hl">New High</option>
-                        <option value="NEW_ALL_TIME_LOW" milestone-type="new-hl">New Low</option>
-                        <option value="HIGH_ALL_TIME_95" milestone-type="all-time">0-5% below High</option>
-                        <option value="HIGH_ALL_TIME_90" milestone-type="all-time">0-10% below High</option>
-                        <option value="LOW_ALL_TIME_95" milestone-type="all-time">0-5% above Low</option>
-                        <option value="LOW_ALL_TIME_90" milestone-type="all-time">0-10% above Low</option>
+                        <option value="NEW_ALL_TIME_HIGH" data-type="new-hl">New High</option>
+                        <option value="NEW_ALL_TIME_LOW" data-type="new-hl">New Low</option>
+                        <option value="HIGH_ALL_TIME_95" data-type="all-time">0-5% below High</option>
+                        <option value="HIGH_ALL_TIME_90" data-type="all-time">0-10% below High</option>
+                        <option value="LOW_ALL_TIME_95" data-type="all-time">0-5% above Low</option>
+                        <option value="LOW_ALL_TIME_90" data-type="all-time">0-10% above Low</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="sma-200" class="dropdown-label">200-Day SMA</label>
                     <select class="form-control" id="sma-200" onchange="dispatchTimeFrameChangeEvent()">
                         <option value="ANY">Any</option>
-                        <option value="ABOVE_200_SMA" milestone-type="sma-200">Above</option>
-                        <option value="BELOW_200_SMA" milestone-type="sma-200">Below</option>
+                        <option value="ABOVE_200_SMA" data-type="sma-200">Above</option>
+                        <option value="BELOW_200_SMA" data-type="sma-200">Below</option>
                     </select>
                 </div>
             </div>
@@ -95,20 +95,20 @@
                     <label for="52-week" class="dropdown-label">52-Week High/Low</label>
                     <select class="form-control" id="52-week" onchange="dispatchTimeFrameChangeEvent()">
                         <option value="ANY">Any</option>
-                        <option value="NEW_52W_HIGH" milestone-type="new-hl">New High</option>
-                        <option value="NEW_52W_LOW" milestone-type="new-hl">New Low</option>
-                        <option value="HIGH_52W_95" milestone-type="52-week">0-5% below High</option>
-                        <option value="HIGH_52W_90" milestone-type="52-week">0-10% below High</option>
-                        <option value="LOW_52W_95" milestone-type="52-week">0-5% above Low</option>
-                        <option value="LOW_52W_90" milestone-type="52-week">0-10% above Low</option>
+                        <option value="NEW_52W_HIGH" data-type="new-hl">New High</option>
+                        <option value="NEW_52W_LOW" data-type="new-hl">New Low</option>
+                        <option value="HIGH_52W_95" data-type="52-week">0-5% below High</option>
+                        <option value="HIGH_52W_90" data-type="52-week">0-10% below High</option>
+                        <option value="LOW_52W_95" data-type="52-week">0-5% above Low</option>
+                        <option value="LOW_52W_90" data-type="52-week">0-10% above Low</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="sma-50" class="dropdown-label">50-Day SMA</label>
                     <select class="form-control" id="sma-50" onchange="dispatchTimeFrameChangeEvent()">
                         <option value="ANY">Any</option>
-                        <option value="ABOVE_50_SMA" milestone-type="sma-50">Above</option>
-                        <option value="BELOW_50_SMA" milestone-type="sma-50">Below</option>
+                        <option value="ABOVE_50_SMA" data-type="sma-50">Above</option>
+                        <option value="BELOW_50_SMA" data-type="sma-50">Below</option>
                     </select>
                 </div>
             </div>
@@ -117,12 +117,12 @@
                     <label for="4-week" class="dropdown-label">4-Week High/Low</label>
                     <select class="form-control" id="4-week" onchange="dispatchTimeFrameChangeEvent()">
                         <option value="ANY">Any</option>
-                        <option value="NEW_4W_HIGH" milestone-type="new-hl">New High</option>
-                        <option value="NEW_4W_LOW" milestone-type="new-hl">New Low</option>
-                        <option value="HIGH_4W_95" milestone-type="4-week">0-5% below High</option>
-                        <option value="HIGH_4W_90" milestone-type="4-week">0-10% below High</option>
-                        <option value="LOW_4W_95" milestone-type="4-week">0-5% above Low</option>
-                        <option value="LOW_4W_90" milestone-type="4-week">0-10% above Low</option>
+                        <option value="NEW_4W_HIGH" data-type="new-hl">New High</option>
+                        <option value="NEW_4W_LOW" data-type="new-hl">New Low</option>
+                        <option value="HIGH_4W_95" data-type="4-week">0-5% below High</option>
+                        <option value="HIGH_4W_90" data-type="4-week">0-10% below High</option>
+                        <option value="LOW_4W_95" data-type="4-week">0-5% above Low</option>
+                        <option value="LOW_4W_90" data-type="4-week">0-10% above Low</option>
                     </select>
                 </div>
                 <div class="form-group">
