@@ -127,9 +127,9 @@ class HighLowPricesCache {
 
     List<? extends HighLowForPeriod> cacheForPricePerformanceMilestone(PricePerformanceMilestone pricePerformanceMilestone) {
         return new ArrayList<>(switch (pricePerformanceMilestone) {
-            case HIGH_4W_95, LOW_4W_95 -> highLow4wMap.values();
-            case HIGH_52W_95, LOW_52W_95 -> highLow52wMap.values();
-            case HIGH_ALL_TIME_95, LOW_ALL_TIME_95 -> highestLowestMap.values();
+            case HIGH_4W_95, LOW_4W_95, HIGH_4W_90, LOW_4W_90 -> highLow4wMap.values();
+            case HIGH_52W_95, LOW_52W_95, HIGH_52W_90, LOW_52W_90 -> highLow52wMap.values();
+            case HIGH_ALL_TIME_95, LOW_ALL_TIME_95, HIGH_ALL_TIME_90, LOW_ALL_TIME_90 -> highestLowestMap.values();
         });
     }
 }

@@ -151,6 +151,10 @@ public class PriceMilestoneService {
                     highLowForPeriod.getLow() != highLowForPeriod.getHigh() && (1 - (1 - (s.getClose() - highLowForPeriod.getLow()) / (highLowForPeriod.getHigh() - highLowForPeriod.getLow()))) > 0.95;
             case LOW_52W_95, LOW_4W_95, LOW_ALL_TIME_95 ->
                     highLowForPeriod.getLow() != highLowForPeriod.getHigh() && (1 - (s.getClose() - highLowForPeriod.getLow()) / (highLowForPeriod.getHigh() - highLowForPeriod.getLow())) > 0.95;
+            case HIGH_52W_90, HIGH_4W_90, HIGH_ALL_TIME_90 ->
+                    highLowForPeriod.getLow() != highLowForPeriod.getHigh() && (1 - (1 - (s.getClose() - highLowForPeriod.getLow()) / (highLowForPeriod.getHigh() - highLowForPeriod.getLow()))) > 0.90;
+            case LOW_52W_90, LOW_4W_90, LOW_ALL_TIME_90 ->
+                    highLowForPeriod.getLow() != highLowForPeriod.getHigh() && (1 - (s.getClose() - highLowForPeriod.getLow()) / (highLowForPeriod.getHigh() - highLowForPeriod.getLow())) > 0.90;
         };
     }
 

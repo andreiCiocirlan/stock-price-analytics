@@ -10,7 +10,13 @@ public enum PricePerformanceMilestone implements PriceMilestone {
     HIGH_ALL_TIME_95("performance"),
     LOW_52W_95("performance"),
     LOW_4W_95("performance"),
-    LOW_ALL_TIME_95("performance");
+    LOW_ALL_TIME_95("performance"),
+    HIGH_52W_90("performance"),
+    HIGH_4W_90("performance"),
+    HIGH_ALL_TIME_90("performance"),
+    LOW_52W_90("performance"),
+    LOW_4W_90("performance"),
+    LOW_ALL_TIME_90("performance");
 
     private final String type;
 
@@ -25,21 +31,25 @@ public enum PricePerformanceMilestone implements PriceMilestone {
 
     public static String timeframeFrom(PricePerformanceMilestone milestone) {
         return switch (milestone) {
-            case HIGH_52W_95, LOW_52W_95 -> "52w";
-            case HIGH_4W_95, LOW_4W_95 -> "4w";
-            case HIGH_ALL_TIME_95, LOW_ALL_TIME_95 -> "all-time";
+            case HIGH_52W_95, LOW_52W_95, HIGH_52W_90, LOW_52W_90 -> "52w";
+            case HIGH_4W_95, LOW_4W_95, HIGH_4W_90, LOW_4W_90 -> "4w";
+            case HIGH_ALL_TIME_95, LOW_ALL_TIME_95, HIGH_ALL_TIME_90, LOW_ALL_TIME_90 -> "all-time";
         };
     }
 
-    public static List<PricePerformanceMilestone> milestones95thPercentile() {
-        return List.of(HIGH_52W_95, HIGH_4W_95, HIGH_ALL_TIME_95, LOW_52W_95, LOW_4W_95, LOW_ALL_TIME_95);
+    public boolean isLow95thPercentile() {
+        return List.of(LOW_52W_95, LOW_4W_95, LOW_ALL_TIME_95).contains(this);
     }
 
-    public static List<PricePerformanceMilestone> high95thPercentileValues() {
-        return List.of(HIGH_52W_95, HIGH_4W_95, HIGH_ALL_TIME_95);
+    public boolean isHigh95thPercentile() {
+        return List.of(HIGH_52W_95, HIGH_4W_95, HIGH_ALL_TIME_95).contains(this);
     }
 
-    public static List<PricePerformanceMilestone> low95thPercentileValues() {
-        return List.of(LOW_52W_95, LOW_4W_95, LOW_ALL_TIME_95);
+    public boolean is95thPercentileValue() {
+        return List.of(HIGH_52W_95, HIGH_4W_95, HIGH_ALL_TIME_95, LOW_52W_95, LOW_4W_95, LOW_ALL_TIME_95).contains(this);
+    }
+
+    public static List<PricePerformanceMilestone> highPercentileValues() {
+        return List.of(HIGH_52W_95, HIGH_4W_95, HIGH_ALL_TIME_95, HIGH_52W_90, HIGH_4W_90, HIGH_ALL_TIME_90);
     }
 }

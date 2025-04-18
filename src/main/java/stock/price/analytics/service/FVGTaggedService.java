@@ -28,19 +28,20 @@ public class FVGTaggedService {
     public Set<String> findTickersFVGsTaggedFor(StockTimeframe timeframe, FvgType fvgType, PricePerformanceMilestone pricePerformanceMilestone, String cfdMargins) {
         final String prefix = timeframe.stockPrefix();
         Pair<String, String> queryFields = switch (pricePerformanceMilestone) {
-            case HIGH_52W_95, LOW_52W_95 -> new MutablePair<>("low52w", "high52w");
-            case HIGH_4W_95, LOW_4W_95 -> new MutablePair<>("low4w", "high4w");
-            case HIGH_ALL_TIME_95, LOW_ALL_TIME_95 -> new MutablePair<>("lowest", "highest");
+            case HIGH_52W_95, LOW_52W_95, HIGH_52W_90, LOW_52W_90 -> new MutablePair<>("low52w", "high52w");
+            case HIGH_4W_95, LOW_4W_95, HIGH_4W_90, LOW_4W_90 -> new MutablePair<>("low4w", "high4w");
+            case HIGH_ALL_TIME_95, LOW_ALL_TIME_95, HIGH_ALL_TIME_90, LOW_ALL_TIME_90 -> new MutablePair<>("lowest", "highest");
         };
         String lowField = queryFields.getLeft();
         String highField = queryFields.getRight();
         String fvgTypeStr = fvgType.name();
 
         String highLowWhereClause;
-        if (PricePerformanceMilestone.high95thPercentileValues().contains(pricePerformanceMilestone)) {
-            highLowWhereClause = STR."AND s.\{lowField} <> s.\{highField} AND (1 - (1 - ((s.close - s.\{lowField}) / (s.\{highField} - s.\{lowField})))) > 0.95";
+        double percentage = pricePerformanceMilestone.is95thPercentileValue() ? 0.95 : 0.9;
+        if (PricePerformanceMilestone.highPercentileValues().contains(pricePerformanceMilestone)) {
+            highLowWhereClause = STR."AND s.\{lowField} <> s.\{highField} AND (1 - (1 - ((s.close - s.\{lowField}) / (s.\{highField} - s.\{lowField})))) > \{percentage}";
         } else {
-            highLowWhereClause = STR."AND s.\{lowField} <> s.\{highField} AND (1 - (s.close - s.\{lowField}) / (s.\{highField} - s.\{lowField})) > 0.95";
+            highLowWhereClause = STR."AND s.\{lowField} <> s.\{highField} AND (1 - (s.close - s.\{lowField}) / (s.\{highField} - s.\{lowField})) > \{percentage}";
         }
 
         String query = STR."""

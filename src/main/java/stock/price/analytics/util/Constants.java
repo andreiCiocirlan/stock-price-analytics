@@ -14,6 +14,9 @@ public class Constants {
     public static final String FVG_95TH_PERCENTILE_4W = "95% 4w";
     public static final String FVG_95TH_PERCENTILE_52W = "95% 52w";
     public static final String FVG_95TH_PERCENTILE_ALL_TIME = "95% All-Time";
+    public static final String FVG_90TH_PERCENTILE_4W = "90% 4w";
+    public static final String FVG_90TH_PERCENTILE_52W = "90% 52w";
+    public static final String FVG_90TH_PERCENTILE_ALL_TIME = "90% All-Time";
     public static final List<Double> CFD_MARGINS_5X = List.of(0.2);
     public static final List<Double> CFD_MARGINS_5X_4X = List.of(0.2, 0.25);
     public static final List<Double> CFD_MARGINS_5X_4X_3X = List.of(0.2, 0.25, 0.33);

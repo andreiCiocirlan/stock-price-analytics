@@ -268,7 +268,7 @@ public class FairValueGapService {
     public void logFVGsTagged95thPercentile(List<Double> cfdMargins) {
         String cfdMargins54 = cfdMargins.stream().map(cfdMargin -> STR."'\{cfdMargin}'").collect(Collectors.joining(", "));
         for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
-            for (PricePerformanceMilestone priceMilestone : milestones95thPercentile()) {
+            for (PricePerformanceMilestone priceMilestone : PricePerformanceMilestone.values()) {
                 for (FvgType fvgType : FvgType.values()) {
                     String fvgLabel = fvgLabelFrom(priceMilestone, fvgType, timeframe);
                     log.info("{}", fvgLabel + fvgTaggedService.findTickersFVGsTaggedFor(timeframe, fvgType, priceMilestone, cfdMargins54));
@@ -279,8 +279,8 @@ public class FairValueGapService {
 
     public String fvgLabelFrom(PricePerformanceMilestone pricePerformanceMilestone, FvgType fvgType, StockTimeframe stockTimeframe) {
         String highLowTimeframeCorrelation = timeframeFrom(pricePerformanceMilestone);
-        boolean isLow95thPercentile = low95thPercentileValues().contains(pricePerformanceMilestone);
-        boolean isHigh95thPercentile = high95thPercentileValues().contains(pricePerformanceMilestone);
+        boolean isLow95thPercentile = pricePerformanceMilestone.isLow95thPercentile();
+        boolean isHigh95thPercentile = pricePerformanceMilestone.isHigh95thPercentile();
         if (isLow95thPercentile && fvgType == BEARISH) {
             // price near lower 95th percentile AND Bearish FVG
             return String.join(" ", stockTimeframe.name(), "ANVIL", highLowTimeframeCorrelation, "FVGs:");
@@ -294,6 +294,9 @@ public class FairValueGapService {
             case HIGH_52W_95, LOW_52W_95 -> FVG_95TH_PERCENTILE_52W;
             case HIGH_4W_95, LOW_4W_95 -> FVG_95TH_PERCENTILE_4W;
             case HIGH_ALL_TIME_95, LOW_ALL_TIME_95 -> FVG_95TH_PERCENTILE_ALL_TIME;
+            case HIGH_52W_90, LOW_52W_90 -> FVG_90TH_PERCENTILE_52W;
+            case HIGH_4W_90, LOW_4W_90 -> FVG_90TH_PERCENTILE_4W;
+            case HIGH_ALL_TIME_90, LOW_ALL_TIME_90 -> FVG_90TH_PERCENTILE_ALL_TIME;
         };
         return String.join(" ", stockTimeframe.name(), fvgType.name(), mainFvgLabel, highLowLabel, "FVGs:");
     }
