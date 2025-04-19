@@ -27,15 +27,6 @@ public class StockService {
     private final AsyncPersistenceService asyncPersistenceService;
     private final SyncPersistenceService syncPersistenceService;
 
-    @Transactional
-    public void saveStocks(String tickers, boolean xtbStock, boolean shortSell, double cfdMargin) {
-        for (String ticker : tickers.split(",")) {
-            if (!cacheService.getStocksMap().containsKey(tickers)) { // only create new stock object if not already in DB
-                stockRepository.save(new Stock(ticker, xtbStock, shortSell, cfdMargin));
-            }
-        }
-    }
-
     private void updateStocksFromOHLCPrices(List<DailyPrice> dailyPrices, List<AbstractPrice> htfPrices, Set<Stock> stocksUpdated) {
         Map<String, Stock> stocksMap = cacheService.getStocksMap();
         // update from daily prices

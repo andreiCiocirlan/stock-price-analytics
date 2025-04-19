@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.client.YahooQuotesClient;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.highlow.HighLow4w;
@@ -22,6 +23,7 @@ import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.model.prices.ohlc.CandleOHLC;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
+import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.prices.highlow.HighLowForPeriodRepository;
 import stock.price.analytics.util.TradingDateUtil;
 
@@ -53,6 +55,7 @@ public class NewTickerService {
     private final PriceService priceService;
     private final PriceGapService priceGapService;
     private final FairValueGapService fairValueGapService;
+    private final CacheService cacheService;
     private final AsyncPersistenceService asyncPersistenceService;
     private final HighLowForPeriodRepository highLowForPeriodRepository;
     private String COOKIE;
@@ -72,7 +75,7 @@ public class NewTickerService {
     // import all data pertaining to the new tickers and create dailyPrices, htfPrices, stocks, highLowPrices etc.
     public void importAllDataFor(String tickers, Double cfdMargin, Boolean shortSell) {
         List<String> tickerList = Arrays.stream(tickers.split(",")).toList();
-        stockService.saveStocks(tickers, Boolean.TRUE, Boolean.TRUE.equals(shortSell), cfdMargin);
+        cacheService.addStocks(tickerList.stream().map(ticker -> new Stock(ticker, Boolean.TRUE, shortSell, cfdMargin)).toList());
         COOKIE = yahooQuotesClient.cookieFromFcYahoo();
         getYahooQuotesAndSaveJSONFileFor(tickers);
         List<DailyPrice> dailyPricesImported = getDailyPricesFor(tickerList);
