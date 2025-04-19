@@ -1,7 +1,5 @@
 package stock.price.analytics.util;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
 
@@ -17,7 +15,6 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Slf4j
 public class PricesUtil {
 
     public static List<AbstractPrice> getHigherTimeframePricesFor(List<DailyPrice> dailyPricesImported) {
