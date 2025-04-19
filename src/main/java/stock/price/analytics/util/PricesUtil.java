@@ -23,16 +23,9 @@ public class PricesUtil {
 
     public static List<AbstractPrice> getHigherTimeframePricesFor(List<DailyPrice> dailyPricesImported) {
         List<AbstractPrice> htfPrices = new ArrayList<>();
-        List<WeeklyPrice> weeklyPrices = htfPricesForTimeframe(dailyPricesImported, StockTimeframe.WEEKLY).stream().map(WeeklyPrice.class::cast).toList();
-        List<MonthlyPrice> monthlyPrices = htfPricesForTimeframe(dailyPricesImported, StockTimeframe.MONTHLY).stream().map(MonthlyPrice.class::cast).toList();
-        List<QuarterlyPrice> quarterlyPrices = htfPricesForTimeframe(dailyPricesImported, StockTimeframe.QUARTERLY).stream().map(QuarterlyPrice.class::cast).toList();
-        List<YearlyPrice> yearlyPrices = htfPricesForTimeframe(dailyPricesImported, StockTimeframe.YEARLY).stream().map(YearlyPrice.class::cast).toList();
-
-        htfPrices.addAll(weeklyPrices);
-        htfPrices.addAll(monthlyPrices);
-        htfPrices.addAll(quarterlyPrices);
-        htfPrices.addAll(yearlyPrices);
-
+        for (StockTimeframe higherTimeframe : StockTimeframe.higherTimeframes()) {
+            htfPrices.addAll(htfPricesForTimeframe(dailyPricesImported, higherTimeframe));
+        }
         return htfPrices;
     }
 
