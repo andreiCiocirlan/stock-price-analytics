@@ -12,6 +12,7 @@ import stock.price.analytics.service.PriceGapService;
 import stock.price.analytics.service.PriceService;
 import stock.price.analytics.service.WebSocketNotificationService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -32,6 +33,25 @@ public class EndOfDayScheduler {
     public void postProcessingEndOfDay() {
         log.info("EOD post-processing started");
 
+        Map<String, List<String>> discrepancies = checkDiscrepancies();
+
+        // update opening prices for first import of the week, month, quarter, year
+        StockTimeframe.higherTimeframes().stream()
+                .filter(priceService::isFirstImportDoneFor)
+                .forEach(timeframe -> {
+                    if (!discrepancies.get("Weekly Opening Price").isEmpty()) {
+                        log.info("Updating {} opening prices for stocks, OHLC tables", timeframe);
+                        discrepancieService.updateHTFOpeningPricesDiscrepancyFor(timeframe);
+                        discrepancieService.updateStocksWithOpeningPriceDiscrepancyFor(timeframe);
+                    }
+                    priceGapService.savePriceGapsTodayFor(cacheService.getCachedTickers(), timeframe);
+                });
+
+        // save daily price gaps at EOD
+        priceGapService.savePriceGapsTodayFor(cacheService.getCachedTickers(), StockTimeframe.DAILY);
+    }
+
+    private Map<String, List<String>> checkDiscrepancies() {
         Map<String, Supplier<List<String>>> discrepancyChecks = Map.of(
                 "Stocks Opening Price", discrepancieService::findStocksOpeningPriceDiscrepancies,
                 "Stocks High-Low/HTF", discrepancieService::findStocksHighLowsOrHTFDiscrepancies,
@@ -40,29 +60,19 @@ public class EndOfDayScheduler {
                 "Weekly High-Low Price", discrepancieService::findWeeklyHighLowPriceDiscrepancies
         );
 
+        Map<String, List<String>> discrepanciesMap = new HashMap<>();
         discrepancyChecks.forEach((discrepancyType, supplier) -> {
-            List<?> discrepancies = supplier.get();
+            List<String> discrepancies = supplier.get();
+            discrepanciesMap.put(discrepancyType, discrepancies);
             if (!discrepancies.isEmpty()) {
                 webSocketNotificationService.broadcastDesktopNotification(
                         "Discrepancy Found",
-                        discrepancyType + " Discrepancies found, check logs! Discrepancies count: " + discrepancies.size()
+                        discrepancyType + " Discrepancies found, check logs! Count: " + discrepancies.size()
                 );
             }
         });
 
-        // update opening prices for first import of the week, month, quarter, year
-        for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
-            if (priceService.isFirstImportDoneFor(timeframe)) {
-                if (!discrepancyChecks.get("Weekly Opening Price").get().isEmpty()) {
-                    log.info("Updating {} opening prices for stocks, OHLC tables", timeframe);
-                    discrepancieService.updateHTFOpeningPricesDiscrepancyFor(timeframe);
-                    discrepancieService.updateStocksWithOpeningPriceDiscrepancyFor(timeframe);
-                }
-                priceGapService.savePriceGapsTodayFor(cacheService.getCachedTickers(), timeframe);
-            }
-        }
-        // save daily price gaps at EOD
-        priceGapService.savePriceGapsTodayFor(cacheService.getCachedTickers(), StockTimeframe.DAILY);
+        return discrepanciesMap;
     }
 
 }
