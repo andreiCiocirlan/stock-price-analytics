@@ -11,6 +11,7 @@ import stock.price.analytics.model.prices.enums.*;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.Stock;
+import stock.price.analytics.util.PriceMilestoneFactory;
 
 import java.util.*;
 import java.util.function.Function;
@@ -54,7 +55,7 @@ public class PriceMilestoneService {
     public Map<PriceMilestone, List<String>> findTickersForMilestones(List<PriceMilestone> priceMilestones, List<Double> cfdMargins) {
         Map<PriceMilestone, List<String>> tickersByPriceMilestones = new HashMap<>();
         priceMilestones.forEach(priceMilestone -> {
-            List<String> tickers = findTickersForMilestone(priceMilestone.name(), priceMilestone.getType(), cfdMargins);
+            List<String> tickers = findTickersForMilestone(priceMilestone, cfdMargins);
             if (!tickers.isEmpty()) {
                 tickersByPriceMilestones.put(priceMilestone, tickers);
             }
@@ -62,17 +63,13 @@ public class PriceMilestoneService {
         return tickersByPriceMilestones;
     }
 
-    public List<String> findTickersForMilestone(String priceMilestone, String milestoneType, List<Double> cfdMargins) {
-        if (isInvalidTypeMapping(priceMilestone, milestoneType)) {
-            throw new IllegalArgumentException("Invalid milestone type combination");
-        }
-
-        return switch (milestoneType) {
-            case "new-high-low" -> filterByNewHighLowMilestone(NewHighLowMilestone.valueOf(priceMilestone), cfdMargins);
-            case "performance" -> filterByPerformanceMilestone(PricePerformanceMilestone.valueOf(priceMilestone), cfdMargins);
-            case "premarket" -> filterByPreMarketMilestone(PreMarketPriceMilestone.valueOf(priceMilestone), cfdMargins);
-            case "intraday-spike" -> filterByIntradaySpikeMilestone(IntradayPriceSpike.valueOf(priceMilestone), cfdMargins);
-            case "sma-milestone" -> filterBySimpleMovingAvgMilestone(SimpleMovingAverageMilestone.valueOf(priceMilestone), cfdMargins);
+    public List<String> findTickersForMilestone(PriceMilestone milestone, List<Double> cfdMargins) {
+        return switch (milestone) {
+            case NewHighLowMilestone newHighLowMilestone -> filterByNewHighLowMilestone(newHighLowMilestone, cfdMargins);
+            case PricePerformanceMilestone pricePerformanceMilestone -> filterByPerformanceMilestone(pricePerformanceMilestone, cfdMargins);
+            case PreMarketPriceMilestone preMarketMilestone -> filterByPreMarketMilestone(preMarketMilestone, cfdMargins);
+            case IntradayPriceSpike intradayPriceSpike -> filterByIntradaySpikeMilestone(intradayPriceSpike, cfdMargins);
+            case SimpleMovingAverageMilestone smaMilestone -> filterBySimpleMovingAvgMilestone(smaMilestone, cfdMargins);
             default -> throw new IllegalArgumentException("Invalid milestone type");
         };
     }
@@ -209,36 +206,9 @@ public class PriceMilestoneService {
         };
     }
 
-    private boolean isInvalidTypeMapping(String priceMilestone, String milestoneType) {
-        return switch (milestoneType) {
-            case "premarket" -> Arrays.stream(PreMarketPriceMilestone.values())
-                    .map(Enum::name)
-                    .noneMatch(pm -> pm.equals(priceMilestone));
-            case "performance" -> Arrays.stream(PricePerformanceMilestone.values())
-                    .map(Enum::name)
-                    .noneMatch(pm -> pm.equals(priceMilestone));
-            case "intraday-spike" -> Arrays.stream(IntradayPriceSpike.values())
-                    .map(Enum::name)
-                    .noneMatch(pm -> pm.equals(priceMilestone));
-            case "sma-milestone" -> Arrays.stream(SimpleMovingAverageMilestone.values())
-                    .map(Enum::name)
-                    .noneMatch(pm -> pm.equals(priceMilestone));
-            default -> false;
-        };
-    }
-
     public void cacheTickersForMilestones() {
-        for (PricePerformanceMilestone pricePerformanceMilestone : PricePerformanceMilestone.values()) {
-            cacheService.cachePriceMilestoneTickers(pricePerformanceMilestone, findTickersForMilestone(pricePerformanceMilestone.name(), pricePerformanceMilestone.getType(), CFD_MARGINS_5X_4X_3X_2X_1X));
-        }
-        for (PreMarketPriceMilestone preMarketPriceMilestone : PreMarketPriceMilestone.values()) {
-            cacheService.cachePriceMilestoneTickers(preMarketPriceMilestone, findTickersForMilestone(preMarketPriceMilestone.name(), preMarketPriceMilestone.getType(), CFD_MARGINS_5X_4X_3X_2X_1X));
-        }
-        for (SimpleMovingAverageMilestone simpleMovingAverageMilestone : SimpleMovingAverageMilestone.values()) {
-            cacheService.cachePriceMilestoneTickers(simpleMovingAverageMilestone, findTickersForMilestone(simpleMovingAverageMilestone.name(), simpleMovingAverageMilestone.getType(), CFD_MARGINS_5X_4X_3X_2X_1X));
-        }
-        for (NewHighLowMilestone newHighLowMilestone : NewHighLowMilestone.values()) {
-            cacheService.cachePriceMilestoneTickers(newHighLowMilestone, findTickersForMilestone(newHighLowMilestone.name(), newHighLowMilestone.getType(), CFD_MARGINS_5X_4X_3X_2X_1X));
+        for (PriceMilestone priceMilestone : PriceMilestoneFactory.registry()) {
+            cacheService.cachePriceMilestoneTickers(priceMilestone, findTickersForMilestone(priceMilestone, CFD_MARGINS_5X_4X_3X_2X_1X));
         }
     }
 }

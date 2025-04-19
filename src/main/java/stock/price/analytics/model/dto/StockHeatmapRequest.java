@@ -5,10 +5,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import stock.price.analytics.model.candlestick.CandleStickType;
 import stock.price.analytics.model.prices.PriceMilestone;
-import stock.price.analytics.model.prices.enums.*;
 import stock.price.analytics.model.stocks.enums.MarketState;
+import stock.price.analytics.util.PriceMilestoneFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -20,28 +19,14 @@ public class StockHeatmapRequest {
     private Integer limit;
     private List<Double> cfdMargins;
     private List<String> priceMilestones;
-    private List<String> milestoneTypes;
     private MarketState marketState;
     private CandleStickType candleStickType;
 
     public List<PriceMilestone> priceMilestones() {
-        List<PriceMilestone> priceMilestones = new ArrayList<>();
-        for (int i = 0; i < this.getPriceMilestones().size(); i++) {
-            String priceMilestoneStr = this.getPriceMilestones().get(i);
-            String milestoneType = this.getMilestoneTypes().get(i);
-            priceMilestones.add(switch (milestoneType) {
-                case "performance" -> PricePerformanceMilestone.valueOf(priceMilestoneStr);
-                case "new-high-low" -> NewHighLowMilestone.valueOf(priceMilestoneStr);
-                case "premarket" -> PreMarketPriceMilestone.valueOf(priceMilestoneStr);
-                case "intraday-spike" -> IntradayPriceSpike.valueOf(priceMilestoneStr);
-                case "sma-milestone" -> SimpleMovingAverageMilestone.valueOf(priceMilestoneStr);
-                default -> throw new IllegalArgumentException("Invalid milestone type");
-            });
-        }
-        return priceMilestones;
+        return PriceMilestoneFactory.priceMilestonesFrom(this.getPriceMilestones());
     }
 
     public boolean hasMilestonesOrCandlestickFilters() {
-        return !this.getMilestoneTypes().isEmpty() || this.getCandleStickType() != CandleStickType.ANY;
+        return !this.getPriceMilestones().isEmpty() || this.getCandleStickType() != CandleStickType.ANY;
     }
 }

@@ -85,37 +85,21 @@ function updateStockPerformanceChart(timeFrame) {
     };
 
     if (stockFilters) {
-        const dropdownsMilestone = stockFilters.querySelectorAll('select');
-        const dropdownCandleStick = stockFilters.querySelector('select[candlestick-type]');
-
-        const milestoneTypeMap = {
-            'pre-market': 'premarket',
-            'intraday-spike': 'intraday-spike',
-            'all-time': 'performance',
-            '52-week': 'performance',
-            '4-week': 'performance',
-            'new-hl': 'new-high-low',
-            'sma-200': 'sma-milestone',
-            'sma-50': 'sma-milestone'
-        };
-
+        const dropdowns = stockFilters.querySelectorAll('select');
         const priceMilestones = [];
-        const milestoneTypes = [];
 
-        dropdownsMilestone.forEach(dropdown => {
+        dropdowns.forEach(dropdown => {
             const selectedValue = dropdown.value;
-            if (selectedValue !== "ANY") {
-                const selectedOption = dropdown.options[dropdown.selectedIndex];
-                const dataType = selectedOption.getAttribute('data-type');
-                if (dataType) { // only process if milestone-type attribute is present
-                    priceMilestones.push(selectedOption.value);
-                    milestoneTypes.push(milestoneTypeMap[dataType]);
+            const dataType = dropdown.getAttribute('data-type');
+            if (dataType == 'candlestick') {
+                requestBody.candleStickType = selectedValue;
+            } else if (dataType == 'price-milestone') {
+                if (selectedValue !== "ANY") {
+                    priceMilestones.push(selectedValue);
                 }
             }
         });
         requestBody.priceMilestones = priceMilestones;
-        requestBody.milestoneTypes = milestoneTypes;
-        requestBody.candleStickType = dropdownCandleStick.value;
     }
 
     fetch('/stock-performance-json', {
