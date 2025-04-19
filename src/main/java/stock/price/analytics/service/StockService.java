@@ -74,23 +74,14 @@ public class StockService {
     }
 
     @Transactional
-    public void updateStocksHighLowsAndOHLCFrom(List<DailyPrice> dailyPrices, List<AbstractPrice> htfPrices, boolean syncPersistence) {
+    public void updateStocksHighLowsAndOHLCFrom(List<DailyPrice> dailyPrices, List<AbstractPrice> htfPrices) {
         Set<Stock> stocksUpdated = new HashSet<>();
         updateStocksFromOHLCPrices(dailyPrices, htfPrices, stocksUpdated);
         updateStocksFromHighLowCaches(stocksUpdated);
 
         List<Stock> stocks = new ArrayList<>(stocksUpdated);
-        if (syncPersistence) {
-            syncPersistenceService.partitionDataAndSaveWithLogTime(stocks, stockRepository, "saved " + stocks.size() + " stocks after OHLC higher-timeframe and high-lows 4w, 52w, all-time updates");
-        } else {
-            asyncPersistenceService.partitionDataAndSaveWithLogTime(stocks, stockRepository, "saved " + stocks.size() + " stocks after OHLC higher-timeframe and high-lows 4w, 52w, all-time updates");
-        }
+        asyncPersistenceService.partitionDataAndSaveWithLogTime(stocks, stockRepository, "saved " + stocks.size() + " stocks after OHLC higher-timeframe and high-lows 4w, 52w, all-time updates");
         cacheService.addStocks(stocks);
-    }
-
-    @Transactional
-    public void updateStocksHighLowsAndOHLCFrom(List<DailyPrice> dailyPrices, List<AbstractPrice> htfPrices) {
-        updateStocksHighLowsAndOHLCFrom(dailyPrices, htfPrices, false);
     }
 
     @Transactional
