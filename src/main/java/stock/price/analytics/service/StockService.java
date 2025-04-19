@@ -15,6 +15,8 @@ import stock.price.analytics.repository.stocks.TickerRenameRepository;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -33,7 +35,6 @@ public class StockService {
         for (DailyPrice dailyPrice : dailyPrices) {
             String ticker = dailyPrice.getTicker();
             Optional.ofNullable(stocksMap.get(ticker))
-                    .filter(stock -> !stock.getLastUpdated().isAfter(dailyPrice.getDate()))
                     .ifPresent(stock -> {
                         stock.updateFrom(dailyPrice);
                         stocksUpdated.add(stock);
@@ -43,14 +44,16 @@ public class StockService {
         // update from higher timeframe prices
         for (AbstractPrice wmyPrice : htfPrices) {
             String ticker = wmyPrice.getTicker();
-            Stock stock = stocksMap.getOrDefault(ticker, new Stock(ticker, wmyPrice.getStartDate(), true));
-            stock.updateFrom(wmyPrice);
-            stocksUpdated.add(stock);
+            Optional.ofNullable(stocksMap.get(ticker))
+                    .ifPresent(stock -> {
+                        stock.updateFrom(wmyPrice);
+                        stocksUpdated.add(stock);
+                    });
         }
     }
 
     private void updateStocksFromHighLowCaches(Set<Stock> stocksUpdated) {
-        Map<String, Stock> stocksMap = cacheService.getStocksMap();
+        Map<String, Stock> stocksMap = stocksUpdated.stream().collect(Collectors.toMap(Stock::getTicker, Function.identity()));
 
         for (HighLowPeriod period : HighLowPeriod.values()) {
             List<? extends HighLowForPeriod> cache = cacheService.highLowForPeriodPricesFor(period);
