@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.gaps.enums.FvgType.BEARISH;
 import static stock.price.analytics.model.gaps.enums.FvgType.BULLISH;
-import static stock.price.analytics.model.prices.enums.PricePerformanceMilestone.*;
+import static stock.price.analytics.model.prices.enums.PricePerformanceMilestone.timeframeFrom;
 import static stock.price.analytics.util.Constants.*;
 
 @Slf4j

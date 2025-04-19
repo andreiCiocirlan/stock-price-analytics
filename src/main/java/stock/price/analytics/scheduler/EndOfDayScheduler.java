@@ -7,10 +7,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.service.PriceService;
-import stock.price.analytics.service.WebSocketNotificationService;
 import stock.price.analytics.service.DiscrepancieService;
 import stock.price.analytics.service.PriceGapService;
+import stock.price.analytics.service.PriceService;
+import stock.price.analytics.service.WebSocketNotificationService;
 
 import java.util.List;
 import java.util.Map;

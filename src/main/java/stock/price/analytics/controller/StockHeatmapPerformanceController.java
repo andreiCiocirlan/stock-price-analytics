@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import stock.price.analytics.model.dto.StockHeatmapRequest;
 import stock.price.analytics.model.dto.StockPerformanceDTO;
-import stock.price.analytics.model.prices.enums.*;
+import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.service.PriceMilestoneService;
 import stock.price.analytics.service.StockHeatmapPerformanceService;
 
