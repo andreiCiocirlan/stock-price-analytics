@@ -59,7 +59,10 @@ public class YahooQuotesController {
             List<AbstractPrice> htfPricesUpdated = priceService.updatePricesForHigherTimeframes(dailyImportedPrices);
 
             logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices), "saved current week HighLow prices");
-            logTime(() -> stockService.updateStocksHighLowsAndOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks highs-lows 4w,52w,all-time and higher-timeframe OHLC prices");
+            // update stocks only if the most recent trading date was imported
+            if (tradingDateNow().isEqual(dailyImportedPrices.getFirst().getDate())) {
+                logTime(() -> stockService.updateStocksHighLowsAndOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks highs-lows 4w,52w,all-time and higher-timeframe OHLC prices");
+            }
         }
         long duration = (System.nanoTime() - start) / 1_000_000;
         log.info("Import from file done in {} ms", duration);
