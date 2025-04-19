@@ -189,8 +189,12 @@ public class NewTickerService {
                 List<AbstractPrice> prices = entry.getValue();
                 prices.sort(Comparator.comparing(AbstractPrice::getStartDate).reversed());
 
-                for (int i = 0; i <= prices.size() - intervalNrWeeks; i++) {
-                    int toIndex = intervalNrWeeks == 1 ? prices.size() : i + intervalNrWeeks;
+                // NBIS is a newer ticker, for high_52w it had only 26 weeks of data
+                if (prices.size() < intervalNrWeeks) {
+                    intervalNrWeeks = 1;
+                }
+                for (int i = 0; i <= prices.size() - 1; i++) {
+                    int toIndex = intervalNrWeeks == 1 ? prices.size() : Math.min(i + intervalNrWeeks, prices.size());
                     List<AbstractPrice> currentWeeksForPeriod = prices.subList(i, toIndex);
                     double highestPriceForPeriod = currentWeeksForPeriod.stream()
                             .mapToDouble(AbstractPrice::getHigh)
