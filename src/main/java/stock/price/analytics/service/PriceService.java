@@ -265,6 +265,6 @@ public class PriceService {
 
     @Transactional
     public void savePrices(List<? extends AbstractPrice> prices) {
-        asyncPersistenceService.partitionDataAndSave(prices, priceRepository);
+        syncPersistenceService.partitionDataAndSave(prices, priceRepository);
     }
 }
