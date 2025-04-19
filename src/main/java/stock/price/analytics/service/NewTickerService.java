@@ -28,6 +28,7 @@ import stock.price.analytics.repository.prices.highlow.HighLowForPeriodRepositor
 import stock.price.analytics.util.TradingDateUtil;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.DayOfWeek;
 import java.time.Instant;
@@ -60,30 +61,37 @@ public class NewTickerService {
     private final HighLowForPeriodRepository highLowForPeriodRepository;
     private String COOKIE;
 
-    public void importFromExistingJSONFor(String tickers) {
-        List<String> tickerList = Arrays.stream(tickers.split(",")).toList();
-        List<DailyPrice> dailyPricesImported = getDailyPricesFor(tickerList);
-        List<AbstractPrice> htfPricesImported = getHigherTimeframePricesFor(dailyPricesImported);
-        priceService.savePrices(dailyPricesImported);
-        priceService.savePrices(htfPricesImported);
-        saveHighLowPricesForPeriodFrom(htfPricesImported);
-        saveAndUpdateStocksFor(dailyPricesImported, htfPricesImported);
-        priceGapService.saveAllPriceGapsFor(tickerList);
-        fairValueGapService.findNewFVGsAndSaveForAllTimeframes(tickerList, true);
-    }
-
     // import all data pertaining to the new tickers and create dailyPrices, htfPrices, stocks, highLowPrices etc.
     public void importAllDataFor(String tickers, Double cfdMargin, Boolean shortSell) {
         List<String> tickerList = Arrays.stream(tickers.split(",")).toList();
-        cacheService.addStocks(tickerList.stream().map(ticker -> new Stock(ticker, Boolean.TRUE, shortSell, cfdMargin)).toList());
-        COOKIE = yahooQuotesClient.cookieFromFcYahoo();
-        getYahooQuotesAndSaveJSONFileFor(tickers);
+        List<String> newTickers = new ArrayList<>();
+        List<String> tickersToCache = new ArrayList<>();
+        for (String ticker : tickerList) {
+            if (!cacheService.getCachedTickers().contains(ticker)) {
+                tickersToCache.add(ticker);
+            }
+            if (!fileExistsFor(ticker)) {
+                newTickers.add(ticker);
+            }
+        }
+
+        LocalDate lastUpdate = stockService.findLastUpdate();
+        if (!tickersToCache.isEmpty()) {
+            cacheService.addStocks(tickersToCache.stream()
+                    .map(ticker -> new Stock(ticker, Boolean.TRUE, shortSell, cfdMargin, lastUpdate))
+                    .toList());
+        }
+
+        if (!newTickers.isEmpty()) { // call API to get the data and save the files
+            COOKIE = yahooQuotesClient.cookieFromFcYahoo();
+            getYahooQuotesAndSaveJSONFileFor(String.join(",", newTickers));
+        }
         List<DailyPrice> dailyPricesImported = getDailyPricesFor(tickerList);
         priceService.savePrices(dailyPricesImported);
         List<AbstractPrice> htfPricesImported = getHigherTimeframePricesFor(dailyPricesImported);
         priceService.savePrices(htfPricesImported);
         saveHighLowPricesForPeriodFrom(htfPricesImported);
-        saveAndUpdateStocksFor(dailyPricesImported, htfPricesImported);
+        saveAndUpdateStocksFor(dailyPricesImported, htfPricesImported, lastUpdate);
         priceGapService.saveAllPriceGapsFor(tickerList);
         fairValueGapService.findNewFVGsAndSaveForAllTimeframes(tickerList, true);
     }
@@ -148,10 +156,9 @@ public class NewTickerService {
         return dailyPricesImported;
     }
 
-    private void saveAndUpdateStocksFor(List<DailyPrice> dailyPricesImported, List<AbstractPrice> htfPricesImported) {
-        LocalDate tradingDateNow = TradingDateUtil.tradingDateNow();
+    private void saveAndUpdateStocksFor(List<DailyPrice> dailyPricesImported, List<AbstractPrice> htfPricesImported, LocalDate lastUpdate) {
         List<DailyPrice> latestDailyPricesImported = dailyPricesImported.stream()
-                .filter(dp -> dp.getDate().isEqual(tradingDateNow))
+                .filter(dp -> dp.getDate().isEqual(lastUpdate))
                 .toList();
 
         List<AbstractPrice> latestHTFPrices = htfPricesImported.stream()
@@ -176,7 +183,7 @@ public class NewTickerService {
     }
 
     private void saveHighLowPricesForPeriodFrom(List<AbstractPrice> weeklyPricesImported) {
-        List<HighLowForPeriod> highLowForPeriodPrices = new ArrayList<>();
+        Map<HighLowPeriod, List<HighLowForPeriod>> highLowForPeriodPrices = new HashMap<>();
         Map<String, List<AbstractPrice>> weeklyPricesByTicker = weeklyPricesImported.stream()
                 .filter(price -> price.getTimeframe() == StockTimeframe.WEEKLY)
                 .collect(Collectors.groupingBy(AbstractPrice::getTicker));
@@ -219,12 +226,17 @@ public class NewTickerService {
                     };
                     highLowForPeriod.setLow(lowestPriceForPeriod);
                     highLowForPeriod.setHigh(highestPriceForPeriod);
-                    highLowForPeriodPrices.add(highLowForPeriod);
+                    highLowForPeriodPrices.computeIfAbsent(highLowPeriod, _ -> new ArrayList<>()).add(highLowForPeriod);
                 }
 
             }
         }
-        asyncPersistenceService.partitionDataAndSaveNoLogging(highLowForPeriodPrices, highLowForPeriodRepository);
+        for (Map.Entry<HighLowPeriod, List<HighLowForPeriod>> entry : highLowForPeriodPrices.entrySet()) {
+            List<HighLowForPeriod> highLowForPeriods = entry.getValue();
+            HighLowPeriod highLowPeriod = entry.getKey();
+            asyncPersistenceService.partitionDataAndSaveNoLogging(highLowForPeriods, highLowForPeriodRepository);
+            cacheService.addHighLowPrices(highLowForPeriods, highLowPeriod);
+        }
     }
 
     private List<DailyPrice> extractDailyPricesFrom(String ticker, String jsonResponse) throws JsonProcessingException {
@@ -308,5 +320,9 @@ public class NewTickerService {
         };
     }
 
+    private boolean fileExistsFor(String ticker) {
+        String jsonFilePath = String.join("", "./all-historical-prices/DAILY/", ticker, ".json");
+        return Files.exists(Path.of(jsonFilePath)) && Files.isRegularFile(Path.of(jsonFilePath));
+    }
 
 }

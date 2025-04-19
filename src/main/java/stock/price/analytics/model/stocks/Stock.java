@@ -128,11 +128,12 @@ public class Stock implements BusinessEntity {
         this.xtbStock = xtbStock;
     }
 
-    public Stock(String ticker, boolean xtbStock, boolean shortSell, double cfdMargin) {
+    public Stock(String ticker, boolean xtbStock, boolean shortSell, double cfdMargin, LocalDate lastUpdated) {
         this.ticker = ticker;
         this.xtbStock = xtbStock;
         this.shortSell = shortSell;
         this.cfdMargin = cfdMargin;
+        this.lastUpdated = lastUpdated;
     }
 
     public Stock(String ticker, LocalDate ipoDate, boolean xtbStock) {

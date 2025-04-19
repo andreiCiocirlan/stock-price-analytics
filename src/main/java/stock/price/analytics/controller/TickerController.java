@@ -17,14 +17,9 @@ public class TickerController {
     private final NewTickerService newTickerService;
 
     @PostMapping("/import-all-data")
-    public void newTickersimportAllDataFor(@RequestParam(value = "tickers") String tickers,
-                                           @RequestParam(value = "cfdMargin") Double cfdMargin,
-                                           @RequestParam(value = "shortSell") Boolean shortSell) {
+    public void importAllDataFor(@RequestParam(value = "tickers") String tickers,
+                                 @RequestParam(value = "cfdMargin") Double cfdMargin,
+                                 @RequestParam(value = "shortSell") Boolean shortSell) {
         newTickerService.importAllDataFor(tickers, cfdMargin, shortSell);
-    }
-
-    @PostMapping("/import-from-existing-json")
-    public void importFromExistingJSON(@RequestParam(value = "tickers") String tickers) {
-        newTickerService.importFromExistingJSONFor(tickers);
     }
 }
