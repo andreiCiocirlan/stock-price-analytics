@@ -18,8 +18,8 @@ public class TickerController {
 
     @PostMapping("/import-all-data")
     public void newTickersimportAllDataFor(@RequestParam(value = "tickers") String tickers,
-                                 @RequestParam(value = "cfdMargin") Double cfdMargin,
-                                 @RequestParam(value = "shortSell") Boolean shortSell) {
+                                           @RequestParam(value = "cfdMargin") Double cfdMargin,
+                                           @RequestParam(value = "shortSell") Boolean shortSell) {
         newTickerService.importAllDataFor(tickers, cfdMargin, shortSell);
     }
 
