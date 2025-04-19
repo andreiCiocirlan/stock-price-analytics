@@ -10,9 +10,9 @@ import stock.price.analytics.service.NewTickerService;
 
 @Slf4j
 @RestController
-@RequestMapping("/new-ticker")
+@RequestMapping("/ticker")
 @RequiredArgsConstructor
-public class NewTickerController {
+public class TickerController {
 
     private final NewTickerService newTickerService;
 
