@@ -165,7 +165,7 @@ public class Stock implements BusinessEntity {
         };
     }
 
-    public boolean hasChanges(AbstractPrice p) {
+    public boolean needsUpdate(AbstractPrice p) {
         if (this.getClose() != p.getClose()) return true;
 
         return switch (p.getTimeframe()) {
@@ -177,7 +177,7 @@ public class Stock implements BusinessEntity {
         };
     }
 
-    public boolean hasChanges(HighLowForPeriod hl) {
+    public boolean needsUpdate(HighLowForPeriod hl) {
         return switch (hl.getHighLowPeriod()) {
             case HIGH_LOW_4W -> this.getHigh4w() != hl.getHigh() || this.getLow4w() != hl.getLow();
             case HIGH_LOW_52W -> this.getHigh52w() != hl.getHigh() || this.getLow52w() != hl.getLow();
