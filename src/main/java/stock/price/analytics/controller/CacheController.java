@@ -49,9 +49,9 @@ public class CacheController {
         return cacheService.getCachedDailyPrices(REGULAR);
     }
 
-    @GetMapping("/htf-prices")
-    public List<AbstractPrice> htfPricesFor(@RequestParam(required = false, value = "ticker") String ticker, @RequestParam("timeFrame") String timeFrame) {
-        return cacheService.htfPricesFor(StockTimeframe.valueOf(timeFrame)).stream()
+    @GetMapping("/prices")
+    public List<AbstractPrice> pricesFor(@RequestParam(required = false, value = "ticker") String ticker, @RequestParam("timeFrame") String timeFrame) {
+        return cacheService.pricesFor(StockTimeframe.valueOf(timeFrame)).stream()
                 .filter(p -> ticker == null || p.getTicker().equals(ticker))
                 .toList();
     }

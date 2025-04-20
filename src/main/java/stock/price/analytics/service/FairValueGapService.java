@@ -213,7 +213,7 @@ public class FairValueGapService {
         Map<String, FairValueGap> updatedFVGsByCompositeId = new HashMap<>();
         List<FairValueGap> currentFVGs = findFVGsForTickersAndTimeframe(cacheService.getCachedTickers(), timeframe, allHistoricalData);
         Map<String, FairValueGap> dbFVGsByCompositeId = fvgRepository.findByTimeframe(timeframe.name()).stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
-        Map<String, List<AbstractPrice>> pricesByTicker = cacheService.htfPricesFor(timeframe).stream().collect(Collectors.groupingBy(AbstractPrice::getTicker));
+        Map<String, List<AbstractPrice>> pricesByTicker = cacheService.pricesFor(timeframe).stream().collect(Collectors.groupingBy(AbstractPrice::getTicker));
 
         Map<String, FairValueGap> currentFVGsByCompositeId = currentFVGs.stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
         currentFVGsByCompositeId.forEach((compositeKey, fvg) -> {
