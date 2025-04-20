@@ -30,19 +30,8 @@ public class StockService {
     private Set<String> updateStocksFromOHLCPrices(List<DailyPrice> dailyPrices, List<AbstractPrice> htfPrices) {
         Set<String> tickersUpdated = new HashSet<>();
         Map<String, Stock> stocksMap = cacheService.getStocksMap();
-        // update from daily prices
-        for (DailyPrice dailyPrice : dailyPrices) {
-            String ticker = dailyPrice.getTicker();
-            Optional.ofNullable(stocksMap.get(ticker))
-                    .ifPresent(stock -> {
-                        if (stock.needsUpdate(dailyPrice)) {
-                            tickersUpdated.add(ticker);
-                            stock.updateFrom(dailyPrice);
-                        }
-                    });
-        }
 
-        // update from higher timeframe prices
+        // order matters (htf prices processed first because stock closing price gets updated only from daily prices)
         for (AbstractPrice wmyPrice : htfPrices) {
             String ticker = wmyPrice.getTicker();
             Optional.ofNullable(stocksMap.get(ticker))
@@ -50,6 +39,17 @@ public class StockService {
                         if (stock.needsUpdate(wmyPrice)) {
                             tickersUpdated.add(ticker);
                             stock.updateFrom(wmyPrice);
+                        }
+                    });
+        }
+
+        for (DailyPrice dailyPrice : dailyPrices) {
+            String ticker = dailyPrice.getTicker();
+            Optional.ofNullable(stocksMap.get(ticker))
+                    .ifPresent(stock -> {
+                        if (stock.needsUpdate(dailyPrice)) {
+                            tickersUpdated.add(ticker);
+                            stock.updateFrom(dailyPrice);
                         }
                     });
         }
@@ -100,6 +100,24 @@ public class StockService {
     @Transactional
     public void updateStockDailyPricesFor(String ticker) {
         stockRepository.updateStockDailyPricesFor(ticker);
+    }
+
+    private void updateIntradayPriceSpikesCache(Double oldClosingPrice, Double newClosingPrice, String ticker) {
+        // clear cache of intraday spikes before adding
+//        cacheService.clearIntradaySpikes();
+
+        boolean spikeUp = newClosingPrice > oldClosingPrice * (1 + INTRADAY_SPIKE_PERCENTAGE);
+        boolean spikeDown = newClosingPrice < oldClosingPrice * (1 - INTRADAY_SPIKE_PERCENTAGE);
+        if (spikeUp) {
+            cacheService.addIntradaySpike(INTRADAY_SPIKE_UP, ticker);
+        } else if (spikeDown) {
+            cacheService.addIntradaySpike(INTRADAY_SPIKE_DOWN, ticker);
+        }
+
+
+//        double oldClosingPrice = stock.getClose();
+//        double newClosingPrice = dailyPrice.getClose();
+//        updateIntradayPriceSpikesCache(oldClosingPrice, newClosingPrice, ticker);
     }
 
     @Transactional
