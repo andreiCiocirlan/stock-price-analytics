@@ -2,12 +2,15 @@ package stock.price.analytics.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.service.*;
+import stock.price.analytics.util.TradingDateUtil;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
@@ -50,9 +53,10 @@ public class YahooQuotesController {
 
     @GetMapping("/from-file")
     @ResponseStatus(HttpStatus.OK)
-    public List<DailyPrice> yahooQuotesImportFromFile(@RequestParam(value = "fileName", required = false) String fileNameStr) {
+    public List<DailyPrice> yahooQuotesImportFromFile(@RequestParam(value = "tradingDate", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate tradingDate) {
         long start = System.nanoTime();
-        String fileName = Objects.requireNonNullElseGet(fileNameStr, () -> tradingDateNow().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+        LocalDate date = Objects.requireNonNullElseGet(tradingDate, stockService::findLastUpdate);
+        String fileName = date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         List<DailyPrice> dailyImportedPrices = logTimeAndReturn(() -> yahooQuoteService.yahooQuotesFromFile(fileName), "imported daily prices");
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
             priceService.savePrices(dailyImportedPrices);
@@ -60,7 +64,7 @@ public class YahooQuotesController {
 
             logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices), "saved current week HighLow prices");
             // update stocks only if the most recent trading date was imported
-            if (tradingDateNow().isEqual(dailyImportedPrices.getFirst().getDate())) {
+            if (date.isEqual(dailyImportedPrices.getFirst().getDate())) {
                 logTime(() -> stockService.updateStocksHighLowsAndOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks highs-lows 4w,52w,all-time and higher-timeframe OHLC prices");
             }
         }
