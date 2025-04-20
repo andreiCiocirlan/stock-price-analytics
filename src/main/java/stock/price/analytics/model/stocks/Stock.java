@@ -165,6 +165,26 @@ public class Stock implements BusinessEntity {
         };
     }
 
+    public boolean hasChanges(AbstractPrice p) {
+        if (this.getClose() != p.getClose()) return true;
+
+        return switch (p.getTimeframe()) {
+            case DAILY -> this.getDailyHigh() != p.getHigh() || this.getDailyLow() != p.getLow() || this.getDailyOpen() != p.getOpen();
+            case WEEKLY -> this.getWeeklyHigh() != p.getHigh() || this.getWeeklyLow() != p.getLow() || this.getWeeklyOpen() != p.getOpen();
+            case MONTHLY -> this.getMonthlyHigh() != p.getHigh() || this.getMonthlyLow() != p.getLow() || this.getMonthlyOpen() != p.getOpen();
+            case QUARTERLY -> this.getQuarterlyHigh() != p.getHigh() || this.getQuarterlyLow() != p.getLow() || this.getQuarterlyOpen() != p.getOpen();
+            case YEARLY -> this.getYearlyHigh() != p.getHigh() || this.getYearlyLow() != p.getLow() || this.getYearlyOpen() != p.getOpen();
+        };
+    }
+
+    public boolean hasChanges(HighLowForPeriod hl) {
+        return switch (hl.getHighLowPeriod()) {
+            case HIGH_LOW_4W -> this.getHigh4w() != hl.getHigh() || this.getLow4w() != hl.getLow();
+            case HIGH_LOW_52W -> this.getHigh52w() != hl.getHigh() || this.getLow52w() != hl.getLow();
+            case HIGH_LOW_ALL_TIME -> this.getHighest() != hl.getHigh() || this.getLowest() != hl.getLow();
+        };
+    }
+
     @Override
     public String toString() {
         return STR."Stock{ticker='\{ticker}\{'\''}, xtbStock=\{xtbStock}, ipoDate=\{ipoDate}, delistedDate=\{delistedDate}, shortSell=\{shortSell}, cfdMargin=\{cfdMargin}\{'}'}";
