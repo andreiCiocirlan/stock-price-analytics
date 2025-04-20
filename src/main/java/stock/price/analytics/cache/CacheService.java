@@ -22,8 +22,11 @@ import java.util.List;
 import java.util.Map;
 
 import static java.util.Collections.emptySet;
+import static stock.price.analytics.model.prices.enums.IntradayPriceSpike.INTRADAY_SPIKE_DOWN;
+import static stock.price.analytics.model.prices.enums.IntradayPriceSpike.INTRADAY_SPIKE_UP;
 import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
 import static stock.price.analytics.model.stocks.enums.MarketState.REGULAR;
+import static stock.price.analytics.util.Constants.INTRADAY_SPIKE_PERCENTAGE;
 
 @Slf4j
 @Service
@@ -169,5 +172,23 @@ public class CacheService {
                 .filter(dp -> dp.toCandleStickType() == candleStickType)
                 .map(DailyPrice::getTicker)
                 .toList();
+    }
+
+    public void updateIntradayPriceSpikesCache(List<DailyPrice> dailyPrices) {
+        // clear intraday spikes before adding
+        priceMilestoneCache.clearIntradaySpikes();
+
+        for (DailyPrice dailyPrice : dailyPrices) {
+            String ticker = dailyPrice.getTicker();
+            double oldClosingPrice = getStocksMap().get(ticker).getClose();
+            double newClosingPrice = dailyPrice.getClose();
+            boolean spikeUp = newClosingPrice > oldClosingPrice * (1 + INTRADAY_SPIKE_PERCENTAGE);
+            boolean spikeDown = newClosingPrice < oldClosingPrice * (1 - INTRADAY_SPIKE_PERCENTAGE);
+            if (spikeUp) {
+                priceMilestoneCache.addIntradaySpike(INTRADAY_SPIKE_UP, ticker);
+            } else if (spikeDown) {
+                priceMilestoneCache.addIntradaySpike(INTRADAY_SPIKE_DOWN, ticker);
+            }
+        }
     }
 }

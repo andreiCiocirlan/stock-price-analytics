@@ -18,8 +18,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
-import static stock.price.analytics.model.stocks.enums.MarketState.REGULAR;
-import static stock.price.analytics.util.Constants.*;
+import static stock.price.analytics.util.Constants.CFD_MARGINS_5X_4X_3X_2X_1X;
+import static stock.price.analytics.util.Constants.MIN_GAP_AND_GO_PERCENTAGE;
 
 @Service
 @RequiredArgsConstructor
@@ -68,7 +68,6 @@ public class PriceMilestoneService {
             case NewHighLowMilestone newHighLowMilestone -> filterByNewHighLowMilestone(newHighLowMilestone, cfdMargins);
             case PricePerformanceMilestone pricePerformanceMilestone -> filterByPerformanceMilestone(pricePerformanceMilestone, cfdMargins);
             case PreMarketPriceMilestone preMarketMilestone -> filterByPreMarketMilestone(preMarketMilestone, cfdMargins);
-            case IntradayPriceSpike intradayPriceSpike -> filterByIntradaySpikeMilestone(intradayPriceSpike, cfdMargins);
             case SimpleMovingAverageMilestone smaMilestone -> filterBySimpleMovingAvgMilestone(smaMilestone, cfdMargins);
             default -> throw new IllegalArgumentException("Invalid milestone type");
         };
@@ -109,19 +108,6 @@ public class PriceMilestoneService {
                 .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
                 .filter(stock -> preMarketPricesCache.containsKey(stock.getTicker()))
                 .filter(stock -> withinPreMarketMilestone(stock, preMarketPricesCache.get(stock.getTicker()), milestone))
-                .map(Stock::getTicker)
-                .toList();
-    }
-
-    private List<String> filterByIntradaySpikeMilestone(IntradayPriceSpike milestone, List<Double> cfdMargins) {
-        Map<String, DailyPrice> intradayPricesCache = cacheService.getCachedDailyPrices(REGULAR)
-                .stream()
-                .collect(Collectors.toMap(DailyPrice::getTicker, p -> p));
-
-        return cacheService.getCachedStocks().stream()
-                .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
-                .filter(stock -> intradayPricesCache.containsKey(stock.getTicker()))
-                .filter(stock -> withinIntradaySpikeMilestone(stock, intradayPricesCache.get(stock.getTicker()), milestone))
                 .map(Stock::getTicker)
                 .toList();
     }
@@ -189,14 +175,6 @@ public class PriceMilestoneService {
         };
     }
 
-    // called before stocks cache is updated (compare daily price imported to determine spikes)
-    private boolean withinIntradaySpikeMilestone(Stock s, DailyPrice dailyPrice, IntradayPriceSpike milestone) {
-        return switch (milestone) {
-            case INTRADAY_SPIKE_UP -> dailyPrice.getClose() > s.getClose() * (1 + INTRADAY_SPIKE_PERCENTAGE);
-            case INTRADAY_SPIKE_DOWN -> dailyPrice.getClose() < s.getClose() * (1 - INTRADAY_SPIKE_PERCENTAGE);
-        };
-    }
-
     private boolean withinSimpleMovingAvgMilestone(DailyPriceJSON dailyPriceJSON, SimpleMovingAverageMilestone milestone) {
         return switch (milestone) {
             case ABOVE_200_SMA -> dailyPriceJSON.getRegularMarketPrice() > dailyPriceJSON.getTwoHundredDayAverage();
@@ -208,10 +186,9 @@ public class PriceMilestoneService {
 
     public void cacheTickersForMilestones() {
         for (PriceMilestone priceMilestone : PriceMilestoneFactory.registry()) {
-            boolean isIntradaySpike = priceMilestone instanceof IntradayPriceSpike;
-            if (!isIntradaySpike) {
-                cacheService.cachePriceMilestoneTickers(priceMilestone, findTickersForMilestone(priceMilestone, CFD_MARGINS_5X_4X_3X_2X_1X));
-            }
+            List<String> tickersForMilestone = priceMilestone instanceof IntradayPriceSpike
+                    ? new ArrayList<>() : findTickersForMilestone(priceMilestone, CFD_MARGINS_5X_4X_3X_2X_1X);
+            cacheService.cachePriceMilestoneTickers(priceMilestone, tickersForMilestone);
         }
     }
 }

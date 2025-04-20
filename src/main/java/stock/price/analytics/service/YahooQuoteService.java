@@ -12,8 +12,6 @@ import stock.price.analytics.repository.prices.ohlc.DailyPriceRepository;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static stock.price.analytics.model.prices.enums.IntradayPriceSpike.intradaySpikes;
-import static stock.price.analytics.util.Constants.CFD_MARGINS_5X_4X_3X;
 import static stock.price.analytics.util.Constants.MAX_TICKER_COUNT_PRINT;
 import static stock.price.analytics.util.FileUtil.writeToFile;
 import static stock.price.analytics.util.JsonUtil.mergedPricesJSONs;
@@ -34,6 +32,7 @@ public class YahooQuoteService {
 
     public List<DailyPrice> yahooQuotesFromFile(String fileName) {
         List<DailyPrice> dailyPrices = dailyPriceJSONService.dailyPricesFromFile(fileName);
+        cacheService.updateIntradayPriceSpikesCache(dailyPrices);
         return cacheService.cacheAndReturn(dailyPrices);
     }
 
@@ -66,8 +65,7 @@ public class YahooQuoteService {
         }
 
         // cache Intraday Spike tickers (compares closing prices from dailyPrices and stocks cache, which was not updated yet)
-        priceMilestoneService.findTickersForMilestones(intradaySpikes(), CFD_MARGINS_5X_4X_3X)
-                .forEach(cacheService::cachePriceMilestoneTickers);
+        cacheService.updateIntradayPriceSpikesCache(dailyImportedPrices);
 
         return dailyImportedPrices;
     }
