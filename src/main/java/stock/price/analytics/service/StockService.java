@@ -102,24 +102,6 @@ public class StockService {
         stockRepository.updateStockDailyPricesFor(ticker);
     }
 
-    private void updateIntradayPriceSpikesCache(Double oldClosingPrice, Double newClosingPrice, String ticker) {
-        // clear cache of intraday spikes before adding
-//        cacheService.clearIntradaySpikes();
-
-        boolean spikeUp = newClosingPrice > oldClosingPrice * (1 + INTRADAY_SPIKE_PERCENTAGE);
-        boolean spikeDown = newClosingPrice < oldClosingPrice * (1 - INTRADAY_SPIKE_PERCENTAGE);
-        if (spikeUp) {
-            cacheService.addIntradaySpike(INTRADAY_SPIKE_UP, ticker);
-        } else if (spikeDown) {
-            cacheService.addIntradaySpike(INTRADAY_SPIKE_DOWN, ticker);
-        }
-
-
-//        double oldClosingPrice = stock.getClose();
-//        double newClosingPrice = dailyPrice.getClose();
-//        updateIntradayPriceSpikesCache(oldClosingPrice, newClosingPrice, ticker);
-    }
-
     @Transactional
     public void updateStockHigherTimeframePricesFor(String ticker) {
         stockRepository.updateStockWeeklyPricesFor(ticker);
