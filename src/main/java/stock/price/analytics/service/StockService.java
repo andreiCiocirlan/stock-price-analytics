@@ -15,8 +15,6 @@ import stock.price.analytics.repository.stocks.TickerRenameRepository;
 
 import java.time.LocalDate;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -29,15 +27,18 @@ public class StockService {
     private final AsyncPersistenceService asyncPersistenceService;
     private final SyncPersistenceService syncPersistenceService;
 
-    private void updateStocksFromOHLCPrices(List<DailyPrice> dailyPrices, List<AbstractPrice> htfPrices, Set<Stock> stocksUpdated) {
+    private Set<String> updateStocksFromOHLCPrices(List<DailyPrice> dailyPrices, List<AbstractPrice> htfPrices) {
+        Set<String> tickersUpdated = new HashSet<>();
         Map<String, Stock> stocksMap = cacheService.getStocksMap();
         // update from daily prices
         for (DailyPrice dailyPrice : dailyPrices) {
             String ticker = dailyPrice.getTicker();
             Optional.ofNullable(stocksMap.get(ticker))
                     .ifPresent(stock -> {
-                        stock.updateFrom(dailyPrice);
-                        stocksUpdated.add(stock);
+                        if (stock.needsUpdate(dailyPrice)) {
+                            tickersUpdated.add(ticker);
+                            stock.updateFrom(dailyPrice);
+                        }
                     });
         }
 
@@ -46,46 +47,47 @@ public class StockService {
             String ticker = wmyPrice.getTicker();
             Optional.ofNullable(stocksMap.get(ticker))
                     .ifPresent(stock -> {
-                        stock.updateFrom(wmyPrice);
-                        stocksUpdated.add(stock);
+                        if (stock.needsUpdate(wmyPrice)) {
+                            tickersUpdated.add(ticker);
+                            stock.updateFrom(wmyPrice);
+                        }
                     });
         }
+        return tickersUpdated;
     }
 
-    private void updateStocksFromHighLowCaches(Set<Stock> stocksUpdated) {
-        Map<String, Stock> stocksMap = stocksUpdated.stream().collect(Collectors.toMap(Stock::getTicker, Function.identity()));
+    private Set<String> updateStocksFromHighLowCaches() {
+        Set<String> tickersUpdated = new HashSet<>();
+        Map<String, Stock> stocksMap = cacheService.getStocksMap();
 
         for (HighLowPeriod period : HighLowPeriod.values()) {
             List<? extends HighLowForPeriod> cache = cacheService.highLowForPeriodPricesFor(period);
             for (HighLowForPeriod hl : cache) {
                 Optional.ofNullable(stocksMap.get(hl.getTicker()))
                         .ifPresent(stock -> {
-                            stock.updateFrom(hl);
-                            stocksUpdated.add(stock);
+                            if (stock.needsUpdate(hl)) {
+                                tickersUpdated.add(hl.getTicker());
+                                stock.updateFrom(hl);
+                            }
                         });
             }
         }
+        return tickersUpdated;
     }
 
     @Transactional
     public void updateStocksHighLowsAndOHLCFrom(List<DailyPrice> dailyPrices, List<AbstractPrice> htfPrices) {
-        Set<Stock> stocksUpdated = new HashSet<>();
-        updateStocksFromOHLCPrices(dailyPrices, htfPrices, stocksUpdated);
-        updateStocksFromHighLowCaches(stocksUpdated);
-
-        List<Stock> stocks = new ArrayList<>(stocksUpdated);
-        asyncPersistenceService.partitionDataAndSaveWithLogTime(stocks, stockRepository, "saved " + stocks.size() + " stocks after OHLC higher-timeframe and high-lows 4w, 52w, all-time updates");
-        cacheService.addStocks(stocks);
+        Set<String> tickersUpdated = new HashSet<>(updateStocksFromOHLCPrices(dailyPrices, htfPrices));
+        tickersUpdated.addAll(updateStocksFromHighLowCaches());
+        List<Stock> stocksUpdated = cacheService.getCachedStocks().stream().filter(stock -> tickersUpdated.contains(stock.getTicker())).toList();
+        asyncPersistenceService.partitionDataAndSaveWithLogTime(stocksUpdated, stockRepository, "saved " + stocksUpdated.size() + " stocks after OHLC higher-timeframe and high-lows 4w, 52w, all-time updates");
     }
 
     @Transactional
     public void updateHighLowForPeriodFromHLCachesAndAdjustWeekend() {
-        Set<Stock> stocksUpdated = new HashSet<>();
-        updateStocksFromHighLowCaches(stocksUpdated);
-
-        List<Stock> stocks = new ArrayList<>(stocksUpdated);
-        syncPersistenceService.partitionDataAndSaveWithLogTime(stocks, stockRepository, "saved stocks after generating high-lows 4w, 52w, all-time for the first import of the week");
-        cacheService.addStocks(stocks);
+        Set<String> tickersUpdated = new HashSet<>(updateStocksFromHighLowCaches());
+        List<Stock> stocksUpdated = cacheService.getCachedStocks().stream().filter(stock -> tickersUpdated.contains(stock.getTicker())).toList();
+        syncPersistenceService.partitionDataAndSaveWithLogTime(stocksUpdated, stockRepository, "saved" + stocksUpdated.size() + " stocks after generating high-lows 4w, 52w, all-time for the first import of the week");
     }
 
     public LocalDate findLastUpdate() {
