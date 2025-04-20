@@ -168,7 +168,7 @@ public class PriceService {
             htfPricesUpdated.addAll(htfPricesWithPrevCloseUpdated.stream().map(PriceWithPrevClose::getPrice).toList());
             cacheService.addHtfPricesWithPrevClose(htfPricesWithPrevCloseUpdated);
         }
-        asyncPersistenceService.partitionDataAndSaveWithLogTime(htfPricesUpdated, priceRepository, "saved HTF prices");
+        asyncPersistenceService.partitionDataAndSaveWithLogTime(htfPricesUpdated, priceRepository, "saved " + htfPricesUpdated.size() + " HTF prices");
 
         return htfPricesUpdated;
     }
