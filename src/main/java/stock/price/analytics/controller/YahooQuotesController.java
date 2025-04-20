@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.service.*;
-import stock.price.analytics.util.TradingDateUtil;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -17,7 +16,6 @@ import java.util.Objects;
 
 import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
-import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 
 @Slf4j
