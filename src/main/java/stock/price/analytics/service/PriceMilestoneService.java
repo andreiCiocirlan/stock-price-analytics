@@ -100,7 +100,7 @@ public class PriceMilestoneService {
                 .toList();
     }
 
-    private List<String> filterByPreMarketMilestone(PreMarketPriceMilestone milestone, List<Double> cfdMargins) {
+    private List<String> filterByPreMarketMilestone(PreMarketPriceMilestone preMarketMilestone, List<Double> cfdMargins) {
         Map<String, DailyPrice> preMarketPricesCache = cacheService.getCachedDailyPrices(PRE)
                 .stream()
                 .collect(Collectors.toMap(DailyPrice::getTicker, p -> p));
@@ -108,7 +108,7 @@ public class PriceMilestoneService {
         return cacheService.getCachedStocks().stream()
                 .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
                 .filter(stock -> preMarketPricesCache.containsKey(stock.getTicker()))
-                .filter(stock -> milestone.isMetFor(new StockDailyPriceContext(stock, preMarketPricesCache.get(stock.getTicker()))))
+                .filter(stock -> preMarketMilestone.isMetFor(new StockDailyPriceContext(stock, preMarketPricesCache.get(stock.getTicker()))))
                 .map(Stock::getTicker)
                 .toList();
     }
