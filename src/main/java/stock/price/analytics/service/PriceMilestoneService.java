@@ -9,6 +9,8 @@ import stock.price.analytics.model.json.DailyPriceJSON;
 import stock.price.analytics.model.prices.PriceMilestone;
 import stock.price.analytics.model.prices.enums.*;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
+import stock.price.analytics.model.prices.context.StockDailyPriceContext;
+import stock.price.analytics.model.prices.context.StockHighLowForPeriodContext;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.util.PriceMilestoneFactory;
@@ -19,7 +21,6 @@ import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
 import static stock.price.analytics.util.Constants.CFD_MARGINS_5X_4X_3X_2X_1X;
-import static stock.price.analytics.util.Constants.MIN_GAP_AND_GO_PERCENTAGE;
 
 @Service
 @RequiredArgsConstructor
@@ -81,7 +82,7 @@ public class PriceMilestoneService {
         return cacheService.getCachedStocks().stream()
                 .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
                 .filter(stock -> hlPricesCache.containsKey(stock.getTicker()))
-                .filter(stock -> withinPerformanceMilestone(stock, hlPricesCache.get(stock.getTicker()), pricePerformanceMilestone))
+                .filter(stock -> pricePerformanceMilestone.isMetFor(new StockHighLowForPeriodContext(stock, hlPricesCache.get(stock.getTicker()))))
                 .map(Stock::getTicker)
                 .toList();
     }
@@ -94,7 +95,7 @@ public class PriceMilestoneService {
         return cacheService.getCachedStocks().stream()
                 .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
                 .filter(stock -> hlPricesCache.containsKey(stock.getTicker()))
-                .filter(stock -> withinNewHighLowMilestone(stock, hlPricesCache.get(stock.getTicker()), newHighLowMilestone))
+                .filter(stock -> newHighLowMilestone.isMetFor(new StockHighLowForPeriodContext(stock, hlPricesCache.get(stock.getTicker()))))
                 .map(Stock::getTicker)
                 .toList();
     }
@@ -107,7 +108,7 @@ public class PriceMilestoneService {
         return cacheService.getCachedStocks().stream()
                 .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
                 .filter(stock -> preMarketPricesCache.containsKey(stock.getTicker()))
-                .filter(stock -> withinPreMarketMilestone(stock, preMarketPricesCache.get(stock.getTicker()), milestone))
+                .filter(stock -> milestone.isMetFor(new StockDailyPriceContext(stock, preMarketPricesCache.get(stock.getTicker()))))
                 .map(Stock::getTicker)
                 .toList();
     }
@@ -125,63 +126,8 @@ public class PriceMilestoneService {
                 .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
                 .map(Stock::getTicker)
                 .filter(dailyPriceJsonCache::containsKey)
-                .filter(ticker -> withinSimpleMovingAvgMilestone(dailyPriceJsonCache.get(ticker), smaMilestone))
+                .filter(ticker -> smaMilestone.isMetFor(dailyPriceJsonCache.get(ticker)))
                 .toList();
-    }
-
-    private boolean withinPerformanceMilestone(Stock s, HighLowForPeriod highLowForPeriod, PricePerformanceMilestone pricePerformanceMilestone) {
-        return switch (pricePerformanceMilestone) {
-            case HIGH_52W_95, HIGH_4W_95, HIGH_ALL_TIME_95 ->
-                    highLowForPeriod.getLow() != highLowForPeriod.getHigh() && (1 - (1 - (s.getClose() - highLowForPeriod.getLow()) / (highLowForPeriod.getHigh() - highLowForPeriod.getLow()))) > 0.95;
-            case LOW_52W_95, LOW_4W_95, LOW_ALL_TIME_95 ->
-                    highLowForPeriod.getLow() != highLowForPeriod.getHigh() && (1 - (s.getClose() - highLowForPeriod.getLow()) / (highLowForPeriod.getHigh() - highLowForPeriod.getLow())) > 0.95;
-            case HIGH_52W_90, HIGH_4W_90, HIGH_ALL_TIME_90 ->
-                    highLowForPeriod.getLow() != highLowForPeriod.getHigh() && (1 - (1 - (s.getClose() - highLowForPeriod.getLow()) / (highLowForPeriod.getHigh() - highLowForPeriod.getLow()))) > 0.90;
-            case LOW_52W_90, LOW_4W_90, LOW_ALL_TIME_90 ->
-                    highLowForPeriod.getLow() != highLowForPeriod.getHigh() && (1 - (s.getClose() - highLowForPeriod.getLow()) / (highLowForPeriod.getHigh() - highLowForPeriod.getLow())) > 0.90;
-        };
-    }
-
-    private boolean withinNewHighLowMilestone(Stock s, HighLowForPeriod highLowForPeriod, NewHighLowMilestone newHighLowMilestone) {
-        return switch (newHighLowMilestone) {
-            case NEW_52W_HIGH, NEW_ALL_TIME_HIGH, NEW_4W_HIGH -> s.getWeeklyHigh() > highLowForPeriod.getHigh();
-            case NEW_52W_LOW, NEW_4W_LOW, NEW_ALL_TIME_LOW -> s.getWeeklyLow() < highLowForPeriod.getLow();
-        };
-    }
-
-    private boolean withinPreMarketMilestone(Stock s, DailyPrice preMarketPrice, PreMarketPriceMilestone milestone) {
-        return switch (milestone) {
-            // previous day DOWN more than 1% && pre-market GAP UP more than 4%
-            case KICKING_CANDLE_UP ->
-                    s.getDailyPerformance() < -1.0d && preMarketPrice.getClose() > s.getClose() * (1 + MIN_GAP_AND_GO_PERCENTAGE);
-            // previous day UP more than 1% && pre-market GAP DOWN more than 4%
-            case KICKING_CANDLE_DOWN ->
-                    s.getDailyPerformance() > 1.0d && preMarketPrice.getClose() < s.getClose() * (1 - MIN_GAP_AND_GO_PERCENTAGE);
-            case GAP_UP -> preMarketPrice.getClose() > s.getClose();
-            case GAP_DOWN -> preMarketPrice.getClose() < s.getClose();
-            case GAP_UP_10_PERCENT -> preMarketPrice.getClose() > s.getClose() * 1.10;
-            case GAP_DOWN_10_PERCENT -> preMarketPrice.getClose() < s.getClose() * 0.90;
-            // pre-market GAP UP more than 4%
-            case GAP_UP_AND_GO -> preMarketPrice.getClose() > s.getClose() * (1 + MIN_GAP_AND_GO_PERCENTAGE);
-            // pre-market GAP DOWN more than 4%
-            case GAP_DOWN_AND_GO -> preMarketPrice.getClose() < s.getClose() * (1 - MIN_GAP_AND_GO_PERCENTAGE);
-            // new 4w, 52w, all-time high-low in pre-market
-            case PRE_NEW_4W_HIGH -> preMarketPrice.getClose() > s.getHigh4w();
-            case PRE_NEW_4W_LOW -> preMarketPrice.getClose() < s.getLow4w();
-            case PRE_NEW_52W_HIGH -> preMarketPrice.getClose() > s.getHigh52w();
-            case PRE_NEW_52W_LOW -> preMarketPrice.getClose() < s.getLow52w();
-            case PRE_NEW_ALL_TIME_HIGH -> preMarketPrice.getClose() > s.getHighest();
-            case PRE_NEW_ALL_TIME_LOW -> preMarketPrice.getClose() < s.getLowest();
-        };
-    }
-
-    private boolean withinSimpleMovingAvgMilestone(DailyPriceJSON dailyPriceJSON, SimpleMovingAverageMilestone milestone) {
-        return switch (milestone) {
-            case ABOVE_200_SMA -> dailyPriceJSON.getRegularMarketPrice() > dailyPriceJSON.getTwoHundredDayAverage();
-            case ABOVE_50_SMA -> dailyPriceJSON.getRegularMarketPrice() > dailyPriceJSON.getFiftyDayAverage();
-            case BELOW_200_SMA -> dailyPriceJSON.getRegularMarketPrice() < dailyPriceJSON.getTwoHundredDayAverage();
-            case BELOW_50_SMA -> dailyPriceJSON.getRegularMarketPrice() < dailyPriceJSON.getFiftyDayAverage();
-        };
     }
 
     public void cacheTickersForMilestones() {

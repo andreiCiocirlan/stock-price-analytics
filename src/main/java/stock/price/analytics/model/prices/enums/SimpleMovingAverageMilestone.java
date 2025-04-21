@@ -1,10 +1,12 @@
 package stock.price.analytics.model.prices.enums;
 
+import stock.price.analytics.model.json.DailyPriceJSON;
 import stock.price.analytics.model.prices.PriceMilestone;
+import stock.price.analytics.model.prices.StockPriceMilestone;
 
 import java.util.List;
 
-public enum SimpleMovingAverageMilestone implements PriceMilestone {
+public enum SimpleMovingAverageMilestone implements StockPriceMilestone<DailyPriceJSON> {
 
     ABOVE_200_SMA {
         @Override
@@ -33,5 +35,15 @@ public enum SimpleMovingAverageMilestone implements PriceMilestone {
 
     public static List<PriceMilestone> smaMilestones() {
         return List.of(ABOVE_50_SMA, ABOVE_200_SMA, BELOW_50_SMA, BELOW_200_SMA);
+    }
+
+    @Override
+    public boolean isMetFor(DailyPriceJSON dailyPriceJSON) {
+        return switch (this) {
+            case ABOVE_200_SMA -> dailyPriceJSON.getRegularMarketPrice() > dailyPriceJSON.getTwoHundredDayAverage();
+            case ABOVE_50_SMA -> dailyPriceJSON.getRegularMarketPrice() > dailyPriceJSON.getFiftyDayAverage();
+            case BELOW_200_SMA -> dailyPriceJSON.getRegularMarketPrice() < dailyPriceJSON.getTwoHundredDayAverage();
+            case BELOW_50_SMA -> dailyPriceJSON.getRegularMarketPrice() < dailyPriceJSON.getFiftyDayAverage();
+        };
     }
 }
