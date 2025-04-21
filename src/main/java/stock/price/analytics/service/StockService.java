@@ -87,7 +87,7 @@ public class StockService {
     public void updateHighLowForPeriodFromHLCachesAndAdjustWeekend() {
         Set<String> tickersUpdated = new HashSet<>(updateStocksFromHighLowCaches());
         List<Stock> stocksUpdated = cacheService.getCachedStocks().stream().filter(stock -> tickersUpdated.contains(stock.getTicker())).toList();
-        syncPersistenceService.partitionDataAndSaveWithLogTime(stocksUpdated, stockRepository, "saved" + stocksUpdated.size() + " stocks after generating high-lows 4w, 52w, all-time for the first import of the week");
+        syncPersistenceService.partitionDataAndSaveWithLogTime(stocksUpdated, stockRepository, "saved " + stocksUpdated.size() + " stocks after generating high-lows 4w, 52w, all-time for the first import of the week");
     }
 
     public LocalDate findLastUpdate() {
