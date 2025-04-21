@@ -16,7 +16,7 @@ class StocksCache {
     private final Map<String, Stock> stocksMap = new HashMap<>();
 
     void addStocks(List<Stock> stocks) {
-        stocks.forEach(s -> stocksMap.merge(s.getTicker(), s, (_, newValue) -> newValue));
+        stocks.forEach(s -> stocksMap.put(s.getTicker(), s));
     }
 
     List<String> getCachedTickers() {
