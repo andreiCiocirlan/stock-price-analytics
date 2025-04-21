@@ -198,6 +198,7 @@ public class CacheInitializationService {
                 .toList();
 
         if (!delistedStocks.isEmpty()) {
+            delistedStocks.forEach(delisted -> stocksCache.getStocksMap().remove(delisted.getTicker()));
             syncPersistenceService.partitionDataAndSave(delistedStocks, stockRepository);
         }
     }
