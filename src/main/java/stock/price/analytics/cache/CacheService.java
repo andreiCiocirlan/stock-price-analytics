@@ -167,10 +167,10 @@ public class CacheService {
                 .filter(priceMilestoneCache.tickersFor(priceMilestone)::contains).toList();
     }
 
-    public List<String> tickersWith(CandleStickType candleStickType) {
-        return getCachedDailyPrices(REGULAR).stream()
+    public List<String> tickersWith(StockTimeframe stockTimeframe, CandleStickType candleStickType) {
+        return pricesFor(stockTimeframe).stream()
                 .filter(dp -> dp.toCandleStickType() == candleStickType)
-                .map(DailyPrice::getTicker)
+                .map(AbstractPrice::getTicker)
                 .toList();
     }
 
