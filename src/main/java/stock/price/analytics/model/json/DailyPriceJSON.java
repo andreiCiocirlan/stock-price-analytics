@@ -348,22 +348,6 @@ public class DailyPriceJSON implements BusinessEntity {
 		return new DailyPrice(this.getSymbol(), this.getDate(), percentChange, new CandleOHLC(open, high, low, close));
 	}
 
-	public DailyPriceJSON toLighterVersion() {
-		DailyPriceJSON lighter = new DailyPriceJSON();
-		lighter.setRegularMarketOpen(this.getRegularMarketOpen());
-		lighter.setRegularMarketDayHigh(this.getRegularMarketDayHigh());
-		lighter.setRegularMarketDayLow(this.getRegularMarketDayLow());
-		lighter.setRegularMarketPrice(this.getRegularMarketPrice());
-		lighter.setRegularMarketChangePercent(this.getRegularMarketChangePercent());
-		lighter.setSymbol(this.getSymbol());
-		lighter.setDate(this.getDate());
-		lighter.setPreMarketPrice(this.getPreMarketPrice());
-		lighter.setFiftyDayAverage(this.getFiftyDayAverage());
-		lighter.setTwoHundredDayAverage(this.getTwoHundredDayAverage());
-
-		return lighter;
-	}
-
 	public DailyPriceJSON updateFrom(DailyPriceJSON dailyPriceJSON) {
 		this.symbol = dailyPriceJSON.getSymbol();
 		this.twoHundredDayAverageChangePercent = dailyPriceJSON.getTwoHundredDayAverageChangePercent();
