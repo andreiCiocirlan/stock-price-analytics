@@ -166,7 +166,8 @@ public class Stock implements BusinessEntity {
     }
 
     public boolean needsUpdate(AbstractPrice p) {
-        if (this.getClose() != p.getClose()) return true;
+        double performance = performanceFor(p.getTimeframe());
+        if (this.getClose() != p.getClose() && performance != p.getPerformance()) return true;
 
         return switch (p.getTimeframe()) {
             case DAILY -> this.getDailyHigh() != p.getHigh() || this.getDailyLow() != p.getLow() || this.getDailyOpen() != p.getOpen();
