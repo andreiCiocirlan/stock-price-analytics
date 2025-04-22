@@ -134,8 +134,6 @@ public class PriceMilestoneService {
         for (PriceMilestone priceMilestone : PriceMilestoneFactory.registry()) {
             List<String> tickersForMilestone = priceMilestone instanceof IntradayPriceSpike
                     ? new ArrayList<>() : findTickersForMilestone(priceMilestone, CFD_MARGINS_5X_4X_3X_2X_1X);
-            System.out.println(priceMilestone);
-            System.out.println(priceMilestone instanceof IntradayPriceSpike);
             cacheService.cachePriceMilestoneTickers(priceMilestone, tickersForMilestone);
         }
     }
