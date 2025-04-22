@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.cache.model.PriceWithPrevClose;
+import stock.price.analytics.model.json.DailyPriceJSON;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
@@ -35,6 +36,12 @@ public class CacheController {
     @ResponseStatus(HttpStatus.OK)
     public List<String> getCachedTickers() {
         return cacheService.getCachedTickers();
+    }
+
+    @GetMapping("/daily-prices-json")
+    @ResponseStatus(HttpStatus.OK)
+    public List<DailyPriceJSON> getDailyPriceJsonCache() {
+        return cacheService.dailyPriceJsonCache();
     }
 
     @GetMapping("/pre-market-prices")
