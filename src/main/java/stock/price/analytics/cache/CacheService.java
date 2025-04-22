@@ -58,10 +58,6 @@ public class CacheService {
         };
     }
 
-    public boolean isFirstImportFor(StockTimeframe timeframe) {
-        return dailyPriceCache.getFirstImportForTimeframe().get(timeframe);
-    }
-
     public void addPreMarketDailyPrices(List<DailyPrice> preMarketPrices) {
         dailyPriceCache.addDailyPrices(preMarketPrices, PRE);
     }
