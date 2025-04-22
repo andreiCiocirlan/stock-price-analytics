@@ -22,7 +22,7 @@ class DailyPriceJsonCache {
 
     List<DailyPriceJSON> cacheAndReturn(List<DailyPriceJSON> dailyPriceJSONs) {
         List<DailyPriceJSON> addedPrices = new ArrayList<>();
-        dailyPriceJSONs.forEach(price -> addToMap(price, addedPrices));
+        dailyPriceJSONs.forEach(price -> addToMap(price.toLighterVersion(), addedPrices));
         return addedPrices;
     }
 
