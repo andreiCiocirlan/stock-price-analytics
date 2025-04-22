@@ -14,6 +14,7 @@ import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -82,7 +83,7 @@ class HighLowPricesCache {
     }
 
     List<? extends HighLowForPeriod> getUpdatedHighLowPricesForTickers(List<DailyPrice> dailyPrices, List<String> tickers, HighLowPeriod highLowPeriod) {
-        Map<String, DailyPrice> dailyPricesByTicker = dailyPrices.stream().collect(Collectors.toMap(DailyPrice::getTicker, p -> p));
+        Map<String, DailyPrice> dailyPricesByTicker = dailyPrices.stream().collect(Collectors.toMap(DailyPrice::getTicker, Function.identity()));
         Map<String, ? extends HighLowForPeriod> highLowPrices = switch (highLowPeriod) {
             case HIGH_LOW_4W -> highLow4wMap;
             case HIGH_LOW_52W -> highLow52wMap;

@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.nio.file.Files.readAllLines;
@@ -75,7 +76,7 @@ public class DailyPriceJSONService {
         List<String> sameDailyPrices = new ArrayList<>();
         List<DailyPriceJSON> dailyJSONPrices = new ArrayList<>();
         List<DailyPrice> preMarketPrices = new ArrayList<>();
-        Map<String, DailyPriceJSON> recentJsonPricesById = recentJsonPrices.stream().collect(Collectors.toMap(DailyPriceJSON::getCompositeId, p -> p));
+        Map<String, DailyPriceJSON> recentJsonPricesById = recentJsonPrices.stream().collect(Collectors.toMap(DailyPriceJSON::getCompositeId, Function.identity()));
         LocalDate tradingDateNow = tradingDateNow();
         for (DailyPriceJSON dailyPriceJson : dailyPriceJSONs) {
             String ticker = dailyPriceJson.getSymbol();
@@ -160,7 +161,7 @@ public class DailyPriceJSONService {
         List<String> sameDailyPrices = new ArrayList<>();
         List<DailyPriceJSON> dailyJSONPrices = new ArrayList<>();
         List<DailyPrice> preMarketPrices = new ArrayList<>();
-        Map<String, DailyPriceJSON> recentJsonPricesById = recentJsonPrices.stream().collect(Collectors.toMap(DailyPriceJSON::getCompositeId, p -> p));
+        Map<String, DailyPriceJSON> recentJsonPricesById = recentJsonPrices.stream().collect(Collectors.toMap(DailyPriceJSON::getCompositeId, Function.identity()));
 
         for (DailyPriceJSON dailyPriceJson : dailyPriceJSONs) {
             String ticker = dailyPriceJson.getSymbol();

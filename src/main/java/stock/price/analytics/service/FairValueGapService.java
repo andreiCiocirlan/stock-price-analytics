@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.gaps.enums.FvgType.BEARISH;
@@ -177,8 +178,8 @@ public class FairValueGapService {
         List<FairValueGap> newFVGsFound = new ArrayList<>();
         List<FairValueGap> currentFVGs = findFVGsForTickersAndTimeframe(tickers, timeframe, allHistoricalData);
 
-        Map<String, FairValueGap> dbFVGsByCompositeId = fvgRepository.findByTimeframe(timeframe.name()).stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
-        Map<String, FairValueGap> currentFVGsByCompositeId = currentFVGs.stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
+        Map<String, FairValueGap> dbFVGsByCompositeId = fvgRepository.findByTimeframe(timeframe.name()).stream().collect(Collectors.toMap(FairValueGap::compositeId, Function.identity()));
+        Map<String, FairValueGap> currentFVGsByCompositeId = currentFVGs.stream().collect(Collectors.toMap(FairValueGap::compositeId, Function.identity()));
         currentFVGsByCompositeId.forEach((compositeKey, fvg) -> {
             if (!dbFVGsByCompositeId.containsKey(compositeKey)) {
                 FairValueGap newFVG = new FairValueGap(fvg.getTicker(), fvg.getTimeframe(), fvg.getDate(), fvg.getType(), fvg.getStatus(), fvg.getLow(), fvg.getHigh());
@@ -212,10 +213,10 @@ public class FairValueGapService {
     public List<FairValueGap> findUpdatedFVGsHighLowAndClosedFor(StockTimeframe timeframe, boolean allHistoricalData) {
         Map<String, FairValueGap> updatedFVGsByCompositeId = new HashMap<>();
         List<FairValueGap> currentFVGs = findFVGsForTickersAndTimeframe(cacheService.getCachedTickers(), timeframe, allHistoricalData);
-        Map<String, FairValueGap> dbFVGsByCompositeId = fvgRepository.findByTimeframe(timeframe.name()).stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
+        Map<String, FairValueGap> dbFVGsByCompositeId = fvgRepository.findByTimeframe(timeframe.name()).stream().collect(Collectors.toMap(FairValueGap::compositeId, Function.identity()));
         Map<String, List<AbstractPrice>> pricesByTicker = cacheService.pricesFor(timeframe).stream().collect(Collectors.groupingBy(AbstractPrice::getTicker));
 
-        Map<String, FairValueGap> currentFVGsByCompositeId = currentFVGs.stream().collect(Collectors.toMap(FairValueGap::compositeId, p -> p));
+        Map<String, FairValueGap> currentFVGsByCompositeId = currentFVGs.stream().collect(Collectors.toMap(FairValueGap::compositeId, Function.identity()));
         currentFVGsByCompositeId.forEach((compositeKey, fvg) -> {
             if (dbFVGsByCompositeId.containsKey(compositeKey)) { // check for high-low updates of existing FVGs
                 FairValueGap dbFVG = dbFVGsByCompositeId.get(compositeKey);

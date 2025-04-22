@@ -77,7 +77,7 @@ public class PriceMilestoneService {
     private List<String> filterByPerformanceMilestone(PricePerformanceMilestone pricePerformanceMilestone, List<Double> cfdMargins) {
         Map<String, HighLowForPeriod> hlPricesCache = cacheService.highLowForPeriodPricesForPricePerformanceMilestone(pricePerformanceMilestone)
                 .stream()
-                .collect(Collectors.toMap(HighLowForPeriod::getTicker, p -> p));
+                .collect(Collectors.toMap(HighLowForPeriod::getTicker, Function.identity()));
 
         return cacheService.getCachedStocks().stream()
                 .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
@@ -90,7 +90,7 @@ public class PriceMilestoneService {
     private List<String> filterByNewHighLowMilestone(NewHighLowMilestone newHighLowMilestone, List<Double> cfdMargins) {
         Map<String, HighLowForPeriod> hlPricesCache = cacheService.highLowForPeriodPricesForNewHighLowMilestone(newHighLowMilestone)
                 .stream()
-                .collect(Collectors.toMap(HighLowForPeriod::getTicker, p -> p));
+                .collect(Collectors.toMap(HighLowForPeriod::getTicker, Function.identity()));
 
         return cacheService.getCachedStocks().stream()
                 .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
@@ -103,7 +103,7 @@ public class PriceMilestoneService {
     private List<String> filterByPreMarketMilestone(PreMarketPriceMilestone preMarketMilestone, List<Double> cfdMargins) {
         Map<String, DailyPrice> preMarketPricesCache = cacheService.getCachedDailyPrices(PRE)
                 .stream()
-                .collect(Collectors.toMap(DailyPrice::getTicker, p -> p));
+                .collect(Collectors.toMap(DailyPrice::getTicker, Function.identity()));
 
         return cacheService.getCachedStocks().stream()
                 .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
@@ -134,6 +134,8 @@ public class PriceMilestoneService {
         for (PriceMilestone priceMilestone : PriceMilestoneFactory.registry()) {
             List<String> tickersForMilestone = priceMilestone instanceof IntradayPriceSpike
                     ? new ArrayList<>() : findTickersForMilestone(priceMilestone, CFD_MARGINS_5X_4X_3X_2X_1X);
+            System.out.println(priceMilestone);
+            System.out.println(priceMilestone instanceof IntradayPriceSpike);
             cacheService.cachePriceMilestoneTickers(priceMilestone, tickersForMilestone);
         }
     }

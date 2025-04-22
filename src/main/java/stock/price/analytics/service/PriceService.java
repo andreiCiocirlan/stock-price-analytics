@@ -18,6 +18,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.time.temporal.TemporalAdjusters.*;
@@ -179,7 +180,7 @@ public class PriceService {
                                                          List<PriceWithPrevClose> pricesWithPrevClose) {
         List<PriceWithPrevClose> result = new ArrayList<>();
         Map<String, PriceWithPrevClose> pricesWithPrevCloseByTicker = pricesWithPrevClose.stream()
-                .collect(Collectors.toMap(priceWithPrevClose -> priceWithPrevClose.abstractPrice().getTicker(), p -> p));
+                .collect(Collectors.toMap(priceWithPrevClose -> priceWithPrevClose.abstractPrice().getTicker(), Function.identity()));
         for (DailyPrice importedDailyPrice : importedDailyPrices) {
             String ticker = importedDailyPrice.getTicker();
             PriceWithPrevClose priceWithPrevClose = pricesWithPrevCloseByTicker.get(ticker);
