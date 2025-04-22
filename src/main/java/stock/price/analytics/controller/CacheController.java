@@ -4,14 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.cache.CacheService;
-import stock.price.analytics.model.prices.ohlc.PriceWithPrevClose;
 import stock.price.analytics.model.json.DailyPriceJSON;
-import stock.price.analytics.model.prices.enums.StockTimeframe;
+import stock.price.analytics.model.prices.PriceMilestone;
+import stock.price.analytics.model.prices.enums.*;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
+import stock.price.analytics.model.prices.ohlc.PriceWithPrevClose;
 import stock.price.analytics.model.stocks.Stock;
+import stock.price.analytics.util.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,6 +106,31 @@ public class CacheController {
             result.add(cacheService.prevWeekHighLowForPeriodPricesFor(highLowPeriod).stream().filter(hlp -> ticker.equals(hlp.getTicker())).findFirst().orElseThrow());
         }
         return result;
+    }
+
+    @GetMapping("/price-milestone")
+    @ResponseStatus(HttpStatus.OK)
+    public List<String> priceMilestoneTickersFor(@RequestParam String type, @RequestParam("priceMilestone") String priceMilestoneStr) {
+        PriceMilestone priceMilestone;
+        try {
+            priceMilestone = switch (type) {
+                case "new-hl":
+                    yield NewHighLowMilestone.valueOf(priceMilestoneStr.toUpperCase());
+                case "pre":
+                    yield PreMarketPriceMilestone.valueOf(priceMilestoneStr.toUpperCase());
+                case "performance":
+                    yield PricePerformanceMilestone.valueOf(priceMilestoneStr.toUpperCase());
+                case "spike":
+                    yield IntradayPriceSpike.valueOf(priceMilestoneStr.toUpperCase());
+                case "sma":
+                    yield SimpleMovingAverageMilestone.valueOf(priceMilestoneStr.toUpperCase());
+                default:
+                    throw new IllegalStateException("Unexpected value: " + type);
+            };
+        } catch (RuntimeException e) {
+            return List.of("Invalid enum type and price milestone combo!");
+        }
+        return cacheService.tickersFor(priceMilestone, Constants.CFD_MARGINS_5X_4X_3X_2X);
     }
 
 }
