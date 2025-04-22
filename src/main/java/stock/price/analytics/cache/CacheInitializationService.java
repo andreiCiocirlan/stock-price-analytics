@@ -85,7 +85,7 @@ public class CacheInitializationService {
 
     private void initDailyJSONPricesCache() {
         LocalDate tradingDateNow = tradingDateNow();
-        dailyPriceJsonCache.addDailyJSONPrices(dailyPriceJSONRepository.findByDateBetween(tradingDateNow.minusDays(7), tradingDateNow));
+        dailyPriceJsonCache.cacheAndReturn(dailyPriceJSONRepository.findByDateBetween(tradingDateNow.minusDays(7), tradingDateNow));
     }
 
     private void initPreMarketDailyPrices() {

@@ -16,10 +16,6 @@ class DailyPriceJsonCache {
 
     private final Map<String, DailyPriceJSON> dailyPriceJSONByTicker = new HashMap<>();
 
-    void addDailyJSONPrices(List<DailyPriceJSON> dailyPriceJSONs) {
-        dailyPriceJSONs.forEach(price -> dailyPriceJSONByTicker.put(createKey(price.getSymbol(), price.getDate()), price));
-    }
-
     List<DailyPriceJSON> cacheAndReturn(List<DailyPriceJSON> dailyPriceJSONs) {
         List<DailyPriceJSON> addedPrices = new ArrayList<>();
         dailyPriceJSONs.forEach(price -> addToMap(price.toLighterVersion(), addedPrices));
