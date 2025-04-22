@@ -40,20 +40,26 @@ public class CacheController {
 
     @GetMapping("/daily-prices-json")
     @ResponseStatus(HttpStatus.OK)
-    public List<DailyPriceJSON> getDailyPriceJsonCache() {
-        return cacheService.dailyPriceJsonCache();
+    public List<DailyPriceJSON> getDailyPriceJsonCache(@RequestParam(required = false, value = "ticker") String ticker) {
+        return cacheService.dailyPriceJsonCache().stream()
+                .filter(p -> ticker == null || p.getSymbol().equals(ticker))
+                .toList();
     }
 
     @GetMapping("/pre-market-prices")
     @ResponseStatus(HttpStatus.OK)
-    public List<DailyPrice> getPreMarketDailyPricesCache() {
-        return cacheService.getCachedDailyPrices(PRE);
+    public List<DailyPrice> getPreMarketDailyPricesCache(@RequestParam(required = false, value = "ticker") String ticker) {
+        return cacheService.getCachedDailyPrices(PRE).stream()
+                .filter(p -> ticker == null || p.getTicker().equals(ticker))
+                .toList();
     }
 
     @GetMapping("/intraday-prices")
     @ResponseStatus(HttpStatus.OK)
-    public List<DailyPrice> getIntradayDailyPricesCache() {
-        return cacheService.getCachedDailyPrices(REGULAR);
+    public List<DailyPrice> getIntradayDailyPricesCache(@RequestParam(required = false, value = "ticker") String ticker) {
+        return cacheService.getCachedDailyPrices(REGULAR).stream()
+                .filter(p -> ticker == null || p.getTicker().equals(ticker))
+                .toList();
     }
 
     @GetMapping("/prices")
