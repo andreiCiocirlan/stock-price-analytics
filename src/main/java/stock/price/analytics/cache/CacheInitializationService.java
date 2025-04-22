@@ -129,6 +129,7 @@ public class CacheInitializationService {
         if (cacheService.weeklyHighLowExists() && !cacheService.isFirstImportFor(StockTimeframe.WEEKLY)) { // on first import of the week need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
             prevWeekStartDate = prevWeekStartDate.minusWeeks(1);
         }
+        log.info("prevWeekStartDate " + prevWeekStartDate);
         List<? extends HighLowForPeriod> prevWeekHighLowPrices = switch (highLowPeriod) {
             case HIGH_LOW_4W -> highLowForPeriodRepository.highLow4wPricesFor(prevWeekStartDate);
             case HIGH_LOW_52W -> highLowForPeriodRepository.highLow52wPricesFor(prevWeekStartDate);
