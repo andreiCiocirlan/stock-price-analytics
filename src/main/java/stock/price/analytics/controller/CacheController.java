@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.cache.CacheService;
-import stock.price.analytics.cache.model.PriceWithPrevClose;
+import stock.price.analytics.model.prices.ohlc.PriceWithPrevClose;
 import stock.price.analytics.model.json.DailyPriceJSON;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;

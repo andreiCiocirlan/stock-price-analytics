@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import stock.price.analytics.cache.model.PriceWithPrevClose;
+import stock.price.analytics.model.prices.ohlc.PriceWithPrevClose;
 import stock.price.analytics.model.json.DailyPriceJSON;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.highlow.*;

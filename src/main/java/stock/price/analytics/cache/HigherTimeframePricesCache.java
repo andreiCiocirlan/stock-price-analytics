@@ -1,7 +1,7 @@
 package stock.price.analytics.cache;
 
 import org.springframework.stereotype.Component;
-import stock.price.analytics.cache.model.PriceWithPrevClose;
+import stock.price.analytics.model.prices.ohlc.PriceWithPrevClose;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 
