@@ -1,7 +1,6 @@
 package stock.price.analytics.model.json;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -24,7 +23,6 @@ import java.util.Objects;
 @NoArgsConstructor
 @Table(name = "daily_prices_json")
 @JsonIgnoreProperties(ignoreUnknown=true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class DailyPriceJSON implements BusinessEntity {
 
 	@Id
@@ -37,13 +35,13 @@ public class DailyPriceJSON implements BusinessEntity {
 	private String symbol;
 
 	@JsonProperty("twoHundredDayAverageChangePercent")
-	private Double twoHundredDayAverageChangePercent;
+	private double twoHundredDayAverageChangePercent;
 
 	@JsonProperty("averageAnalystRating")
 	private String averageAnalystRating;
 
 	@JsonProperty("fiftyTwoWeekLowChangePercent")
-	private Double fiftyTwoWeekLowChangePercent;
+	private double fiftyTwoWeekLowChangePercent;
 
 	@JsonProperty("isEarningsDateEstimate")
 	private boolean isEarningsDateEstimate;
@@ -55,31 +53,31 @@ public class DailyPriceJSON implements BusinessEntity {
 	private String regularMarketDayRange;
 
 	@JsonProperty("earningsTimestampEnd")
-	private Long earningsTimestampEnd;
+	private long earningsTimestampEnd;
 
 	@JsonProperty("epsForward")
-	private Double epsForward;
+	private double epsForward;
 
 	@JsonProperty("regularMarketDayHigh")
-	private Double regularMarketDayHigh;
+	private double regularMarketDayHigh;
 
 	@JsonProperty("twoHundredDayAverageChange")
-	private Double twoHundredDayAverageChange;
+	private double twoHundredDayAverageChange;
 
 	@JsonProperty("askSize")
-	private Long askSize;
+	private long askSize;
 
 	@JsonProperty("twoHundredDayAverage")
-	private Double twoHundredDayAverage;
+	private double twoHundredDayAverage;
 
 	@JsonProperty("bookValue")
-	private Double bookValue;
+	private double bookValue;
 
 	@JsonProperty("fiftyTwoWeekHighChange")
-	private Double fiftyTwoWeekHighChange;
+	private double fiftyTwoWeekHighChange;
 
 	@JsonProperty("marketCap")
-	private Long marketCap;
+	private long marketCap;
 
 	@JsonProperty("esgPopulated")
 	private boolean esgPopulated;
@@ -88,37 +86,37 @@ public class DailyPriceJSON implements BusinessEntity {
 	private String fiftyTwoWeekRange;
 
 	@JsonProperty("fiftyDayAverageChange")
-	private Double fiftyDayAverageChange;
+	private double fiftyDayAverageChange;
 
 	@JsonProperty("exchangeDataDelayedBy")
-	private Long exchangeDataDelayedBy;
+	private long exchangeDataDelayedBy;
 
 	@JsonProperty("firstTradeDateMilliseconds")
-	private Long firstTradeDateMilliseconds;
+	private long firstTradeDateMilliseconds;
 
 	@JsonProperty("averageDailyVolume3Month")
-	private Long averageDailyVolume3Month;
+	private long averageDailyVolume3Month;
 
 	@JsonProperty("fiftyTwoWeekChangePercent")
-	private Double fiftyTwoWeekChangePercent;
+	private double fiftyTwoWeekChangePercent;
 
 	@JsonProperty("trailingAnnualDividendRate")
-	private Double trailingAnnualDividendRate;
+	private double trailingAnnualDividendRate;
 
 	@JsonProperty("hasPrePostMarketData")
 	private boolean hasPrePostMarketData;
 
 	@JsonProperty("fiftyTwoWeekLow")
-	private Double fiftyTwoWeekLow;
+	private double fiftyTwoWeekLow;
 
 	@JsonProperty("market")
 	private String market;
 
 	@JsonProperty("regularMarketVolume")
-	private Long regularMarketVolume;
+	private long regularMarketVolume;
 
 	@JsonProperty("postMarketPrice")
-	private Double postMarketPrice;
+	private double postMarketPrice;
 
 	@JsonProperty("quoteSourceName")
 	private String quoteSourceName;
@@ -127,16 +125,16 @@ public class DailyPriceJSON implements BusinessEntity {
 	private String messageBoardId;
 
 	@JsonProperty("priceHint")
-	private Long priceHint;
+	private long priceHint;
 
 	@JsonProperty("exchange")
 	private String exchange;
 
 	@JsonProperty("sourceInterval")
-	private Long sourceInterval;
+	private long sourceInterval;
 
 	@JsonProperty("regularMarketDayLow")
-	private Double regularMarketDayLow;
+	private double regularMarketDayLow;
 
 	@JsonProperty("region")
 	private String region;
@@ -145,13 +143,13 @@ public class DailyPriceJSON implements BusinessEntity {
 	private String shortName;
 
 	@JsonProperty("fiftyDayAverageChangePercent")
-	private Double fiftyDayAverageChangePercent;
+	private double fiftyDayAverageChangePercent;
 
 	@JsonProperty("fullExchangeName")
 	private String fullExchangeName;
 
 	@JsonProperty("earningsTimestampStart")
-	private Long earningsTimestampStart;
+	private long earningsTimestampStart;
 
 	@JsonProperty("financialCurrency")
 	private String financialCurrency;
@@ -160,135 +158,135 @@ public class DailyPriceJSON implements BusinessEntity {
 	private String displayName;
 
 	@JsonProperty("gmtOffSetMilliseconds")
-	private Long gmtOffSetMilliseconds;
+	private long gmtOffSetMilliseconds;
 
 	@JsonProperty("regularMarketOpen")
-	private Double regularMarketOpen;
+	private double regularMarketOpen;
 
 	@Column(name = "date")
 	@JsonProperty("regularMarketTime")
 	private LocalDate date;
 
 	@JsonProperty("regularMarketChangePercent")
-	private Double regularMarketChangePercent;
+	private double regularMarketChangePercent;
 
 	@JsonProperty("quoteType")
 	private String quoteType;
 
 	@JsonProperty("trailingAnnualDividendYield")
-	private Double trailingAnnualDividendYield;
+	private double trailingAnnualDividendYield;
 
 	@JsonProperty("averageDailyVolume10Day")
-	private Long averageDailyVolume10Day;
+	private long averageDailyVolume10Day;
 
 	@JsonProperty("fiftyTwoWeekLowChange")
-	private Double fiftyTwoWeekLowChange;
+	private double fiftyTwoWeekLowChange;
 
 	@JsonProperty("fiftyTwoWeekHighChangePercent")
-	private Double fiftyTwoWeekHighChangePercent;
+	private double fiftyTwoWeekHighChangePercent;
 
 	@JsonProperty("earningsCallTimestampEnd")
-	private Long earningsCallTimestampEnd;
+	private long earningsCallTimestampEnd;
 
 	@JsonProperty("typeDisp")
 	private String typeDisp;
 
 	@JsonProperty("trailingPE")
-	private Double trailingPE;
+	private double trailingPE;
 
 	@JsonProperty("tradeable")
 	private boolean tradeable;
 
 	@JsonProperty("postMarketTime")
-	private Long postMarketTime;
+	private long postMarketTime;
 
 	@JsonProperty("currency")
 	private String currency;
 
 	@JsonProperty("sharesOutstanding")
-	private Long sharesOutstanding;
+	private long sharesOutstanding;
 
 	@JsonProperty("regularMarketPreviousClose")
-	private Double regularMarketPreviousClose;
+	private double regularMarketPreviousClose;
 
 	@JsonProperty("fiftyTwoWeekHigh")
-	private Double fiftyTwoWeekHigh;
+	private double fiftyTwoWeekHigh;
 
 	@JsonProperty("exchangeTimezoneName")
 	private String exchangeTimezoneName;
 
 	@JsonProperty("postMarketChangePercent")
-	private Double postMarketChangePercent;
+	private double postMarketChangePercent;
 
 	@JsonProperty("regularMarketChange")
-	private Double regularMarketChange;
+	private double regularMarketChange;
 
 	@JsonProperty("bidSize")
-	private Long bidSize;
+	private long bidSize;
 
 	@JsonProperty("priceEpsCurrentYear")
-	private Double priceEpsCurrentYear;
+	private double priceEpsCurrentYear;
 
 	@JsonProperty("cryptoTradeable")
 	private boolean cryptoTradeable;
 
 	@JsonProperty("fiftyDayAverage")
-	private Double fiftyDayAverage;
+	private double fiftyDayAverage;
 
 	@JsonProperty("exchangeTimezoneShortName")
 	private String exchangeTimezoneShortName;
 
 	@JsonProperty("epsCurrentYear")
-	private Double epsCurrentYear;
+	private double epsCurrentYear;
 
 	@JsonProperty("customPriceAlertConfidence")
 	private String customPriceAlertConfidence;
 
 	@JsonProperty("regularMarketPrice")
-	private Double regularMarketPrice;
+	private double regularMarketPrice;
 
 	@JsonProperty("marketState")
 	@Enumerated(EnumType.STRING)
 	private MarketState marketState;
 
 	@JsonProperty("postMarketChange")
-	private Double postMarketChange;
+	private double postMarketChange;
 
 	@JsonProperty("forwardPE")
-	private Double forwardPE;
+	private double forwardPE;
 
 	@JsonProperty("earningsTimestamp")
-	private Long earningsTimestamp;
+	private long earningsTimestamp;
 
 	@JsonProperty("ask")
-	private Double ask;
+	private double ask;
 
 	@JsonProperty("epsTrailingTwelveMonths")
-	private Double epsTrailingTwelveMonths;
+	private double epsTrailingTwelveMonths;
 
 	@JsonProperty("bid")
-	private Double bid;
+	private double bid;
 
 	@JsonProperty("triggerable")
 	private boolean triggerable;
 
 	@JsonProperty("earningsCallTimestampStart")
-	private Long earningsCallTimestampStart;
+	private long earningsCallTimestampStart;
 
 	@JsonProperty("priceToBook")
-	private Double priceToBook;
+	private double priceToBook;
 
 	@JsonProperty("longName")
 	private String longName;
 
 	@JsonProperty("dividendDate")
-	private Long dividendDate;
+	private long dividendDate;
 
 	@JsonProperty("dividendYield")
-	private Double dividendYield;
+	private double dividendYield;
 
 	@JsonProperty("dividendRate")
-	private Double dividendRate;
+	private double dividendRate;
 
 	@JsonProperty("prevName")
 	private String prevName;
@@ -303,13 +301,13 @@ public class DailyPriceJSON implements BusinessEntity {
 	private LocalDate preMarketTime;
 
 	@JsonProperty("preMarketPrice")
-	private Double preMarketPrice;
+	private double preMarketPrice;
 
 	@JsonProperty("preMarketChange")
-	private Double preMarketChange;
+	private double preMarketChange;
 
 	@JsonProperty("preMarketChangePercent")
-	private Double preMarketChangePercent;
+	private double preMarketChangePercent;
 
 	@JsonProperty("nameChangeDate")
 	private String nameChangeDate;
@@ -318,7 +316,7 @@ public class DailyPriceJSON implements BusinessEntity {
 	private String ipoExpectedDate;
 
 	@JsonProperty("openInterest")
-	private Long openInterest;
+	private long openInterest;
 
 	@Column(name = "prevTicker")
 	@JsonProperty("prevTicker")
