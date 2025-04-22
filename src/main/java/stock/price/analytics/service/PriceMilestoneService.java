@@ -132,9 +132,9 @@ public class PriceMilestoneService {
 
     public void cacheTickersForMilestones() {
         for (PriceMilestone priceMilestone : PriceMilestoneFactory.registry()) {
-            List<String> tickersForMilestone = priceMilestone instanceof IntradayPriceSpike
-                    ? new ArrayList<>() : findTickersForMilestone(priceMilestone, CFD_MARGINS_5X_4X_3X_2X_1X);
-            cacheService.cachePriceMilestoneTickers(priceMilestone, tickersForMilestone);
+            if (!(priceMilestone instanceof IntradayPriceSpike)) {
+                cacheService.cachePriceMilestoneTickers(priceMilestone, findTickersForMilestone(priceMilestone, CFD_MARGINS_5X_4X_3X_2X_1X));
+            }
         }
     }
 }

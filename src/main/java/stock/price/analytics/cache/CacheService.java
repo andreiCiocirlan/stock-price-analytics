@@ -171,9 +171,8 @@ public class CacheService {
     }
 
     public void updateIntradayPriceSpikesCache(List<DailyPrice> dailyPrices) {
-        // clear intraday spikes before adding
-        priceMilestoneCache.clearIntradaySpikes();
-
+        List<String> spikeUpTickers = new ArrayList<>();
+        List<String> spikeDownTickers = new ArrayList<>();
         for (DailyPrice dailyPrice : dailyPrices) {
             String ticker = dailyPrice.getTicker();
             double oldClosingPrice = getStocksMap().get(ticker).getClose();
@@ -181,10 +180,12 @@ public class CacheService {
             boolean spikeUp = newClosingPrice > oldClosingPrice * (1 + INTRADAY_SPIKE_PERCENTAGE);
             boolean spikeDown = newClosingPrice < oldClosingPrice * (1 - INTRADAY_SPIKE_PERCENTAGE);
             if (spikeUp) {
-                priceMilestoneCache.addIntradaySpike(INTRADAY_SPIKE_UP, ticker);
+                spikeUpTickers.add(ticker);
             } else if (spikeDown) {
-                priceMilestoneCache.addIntradaySpike(INTRADAY_SPIKE_DOWN, ticker);
+                spikeDownTickers.add(ticker);
             }
         }
+        cachePriceMilestoneTickers(INTRADAY_SPIKE_UP, spikeUpTickers);
+        cachePriceMilestoneTickers(INTRADAY_SPIKE_DOWN, spikeDownTickers);
     }
 }
