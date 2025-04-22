@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
-import stock.price.analytics.cache.model.*;
+import stock.price.analytics.cache.model.PriceWithPrevClose;
 import stock.price.analytics.model.dto.CandleWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
@@ -165,7 +165,7 @@ public class PriceService {
         for (StockTimeframe timeframe : higherTimeframes()) {
             List<PriceWithPrevClose> htfPricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, timeframe,
                     cacheService.htfPricesWithPrevCloseFor(tickers, timeframe));
-            htfPricesUpdated.addAll(htfPricesWithPrevCloseUpdated.stream().map(PriceWithPrevClose::getPrice).toList());
+            htfPricesUpdated.addAll(htfPricesWithPrevCloseUpdated.stream().map(PriceWithPrevClose::abstractPrice).toList());
             cacheService.addHtfPricesWithPrevClose(htfPricesWithPrevCloseUpdated);
         }
         asyncPersistenceService.partitionDataAndSaveWithLogTime(htfPricesUpdated, priceRepository, "saved " + htfPricesUpdated.size() + " HTF prices");
@@ -179,11 +179,11 @@ public class PriceService {
                                                          List<PriceWithPrevClose> pricesWithPrevClose) {
         List<PriceWithPrevClose> result = new ArrayList<>();
         Map<String, PriceWithPrevClose> pricesWithPrevCloseByTicker = pricesWithPrevClose.stream()
-                .collect(Collectors.toMap(priceWithPrevClose -> priceWithPrevClose.getPrice().getTicker(), p -> p));
+                .collect(Collectors.toMap(priceWithPrevClose -> priceWithPrevClose.abstractPrice().getTicker(), p -> p));
         for (DailyPrice importedDailyPrice : importedDailyPrices) {
             String ticker = importedDailyPrice.getTicker();
             PriceWithPrevClose priceWithPrevClose = pricesWithPrevCloseByTicker.get(ticker);
-            AbstractPrice price = priceWithPrevClose.getPrice();
+            AbstractPrice price = priceWithPrevClose.abstractPrice();
             LocalDate latestEndDateWMQY = price.getEndDate(); // latest cached w,m,q,y end_date per ticker
             if (isWithinSameTimeframe(importedDailyPrice.getDate(), latestEndDateWMQY, timeframe)) {
                 price.convertFrom(importedDailyPrice, priceWithPrevClose.previousClose());
@@ -197,25 +197,14 @@ public class PriceService {
     }
 
     private PriceWithPrevClose newPriceWithPrevCloseFrom(DailyPrice importedDailyPrice, StockTimeframe timeframe, double previousClose) {
-        AbstractPrice price = createNewHTFPrice(importedDailyPrice, timeframe, previousClose);
-
-        return switch (timeframe) {
-            case DAILY -> throw new IllegalStateException("Unexpected timeframe DAILY");
-            case WEEKLY -> new WeeklyPriceWithPrevClose((WeeklyPrice) price, previousClose);
-            case MONTHLY -> new MonthlyPriceWithPrevClose((MonthlyPrice) price, previousClose);
-            case QUARTERLY -> new QuarterlyPriceWithPrevClose((QuarterlyPrice) price, previousClose);
-            case YEARLY -> new YearlyPriceWithPrevClose((YearlyPrice) price, previousClose);
-        };
-    }
-
-    private AbstractPrice createNewHTFPrice(DailyPrice dailyPrice, StockTimeframe timeframe, double previousClose) {
-        return switch (timeframe) {
+        AbstractPrice price = switch (timeframe) {
             case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
-            case WEEKLY -> WeeklyPrice.newFrom(dailyPrice, previousClose);
-            case MONTHLY -> MonthlyPrice.newFrom(dailyPrice, previousClose);
-            case QUARTERLY -> QuarterlyPrice.newFrom(dailyPrice, previousClose);
-            case YEARLY -> YearlyPrice.newFrom(dailyPrice, previousClose);
+            case WEEKLY -> WeeklyPrice.newFrom(importedDailyPrice, previousClose);
+            case MONTHLY -> MonthlyPrice.newFrom(importedDailyPrice, previousClose);
+            case QUARTERLY -> QuarterlyPrice.newFrom(importedDailyPrice, previousClose);
+            case YEARLY -> YearlyPrice.newFrom(importedDailyPrice, previousClose);
         };
+        return new PriceWithPrevClose(price, previousClose);
     }
 
     public List<AbstractPrice> computeHTFPriceForStockSplitDate(LocalDate date, List<DailyPrice> dailyPrices, Map<StockTimeframe, AbstractPrice> stockSplitDateHTFPriceByTimeframe) {

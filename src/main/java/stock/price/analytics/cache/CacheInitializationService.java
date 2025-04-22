@@ -4,12 +4,13 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import stock.price.analytics.cache.model.*;
+import stock.price.analytics.cache.model.PriceWithPrevClose;
 import stock.price.analytics.model.json.DailyPriceJSON;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.highlow.*;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
-import stock.price.analytics.model.prices.ohlc.*;
+import stock.price.analytics.model.prices.ohlc.AbstractPrice;
+import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.json.DailyPriceJSONRepository;
 import stock.price.analytics.repository.prices.highlow.HighLowForPeriodRepository;
@@ -231,17 +232,7 @@ public class CacheInitializationService {
         }
 
         return latestPrices.stream()
-                .map(price -> (PriceWithPrevClose) switch (price.getTimeframe()) {
-                    case DAILY -> throw new IllegalStateException("Unexpected timeframe DAILY");
-                    case WEEKLY ->
-                            new WeeklyPriceWithPrevClose((WeeklyPrice) price, previousCloseByTicker.get(price.getTicker()));
-                    case MONTHLY ->
-                            new MonthlyPriceWithPrevClose((MonthlyPrice) price, previousCloseByTicker.get(price.getTicker()));
-                    case QUARTERLY ->
-                            new QuarterlyPriceWithPrevClose((QuarterlyPrice) price, previousCloseByTicker.get(price.getTicker()));
-                    case YEARLY ->
-                            new YearlyPriceWithPrevClose((YearlyPrice) price, previousCloseByTicker.get(price.getTicker()));
-                })
+                .map(price -> new PriceWithPrevClose(price, previousCloseByTicker.get(price.getTicker())))
                 .toList();
     }
 }

@@ -134,7 +134,7 @@ public class CacheService {
     }
 
     public void addHtfPricesWithPrevClose(List<PriceWithPrevClose> pricesWithPrevClose) {
-        higherTimeframePricesCache.addPricesWithPrevClose(pricesWithPrevClose, pricesWithPrevClose.getFirst().getPrice().getTimeframe());
+        higherTimeframePricesCache.addPricesWithPrevClose(pricesWithPrevClose, pricesWithPrevClose.getFirst().abstractPrice().getTimeframe());
     }
 
     public void logNewHighLowsForHLPeriods() {
