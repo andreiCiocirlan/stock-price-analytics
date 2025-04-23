@@ -27,4 +27,12 @@ public interface DailyPriceRepository extends JpaRepository<DailyPrice, Long> {
 
     List<DailyPrice> findByTickerAndDateLessThanEqual(String ticker, LocalDate date);
 
+    @Query(value = """
+                SELECT *
+                FROM daily_prices
+                WHERE date BETWEEN (DATE_TRUNC('week', CURRENT_DATE) - INTERVAL '7 days') AND CURRENT_DATE
+                AND ticker in (:tickers)
+                ORDER BY ticker, date DESC
+            """, nativeQuery = true)
+    List<DailyPrice> findPreviousSevenDailyPricesForTickers(List<String> tickers);
 }
