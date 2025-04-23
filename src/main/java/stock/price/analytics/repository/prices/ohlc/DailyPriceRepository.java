@@ -12,19 +12,6 @@ import java.util.List;
 @Repository
 public interface DailyPriceRepository extends JpaRepository<DailyPrice, Long> {
 
-    @Query(value = """
-            WITH latest_prices AS (
-                SELECT *,
-                       ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY date DESC) AS row_num
-                FROM daily_prices
-                WHERE date >= CURRENT_DATE - interval '7 days'
-            )
-            SELECT id, open, high, low, close, ticker, date, performance
-            FROM latest_prices
-            WHERE row_num = 1;
-            """, nativeQuery = true)
-    List<DailyPrice> findLatestDailyPrices();
-
     List<DailyPrice> findByTickerAndDateLessThanEqual(String ticker, LocalDate date);
 
     @Query(value = """

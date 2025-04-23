@@ -33,7 +33,6 @@ import static stock.price.analytics.util.Constants.INTRADAY_SPIKE_PERCENTAGE;
 public class CacheService {
 
     private final DailyPriceJsonCache dailyPriceJsonCache;
-    private final DailyPriceCache dailyPriceCache;
     private final StocksCache stocksCache;
     private final PricesCache pricesCache;
     private final HighLowPricesCache highLowPricesCache;
@@ -44,25 +43,20 @@ public class CacheService {
         return dailyPriceJsonCache.getDailyPriceJSONByTicker().values().stream().toList();
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> List<T> cacheAndReturn(List<T> entities) {
-        if (entities.isEmpty()) {
-            return entities;
-        }
-
-        return switch (entities.getFirst()) {
-            case DailyPrice _ -> (List<T>) dailyPriceCache.cacheAndReturn((List<DailyPrice>) entities);
-            case DailyPriceJSON _ -> (List<T>) dailyPriceJsonCache.cacheAndReturn((List<DailyPriceJSON>) entities);
-            default -> throw new IllegalArgumentException("Unsupported type: " + entities.getFirst().getClass());
-        };
+    public List<DailyPriceJSON> addDailyPricesJSONAndReturn(List<DailyPriceJSON> dailyPriceJsons) {
+        return dailyPriceJsonCache.cacheAndReturn(dailyPriceJsons);
     }
 
     public void addPreMarketDailyPrices(List<DailyPrice> preMarketPrices) {
-        dailyPriceCache.addDailyPrices(preMarketPrices, PRE);
+        pricesCache.addPreMarketPrices(preMarketPrices);
     }
 
     public List<DailyPrice> getCachedDailyPrices(MarketState marketState) {
-        return dailyPriceCache.dailyPrices(marketState);
+        if (marketState == PRE) {
+            return pricesCache.preMarketPrices();
+        } else {
+            return pricesFor(StockTimeframe.DAILY).stream().map(p -> (DailyPrice) p).toList();
+        }
     }
 
     public boolean weeklyHighLowExists() {

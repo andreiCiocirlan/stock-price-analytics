@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.service.*;
 
@@ -37,10 +36,10 @@ public class YahooQuotesController {
         long start = System.nanoTime();
         List<DailyPrice> dailyImportedPrices = logTimeAndReturn(yahooQuoteService::yahooQuotesImport, "imported daily prices");
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
-            List<AbstractPrice> htfPricesUpdated = priceService.updatePricesForHigherTimeframes(dailyImportedPrices);
+            logTime(() -> priceService.updateAllTimeframePrices(dailyImportedPrices), "updated prices for all timeframes");
 
             logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices), "saved current week HighLow prices");
-            logTime(() -> stockService.updateStocksHighLowsAndOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks highs-lows 4w,52w,all-time and higher-timeframe OHLC prices");
+            logTime(stockService::updateStocksHighLowsAndOHLCFrom, "updated stocks highs-lows 4w,52w,all-time and higher-timeframe OHLC prices");
         }
         webSocketNotificationService.broadcastStockChartUpdate();
         logTime(priceMilestoneService::cacheTickersForMilestones, "cached tickers for price milestones");
@@ -57,13 +56,11 @@ public class YahooQuotesController {
         String fileName = date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         List<DailyPrice> dailyImportedPrices = logTimeAndReturn(() -> yahooQuoteService.yahooQuotesFromFile(fileName), "imported daily prices");
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
-            priceService.savePrices(dailyImportedPrices);
-            List<AbstractPrice> htfPricesUpdated = priceService.updatePricesForHigherTimeframes(dailyImportedPrices);
-
+            logTime(() -> priceService.updateAllTimeframePrices(dailyImportedPrices), "updated prices for all timeframes");
             logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices), "saved current week HighLow prices");
             // update stocks only if the most recent trading date was imported
             if (date.isEqual(dailyImportedPrices.getFirst().getDate())) {
-                logTime(() -> stockService.updateStocksHighLowsAndOHLCFrom(dailyImportedPrices, htfPricesUpdated), "updated stocks highs-lows 4w,52w,all-time and higher-timeframe OHLC prices");
+                logTime(stockService::updateStocksHighLowsAndOHLCFrom, "updated stocks highs-lows 4w,52w,all-time and higher-timeframe OHLC prices");
             }
         }
         long duration = (System.nanoTime() - start) / 1_000_000;

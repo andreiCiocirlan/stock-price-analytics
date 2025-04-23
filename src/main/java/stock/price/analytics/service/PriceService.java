@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 
 import static java.time.temporal.TemporalAdjusters.*;
 import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
-import static stock.price.analytics.util.LoggingUtil.logTimeAndReturn;
 import static stock.price.analytics.util.PricesUtil.htfPricesForTimeframe;
 import static stock.price.analytics.util.TradingDateUtil.isWithinSameTimeframe;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
@@ -162,25 +161,19 @@ public class PriceService {
         return candles;
     }
 
-    public List<AbstractPrice> updatePricesForHigherTimeframes(List<DailyPrice> importedDailyPrices) {
-        return logTimeAndReturn(() -> updateHTF(importedDailyPrices), "updated prices for higher timeframes");
-    }
-
     @Transactional
-    private List<AbstractPrice> updateHTF(List<DailyPrice> importedDailyPrices) {
+    public void updateAllTimeframePrices(List<DailyPrice> importedDailyPrices) {
         List<String> tickers = new ArrayList<>(importedDailyPrices.stream().map(DailyPrice::getTicker).toList());
 
-        // Update prices for each timeframe and return (used for stocks cache update)
-        List<AbstractPrice> htfPricesUpdated = new ArrayList<>();
-        for (StockTimeframe timeframe : higherTimeframes()) {
-            List<PriceWithPrevClose> htfPricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, timeframe,
+        // Update prices for each timeframe
+        List<AbstractPrice> pricesUpdated = new ArrayList<>();
+        for (StockTimeframe timeframe : StockTimeframe.values()) {
+            List<PriceWithPrevClose> pricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, timeframe,
                     cacheService.pricesWithPrevCloseFor(tickers, timeframe));
-            htfPricesUpdated.addAll(htfPricesWithPrevCloseUpdated.stream().map(PriceWithPrevClose::abstractPrice).toList());
-            cacheService.addPricesWithPrevClose(htfPricesWithPrevCloseUpdated);
+            pricesUpdated.addAll(pricesWithPrevCloseUpdated.stream().map(PriceWithPrevClose::abstractPrice).toList());
+            cacheService.addPricesWithPrevClose(pricesWithPrevCloseUpdated);
         }
-        asyncPersistenceService.partitionDataAndSaveWithLogTime(htfPricesUpdated, priceRepository, "saved " + htfPricesUpdated.size() + " HTF prices");
-
-        return htfPricesUpdated;
+        asyncPersistenceService.partitionDataAndSaveWithLogTime(pricesUpdated, priceRepository, "saved " + pricesUpdated.size() + " prices");
     }
 
 

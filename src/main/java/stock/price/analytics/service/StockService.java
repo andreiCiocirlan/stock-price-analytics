@@ -5,11 +5,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
+import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.Stock;
+import stock.price.analytics.model.stocks.enums.MarketState;
 import stock.price.analytics.repository.stocks.StockRepository;
 import stock.price.analytics.repository.stocks.TickerRenameRepository;
 
@@ -73,6 +75,16 @@ public class StockService {
             }
         }
         return tickersUpdated;
+    }
+
+    @Transactional
+    public void updateStocksHighLowsAndOHLCFrom() {
+        List<DailyPrice> dailyPrices = cacheService.getCachedDailyPrices(MarketState.REGULAR);
+        List<AbstractPrice> htfPrices = cacheService.pricesFor(StockTimeframe.WEEKLY);
+        htfPrices.addAll(cacheService.pricesFor(StockTimeframe.MONTHLY));
+        htfPrices.addAll(cacheService.pricesFor(StockTimeframe.QUARTERLY));
+        htfPrices.addAll(cacheService.pricesFor(StockTimeframe.YEARLY));
+        updateStocksHighLowsAndOHLCFrom(dailyPrices, htfPrices);
     }
 
     @Transactional

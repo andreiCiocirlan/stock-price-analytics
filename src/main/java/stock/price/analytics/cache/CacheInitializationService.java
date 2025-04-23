@@ -14,7 +14,6 @@ import stock.price.analytics.model.prices.ohlc.PriceWithPrevClose;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.json.DailyPriceJSONRepository;
 import stock.price.analytics.repository.prices.highlow.HighLowForPeriodRepository;
-import stock.price.analytics.repository.prices.ohlc.DailyPriceRepository;
 import stock.price.analytics.repository.stocks.StockRepository;
 import stock.price.analytics.service.*;
 
@@ -24,8 +23,6 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
-import static stock.price.analytics.model.stocks.enums.MarketState.REGULAR;
 import static stock.price.analytics.util.LoggingUtil.logTime;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
@@ -35,10 +32,8 @@ import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 public class CacheInitializationService {
 
     private final DailyPriceJsonCache dailyPriceJsonCache;
-    private final DailyPriceCache dailyPriceCache;
     private final StockRepository stockRepository;
     private final DailyPriceJSONRepository dailyPriceJSONRepository;
-    private final DailyPriceRepository dailyPriceRepository;
     private final PricesCache pricesCache;
     private final HighLowPricesCache highLowPricesCache;
     private final HighLowForPeriodRepository highLowForPeriodRepository;
@@ -56,10 +51,9 @@ public class CacheInitializationService {
 
         List<Stock> stocks = stockRepository.findByXtbStockIsTrueAndDelistedDateIsNull();
         List<String> tickers = stocks.stream().map(Stock::getTicker).toList();
-        logTime(() -> initPricesCache(tickers), "initialized HTF prices cache");
+        logTime(() -> initPricesCache(tickers), "initialized prices cache");
         logTime(() -> initStocksCache(stocks), "initialized xtb stocks cache");
         logTime(this::initHighLowPricesCache, "initialized high low prices cache");
-        logTime(this::initLatestDailyPricesCache, "initialized latest daily prices cache");
         logTime(this::initDailyJSONPricesCache, "initialized daily JSON prices cache");
         logTime(this::initPreMarketDailyPrices, "initialized pre-market daily prices cache");
         logTime(this::initTickersForPriceMilestoneCache, "initialized tickers for price milestone cache");
@@ -93,11 +87,7 @@ public class CacheInitializationService {
                 latestPreMarketDailyPrices.add(latestPrice.convertToDailyPrice(true));
             }
         }
-        dailyPriceCache.addDailyPrices(latestPreMarketDailyPrices, PRE);
-    }
-
-    private void initLatestDailyPricesCache() {
-        dailyPriceCache.addDailyPrices(dailyPriceRepository.findLatestDailyPrices(), REGULAR);
+        pricesCache.addPreMarketPrices(latestPreMarketDailyPrices);
     }
 
     private void initHighLowPricesCache() {
