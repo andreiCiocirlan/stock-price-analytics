@@ -59,7 +59,7 @@ public class TradingDateUtil {
 
     public static boolean isWithinSameTimeframe(LocalDate date, LocalDate latestEndDateWMY, StockTimeframe timeframe) {
         return switch (timeframe) {
-            case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
+            case DAILY -> date.isEqual(latestEndDateWMY);
             case WEEKLY -> sameWeek(date, latestEndDateWMY);
             case MONTHLY -> sameMonth(date, latestEndDateWMY);
             case QUARTERLY -> sameQuarter(date, latestEndDateWMY);
