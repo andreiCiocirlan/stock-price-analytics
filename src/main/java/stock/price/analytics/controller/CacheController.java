@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
-import static stock.price.analytics.model.stocks.enums.MarketState.REGULAR;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -52,14 +52,6 @@ public class CacheController {
     @ResponseStatus(HttpStatus.OK)
     public List<DailyPrice> getPreMarketDailyPricesCache(@RequestParam(required = false, value = "ticker") String ticker) {
         return cacheService.getCachedDailyPrices(PRE).stream()
-                .filter(p -> ticker == null || p.getTicker().equals(ticker))
-                .toList();
-    }
-
-    @GetMapping("/intraday-prices")
-    @ResponseStatus(HttpStatus.OK)
-    public List<DailyPrice> getIntradayDailyPricesCache(@RequestParam(required = false, value = "ticker") String ticker) {
-        return cacheService.getCachedDailyPrices(REGULAR).stream()
                 .filter(p -> ticker == null || p.getTicker().equals(ticker))
                 .toList();
     }
