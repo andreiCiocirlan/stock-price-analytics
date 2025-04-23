@@ -1,16 +1,15 @@
 package stock.price.analytics.util;
 
+import stock.price.analytics.model.json.DailyPriceJSON;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static stock.price.analytics.util.Constants.*;
 
@@ -47,13 +46,11 @@ public class TradingDateUtil {
         }
     }
 
-    // returns the trading date being imported (highest count, as for some tickers it might import previous days)
-    public static LocalDate tradingDateImported(List<? extends AbstractPrice> importedPrices) {
+    // returns the trading date being imported
+    public static LocalDate tradingDateImported(List<DailyPriceJSON> importedPrices) {
         return importedPrices.stream()
-                .collect(Collectors.groupingBy(AbstractPrice::getStartDate, Collectors.counting()))
-                .entrySet().stream()
-                .max(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
+                .max(Comparator.comparing(DailyPriceJSON::getDate))
+                .map(DailyPriceJSON::getDate)
                 .orElseThrow();
     }
 
