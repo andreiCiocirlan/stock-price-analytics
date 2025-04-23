@@ -35,6 +35,14 @@ public class DailyPrice extends AbstractPrice {
         this.setPerformance(performance);
     }
 
+    public static AbstractPrice newFrom(DailyPrice dailyPrice, double previousClose) {
+        return new DailyPrice(
+                dailyPrice.getTicker(),
+                dailyPrice.getDate(),
+                performanceFrom(dailyPrice, previousClose),
+                new CandleOHLC(dailyPrice.getOpen(), dailyPrice.getHigh(), dailyPrice.getLow(), dailyPrice.getClose()));
+    }
+
     @Override
     public void updateStock(Stock stock) {
         stock.setDailyOpen(this.getOpen());
