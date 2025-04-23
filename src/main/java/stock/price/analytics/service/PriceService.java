@@ -201,7 +201,7 @@ public class PriceService {
 
     private PriceWithPrevClose newPriceWithPrevCloseFrom(DailyPrice importedDailyPrice, StockTimeframe timeframe, double previousClose) {
         AbstractPrice price = switch (timeframe) {
-            case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
+            case DAILY -> DailyPrice.newFrom(importedDailyPrice, previousClose);
             case WEEKLY -> WeeklyPrice.newFrom(importedDailyPrice, previousClose);
             case MONTHLY -> MonthlyPrice.newFrom(importedDailyPrice, previousClose);
             case QUARTERLY -> QuarterlyPrice.newFrom(importedDailyPrice, previousClose);
