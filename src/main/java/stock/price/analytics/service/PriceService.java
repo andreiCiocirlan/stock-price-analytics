@@ -174,9 +174,9 @@ public class PriceService {
         List<AbstractPrice> htfPricesUpdated = new ArrayList<>();
         for (StockTimeframe timeframe : higherTimeframes()) {
             List<PriceWithPrevClose> htfPricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, timeframe,
-                    cacheService.htfPricesWithPrevCloseFor(tickers, timeframe));
+                    cacheService.pricesWithPrevCloseFor(tickers, timeframe));
             htfPricesUpdated.addAll(htfPricesWithPrevCloseUpdated.stream().map(PriceWithPrevClose::abstractPrice).toList());
-            cacheService.addHtfPricesWithPrevClose(htfPricesWithPrevCloseUpdated);
+            cacheService.addPricesWithPrevClose(htfPricesWithPrevCloseUpdated);
         }
         asyncPersistenceService.partitionDataAndSaveWithLogTime(htfPricesUpdated, priceRepository, "saved " + htfPricesUpdated.size() + " HTF prices");
 

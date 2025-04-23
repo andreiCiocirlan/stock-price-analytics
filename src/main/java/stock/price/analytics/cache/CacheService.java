@@ -121,11 +121,11 @@ public class CacheService {
         return new ArrayList<>(pricesCache.pricesFor(timeframe));
     }
 
-    public List<PriceWithPrevClose> htfPricesWithPrevCloseFor(List<String> tickers, StockTimeframe timeframe) {
+    public List<PriceWithPrevClose> pricesWithPrevCloseFor(List<String> tickers, StockTimeframe timeframe) {
         return pricesCache.pricesWithPrevCloseFor(tickers, timeframe);
     }
 
-    public void addHtfPricesWithPrevClose(List<PriceWithPrevClose> pricesWithPrevClose) {
+    public void addPricesWithPrevClose(List<PriceWithPrevClose> pricesWithPrevClose) {
         pricesCache.addPricesWithPrevClose(pricesWithPrevClose, pricesWithPrevClose.getFirst().abstractPrice().getTimeframe());
     }
 

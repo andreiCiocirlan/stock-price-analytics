@@ -71,9 +71,9 @@ public class CacheController {
                 .toList();
     }
 
-    @GetMapping("/htf-prices-with-prev-close")
-    public List<PriceWithPrevClose> htfPricesWithPrevCloseFor(@RequestParam(required = false, value = "ticker") String ticker, @RequestParam("timeFrame") String timeFrame) {
-        return cacheService.htfPricesWithPrevCloseFor(List.of(ticker), StockTimeframe.valueOf(timeFrame));
+    @GetMapping("/prices-with-prev-close")
+    public List<PriceWithPrevClose> pricesWithPrevCloseFor(@RequestParam(required = false, value = "ticker") String ticker, @RequestParam("timeFrame") String timeFrame) {
+        return cacheService.pricesWithPrevCloseFor(List.of(ticker), StockTimeframe.valueOf(timeFrame));
     }
 
     @GetMapping("/new-high-lows")

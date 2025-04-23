@@ -56,7 +56,7 @@ public class CacheInitializationService {
 
         List<Stock> stocks = stockRepository.findByXtbStockIsTrueAndDelistedDateIsNull();
         List<String> tickers = stocks.stream().map(Stock::getTicker).toList();
-        logTime(() -> initHigherTimeframePricesCache(tickers), "initialized HTF prices cache");
+        logTime(() -> initPricesCache(tickers), "initialized HTF prices cache");
         logTime(() -> initStocksCache(stocks), "initialized xtb stocks cache");
         logTime(this::initHighLowPricesCache, "initialized high low prices cache");
         logTime(this::initLatestDailyPricesCache, "initialized latest daily prices cache");
@@ -192,13 +192,13 @@ public class CacheInitializationService {
         }
     }
 
-    private void initHigherTimeframePricesCache(List<String> tickers) {
+    private void initPricesCache(List<String> tickers) {
         for (StockTimeframe timeframe : StockTimeframe.values()) {
-            addHtfPricesWithPrevCloseFrom(priceService.previousThreePricesFor(tickers, timeframe));
+            addPricesWithPrevCloseFrom(priceService.previousThreePricesFor(tickers, timeframe));
         }
     }
 
-    private void addHtfPricesWithPrevCloseFrom(List<? extends AbstractPrice> prevThreePrices) {
+    private void addPricesWithPrevCloseFrom(List<? extends AbstractPrice> prevThreePrices) {
         List<PriceWithPrevClose> pricesWithPrevClose = pricesWithPrevCloseByTickerFrom(prevThreePrices);
         pricesCache.addPricesWithPrevClose(pricesWithPrevClose, prevThreePrices.getFirst().getTimeframe());
     }
