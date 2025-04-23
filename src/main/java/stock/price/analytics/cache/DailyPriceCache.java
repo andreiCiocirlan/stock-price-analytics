@@ -18,8 +18,6 @@ import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
 @Component
 class DailyPriceCache {
 
-    private final List<String> inconsistentLows = new ArrayList<>();
-    private final List<String> inconsistentHighs = new ArrayList<>();
     private final Map<String, DailyPrice> preMarketDailyPricesByTicker = new HashMap<>();
     private final Map<String, DailyPrice> dailyPricesByTicker = new HashMap<>();
 
@@ -34,7 +32,6 @@ class DailyPriceCache {
     List<DailyPrice> cacheAndReturn(List<DailyPrice> dailyPrices) {
         List<DailyPrice> addedPrices = new ArrayList<>();
         dailyPrices.forEach(price -> addToMap(price, addedPrices));
-        logInconsistentHighLowImportedPrices();
         return addedPrices;
     }
 
@@ -71,26 +68,13 @@ class DailyPriceCache {
         double low = importedDailyPrice.getLow();
         // abnormal -> imported high price cannot be smaller than already stored high price
         if (importedDailyPrice.getHigh() < storedDailyPrice.getHigh()) {
-            inconsistentLows.add(importedDailyPrice.getTicker());
             high = storedDailyPrice.getHigh();
         }
         // abnormal -> imported low price cannot be greater than already stored low price
         if (importedDailyPrice.getLow() > storedDailyPrice.getLow()) {
-            inconsistentHighs.add(importedDailyPrice.getTicker());
             low = storedDailyPrice.getLow();
         }
         return new MutablePair<>(high, low);
-    }
-
-    private void logInconsistentHighLowImportedPrices() {
-        if (!inconsistentHighs.isEmpty()) {
-            log.warn("Inconsistent DAILY PRICES imported highs for {}", inconsistentHighs);
-        }
-        if (!inconsistentLows.isEmpty()) {
-            log.warn("Inconsistent DAILY PRICES imported lows for {}", inconsistentLows);
-        }
-        inconsistentHighs.clear();
-        inconsistentLows.clear();
     }
 
 }
