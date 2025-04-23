@@ -39,7 +39,7 @@ public class CacheInitializationService {
     private final StockRepository stockRepository;
     private final DailyPriceJSONRepository dailyPriceJSONRepository;
     private final DailyPriceRepository dailyPriceRepository;
-    private final HigherTimeframePricesCache higherTimeframePricesCache;
+    private final PricesCache pricesCache;
     private final HighLowPricesCache highLowPricesCache;
     private final HighLowForPeriodRepository highLowForPeriodRepository;
     private final StocksCache stocksCache;
@@ -193,17 +193,17 @@ public class CacheInitializationService {
     }
 
     private void initHigherTimeframePricesCache(List<String> tickers) {
-        for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
+        for (StockTimeframe timeframe : StockTimeframe.values()) {
             addHtfPricesWithPrevCloseFrom(priceService.previousThreePricesFor(tickers, timeframe));
         }
     }
 
-    private void addHtfPricesWithPrevCloseFrom(List<AbstractPrice> prevThreePrices) {
+    private void addHtfPricesWithPrevCloseFrom(List<? extends AbstractPrice> prevThreePrices) {
         List<PriceWithPrevClose> pricesWithPrevClose = pricesWithPrevCloseByTickerFrom(prevThreePrices);
-        higherTimeframePricesCache.addPricesWithPrevClose(pricesWithPrevClose, prevThreePrices.getFirst().getTimeframe());
+        pricesCache.addPricesWithPrevClose(pricesWithPrevClose, prevThreePrices.getFirst().getTimeframe());
     }
 
-    private List<PriceWithPrevClose> pricesWithPrevCloseByTickerFrom(List<stock.price.analytics.model.prices.ohlc.AbstractPrice> previousThreePricesForTickers) {
+    private List<PriceWithPrevClose> pricesWithPrevCloseByTickerFrom(List<? extends AbstractPrice> previousThreePricesForTickers) {
         Map<String, List<AbstractPrice>> previousTwoPricesByTicker = previousThreePricesForTickers
                 .stream()
                 .collect(Collectors.groupingBy(AbstractPrice::getTicker))

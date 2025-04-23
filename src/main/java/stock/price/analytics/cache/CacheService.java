@@ -25,7 +25,6 @@ import static java.util.Collections.emptySet;
 import static stock.price.analytics.model.prices.enums.IntradayPriceSpike.INTRADAY_SPIKE_DOWN;
 import static stock.price.analytics.model.prices.enums.IntradayPriceSpike.INTRADAY_SPIKE_UP;
 import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
-import static stock.price.analytics.model.stocks.enums.MarketState.REGULAR;
 import static stock.price.analytics.util.Constants.INTRADAY_SPIKE_PERCENTAGE;
 
 @Slf4j
@@ -36,7 +35,7 @@ public class CacheService {
     private final DailyPriceJsonCache dailyPriceJsonCache;
     private final DailyPriceCache dailyPriceCache;
     private final StocksCache stocksCache;
-    private final HigherTimeframePricesCache higherTimeframePricesCache;
+    private final PricesCache pricesCache;
     private final HighLowPricesCache highLowPricesCache;
     private final PriceMilestoneCache priceMilestoneCache;
 
@@ -119,18 +118,15 @@ public class CacheService {
     }
 
     public List<AbstractPrice> pricesFor(StockTimeframe timeframe) {
-        return switch (timeframe) {
-            case DAILY -> new ArrayList<>(getCachedDailyPrices(REGULAR));
-            case WEEKLY, MONTHLY, QUARTERLY, YEARLY -> new ArrayList<>(higherTimeframePricesCache.htfPricesFor(timeframe));
-        };
+        return new ArrayList<>(pricesCache.pricesFor(timeframe));
     }
 
     public List<PriceWithPrevClose> htfPricesWithPrevCloseFor(List<String> tickers, StockTimeframe timeframe) {
-        return higherTimeframePricesCache.pricesWithPrevCloseFor(tickers, timeframe);
+        return pricesCache.pricesWithPrevCloseFor(tickers, timeframe);
     }
 
     public void addHtfPricesWithPrevClose(List<PriceWithPrevClose> pricesWithPrevClose) {
-        higherTimeframePricesCache.addPricesWithPrevClose(pricesWithPrevClose, pricesWithPrevClose.getFirst().abstractPrice().getTimeframe());
+        pricesCache.addPricesWithPrevClose(pricesWithPrevClose, pricesWithPrevClose.getFirst().abstractPrice().getTimeframe());
     }
 
     public void logNewHighLowsForHLPeriods() {

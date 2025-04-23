@@ -100,15 +100,25 @@ public class PriceService {
         return price;
     }
 
-    @SuppressWarnings("unchecked")
-    public List<AbstractPrice> previousThreePricesFor(List<String> tickers, StockTimeframe timeframe) {
-        return (List<AbstractPrice>) (switch (timeframe) {
-            case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
+    public List<? extends AbstractPrice> previousThreePricesFor(List<String> tickers, StockTimeframe timeframe) {
+        return switch (timeframe) {
+            case DAILY -> findPreviousThreeDailyPricesForTickers(tickers);
             case WEEKLY -> weeklyPriceRepository.findPreviousThreeWeeklyPricesForTickers(tickers);
             case MONTHLY -> monthlyPriceRepository.findPreviousThreeMonthlyPricesForTickers(tickers);
             case QUARTERLY -> quarterlyPriceRepository.findPreviousThreeQuarterlyPricesForTickers(tickers);
             case YEARLY -> yearlyPriceRepository.findPreviousThreeYearlyPricesForTickers(tickers);
-        });
+        };
+    }
+
+    private List<? extends AbstractPrice> findPreviousThreeDailyPricesForTickers(List<String> tickers) {
+        List<DailyPrice> previousSevenDailyPricesForTickers = dailyPriceRepository.findPreviousSevenDailyPricesForTickers(tickers);
+
+        return previousSevenDailyPricesForTickers
+                .stream()
+                .collect(Collectors.groupingBy(DailyPrice::getTicker))
+                .values().stream()
+                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(AbstractPrice::getStartDate).reversed()).limit(3))
+                .toList();
     }
 
     public boolean isFirstImportDoneFor(StockTimeframe timeframe) {

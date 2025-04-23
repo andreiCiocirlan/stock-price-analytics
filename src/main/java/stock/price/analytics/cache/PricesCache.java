@@ -13,9 +13,10 @@ import java.util.stream.Collectors;
 import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
 
 @Component
-class HigherTimeframePricesCache {
+class PricesCache {
 
     private final Map<StockTimeframe, Map<String, PriceWithPrevClose>> pricesWithPrevCloseByTimeframe = Map.of(
+            DAILY, new HashMap<>(),
             WEEKLY, new HashMap<>(),
             MONTHLY, new HashMap<>(),
             QUARTERLY, new HashMap<>(),
@@ -38,7 +39,7 @@ class HigherTimeframePricesCache {
                 .collect(Collectors.toList());
     }
 
-    List<AbstractPrice> htfPricesFor(StockTimeframe timeframe) {
+    List<AbstractPrice> pricesFor(StockTimeframe timeframe) {
         return pricesWithPrevCloseByTimeframe.get(timeframe).values().stream()
                 .map(PriceWithPrevClose::abstractPrice)
                 .toList();
