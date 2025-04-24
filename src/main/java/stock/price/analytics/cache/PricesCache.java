@@ -39,7 +39,7 @@ class PricesCache {
         if (pricesWithPrevClose == null || pricesWithPrevClose.isEmpty())
             return; // Handle null or empty list case to avoid exceptions
         Map<String, PriceWithPrevClose> pricesWithPrevCloseByTicker = pricesWithPrevCloseByTimeframe.get(timeframe);
-        pricesWithPrevClose.forEach(price -> pricesWithPrevCloseByTicker.put(price.abstractPrice().getTicker(), price));
+        pricesWithPrevClose.forEach(p -> pricesWithPrevCloseByTicker.put(p.price().getTicker(), p));
     }
 
     List<PriceWithPrevClose> pricesWithPrevCloseFor(List<String> tickers, StockTimeframe timeframe) {
@@ -53,7 +53,7 @@ class PricesCache {
 
     List<AbstractPrice> pricesFor(StockTimeframe timeframe) {
         return pricesWithPrevCloseByTimeframe.get(timeframe).values().stream()
-                .map(PriceWithPrevClose::abstractPrice)
+                .map(PriceWithPrevClose::price)
                 .toList();
     }
 }

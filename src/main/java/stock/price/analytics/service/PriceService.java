@@ -170,7 +170,7 @@ public class PriceService {
         for (StockTimeframe timeframe : StockTimeframe.values()) {
             List<PriceWithPrevClose> pricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, timeframe,
                     cacheService.pricesWithPrevCloseFor(tickers, timeframe));
-            pricesUpdated.addAll(pricesWithPrevCloseUpdated.stream().map(PriceWithPrevClose::abstractPrice).toList());
+            pricesUpdated.addAll(pricesWithPrevCloseUpdated.stream().map(PriceWithPrevClose::price).toList());
             cacheService.addPricesWithPrevClose(pricesWithPrevCloseUpdated, timeframe);
         }
         asyncPersistenceService.partitionDataAndSaveWithLogTime(pricesUpdated, priceRepository, "saved " + pricesUpdated.size() + " prices");
@@ -182,11 +182,11 @@ public class PriceService {
                                                          List<PriceWithPrevClose> pricesWithPrevClose) {
         List<PriceWithPrevClose> result = new ArrayList<>();
         Map<String, PriceWithPrevClose> pricesWithPrevCloseByTicker = pricesWithPrevClose.stream()
-                .collect(Collectors.toMap(priceWithPrevClose -> priceWithPrevClose.abstractPrice().getTicker(), Function.identity()));
+                .collect(Collectors.toMap(priceWithPrevClose -> priceWithPrevClose.price().getTicker(), Function.identity()));
         for (DailyPrice importedDailyPrice : importedDailyPrices) {
             String ticker = importedDailyPrice.getTicker();
             PriceWithPrevClose priceWithPrevClose = pricesWithPrevCloseByTicker.get(ticker);
-            AbstractPrice price = priceWithPrevClose.abstractPrice();
+            AbstractPrice price = priceWithPrevClose.price();
             LocalDate latestEndDateWMQY = price.getEndDate(); // latest cached w,m,q,y end_date per ticker
             if (isWithinSameTimeframe(importedDailyPrice.getDate(), latestEndDateWMQY, timeframe)) {
                 price.convertFrom(importedDailyPrice, priceWithPrevClose.previousClose());
