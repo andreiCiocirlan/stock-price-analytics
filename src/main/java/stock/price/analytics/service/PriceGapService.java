@@ -66,7 +66,7 @@ public class PriceGapService {
                     ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY \{dateColumn} DESC) AS row_num
                 FROM \{dbTable}
                 WHERE ticker in (\{tickersFormatted})
-            	    AND ticker in (select ticker from stocks where cfd_margin in (0.2, 0.25, 0.33))
+            	    AND ticker in (select ticker from stocks where cfd_margin in (0.2, 0.25, 0.33, 0.5))
                     AND \{dateColumn} between CURRENT_DATE - INTERVAL '\{lookBackCount} \{intervalPeriod}' and (SELECT max_date from max_date_cte)
             ),
             unfilled_gaps AS (
