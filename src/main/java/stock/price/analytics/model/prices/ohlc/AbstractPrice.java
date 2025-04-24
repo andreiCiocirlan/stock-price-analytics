@@ -13,7 +13,6 @@ import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.stocks.Stock;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 @Getter
 @Setter
@@ -60,10 +59,6 @@ public abstract class AbstractPrice implements BusinessEntity {
     public abstract void setEndDateFrom(LocalDate date);
     public abstract StockTimeframe getTimeframe();
     public abstract void updateStock(Stock stock);
-
-    public String compositeId() {
-        return getTicker() + "_" + getTimeframe() + "_" + getStartDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
-    }
 
     public void updateFrom(AbstractPrice that) {
         this.setOpen(that.getOpen());
