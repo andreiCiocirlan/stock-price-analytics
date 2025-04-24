@@ -40,10 +40,12 @@ public abstract class HighLowForPeriod implements BusinessEntity {
     @Column(name = "start_date")
     private LocalDate startDate;
 
-    public HighLowForPeriod(String ticker, LocalDate startDate, LocalDate endDate) {
+    public HighLowForPeriod(String ticker, LocalDate startDate, LocalDate endDate, double low, double high) {
         this.ticker = ticker;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.setLow(low);
+        this.setHigh(high);
     }
 
     public MutablePair<Boolean, Boolean> newHighLowOrEqual(DailyPrice dailyPriceImported) {

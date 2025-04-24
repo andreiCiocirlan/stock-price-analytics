@@ -151,15 +151,12 @@ public class CacheInitializationService {
         }
     }
 
-    private HighLowForPeriod convertToHighLowForPeriod(TickerHighLowView dto, LocalDate newWeekStartDate, LocalDate newWeekEndDate, HighLowPeriod highLowPeriod) {
-        HighLowForPeriod highLowForPeriod = switch (highLowPeriod) {
-            case HIGH_LOW_4W -> new HighLow4w(dto.getTicker(), newWeekStartDate, newWeekEndDate);
-            case HIGH_LOW_52W -> new HighLow52Week(dto.getTicker(), newWeekStartDate, newWeekEndDate);
+    private HighLowForPeriod convertToHighLowForPeriod(TickerHighLowView dto, LocalDate startDate, LocalDate endDate, HighLowPeriod highLowPeriod) {
+        return switch (highLowPeriod) {
+            case HIGH_LOW_4W -> new HighLow4w(dto.getTicker(), startDate, endDate, dto.getLow(), dto.getHigh());
+            case HIGH_LOW_52W -> new HighLow52Week(dto.getTicker(), startDate, endDate, dto.getLow(), dto.getHigh());
             case HIGH_LOW_ALL_TIME -> throw new IllegalArgumentException("HIGH_LOW_ALL_TIME is not supported.");
         };
-        highLowForPeriod.setLow(dto.getLow());
-        highLowForPeriod.setHigh(dto.getHigh());
-        return highLowForPeriod;
     }
 
     private void initStocksCache(List<Stock> stocks) {
