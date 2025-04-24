@@ -75,7 +75,9 @@ public class CacheInitializationService {
         dailyPriceJsonCache.cacheAndReturn(dailyPriceJSONs.stream()
                 .collect(Collectors.groupingBy(DailyPriceJSON::getSymbol))
                 .values().stream()
-                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(DailyPriceJSON::getDate).reversed()).limit(2))
+                .flatMap(prices -> prices.stream()
+                        .sorted(Comparator.comparing(DailyPriceJSON::getDate).reversed())
+                        .limit(2))
                 .toList());
     }
 
