@@ -15,14 +15,16 @@ import stock.price.analytics.repository.prices.ohlc.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.time.temporal.TemporalAdjusters.*;
-import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
-import static stock.price.analytics.util.PricesUtil.htfPricesForTimeframe;
+import static stock.price.analytics.model.prices.enums.StockTimeframe.DAILY;
+import static stock.price.analytics.util.PricesUtil.getHigherTimeframePricesFor;
 import static stock.price.analytics.util.TradingDateUtil.isWithinSameTimeframe;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
@@ -56,39 +58,53 @@ public class PriceService {
         List<QuarterlyPrice> quarterlyPricesToUpdate = quarterlyPriceRepository.findByTickerAndStartDateLessThanEqual(ticker, splitDateQuarterlyCutoff);
         List<YearlyPrice> yearlyPricesToUpdate = yearlyPriceRepository.findByTickerAndStartDateLessThanEqual(ticker, splitDateYearlyCutoff);
 
-        // update htf prices before stockSplitDate
-        List<WeeklyPrice> updatedWeeklyPrices = weeklyPricesToUpdate.stream()
-                .map(p -> p.getStartDate().isBefore(splitDateWeeklyCutoff) ? (WeeklyPrice) updatePrice(p, priceMultiplier) : p)
-                .toList();
-        List<MonthlyPrice> updatedMonthlyPrices = monthlyPricesToUpdate.stream()
-                .map(p -> p.getStartDate().isBefore(splitDateMonthlyCutoff) ? (MonthlyPrice) updatePrice(p, priceMultiplier) : p)
-                .toList();
-        List<QuarterlyPrice> updatedQuarterlyPrices = quarterlyPricesToUpdate.stream()
-                .map(p -> p.getStartDate().isBefore(splitDateQuarterlyCutoff) ? (QuarterlyPrice) updatePrice(p, priceMultiplier) : p)
-                .toList();
-        List<YearlyPrice> updatedYearlyPrices = yearlyPricesToUpdate.stream()
-                .map(p -> p.getStartDate().isBefore(splitDateYearlyCutoff) ? (YearlyPrice) updatePrice(p, priceMultiplier) : p)
-                .toList();
-
         // Update daily prices before stockSplitDate and keep others unchanged
         List<DailyPrice> updatedDailyPrices = dailyPricesToUpdate.stream()
                 .map(dp -> dp.getDate().isBefore(stockSplitDate) ? (DailyPrice) updatePrice(dp, priceMultiplier) : dp)
                 .toList();
+
+        // compute all higher timeframe prices using the updated daily prices
+        List<AbstractPrice> htfPricesUpdated = getHigherTimeframePricesFor(updatedDailyPrices);
+
+        Map<StockTimeframe, List<? extends AbstractPrice>> timeframeToDbPrices = Map.of(
+                StockTimeframe.WEEKLY, weeklyPricesToUpdate,
+                StockTimeframe.MONTHLY, monthlyPricesToUpdate,
+                StockTimeframe.QUARTERLY, quarterlyPricesToUpdate,
+                StockTimeframe.YEARLY, yearlyPricesToUpdate
+        );
+
+        Map<StockTimeframe, Map<String, AbstractPrice>> timeframeToDbPriceMap = timeframeToDbPrices.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e -> e.getValue().stream()
+                                .collect(Collectors.toMap(
+                                        p -> p.getTicker() + "|" + p.getStartDate(),
+                                        p -> (AbstractPrice) p
+                                ))
+                ));
+
+        // update htf db prices
+        for (AbstractPrice updatedPrice : htfPricesUpdated) {
+            StockTimeframe timeframe = updatedPrice.getTimeframe();
+            Map<String, AbstractPrice> dbPriceMap = timeframeToDbPriceMap.get(timeframe);
+            if (dbPriceMap == null) continue;
+
+            String key = updatedPrice.getTicker() + "|" + updatedPrice.getStartDate();
+            AbstractPrice existingPrice = dbPriceMap.get(key);
+            if (existingPrice != null) {
+                existingPrice.setOpen(updatedPrice.getOpen());
+                existingPrice.setHigh(updatedPrice.getHigh());
+                existingPrice.setLow(updatedPrice.getLow());
+                existingPrice.setClose(updatedPrice.getClose());
+                existingPrice.setPerformance(updatedPrice.getPerformance());
+            }
+        }
 
         syncPersistenceService.partitionDataAndSave(updatedDailyPrices.stream().filter(price -> price.getDate().isBefore(stockSplitDate)).toList(), dailyPriceRepository);
         syncPersistenceService.partitionDataAndSave(weeklyPricesToUpdate, weeklyPriceRepository);
         syncPersistenceService.partitionDataAndSave(monthlyPricesToUpdate, monthlyPriceRepository);
         syncPersistenceService.partitionDataAndSave(quarterlyPricesToUpdate, quarterlyPriceRepository);
         syncPersistenceService.partitionDataAndSave(yearlyPricesToUpdate, yearlyPriceRepository);
-
-        Map<StockTimeframe, AbstractPrice> htfPriceByTimeframe = new HashMap<>();
-        htfPriceByTimeframe.put(WEEKLY, updatedWeeklyPrices.stream().filter(dp -> dp.getStartDate().isEqual(splitDateWeeklyCutoff)).findFirst().orElseThrow());
-        htfPriceByTimeframe.put(MONTHLY, updatedMonthlyPrices.stream().filter(dp -> dp.getStartDate().isEqual(splitDateMonthlyCutoff)).findFirst().orElseThrow());
-        htfPriceByTimeframe.put(QUARTERLY, updatedQuarterlyPrices.stream().filter(dp -> dp.getStartDate().isEqual(splitDateQuarterlyCutoff)).findFirst().orElseThrow());
-        htfPriceByTimeframe.put(YEARLY, updatedYearlyPrices.stream().filter(dp -> dp.getStartDate().isEqual(splitDateYearlyCutoff)).findFirst().orElseThrow());
-
-        List<AbstractPrice> htfPriceForStockSplitDate = computeHTFPriceForStockSplitDate(stockSplitDate, updatedDailyPrices, htfPriceByTimeframe);
-        syncPersistenceService.partitionDataAndSave(htfPriceForStockSplitDate, priceRepository);
     }
 
     private AbstractPrice updatePrice(AbstractPrice price, double priceMultiplier) {
@@ -208,51 +224,6 @@ public class PriceService {
             case YEARLY -> YearlyPrice.newFrom(importedDailyPrice, previousClose);
         };
         return new PriceWithPrevClose(price, previousClose);
-    }
-
-    public List<AbstractPrice> computeHTFPriceForStockSplitDate(LocalDate date, List<DailyPrice> dailyPrices, Map<StockTimeframe, AbstractPrice> stockSplitDateHTFPriceByTimeframe) {
-        List<AbstractPrice> res = new ArrayList<>();
-
-        for (StockTimeframe timeframe : higherTimeframes()) {
-            final LocalDate from;
-            final LocalDate to;
-            switch (timeframe) {
-                case WEEKLY:
-                    from = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).minusWeeks(1);
-                    to = date.with(nextOrSame(DayOfWeek.FRIDAY));
-                    break;
-                case MONTHLY:
-                    from = date.with(TemporalAdjusters.firstDayOfMonth()).minusMonths(1);
-                    to = date.with(lastDayOfMonth());
-                    break;
-                case QUARTERLY:
-                    int firstMonthOfQuarter = date.getMonth().firstMonthOfQuarter().getValue();
-                    from = LocalDate.of(date.getYear(), firstMonthOfQuarter, 1).minusMonths(3);
-                    to = LocalDate.of(date.getYear(), firstMonthOfQuarter, 1).plusMonths(2).with(lastDayOfMonth());
-                    break;
-                case YEARLY:
-                    from = date.with(TemporalAdjusters.firstDayOfYear()).minusYears(1);
-                    to = date.with(lastDayOfYear());
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unsupported timeframe: " + timeframe);
-            }
-
-            List<DailyPrice> dailyPricesForTimeframe = dailyPrices.stream()
-                    .filter(dp -> (dp.getDate().isEqual(from) || dp.getDate().isAfter(from)) && (dp.getDate().isEqual(to) || dp.getDate().isBefore(to)))
-                    .sorted(Comparator.comparing(AbstractPrice::getStartDate))
-                    .toList();
-
-            AbstractPrice htfPriceUpdated = htfPricesForTimeframe(dailyPricesForTimeframe, timeframe).stream()
-                    .max(Comparator.comparing(AbstractPrice::getStartDate)) // only update htf price within stock split date
-                    .orElseThrow();
-
-            AbstractPrice htfPrice = stockSplitDateHTFPriceByTimeframe.get(htfPriceUpdated.getTimeframe());
-            htfPrice.updateFrom(htfPriceUpdated);
-            res.add(htfPrice);
-        }
-
-        return res;
     }
 
     @Transactional
