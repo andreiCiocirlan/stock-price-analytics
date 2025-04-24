@@ -72,13 +72,11 @@ public abstract class AbstractPrice implements BusinessEntity {
         }
     }
 
-    public AbstractPrice convertFrom(DailyPrice dailyPrice, Double previousClose) {
+    public void convertFrom(DailyPrice dailyPrice, Double previousClose) {
         this.setClose(dailyPrice.getClose());
         this.setLow(Math.min(getLow(), dailyPrice.getLow()));
         this.setHigh(Math.max(getHigh(), dailyPrice.getHigh()));
         this.setPerformance(performanceFrom(dailyPrice, previousClose));
-
-        return this;
     }
 
     protected static double performanceFrom(DailyPrice dailyPrice, Double previousClose) {
