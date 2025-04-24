@@ -119,8 +119,8 @@ public class CacheService {
         return pricesCache.pricesWithPrevCloseFor(tickers, timeframe);
     }
 
-    public void addPricesWithPrevClose(List<PriceWithPrevClose> pricesWithPrevClose) {
-        pricesCache.addPricesWithPrevClose(pricesWithPrevClose, pricesWithPrevClose.getFirst().abstractPrice().getTimeframe());
+    public void addPricesWithPrevClose(List<PriceWithPrevClose> pricesWithPrevClose, StockTimeframe timeframe) {
+        pricesCache.addPricesWithPrevClose(pricesWithPrevClose, timeframe);
     }
 
     public void logNewHighLowsForHLPeriods() {

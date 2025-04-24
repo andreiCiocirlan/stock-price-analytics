@@ -171,7 +171,7 @@ public class PriceService {
             List<PriceWithPrevClose> pricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, timeframe,
                     cacheService.pricesWithPrevCloseFor(tickers, timeframe));
             pricesUpdated.addAll(pricesWithPrevCloseUpdated.stream().map(PriceWithPrevClose::abstractPrice).toList());
-            cacheService.addPricesWithPrevClose(pricesWithPrevCloseUpdated);
+            cacheService.addPricesWithPrevClose(pricesWithPrevCloseUpdated, timeframe);
         }
         asyncPersistenceService.partitionDataAndSaveWithLogTime(pricesUpdated, priceRepository, "saved " + pricesUpdated.size() + " prices");
     }
