@@ -10,6 +10,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         value="scheduling.enabled",
         havingValue = "true",
         matchIfMissing = true)
-public class SchedulingConfiguration {
+public class SchedulingConfig {
     // This class exists only to enable scheduling.
 }
