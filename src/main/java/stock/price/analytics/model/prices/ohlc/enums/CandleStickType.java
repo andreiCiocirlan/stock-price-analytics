@@ -1,4 +1,4 @@
-package stock.price.analytics.model.candlestick;
+package stock.price.analytics.model.prices.ohlc.enums;
 
 public enum CandleStickType {
 
