@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class PricesUtil {
+public final class PricesUtil {
 
     public static List<AbstractPrice> getHigherTimeframePricesFor(List<DailyPrice> dailyPricesImported) {
         List<AbstractPrice> htfPrices = new ArrayList<>();

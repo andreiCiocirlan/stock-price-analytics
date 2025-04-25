@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.util.List;
 
-public class JsonUtil {
+public final class JsonUtil {
 
     public static String mergedPricesJSONs(List<String> pricesJSONs) {
         try {

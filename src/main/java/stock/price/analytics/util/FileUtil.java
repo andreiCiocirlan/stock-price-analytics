@@ -9,7 +9,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
 @Slf4j
-public class FileUtil {
+public final class FileUtil {
 
 
     public static void writeToFile(String filePath, String jsonData) {

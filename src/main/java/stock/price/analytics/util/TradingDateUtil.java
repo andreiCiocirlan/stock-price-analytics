@@ -13,7 +13,7 @@ import java.util.List;
 
 import static stock.price.analytics.util.Constants.*;
 
-public class TradingDateUtil {
+public final class TradingDateUtil {
 
     private static boolean isBetweenMarketHours() {
         LocalTime nowInNY = LocalDateTime.now(NY_ZONE).toLocalTime();
