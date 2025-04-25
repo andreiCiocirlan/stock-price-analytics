@@ -21,6 +21,7 @@ public class PriceMilestoneFactory {
                         NewHighLowMilestone.values(),
                         IntradayPriceSpike.values(),
                         PreMarketPriceMilestone.values(),
+                        PreMarketPerformanceMilestone.values(),
                         SimpleMovingAverageMilestone.values()
                 )
                 .flatMap(Arrays::stream)
@@ -36,7 +37,7 @@ public class PriceMilestoneFactory {
                 .toList();
     }
 
-    private static PriceMilestone priceMilestoneFrom(String milestoneCode) {
+    public static PriceMilestone priceMilestoneFrom(String milestoneCode) {
         PriceMilestone milestone = PRICE_MILESTONE_REGISTRY.get(milestoneCode);
         if (milestone == null) {
             throw new IllegalArgumentException("Invalid milestone milestoneCode: " + milestoneCode);
