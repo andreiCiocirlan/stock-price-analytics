@@ -21,7 +21,7 @@ public class PriceMilestoneFactory {
                         NewHighLowMilestone.values(),
                         IntradayPriceSpike.values(),
                         PreMarketPriceMilestone.values(),
-                        PreMarketPerformanceMilestone.values(),
+                        PreMarketGap.values(),
                         SimpleMovingAverageMilestone.values()
                 )
                 .flatMap(Arrays::stream)
