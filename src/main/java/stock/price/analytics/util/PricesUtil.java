@@ -81,4 +81,11 @@ public final class PricesUtil {
         return prices;
     }
 
+    public static AbstractPrice multiplyWith(AbstractPrice price, double priceMultiplier) {
+        price.setOpen(Math.round((priceMultiplier * price.getOpen()) * 100.0) / 100.0);
+        price.setHigh(Math.round((priceMultiplier * price.getHigh()) * 100.0) / 100.0);
+        price.setLow(Math.round((priceMultiplier * price.getLow()) * 100.0) / 100.0);
+        price.setClose(Math.round((priceMultiplier * price.getClose()) * 100.0) / 100.0);
+        return price;
+    }
 }
