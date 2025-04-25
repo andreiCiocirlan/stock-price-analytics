@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 import static stock.price.analytics.model.prices.enums.PreMarketGap.*;
 import static stock.price.analytics.model.prices.enums.PreMarketPriceMilestone.*;
 
-public class PriceMilestoneFactory {
+public final class PriceMilestoneFactory {
 
     private static final Map<String, PriceMilestone> PRICE_MILESTONE_REGISTRY = createRegistry();
 
