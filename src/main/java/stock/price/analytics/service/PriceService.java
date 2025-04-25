@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import static java.time.temporal.TemporalAdjusters.*;
 import static stock.price.analytics.model.prices.enums.StockTimeframe.DAILY;
 import static stock.price.analytics.util.PricesUtil.getHigherTimeframePricesFor;
+import static stock.price.analytics.util.PricesUtil.multiplyWith;
 import static stock.price.analytics.util.TradingDateUtil.isWithinSameTimeframe;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
@@ -60,7 +61,7 @@ public class PriceService {
 
         // Update daily prices before stockSplitDate and keep others unchanged
         List<DailyPrice> updatedDailyPrices = dailyPricesToUpdate.stream()
-                .map(dp -> dp.getDate().isBefore(stockSplitDate) ? (DailyPrice) updatePrice(dp, priceMultiplier) : dp)
+                .map(dp -> dp.getDate().isBefore(stockSplitDate) ? (DailyPrice) multiplyWith(dp, priceMultiplier) : dp)
                 .toList();
 
         // compute all higher timeframe prices using the updated daily prices
@@ -105,14 +106,6 @@ public class PriceService {
         syncPersistenceService.partitionDataAndSave(monthlyPricesToUpdate, monthlyPriceRepository);
         syncPersistenceService.partitionDataAndSave(quarterlyPricesToUpdate, quarterlyPriceRepository);
         syncPersistenceService.partitionDataAndSave(yearlyPricesToUpdate, yearlyPriceRepository);
-    }
-
-    private AbstractPrice updatePrice(AbstractPrice price, double priceMultiplier) {
-        price.setOpen(Math.round((priceMultiplier * price.getOpen()) * 100.0) / 100.0);
-        price.setHigh(Math.round((priceMultiplier * price.getHigh()) * 100.0) / 100.0);
-        price.setLow(Math.round((priceMultiplier * price.getLow()) * 100.0) / 100.0);
-        price.setClose(Math.round((priceMultiplier * price.getClose()) * 100.0) / 100.0);
-        return price;
     }
 
     public List<? extends AbstractPrice> previousThreePricesFor(List<String> tickers, StockTimeframe timeframe) {
