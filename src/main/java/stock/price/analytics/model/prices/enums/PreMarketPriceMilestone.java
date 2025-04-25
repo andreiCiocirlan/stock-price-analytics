@@ -1,10 +1,7 @@
 package stock.price.analytics.model.prices.enums;
 
-import stock.price.analytics.model.prices.PriceMilestone;
 import stock.price.analytics.model.prices.StockPriceMilestone;
 import stock.price.analytics.model.prices.context.StockDailyPriceContext;
-
-import java.util.List;
 
 import static stock.price.analytics.util.Constants.MIN_GAP_AND_GO_PERCENTAGE;
 
@@ -58,10 +55,6 @@ public enum PreMarketPriceMilestone implements StockPriceMilestone<StockDailyPri
             return "New All-time High";
         }
     };
-
-    public static List<PriceMilestone> preMarketSchedulerValues() {
-        return List.of(KICKING_CANDLE_UP, KICKING_CANDLE_DOWN, PRE_NEW_ALL_TIME_LOW, PRE_NEW_ALL_TIME_HIGH);
-    }
 
     @Override
     public boolean isMetFor(StockDailyPriceContext context) {

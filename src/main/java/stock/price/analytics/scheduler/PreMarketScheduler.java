@@ -6,8 +6,8 @@ import org.springframework.scheduling.annotation.Schedules;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.service.PriceMilestoneService;
 import stock.price.analytics.service.WebSocketNotificationService;
+import stock.price.analytics.util.PriceMilestoneFactory;
 
-import static stock.price.analytics.model.prices.enums.PreMarketPriceMilestone.preMarketSchedulerValues;
 import static stock.price.analytics.util.Constants.CFD_MARGINS_5X_4X_3X;
 
 @Component
@@ -22,7 +22,7 @@ public class PreMarketScheduler {
             @Scheduled(cron = "${cron.pre.market.alert.between9and915}", zone = "${cron.timezone}") // 10 0,15 9 * * MON-FRI
     })
     public void alertPreMarketGaps_moreThan_10Percent() {
-        priceMilestoneService.findTickersForMilestones(preMarketSchedulerValues(), CFD_MARGINS_5X_4X_3X)
+        priceMilestoneService.findTickersForMilestones(PriceMilestoneFactory.preMarketSchedulerValues(), CFD_MARGINS_5X_4X_3X)
                 .forEach((priceMilestone, tickers) -> webSocketNotificationService.broadcastDesktopNotification("Pre-Market alert", String.join(" ", priceMilestone.toString(), tickers.toString())));
     }
 

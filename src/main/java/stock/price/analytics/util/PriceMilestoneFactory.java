@@ -11,6 +11,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static stock.price.analytics.model.prices.enums.PreMarketGap.*;
+import static stock.price.analytics.model.prices.enums.PreMarketPriceMilestone.*;
+
 public class PriceMilestoneFactory {
 
     private static final Map<String, PriceMilestone> PRICE_MILESTONE_REGISTRY = createRegistry();
@@ -43,6 +46,10 @@ public class PriceMilestoneFactory {
             throw new IllegalArgumentException("Invalid milestone milestoneCode: " + milestoneCode);
         }
         return milestone;
+    }
+
+    public static List<PriceMilestone> preMarketSchedulerValues() {
+        return List.of(PRE_NEW_52W_HIGH, PRE_NEW_52W_LOW, PRE_NEW_ALL_TIME_LOW, PRE_NEW_ALL_TIME_HIGH, GAP_DOWN_5_PERCENT, GAP_DOWN_10_PERCENT, GAP_UP_5_PERCENT, GAP_UP_10_PERCENT);
     }
 
     public static List<PriceMilestone> registry() {
