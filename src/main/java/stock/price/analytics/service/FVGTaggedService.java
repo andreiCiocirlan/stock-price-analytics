@@ -24,7 +24,7 @@ public class FVGTaggedService {
 
     @SuppressWarnings("unchecked")
     public Set<String> findTickersFVGsTaggedFor(StockTimeframe timeframe, FvgType fvgType, PricePerformanceMilestone pricePerformanceMilestone, String cfdMargins) {
-        final String prefix = timeframe.stockPrefix();
+        String prefix = timeframe.stockPrefix();
         Pair<String, String> queryFields = switch (pricePerformanceMilestone) {
             case HIGH_52W_95, LOW_52W_95, HIGH_52W_90, LOW_52W_90 -> new MutablePair<>("low52w", "high52w");
             case HIGH_4W_95, LOW_4W_95, HIGH_4W_90, LOW_4W_90 -> new MutablePair<>("low4w", "high4w");
