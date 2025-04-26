@@ -7,23 +7,23 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import stock.price.analytics.service.StockSplitService;
+import stock.price.analytics.service.StockService;
 
 import java.time.LocalDate;
 
 @RestController
 @Validated
 @RequiredArgsConstructor
-@RequestMapping("/stock-split")
-public class StockSplitController {
+@RequestMapping("/stock")
+public class StocksController {
 
-    private final StockSplitService stockSplitService;
+    private final StockService stockService;
 
-    @PostMapping("/adjust-prices")
+    @PostMapping("/split-adjust-prices")
     void splitAdjustPrices(@RequestParam("ticker") String ticker,
                            @RequestParam("stockSplitDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate stockSplitDate,
                            @RequestParam("priceMultiplier") double priceMultiplier) {
-        stockSplitService.splitAdjustFor(ticker, stockSplitDate, priceMultiplier);
+        stockService.splitAdjustFor(ticker, stockSplitDate, priceMultiplier);
     }
 
 }

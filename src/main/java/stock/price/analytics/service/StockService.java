@@ -15,14 +15,21 @@ import stock.price.analytics.model.stocks.enums.MarketState;
 import stock.price.analytics.repository.stocks.StockRepository;
 import stock.price.analytics.repository.stocks.TickerRenameRepository;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
+
+import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class StockService {
 
+    private final PriceService priceService;
+    private final HighLowForPeriodService highLowForPeriodService;
+    private final FairValueGapService fairValueGapService;
     private final StockRepository stockRepository;
     private final TickerRenameRepository tickerRenameRepository;
     private final CacheService cacheService;
@@ -143,5 +150,20 @@ public class StockService {
         log.info("Renamed ticker for HighestLowestPrices. Updated {} rows", tickerRenameRepository.updateHighestLowestPrices(oldTicker, newTicker));
         log.info("Renamed ticker for FairValueGap. Updated {} rows", tickerRenameRepository.updateFairValueGap(oldTicker, newTicker));
         log.info("Renamed ticker for PriceGap. Updated {} rows", tickerRenameRepository.updatePriceGap(oldTicker, newTicker));
+    }
+
+    public void splitAdjustFor(String ticker, LocalDate stockSplitDate, double priceMultiplier) {
+        priceService.adjustPricesFor(ticker, stockSplitDate, priceMultiplier);
+        highLowForPeriodService.saveAllHistoricalHighLowPrices(List.of(ticker), stockSplitDate);
+        fairValueGapService.updateFVGPricesForStockSplit(ticker, stockSplitDate, priceMultiplier);
+
+        // stockSplitDate within the last_updated week
+        if (stockSplitDate.isAfter(tradingDateNow().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)))) {
+            updateStockHigherTimeframePricesFor(ticker);
+            updateHighLowForPeriodPrices(ticker);
+            if (stockSplitDate.isEqual(tradingDateNow())) {
+                updateStockDailyPricesFor(ticker);
+            }
+        }
     }
 }
