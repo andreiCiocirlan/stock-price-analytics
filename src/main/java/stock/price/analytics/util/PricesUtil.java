@@ -88,4 +88,23 @@ public final class PricesUtil {
         price.setClose(Math.round((priceMultiplier * price.getClose()) * 100.0) / 100.0);
         return price;
     }
+
+    static DailyPrice dailyPriceWithRoundedDecimals(DailyPrice dailyPrice) {
+        dailyPrice.setOpen(Double.parseDouble(String.format("%.4f", dailyPrice.getOpen())));
+        dailyPrice.setHigh(Double.parseDouble(String.format("%.4f", dailyPrice.getHigh())));
+        dailyPrice.setLow(Double.parseDouble(String.format("%.4f", dailyPrice.getLow())));
+        dailyPrice.setClose(Double.parseDouble(String.format("%.4f", dailyPrice.getClose())));
+//        if (dailyPrice.getOpen() < 1d) {
+//            dailyPrice.setOpen(Math.round(dailyPrice.getOpen() * 100.0) / 100.0);
+//            dailyPrice.setHigh(Math.round(dailyPrice.getHigh() * 100.0) / 100.0);
+//            dailyPrice.setLow(Math.round(dailyPrice.getLow() * 100.0) / 100.0);
+//            dailyPrice.setClose(Math.round(dailyPrice.getClose() * 100.0) / 100.0);
+//        } else {
+//            dailyPrice.setOpen(Math.round(dailyPrice.getOpen() * 1000.0) / 1000.0);
+//            dailyPrice.setHigh(Math.round(dailyPrice.getHigh() * 1000.0) / 1000.0);
+//            dailyPrice.setLow(Math.round(dailyPrice.getLow() * 1000.0) / 1000.0);
+//            dailyPrice.setClose(Math.round(dailyPrice.getClose() * 1000.0) / 1000.0);
+//        }
+        return dailyPrice;
+    }
 }
