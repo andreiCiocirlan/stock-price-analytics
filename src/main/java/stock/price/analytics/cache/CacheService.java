@@ -1,7 +1,6 @@
 package stock.price.analytics.cache;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.model.json.DailyPriceJSON;
 import stock.price.analytics.model.prices.PriceMilestone;
@@ -27,7 +26,6 @@ import static stock.price.analytics.model.prices.enums.IntradayPriceSpike.INTRAD
 import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
 import static stock.price.analytics.util.Constants.INTRADAY_SPIKE_PERCENTAGE;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CacheService {
@@ -121,24 +119,6 @@ public class CacheService {
 
     public void addPricesWithPrevClose(List<PriceWithPrevClose> pricesWithPrevClose, StockTimeframe timeframe) {
         pricesCache.addPricesWithPrevClose(pricesWithPrevClose, timeframe);
-    }
-
-    public void logNewHighLowsForHLPeriods() {
-        for (HighLowPeriod highLowPeriod : HighLowPeriod.values()) {
-            List<String> newHighLowsForHLPeriod = getNewHighLowsForHLPeriod(highLowPeriod);
-            if (!newHighLowsForHLPeriod.isEmpty()) {
-                log.info("{} New {} : {}", newHighLowsForHLPeriod.size(), highLowPeriod, newHighLowsForHLPeriod);
-            }
-        }
-    }
-
-    public void logEqualHighLowsForHLPeriods() {
-        for (HighLowPeriod highLowPeriod : HighLowPeriod.values()) {
-            List<String> equalHighLowsForHLPeriod = getEqualHighLowsForHLPeriod(highLowPeriod);
-            if (!equalHighLowsForHLPeriod.isEmpty()) {
-                log.info("{} Equal {} : {}", equalHighLowsForHLPeriod.size(), highLowPeriod, equalHighLowsForHLPeriod);
-            }
-        }
     }
 
     public void cachePriceMilestoneTickers(PriceMilestone priceMilestone, List<String> tickers) {

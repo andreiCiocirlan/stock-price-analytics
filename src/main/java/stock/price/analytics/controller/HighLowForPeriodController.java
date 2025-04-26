@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.service.HighLowForPeriodService;
 
 import java.time.LocalDate;
@@ -16,7 +15,6 @@ import java.util.List;
 public class HighLowForPeriodController {
 
     private final HighLowForPeriodService highLowForPeriodService;
-    private final CacheService cacheService;
 
     @PostMapping("/save-all-hl-4w-52w-ticker")
     @ResponseStatus(HttpStatus.OK)
@@ -25,18 +23,5 @@ public class HighLowForPeriodController {
                                                             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate tradingDate) {
         highLowForPeriodService.saveAllHistoricalHighLowPrices(List.of(ticker), tradingDate);
     }
-
-    @GetMapping("/daily-new-high-lows-for-hl-period")
-    @ResponseStatus(HttpStatus.OK)
-    public void newDailyHighLowsForHLPeriods() {
-        cacheService.logNewHighLowsForHLPeriods();
-    }
-
-    @GetMapping("/daily-equal-high-lows-for-hl-period")
-    @ResponseStatus(HttpStatus.OK)
-    public void equalHighLowsForHLPeriods() {
-        cacheService.logEqualHighLowsForHLPeriods();
-    }
-
 
 }
