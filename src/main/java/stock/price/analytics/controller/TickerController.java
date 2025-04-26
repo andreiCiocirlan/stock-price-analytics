@@ -2,7 +2,7 @@ package stock.price.analytics.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import stock.price.analytics.service.DeleteTickerService;
+import stock.price.analytics.service.TickerService;
 import stock.price.analytics.service.NewTickerService;
 
 @RestController
@@ -11,7 +11,7 @@ import stock.price.analytics.service.NewTickerService;
 public class TickerController {
 
     private final NewTickerService newTickerService;
-    private final DeleteTickerService deleteTickerService;
+    private final TickerService tickerService;
 
     @PostMapping("/import-all-data")
     public void importAllDataFor(@RequestParam(value = "tickers") String tickers,
@@ -22,6 +22,11 @@ public class TickerController {
 
     @DeleteMapping("/delete-data-for-ticker")
     public void deleteAllDataFor(@RequestParam(value = "ticker") String ticker) {
-        deleteTickerService.deleteAllDataFor(ticker);
+        tickerService.deleteAllDataFor(ticker);
+    }
+
+    @PutMapping("/rename")
+    public void renameTicker(@RequestParam(value = "oldTicker") String oldTicker, @RequestParam(value = "newTicker") String newTicker) {
+        tickerService.renameTicker(oldTicker, newTicker);
     }
 }
