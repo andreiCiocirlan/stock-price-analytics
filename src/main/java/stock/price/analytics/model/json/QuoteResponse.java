@@ -12,10 +12,10 @@ import java.util.List;
 @NoArgsConstructor
 public class QuoteResponse {
 
-	@JsonProperty("result")
-	private List<DailyPriceJSON> result;
+    @JsonProperty("result")
+    private List<DailyPriceJSON> result;
 
-	@JsonProperty("error")
-	private String error;
+    @JsonProperty("error")
+    private String error;
 
 }

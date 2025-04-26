@@ -61,7 +61,7 @@ public class StockHeatmapPerformanceService {
 
     private Predicate<? super Stock> stockFilterPredicate(List<String> tickers, List<Double> cfdMargins) {
         return stock -> (cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin())) &&
-                (tickers.isEmpty() || tickers.contains(stock.getTicker()));
+                        (tickers.isEmpty() || tickers.contains(stock.getTicker()));
     }
 
 }

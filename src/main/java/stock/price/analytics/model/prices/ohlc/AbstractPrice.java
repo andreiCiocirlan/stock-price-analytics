@@ -54,10 +54,15 @@ public abstract class AbstractPrice implements BusinessEntity {
     }
 
     public abstract LocalDate getStartDate();
+
     public abstract LocalDate getEndDate();
+
     public abstract void setStartDateFrom(LocalDate date);
+
     public abstract void setEndDateFrom(LocalDate date);
+
     public abstract StockTimeframe getTimeframe();
+
     public abstract void updateStock(Stock stock);
 
     public void updateFrom(AbstractPrice that) {

@@ -34,7 +34,7 @@ public interface FVGRepository extends JpaRepository<FairValueGap, Long> {
                    ELSE FALSE
                    END;
             """, nativeQuery = true)
-    int updateFVGPricesForStockSplit(@Param(value = "ticker") String ticker, @Param(value = "stockSplitDate") LocalDate  stockSplitDate, @Param(value = "multiplier") double multiplier);
+    int updateFVGPricesForStockSplit(@Param(value = "ticker") String ticker, @Param(value = "stockSplitDate") LocalDate stockSplitDate, @Param(value = "multiplier") double multiplier);
 
     @Query(value = """
             SELECT id, 'daily_date_discrepancy' FROM FVG

@@ -66,10 +66,15 @@ public abstract class HighLowForPeriod implements BusinessEntity {
     }
 
     public abstract void setLow(double low);
+
     public abstract void setHigh(double high);
+
     public abstract double getHigh();
+
     public abstract double getLow();
+
     public abstract HighLowPeriod getHighLowPeriod();
+
     public abstract void updateStock(Stock stock);
 
     @Override

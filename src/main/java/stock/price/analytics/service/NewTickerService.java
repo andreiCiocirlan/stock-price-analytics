@@ -164,9 +164,12 @@ public class NewTickerService {
                     LocalDate endDate = startDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
 
                     HighLowForPeriod highLowForPeriod = switch (highLowPeriod) {
-                        case HIGH_LOW_4W -> new HighLow4w(ticker, startDate, endDate, lowestPriceForPeriod, highestPriceForPeriod);
-                        case HIGH_LOW_52W -> new HighLow52Week(ticker, startDate, endDate, lowestPriceForPeriod, highestPriceForPeriod);
-                        case HIGH_LOW_ALL_TIME -> new HighestLowestPrices(ticker, startDate, endDate, lowestPriceForPeriod, highestPriceForPeriod);
+                        case HIGH_LOW_4W ->
+                                new HighLow4w(ticker, startDate, endDate, lowestPriceForPeriod, highestPriceForPeriod);
+                        case HIGH_LOW_52W ->
+                                new HighLow52Week(ticker, startDate, endDate, lowestPriceForPeriod, highestPriceForPeriod);
+                        case HIGH_LOW_ALL_TIME ->
+                                new HighestLowestPrices(ticker, startDate, endDate, lowestPriceForPeriod, highestPriceForPeriod);
                     };
                     highLowForPeriodPrices.computeIfAbsent(highLowPeriod, _ -> new ArrayList<>()).add(highLowForPeriod);
                 }

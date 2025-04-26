@@ -94,11 +94,11 @@ public class DailyPrice extends AbstractPrice {
         DailyPrice that = (DailyPrice) o;
 
         return Objects.equals(getTicker(), that.getTicker()) &&
-                Objects.equals(date, that.date) &&
-                Double.compare(getOpen(), that.getOpen()) == 0 &&
-                Double.compare(getHigh(), that.getHigh()) == 0 &&
-                Double.compare(getLow(), that.getLow()) == 0 &&
-                Double.compare(getClose(), that.getClose()) == 0;
+               Objects.equals(date, that.date) &&
+               Double.compare(getOpen(), that.getOpen()) == 0 &&
+               Double.compare(getHigh(), that.getHigh()) == 0 &&
+               Double.compare(getLow(), that.getLow()) == 0 &&
+               Double.compare(getClose(), that.getClose()) == 0;
     }
 
     @Override

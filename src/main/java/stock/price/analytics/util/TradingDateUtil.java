@@ -74,7 +74,7 @@ public final class TradingDateUtil {
 
     private static boolean sameQuarter(LocalDate firstDate, LocalDate secondDate) {
         return firstDate.getYear() == secondDate.getYear() &&
-                firstDate.getMonth().firstMonthOfQuarter() == secondDate.getMonth().firstMonthOfQuarter();
+               firstDate.getMonth().firstMonthOfQuarter() == secondDate.getMonth().firstMonthOfQuarter();
     }
 
     private static boolean sameYear(LocalDate firstDate, LocalDate secondDate) {

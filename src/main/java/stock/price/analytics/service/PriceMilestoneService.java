@@ -66,11 +66,15 @@ public class PriceMilestoneService {
 
     public List<String> findTickersForMilestone(PriceMilestone milestone, List<Double> cfdMargins) {
         return switch (milestone) {
-            case NewHighLowMilestone newHighLowMilestone -> filterByNewHighLowMilestone(newHighLowMilestone, cfdMargins);
-            case PricePerformanceMilestone pricePerformanceMilestone -> filterByPerformanceMilestone(pricePerformanceMilestone, cfdMargins);
-            case PreMarketPriceMilestone preMarketMilestone -> filterByPreMarketMilestone(preMarketMilestone, cfdMargins);
+            case NewHighLowMilestone newHighLowMilestone ->
+                    filterByNewHighLowMilestone(newHighLowMilestone, cfdMargins);
+            case PricePerformanceMilestone pricePerformanceMilestone ->
+                    filterByPerformanceMilestone(pricePerformanceMilestone, cfdMargins);
+            case PreMarketPriceMilestone preMarketMilestone ->
+                    filterByPreMarketMilestone(preMarketMilestone, cfdMargins);
             case PreMarketGap preMarketGap -> filterByPreMarketPerformanceMilestone(preMarketGap, cfdMargins);
-            case SimpleMovingAverageMilestone smaMilestone -> filterBySimpleMovingAvgMilestone(smaMilestone, cfdMargins);
+            case SimpleMovingAverageMilestone smaMilestone ->
+                    filterBySimpleMovingAvgMilestone(smaMilestone, cfdMargins);
             default -> throw new IllegalArgumentException("Invalid milestone type");
         };
     }

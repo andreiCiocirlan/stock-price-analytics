@@ -10,9 +10,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @JsonDeserialize(using = ResponseDeserializer.class)
-public class Response{
+public class Response {
 
-	@JsonProperty("quoteResponse")
-	private QuoteResponse quoteResponse;
+    @JsonProperty("quoteResponse")
+    private QuoteResponse quoteResponse;
 
 }

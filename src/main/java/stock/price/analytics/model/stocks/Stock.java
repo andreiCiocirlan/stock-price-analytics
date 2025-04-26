@@ -170,11 +170,16 @@ public class Stock implements BusinessEntity {
         if (this.getClose() != p.getClose() || performance != p.getPerformance()) return true;
 
         return switch (p.getTimeframe()) {
-            case DAILY -> this.getDailyHigh() != p.getHigh() || this.getDailyLow() != p.getLow() || this.getDailyOpen() != p.getOpen();
-            case WEEKLY -> this.getWeeklyHigh() != p.getHigh() || this.getWeeklyLow() != p.getLow() || this.getWeeklyOpen() != p.getOpen();
-            case MONTHLY -> this.getMonthlyHigh() != p.getHigh() || this.getMonthlyLow() != p.getLow() || this.getMonthlyOpen() != p.getOpen();
-            case QUARTERLY -> this.getQuarterlyHigh() != p.getHigh() || this.getQuarterlyLow() != p.getLow() || this.getQuarterlyOpen() != p.getOpen();
-            case YEARLY -> this.getYearlyHigh() != p.getHigh() || this.getYearlyLow() != p.getLow() || this.getYearlyOpen() != p.getOpen();
+            case DAILY ->
+                    this.getDailyHigh() != p.getHigh() || this.getDailyLow() != p.getLow() || this.getDailyOpen() != p.getOpen();
+            case WEEKLY ->
+                    this.getWeeklyHigh() != p.getHigh() || this.getWeeklyLow() != p.getLow() || this.getWeeklyOpen() != p.getOpen();
+            case MONTHLY ->
+                    this.getMonthlyHigh() != p.getHigh() || this.getMonthlyLow() != p.getLow() || this.getMonthlyOpen() != p.getOpen();
+            case QUARTERLY ->
+                    this.getQuarterlyHigh() != p.getHigh() || this.getQuarterlyLow() != p.getLow() || this.getQuarterlyOpen() != p.getOpen();
+            case YEARLY ->
+                    this.getYearlyHigh() != p.getHigh() || this.getYearlyLow() != p.getLow() || this.getYearlyOpen() != p.getOpen();
         };
     }
 

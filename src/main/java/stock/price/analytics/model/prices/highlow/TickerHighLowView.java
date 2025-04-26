@@ -4,7 +4,9 @@ package stock.price.analytics.model.prices.highlow;
 public interface TickerHighLowView {
 
     String getTicker();
+
     Double getLow();
+
     Double getHigh();
 
 }

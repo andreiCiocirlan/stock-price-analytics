@@ -43,7 +43,7 @@ public record CandleWithDateDTO(Date date, double open, double high, double low,
 
         // Validate numeric validity (optional)
         if (Double.isNaN(open) || Double.isNaN(high) || Double.isNaN(low) || Double.isNaN(close) ||
-                open < 0 || high < 0 || low < 0 || close < 0) {
+            open < 0 || high < 0 || low < 0 || close < 0) {
             throw new IllegalArgumentException("All prices must be valid non-negative numeric values.");
         }
     }
