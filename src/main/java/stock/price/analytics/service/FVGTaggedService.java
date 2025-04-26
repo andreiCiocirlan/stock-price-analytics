@@ -24,6 +24,14 @@ public class FVGTaggedService {
 
     @SuppressWarnings("unchecked")
     public Set<String> findTickersFVGsTaggedFor(StockTimeframe timeframe, FvgType fvgType, PricePerformanceMilestone pricePerformanceMilestone, String cfdMargins) {
+        String query = findTickersFVGsTaggedQueryFor(timeframe, fvgType, pricePerformanceMilestone, cfdMargins);
+        return ((List<FairValueGap>) entityManager.createNativeQuery(query, FairValueGap.class).getResultList())
+                .stream()
+                .map(FairValueGap::getTicker)
+                .collect(Collectors.toSet());
+    }
+
+    private static String findTickersFVGsTaggedQueryFor(StockTimeframe timeframe, FvgType fvgType, PricePerformanceMilestone pricePerformanceMilestone, String cfdMargins) {
         String prefix = timeframe.stockPrefix();
         Pair<String, String> queryFields = switch (pricePerformanceMilestone) {
             case HIGH_52W_95, LOW_52W_95, HIGH_52W_90, LOW_52W_90 -> new MutablePair<>("low52w", "high52w");
@@ -33,16 +41,9 @@ public class FVGTaggedService {
         String lowField = queryFields.getLeft();
         String highField = queryFields.getRight();
         String fvgTypeStr = fvgType.name();
+        String highLowWhereClause = highLowWhereClauseFVGsTagged(pricePerformanceMilestone, lowField, highField);
 
-        String highLowWhereClause;
-        double percentage = pricePerformanceMilestone.is95thPercentileValue() ? 0.95 : 0.9;
-        if (PricePerformanceMilestone.highPercentileValues().contains(pricePerformanceMilestone)) {
-            highLowWhereClause = STR."AND s.\{lowField} <> s.\{highField} AND (1 - (1 - ((s.close - s.\{lowField}) / (s.\{highField} - s.\{lowField})))) > \{percentage}";
-        } else {
-            highLowWhereClause = STR."AND s.\{lowField} <> s.\{highField} AND (1 - (s.close - s.\{lowField}) / (s.\{highField} - s.\{lowField})) > \{percentage}";
-        }
-
-        String query = STR."""
+        return STR."""
                 SELECT fvg.*
                 FROM stocks s
                 JOIN fvg on fvg.ticker = s.ticker AND fvg.status = 'OPEN' AND fvg.timeframe = '\{timeframe}' and fvg.type = '\{fvgTypeStr}'
@@ -51,10 +52,16 @@ public class FVGTaggedService {
                 \{highLowWhereClause}
                 AND (s.\{prefix}high between fvg.low AND fvg.high OR s.\{prefix}low between fvg.low AND fvg.high)
                 """;
+    }
 
-        return ((List<FairValueGap>) entityManager.createNativeQuery(query, FairValueGap.class).getResultList())
-                .stream()
-                .map(FairValueGap::getTicker)
-                .collect(Collectors.toSet());
+    private static String highLowWhereClauseFVGsTagged(PricePerformanceMilestone pricePerformanceMilestone, String lowField, String highField) {
+        String highLowWhereClause;
+        double percentage = pricePerformanceMilestone.is95thPercentileValue() ? 0.95 : 0.9;
+        if (PricePerformanceMilestone.highPercentileValues().contains(pricePerformanceMilestone)) {
+            highLowWhereClause = STR."AND s.\{lowField} <> s.\{highField} AND (1 - (1 - ((s.close - s.\{lowField}) / (s.\{highField} - s.\{lowField})))) > \{percentage}";
+        } else {
+            highLowWhereClause = STR."AND s.\{lowField} <> s.\{highField} AND (1 - (s.close - s.\{lowField}) / (s.\{highField} - s.\{lowField})) > \{percentage}";
+        }
+        return highLowWhereClause;
     }
 }

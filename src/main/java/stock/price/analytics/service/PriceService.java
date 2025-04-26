@@ -138,8 +138,14 @@ public class PriceService {
     // checkFirstImport false -> first import not done for timeframe
     // checkFirstImport true -> first import done for timeframe
     private boolean checkImportStatusFor(StockTimeframe timeframe, boolean checkFirstImport) {
+        String query = checkImportStatusQueryFor(timeframe, checkFirstImport);
+        Query nativeQuery = entityManager.createNativeQuery(query, Boolean.class);
+        return (Boolean) nativeQuery.getResultList().getFirst();
+    }
+
+    private static String checkImportStatusQueryFor(StockTimeframe timeframe, boolean checkFirstImport) {
         String timeframePeriod = timeframe.toDateTruncPeriod();
-        String query = STR."""
+        return STR."""
                 SELECT
                     COUNT(*) = \{checkFirstImport ? "0" : "1"}
                 FROM
@@ -148,10 +154,6 @@ public class PriceService {
                     ticker = 'AAPL'
                     AND date_trunc('\{timeframePeriod}', date) = date_trunc('\{timeframePeriod}', current_date);
                 """;
-
-        Query nativeQuery = entityManager.createNativeQuery(query, Boolean.class);
-
-        return (Boolean) nativeQuery.getResultList().getFirst();
     }
 
     public List<CandleWithDateDTO> findFor(String ticker, StockTimeframe timeframe) {

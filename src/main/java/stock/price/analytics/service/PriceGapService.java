@@ -37,6 +37,12 @@ public class PriceGapService {
 
     @Transactional
     private void savePriceGapsFor(List<String> tickers, StockTimeframe timeframe, boolean allHistoricalData) {
+        String query = savePriceGapsQueryFor(tickers, timeframe, allHistoricalData);
+        int rowsAffected = entityManager.createNativeQuery(query).executeUpdate();
+        log.info("saved {} rows for {} price gaps", rowsAffected, timeframe);
+    }
+
+    private String savePriceGapsQueryFor(List<String> tickers, StockTimeframe timeframe, boolean allHistoricalData) {
         String tickersFormatted = tickers.stream().map(ticker -> STR."'\{ticker}'").collect(Collectors.joining(", "));
         String dbTable = timeframe.dbTableOHLC();
         String dateColumn = timeframe == StockTimeframe.DAILY ? "date" : "start_date";
@@ -54,7 +60,7 @@ public class PriceGapService {
             };
         }
 
-        String query = STR."""
+        return STR."""
             WITH max_date_cte AS (
                 select date_trunc('\{dateTruncPeriod}', (select max(last_updated) from stocks)) - INTERVAL '\{interval}' as max_date
             ),
@@ -93,9 +99,6 @@ public class PriceGapService {
             	closing_date
             FROM unfilled_gaps;
             """;
-
-        int rowsAffected = entityManager.createNativeQuery(query).executeUpdate();
-        log.info("saved {} rows for {} price gaps", rowsAffected, timeframe);
     }
 
     @Transactional
