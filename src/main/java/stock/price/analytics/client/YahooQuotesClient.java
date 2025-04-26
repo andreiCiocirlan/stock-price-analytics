@@ -33,7 +33,9 @@ public class YahooQuotesClient {
 
     private static final CloseableHttpClient httpClient;
     private static final int MAX_RETRIES_CRUMB = 5;
-    private static final String YAHOO_BASE_URL = "https://query1.finance.yahoo.com/v7/finance";
+    private static final String QUERY1_BASE_URL = "https://query1.finance.yahoo.com";
+    private static final String QUERY2_BASE_URL = "https://query2.finance.yahoo.com";
+    private static final String V7_FINANCE = "/v7/finance";
     private final RestTemplate restTemplate;
     private int RETRY_COUNT_CRUMB = 0;
     private String COOKIE_FC_YAHOO = "EuConsent=CQONUAAQONUAAAOACKROBgFgAAAAAAAAACiQAAAAAAAA; A1S=d=AQABBHu40mcCECI3dDTimCiMyiAvT34B1oUFEgABCAH-02cCaPF3ziMAAiAAAAcIdrfSZ2r5DG4&S=AQAAAszl9s9YvJYIkeFU0a_zZTg; A1=d=AQABBHu40mcCECI3dDTimCiMyiAvT34B1oUFEgABCAH-02cCaPF3ziMAAiAAAAcIdrfSZ2r5DG4&S=AQAAAszl9s9YvJYIkeFU0a_zZTg; GUC=AQABCAFn0_5oAkIdNgR3&s=AQAAAL3PAraG&g=Z9K4hQ; A3=d=AQABBHu40mcCECI3dDTimCiMyiAvT34B1oUFEgABCAH-02cCaPF3ziMAAiAAAAcIdrfSZ2r5DG4&S=AQAAAszl9s9YvJYIkeFU0a_zZTg; PRF=theme%3Dauto";
@@ -68,7 +70,7 @@ public class YahooQuotesClient {
 
                     org.springframework.http.HttpEntity<String> entity = new org.springframework.http.HttpEntity<>(null, headers);
                     response = restTemplate.exchange(
-                            YAHOO_BASE_URL + "/chart/{ticker}?range=60y&interval=1d&indicators=quote&includeTimestamps=true",
+                            QUERY1_BASE_URL + V7_FINANCE + "/chart/{ticker}?range=60y&interval=1d&indicators=quote&includeTimestamps=true",
                             HttpMethod.GET,
                             entity,
                             String.class,
@@ -118,7 +120,7 @@ public class YahooQuotesClient {
 
     public String quotePricesJSON(String tickers) {
         String crumb = CRUMB_COOKIE.isEmpty() ? getCrumb() : CRUMB_COOKIE;
-        String URL = String.join("", "https://query2.finance.yahoo.com/v7/finance/quote?lang=en-US&region=US&corsDomain=finance.yahoo.com&symbols=",
+        String URL = String.join("", QUERY2_BASE_URL + V7_FINANCE + "/quote?lang=en-US&region=US&corsDomain=finance.yahoo.com&symbols=",
                 tickers, "&crumb=", crumb);
         String quoteResponse = null;
         int maxRetries = 3;
@@ -192,7 +194,7 @@ public class YahooQuotesClient {
         while (RETRY_COUNT_CRUMB < MAX_RETRIES_CRUMB) {
             String crumb = null;
             try {
-                HttpGet request = new HttpGet("https://query2.finance.yahoo.com/v1/test/getcrumb");
+                HttpGet request = new HttpGet(QUERY2_BASE_URL + "/v1/test/getcrumb");
                 request.setHeader("Cookie", cookieFromFcYahoo());
                 request.setHeader("User-Agent", USER_AGENT_VALUE);
 
