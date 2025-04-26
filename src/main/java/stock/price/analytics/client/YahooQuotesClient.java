@@ -36,10 +36,6 @@ public class YahooQuotesClient {
     private static final String QUERY1_BASE_URL = "https://query1.finance.yahoo.com";
     private static final String QUERY2_BASE_URL = "https://query2.finance.yahoo.com";
     private static final String V7_FINANCE = "/v7/finance";
-    private final RestTemplate restTemplate;
-    private int RETRY_COUNT_CRUMB = 0;
-    private String COOKIE_FC_YAHOO = "EuConsent=CQONUAAQONUAAAOACKROBgFgAAAAAAAAACiQAAAAAAAA; A1S=d=AQABBHu40mcCECI3dDTimCiMyiAvT34B1oUFEgABCAH-02cCaPF3ziMAAiAAAAcIdrfSZ2r5DG4&S=AQAAAszl9s9YvJYIkeFU0a_zZTg; A1=d=AQABBHu40mcCECI3dDTimCiMyiAvT34B1oUFEgABCAH-02cCaPF3ziMAAiAAAAcIdrfSZ2r5DG4&S=AQAAAszl9s9YvJYIkeFU0a_zZTg; GUC=AQABCAFn0_5oAkIdNgR3&s=AQAAAL3PAraG&g=Z9K4hQ; A3=d=AQABBHu40mcCECI3dDTimCiMyiAvT34B1oUFEgABCAH-02cCaPF3ziMAAiAAAAcIdrfSZ2r5DG4&S=AQAAAszl9s9YvJYIkeFU0a_zZTg; PRF=theme%3Dauto";
-    private String CRUMB_COOKIE = "Ux/F/1Q/D1k";
 
     static {
         httpClient = createHttpClient();
@@ -53,6 +49,20 @@ public class YahooQuotesClient {
                 log.error("Error closing HttpClient", e);
             }
         }));
+    }
+
+    private final RestTemplate restTemplate;
+    private int RETRY_COUNT_CRUMB = 0;
+    private String COOKIE_FC_YAHOO = "EuConsent=CQONUAAQONUAAAOACKROBgFgAAAAAAAAACiQAAAAAAAA; A1S=d=AQABBHu40mcCECI3dDTimCiMyiAvT34B1oUFEgABCAH-02cCaPF3ziMAAiAAAAcIdrfSZ2r5DG4&S=AQAAAszl9s9YvJYIkeFU0a_zZTg; A1=d=AQABBHu40mcCECI3dDTimCiMyiAvT34B1oUFEgABCAH-02cCaPF3ziMAAiAAAAcIdrfSZ2r5DG4&S=AQAAAszl9s9YvJYIkeFU0a_zZTg; GUC=AQABCAFn0_5oAkIdNgR3&s=AQAAAL3PAraG&g=Z9K4hQ; A3=d=AQABBHu40mcCECI3dDTimCiMyiAvT34B1oUFEgABCAH-02cCaPF3ziMAAiAAAAcIdrfSZ2r5DG4&S=AQAAAszl9s9YvJYIkeFU0a_zZTg; PRF=theme%3Dauto";
+    private String CRUMB_COOKIE = "Ux/F/1Q/D1k";
+
+    private static CloseableHttpClient createHttpClient() {
+        RequestConfig requestConfig = RequestConfig.custom()
+                .setCookieSpec(CookieSpecs.STANDARD)
+                .build();
+        return HttpClientBuilder.create()
+                .setDefaultRequestConfig(requestConfig)
+                .build();
     }
 
     public void getAllHistoricalPrices_andSaveJSONFileFor(String tickers) {
@@ -225,15 +235,6 @@ public class YahooQuotesClient {
         // If we reach this point, all retries have been exhausted
         log.error("Maximum number of retries reached. Unable to get crumb.");
         throw new RuntimeException("Unable to get crumb after multiple attempts.");
-    }
-
-    private static CloseableHttpClient createHttpClient() {
-        RequestConfig requestConfig = RequestConfig.custom()
-                .setCookieSpec(CookieSpecs.STANDARD)
-                .build();
-        return HttpClientBuilder.create()
-                .setDefaultRequestConfig(requestConfig)
-                .build();
     }
 
 }
