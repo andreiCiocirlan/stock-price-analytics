@@ -12,7 +12,7 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DeleteTickerService {
+public class TickerService {
 
     @PersistenceContext
     private final EntityManager entityManager;
@@ -32,6 +32,19 @@ public class DeleteTickerService {
             "highest_lowest"
     );
 
+    @Transactional
+    public void renameTicker(String oldTicker, String newTicker) {
+        for (String table : DB_TABLES) {
+            String column = "daily_prices_json".equals(table) ? "symbol" : "ticker";
+            String sql = STR."UPDATE \{table} SET \{column} = ?2 WHERE \{column} = ?1";
+
+            int rowsAffected = entityManager.createNativeQuery(sql)
+                    .setParameter(1, oldTicker)
+                    .setParameter(2, newTicker)
+                    .executeUpdate();
+            log.info("Ticker rename: updated {} rows for {} ", rowsAffected, table);
+        }
+    }
 
     @Transactional
     public void deleteAllDataFor(String ticker) {
