@@ -11,6 +11,7 @@ import stock.price.analytics.model.dto.CandleWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.repository.prices.ohlc.*;
+import stock.price.analytics.util.QueryUtil;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -138,22 +139,9 @@ public class PriceService {
     // checkFirstImport false -> first import not done for timeframe
     // checkFirstImport true -> first import done for timeframe
     private boolean checkImportStatusFor(StockTimeframe timeframe, boolean checkFirstImport) {
-        String query = checkImportStatusQueryFor(timeframe, checkFirstImport);
+        String query = QueryUtil.checkImportStatusQueryFor(timeframe, checkFirstImport);
         Query nativeQuery = entityManager.createNativeQuery(query, Boolean.class);
         return (Boolean) nativeQuery.getResultList().getFirst();
-    }
-
-    private static String checkImportStatusQueryFor(StockTimeframe timeframe, boolean checkFirstImport) {
-        String timeframePeriod = timeframe.toDateTruncPeriod();
-        return STR."""
-                SELECT
-                    COUNT(*) = \{checkFirstImport ? "0" : "1"}
-                FROM
-                    daily_prices
-                WHERE
-                    ticker = 'AAPL'
-                    AND date_trunc('\{timeframePeriod}', date) = date_trunc('\{timeframePeriod}', current_date);
-                """;
     }
 
     public List<CandleWithDateDTO> findFor(String ticker, StockTimeframe timeframe) {

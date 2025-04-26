@@ -14,9 +14,9 @@ import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.repository.gaps.FVGRepository;
+import stock.price.analytics.util.QueryUtil;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -142,108 +142,10 @@ public class FairValueGapService {
         return !originalFVG.equals(fvg);
     }
 
-    private LocalDate toFVGDateFor(StockTimeframe timeframe, boolean allHistoricalData) {
-        if (allHistoricalData) return LocalDate.of(1990, 1, 1);
-
-        return switch (timeframe) {
-            case DAILY -> LocalDate.now().minusWeeks(1);
-            case WEEKLY -> LocalDate.now().minusWeeks(3);
-            case MONTHLY -> LocalDate.now().minusMonths(3);
-            case QUARTERLY -> LocalDate.now().minusMonths(9);
-            case YEARLY -> LocalDate.now().minusYears(3);
-        };
-    }
-
     @SuppressWarnings("unchecked")
     private List<FairValueGap> findFVGsForTickersAndTimeframe(List<String> tickers, StockTimeframe timeframe, boolean allHistoricalData) {
-        String query = findFVGsQueryFrom(timeframe, tickers, allHistoricalData);
+        String query = QueryUtil.findFVGsQueryFrom(timeframe, tickers, allHistoricalData);
         return (List<FairValueGap>) entityManager.createNativeQuery(query, FairValueGap.class).getResultList();
-    }
-
-    private String findFVGsQueryFrom(StockTimeframe timeframe, List<String> tickers, boolean allHistoricalData) {
-        String date = toFVGDateFor(timeframe, allHistoricalData).format(DateTimeFormatter.ISO_LOCAL_DATE);
-        String dateColumn = timeframe == StockTimeframe.DAILY ? "date" : "start_date";
-        String tickersFormatted = tickers.stream().map(ticker -> STR."'\{ticker}'").collect(Collectors.joining(", "));
-        String dateTruncPeriod = timeframe.toDateTruncPeriod();
-        String dbTable = timeframe.dbTableOHLC();
-
-        return STR."""
-                WITH price_data AS (
-                    SELECT
-                        ticker,
-                        date_trunc('\{dateTruncPeriod}', \{dateColumn})::date AS wmy_date,
-                        open, high, low, close,
-                        ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY \{dateColumn}) AS rn
-                    FROM \{dbTable}
-                    WHERE \{dateColumn} >= '\{date}'::date and ticker in (\{tickersFormatted})
-                ),
-                fvg_candidates AS (
-                    SELECT a.ticker,
-                        a.wmy_date AS date1, b.wmy_date AS date2, c.wmy_date AS date3,
-                        a.high AS high1, b.high AS high2, c.high AS high3,
-                        a.low AS low1, b.low AS low2, c.low AS low3
-                    FROM price_data a
-                    JOIN price_data b ON b.rn = a.rn + 1 AND b.ticker = a.ticker
-                    JOIN price_data c ON c.rn = a.rn + 2 AND c.ticker = a.ticker
-                ),
-                identified_fvgs AS (
-                    SELECT
-                        *,
-                        CASE
-                            WHEN low1 > high3 THEN 'BEARISH'
-                            WHEN high1 < low3 THEN 'BULLISH'
-                        END AS type
-                    FROM fvg_candidates
-                    WHERE (low1 > high3 OR high1 < low3)
-                )
-                SELECT
-                    nextval('sequence_fvg') as id,
-                    '\{timeframe}' as timeframe,
-                    'OPEN' as status,
-                    fvg.ticker as ticker,
-                    fvg.date2 as date,
-                    fvg.type,
-                    CASE
-                        WHEN fvg.type = 'BULLISH' THEN
-                            CASE
-                                WHEN low1 > high3 THEN low1
-                                WHEN high1 < low3 THEN high1
-                            END
-                        ELSE
-                            CASE
-                                WHEN low1 > high3 THEN high3
-                                WHEN high1 < low3 THEN low3
-                            END
-                    END AS LOW,
-                    CASE
-                        WHEN fvg.type = 'BULLISH' THEN
-                            CASE
-                                WHEN low1 > high3 THEN high3
-                                WHEN high1 < low3 THEN low3
-                            END
-                        ELSE
-                            CASE
-                                WHEN low1 > high3 THEN low1
-                                WHEN high1 < low3 THEN high1
-                            END
-                    END AS high,
-                    null as unfilled_low1,
-                    null as unfilled_high1,
-                    null as unfilled_low2,
-                    null as unfilled_high2
-                FROM identified_fvgs fvg
-                WHERE
-                    NOT EXISTS (
-                        SELECT 1
-                        FROM price_data next_wmy
-                        WHERE next_wmy.wmy_date >= fvg.date3 AND next_wmy.ticker = fvg.ticker
-                          AND (
-                              (fvg.type = 'BULLISH' AND next_wmy.low <= fvg.high1)
-                              OR (fvg.type = 'BEARISH' AND next_wmy.high >= fvg.low1)
-                          )
-                    )
-                order by ticker, fvg.date2 desc;
-                """;
     }
 
     @Transactional
