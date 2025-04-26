@@ -22,7 +22,6 @@ import stock.price.analytics.repository.prices.highlow.HighLowForPeriodRepositor
 import stock.price.analytics.util.TradingDateUtil;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.DayOfWeek;
 import java.time.Instant;
@@ -33,6 +32,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.nio.file.Files.readAllLines;
+import static stock.price.analytics.util.FileUtil.fileExistsFor;
 import static stock.price.analytics.util.PricesUtil.getHigherTimeframePricesFor;
 import static stock.price.analytics.util.PricesUtil.pricesWithPerformance;
 
@@ -250,11 +250,6 @@ public class NewTickerService {
 //            dailyPrice.setClose(Math.round(dailyPrice.getClose() * 1000.0) / 1000.0);
 //        }
         return dailyPrice;
-    }
-
-    private boolean fileExistsFor(String ticker) {
-        String jsonFilePath = String.join("", "./all-historical-prices/DAILY/", ticker, ".json");
-        return Files.exists(Path.of(jsonFilePath)) && Files.isRegularFile(Path.of(jsonFilePath));
     }
 
 }

@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @Slf4j
 public final class FileUtil {
@@ -24,4 +26,8 @@ public final class FileUtil {
         }
     }
 
+    public static boolean fileExistsFor(String ticker) {
+        String jsonFilePath = String.join("", "./all-historical-prices/DAILY/", ticker, ".json");
+        return Files.exists(Path.of(jsonFilePath)) && Files.isRegularFile(Path.of(jsonFilePath));
+    }
 }
