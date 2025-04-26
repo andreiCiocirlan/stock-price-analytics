@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -15,26 +17,26 @@ public class DeleteTickerService {
     @PersistenceContext
     private final EntityManager entityManager;
 
-    private final String[][] deletionTargets = {
-            {"daily_prices_json", "symbol"},
-            {"daily_prices", "ticker"},
-            {"weekly_prices", "ticker"},
-            {"monthly_prices", "ticker"},
-            {"quarterly_prices", "ticker"},
-            {"yearly_prices", "ticker"},
-            {"stocks", "ticker"},
-            {"price_gaps", "ticker"},
-            {"fvg", "ticker"},
-            {"high_low4w", "ticker"},
-            {"high_low52w", "ticker"},
-            {"highest_lowest", "ticker"}
-    };
+    private static final List<String> DB_TABLES = List.of(
+            "daily_prices_json",
+            "daily_prices",
+            "weekly_prices",
+            "monthly_prices",
+            "quarterly_prices",
+            "yearly_prices",
+            "stocks",
+            "price_gaps",
+            "fvg",
+            "high_low4w",
+            "high_low52w",
+            "highest_lowest"
+    );
+
 
     @Transactional
     public void deleteAllDataFor(String ticker) {
-        for (String[] target : deletionTargets) {
-            String table = target[0];
-            String column = target[1];
+        for (String table : DB_TABLES) {
+            String column = "daily_prices_json".equals(table) ? "symbol" : "ticker";
             String sql = STR."DELETE FROM \{table} WHERE \{column} = ?1";
 
             int rowsAffected = entityManager.createNativeQuery(sql)
