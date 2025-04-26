@@ -17,7 +17,9 @@ import stock.price.analytics.util.PriceMilestoneFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import static stock.price.analytics.model.prices.highlow.enums.HighLowPeriod.*;
 import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
 
 
@@ -70,14 +72,22 @@ public class CacheController {
 
     @GetMapping("/new-high-lows")
     @ResponseStatus(HttpStatus.OK)
-    public List<String> newDailyHighLowsForHLPeriods(@RequestParam("highLowPeriod") HighLowPeriod highLowPeriod) {
-        return cacheService.getNewHighLowsForHLPeriod(highLowPeriod);
+    public Map<HighLowPeriod, List<String>> newDailyHighLowsForHLPeriods() {
+        return Map.of(
+                HIGH_LOW_4W, cacheService.getNewHighLowsForHLPeriod(HIGH_LOW_4W),
+                HIGH_LOW_52W, cacheService.getNewHighLowsForHLPeriod(HIGH_LOW_52W),
+                HIGH_LOW_ALL_TIME, cacheService.getNewHighLowsForHLPeriod(HIGH_LOW_ALL_TIME)
+        );
     }
 
     @GetMapping("/equal-high-lows")
     @ResponseStatus(HttpStatus.OK)
-    public List<String> equalHighLowsForHLPeriods(@RequestParam("highLowPeriod") HighLowPeriod highLowPeriod) {
-        return cacheService.getEqualHighLowsForHLPeriod(highLowPeriod);
+    public Map<HighLowPeriod, List<String>> equalHighLowsForHLPeriods() {
+        return Map.of(
+                HIGH_LOW_4W, cacheService.getEqualHighLowsForHLPeriod(HIGH_LOW_4W),
+                HIGH_LOW_52W, cacheService.getEqualHighLowsForHLPeriod(HIGH_LOW_52W),
+                HIGH_LOW_ALL_TIME, cacheService.getEqualHighLowsForHLPeriod(HIGH_LOW_ALL_TIME)
+        );
     }
 
     @GetMapping("/high-lows")
