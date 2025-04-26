@@ -13,7 +13,6 @@ import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.model.stocks.enums.MarketState;
 import stock.price.analytics.repository.stocks.StockRepository;
-import stock.price.analytics.repository.stocks.TickerRenameRepository;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -31,7 +30,6 @@ public class StockService {
     private final HighLowForPeriodService highLowForPeriodService;
     private final FairValueGapService fairValueGapService;
     private final StockRepository stockRepository;
-    private final TickerRenameRepository tickerRenameRepository;
     private final CacheService cacheService;
     private final AsyncPersistenceService asyncPersistenceService;
     private final SyncPersistenceService syncPersistenceService;
@@ -134,22 +132,6 @@ public class StockService {
         stockRepository.updateHighLow4wPricesFor(ticker);
         stockRepository.updateHighLow52wPricesFor(ticker);
         stockRepository.updateHighestLowestPricesFor(ticker);
-    }
-
-    @Transactional
-    public void renameTicker(String oldTicker, String newTicker) {
-        log.info("Renamed ticker for Stock. Updated {} rows", tickerRenameRepository.updateStock(oldTicker, newTicker));
-        log.info("Renamed ticker for DailyPrices. Updated {} rows", tickerRenameRepository.updateDailyPrices(oldTicker, newTicker));
-        log.info("Renamed ticker for WeeklyPrices. Updated {} rows", tickerRenameRepository.updateWeeklyPrices(oldTicker, newTicker));
-        log.info("Renamed ticker for MonthlyPrices. Updated {} rows", tickerRenameRepository.updateMonthlyPrices(oldTicker, newTicker));
-        log.info("Renamed ticker for QuarterlyPrices. Updated {} rows", tickerRenameRepository.updateQuarterlyPrices(oldTicker, newTicker));
-        log.info("Renamed ticker for YearlyPrices. Updated {} rows", tickerRenameRepository.updateYearlyPrices(oldTicker, newTicker));
-        log.info("Renamed ticker for DailyPriceJSON. Updated {} rows", tickerRenameRepository.updateDailyPriceJson(oldTicker, newTicker));
-        log.info("Renamed ticker for HighLow4w. Updated {} rows", tickerRenameRepository.updateHighLow4w(oldTicker, newTicker));
-        log.info("Renamed ticker for HighLow52Week. Updated {} rows", tickerRenameRepository.updateHighLow52Week(oldTicker, newTicker));
-        log.info("Renamed ticker for HighestLowestPrices. Updated {} rows", tickerRenameRepository.updateHighestLowestPrices(oldTicker, newTicker));
-        log.info("Renamed ticker for FairValueGap. Updated {} rows", tickerRenameRepository.updateFairValueGap(oldTicker, newTicker));
-        log.info("Renamed ticker for PriceGap. Updated {} rows", tickerRenameRepository.updatePriceGap(oldTicker, newTicker));
     }
 
     public void splitAdjustFor(String ticker, LocalDate stockSplitDate, double priceMultiplier) {
