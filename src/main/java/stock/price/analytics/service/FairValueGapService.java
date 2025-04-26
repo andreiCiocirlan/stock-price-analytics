@@ -17,10 +17,7 @@ import stock.price.analytics.repository.gaps.FVGRepository;
 import stock.price.analytics.util.QueryUtil;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -37,7 +34,6 @@ public class FairValueGapService {
     @PersistenceContext
     private final EntityManager entityManager;
     private final FVGRepository fvgRepository;
-    private final FVGTaggedService fvgTaggedService;
     private final CacheService cacheService;
     private final AsyncPersistenceService asyncPersistenceService;
 
@@ -260,10 +256,19 @@ public class FairValueGapService {
             for (PricePerformanceMilestone priceMilestone : PricePerformanceMilestone.values()) {
                 for (FvgType fvgType : FvgType.values()) {
                     String fvgLabel = fvgLabelFrom(priceMilestone, fvgType, timeframe);
-                    log.info("{}", fvgLabel + fvgTaggedService.findTickersFVGsTaggedFor(timeframe, fvgType, priceMilestone, cfdMargins54));
+                    log.info("{}", fvgLabel + findTickersFVGsTaggedFor(timeframe, fvgType, priceMilestone, cfdMargins54));
                 }
             }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public Set<String> findTickersFVGsTaggedFor(StockTimeframe timeframe, FvgType fvgType, PricePerformanceMilestone pricePerformanceMilestone, String cfdMargins) {
+        String query = QueryUtil.findTickersFVGsTaggedQueryFor(timeframe, fvgType, pricePerformanceMilestone, cfdMargins);
+        return ((List<FairValueGap>) entityManager.createNativeQuery(query, FairValueGap.class).getResultList())
+                .stream()
+                .map(FairValueGap::getTicker)
+                .collect(Collectors.toSet());
     }
 
     public String fvgLabelFrom(PricePerformanceMilestone pricePerformanceMilestone, FvgType fvgType, StockTimeframe stockTimeframe) {
