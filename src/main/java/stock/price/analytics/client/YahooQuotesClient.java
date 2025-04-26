@@ -12,14 +12,19 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static stock.price.analytics.util.Constants.USER_AGENT_VALUE;
+import static stock.price.analytics.util.FileUtil.writeToFile;
 
 @Slf4j
 @Component
@@ -28,6 +33,8 @@ public class YahooQuotesClient {
 
     private static final CloseableHttpClient httpClient;
     private static final int MAX_RETRIES_CRUMB = 5;
+    private static final String YAHOO_BASE_URL = "https://query1.finance.yahoo.com/v7/finance";
+    private final RestTemplate restTemplate;
     private int RETRY_COUNT_CRUMB = 0;
     private String COOKIE_FC_YAHOO = "EuConsent=CQONUAAQONUAAAOACKROBgFgAAAAAAAAACiQAAAAAAAA; A1S=d=AQABBHu40mcCECI3dDTimCiMyiAvT34B1oUFEgABCAH-02cCaPF3ziMAAiAAAAcIdrfSZ2r5DG4&S=AQAAAszl9s9YvJYIkeFU0a_zZTg; A1=d=AQABBHu40mcCECI3dDTimCiMyiAvT34B1oUFEgABCAH-02cCaPF3ziMAAiAAAAcIdrfSZ2r5DG4&S=AQAAAszl9s9YvJYIkeFU0a_zZTg; GUC=AQABCAFn0_5oAkIdNgR3&s=AQAAAL3PAraG&g=Z9K4hQ; A3=d=AQABBHu40mcCECI3dDTimCiMyiAvT34B1oUFEgABCAH-02cCaPF3ziMAAiAAAAcIdrfSZ2r5DG4&S=AQAAAszl9s9YvJYIkeFU0a_zZTg; PRF=theme%3Dauto";
     private String CRUMB_COOKIE = "Ux/F/1Q/D1k";
@@ -44,6 +51,49 @@ public class YahooQuotesClient {
                 log.error("Error closing HttpClient", e);
             }
         }));
+    }
+
+    public void getAllHistoricalPrices_andSaveJSONFileFor(String tickers) {
+        int lowerBound = 100;
+        int upperBound = 200;
+        int range = (upperBound - lowerBound) + 1;
+        try {
+            for (String ticker : tickers.split(",")) {
+                long currentTime = System.currentTimeMillis();
+                ResponseEntity<String> response;
+                try {
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.add("Cookie", cookieFromFcYahoo());
+                    headers.add(HttpHeaders.USER_AGENT, USER_AGENT_VALUE);
+
+                    org.springframework.http.HttpEntity<String> entity = new org.springframework.http.HttpEntity<>(null, headers);
+                    response = restTemplate.exchange(
+                            YAHOO_BASE_URL + "/chart/{ticker}?range=60y&interval=1d&indicators=quote&includeTimestamps=true",
+                            HttpMethod.GET,
+                            entity,
+                            String.class,
+                            ticker
+                    );
+
+                    String responseBody = response.getBody();
+                    if (responseBody != null) {
+                        String fileName = ticker + ".json";
+                        String path = "./all-historical-prices/DAILY/" + fileName;
+                        writeToFile(path, responseBody);
+                    } else {
+                        log.error("response body is null for ticker {}", ticker);
+                    }
+                } catch (RestClientException e) {
+                    log.error("Failed retrieving prices data for ticker {}: {}", ticker, e.getMessage());
+                }
+                log.info("saving JSON historical prices for {} took {} ms", ticker, (System.currentTimeMillis() - currentTime));
+                int sleepTime = (int) (Math.random() * range) + lowerBound;
+                Thread.sleep(sleepTime);
+                log.info("sleeping for {} ms", sleepTime);
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public List<String> quotePricesFor(List<String> tickers) {

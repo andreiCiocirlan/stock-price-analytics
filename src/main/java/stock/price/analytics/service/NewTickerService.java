@@ -5,13 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.client.YahooQuotesClient;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
@@ -39,8 +33,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.nio.file.Files.readAllLines;
-import static stock.price.analytics.util.Constants.USER_AGENT_VALUE;
-import static stock.price.analytics.util.FileUtil.writeToFile;
 import static stock.price.analytics.util.PricesUtil.getHigherTimeframePricesFor;
 import static stock.price.analytics.util.PricesUtil.pricesWithPerformance;
 
@@ -49,9 +41,7 @@ import static stock.price.analytics.util.PricesUtil.pricesWithPerformance;
 @RequiredArgsConstructor
 public class NewTickerService {
 
-    private static final String YAHOO_BASE_URL = "https://query1.finance.yahoo.com/v7/finance";
     private final YahooQuotesClient yahooQuotesClient;
-    private final RestTemplate restTemplate;
     private final StockService stockService;
     private final PriceService priceService;
     private final PriceGapService priceGapService;
@@ -59,7 +49,6 @@ public class NewTickerService {
     private final CacheService cacheService;
     private final AsyncPersistenceService asyncPersistenceService;
     private final HighLowForPeriodRepository highLowForPeriodRepository;
-    private String COOKIE;
 
     // import all data pertaining to the new tickers and create dailyPrices, htfPrices, stocks, highLowPrices etc.
     public void importAllDataFor(String tickers, Double cfdMargin, Boolean shortSell) {
@@ -83,8 +72,7 @@ public class NewTickerService {
         }
 
         if (!newTickers.isEmpty()) { // call API to get the data and save the files
-            COOKIE = yahooQuotesClient.cookieFromFcYahoo();
-            getYahooQuotesAndSaveJSONFileFor(String.join(",", newTickers));
+            yahooQuotesClient.getAllHistoricalPrices_andSaveJSONFileFor(String.join(",", newTickers));
         }
         List<DailyPrice> dailyPricesImported = getDailyPricesFor(tickerList);
         priceService.savePrices(dailyPricesImported);
@@ -94,50 +82,6 @@ public class NewTickerService {
         saveAndUpdateStocksFor(dailyPricesImported, htfPricesImported, lastUpdate);
         priceGapService.saveAllPriceGapsFor(tickerList);
         fairValueGapService.findNewFVGsAndSaveForAllTimeframes(tickerList, true);
-    }
-
-    private void getYahooQuotesAndSaveJSONFileFor(String tickers) {
-        int lowerBound = 100;
-        int upperBound = 200;
-        int range = (upperBound - lowerBound) + 1;
-        try {
-            for (String ticker : tickers.split(",")) {
-                long currentTime = System.currentTimeMillis();
-                ResponseEntity<String> response;
-                try {
-                    HttpHeaders headers = new HttpHeaders();
-                    headers.add("Cookie", COOKIE);
-                    headers.add(HttpHeaders.USER_AGENT, USER_AGENT_VALUE);
-
-                    HttpEntity<String> entity = new HttpEntity<>(null, headers);
-                    response = restTemplate.exchange(
-                            YAHOO_BASE_URL + "/chart/{ticker}?range=60y&interval=" + timeframeToQParam(StockTimeframe.DAILY)
-                            + "&indicators=quote&includeTimestamps=true",
-                            HttpMethod.GET,
-                            entity,
-                            String.class,
-                            ticker
-                    );
-
-                    String responseBody = response.getBody();
-                    if (responseBody != null) {
-                        String fileName = ticker + ".json";
-                        String path = "./all-historical-prices/DAILY/" + fileName;
-                        writeToFile(path, responseBody);
-                    } else {
-                        log.error("response body is null for ticker {}", ticker);
-                    }
-                } catch (RestClientException e) {
-                    log.error("Failed retrieving prices data for ticker {}: {}", ticker, e.getMessage());
-                }
-                log.info("saving JSON historical prices for {} took {} ms", ticker, (System.currentTimeMillis() - currentTime));
-                int sleepTime = (int) (Math.random() * range) + lowerBound;
-                Thread.sleep(sleepTime);
-                log.info("sleeping for {} ms", sleepTime);
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private List<DailyPrice> getDailyPricesFor(List<String> tickerList) {
@@ -306,16 +250,6 @@ public class NewTickerService {
 //            dailyPrice.setClose(Math.round(dailyPrice.getClose() * 1000.0) / 1000.0);
 //        }
         return dailyPrice;
-    }
-
-    private String timeframeToQParam(StockTimeframe timeframe) {
-        return switch (timeframe) {
-            case DAILY -> "1d";
-            case WEEKLY -> "1wk";
-            case MONTHLY -> "1mo";
-            case QUARTERLY -> throw new IllegalStateException("Unexpected value QUARTERLY");
-            case YEARLY -> throw new IllegalStateException("Unexpected value YEARLY");
-        };
     }
 
     private boolean fileExistsFor(String ticker) {
