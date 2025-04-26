@@ -72,7 +72,7 @@ public class PriceMilestoneService {
                     filterByPerformanceMilestone(pricePerformanceMilestone, cfdMargins);
             case PreMarketPriceMilestone preMarketMilestone ->
                     filterByPreMarketMilestone(preMarketMilestone, cfdMargins);
-            case PreMarketGap preMarketGap -> filterByPreMarketPerformanceMilestone(preMarketGap, cfdMargins);
+            case PreMarketGap preMarketGap -> filterByPreMarketGap(preMarketGap, cfdMargins);
             case SimpleMovingAverageMilestone smaMilestone ->
                     filterBySimpleMovingAvgMilestone(smaMilestone, cfdMargins);
             default -> throw new IllegalArgumentException("Invalid milestone type");
@@ -118,7 +118,7 @@ public class PriceMilestoneService {
                 .toList();
     }
 
-    private List<String> filterByPreMarketPerformanceMilestone(PreMarketGap preMarketGap, List<Double> cfdMargins) {
+    private List<String> filterByPreMarketGap(PreMarketGap preMarketGap, List<Double> cfdMargins) {
         Map<String, DailyPrice> preMarketPricesCache = cacheService.getCachedDailyPrices(PRE)
                 .stream()
                 .collect(Collectors.toMap(DailyPrice::getTicker, Function.identity()));
