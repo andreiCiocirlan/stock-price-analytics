@@ -22,14 +22,6 @@ public enum HighLowPeriod {
         };
     }
 
-    public String whereClause(String date) {
-        return switch (this) {
-            case HIGH_LOW_4W -> STR."wp.start_date > DATE_TRUNC('week', '\{date}'::date) - INTERVAL '4 week'";
-            case HIGH_LOW_52W -> STR."wp.start_date > DATE_TRUNC('week', '\{date}'::date) - INTERVAL '52 week'";
-            case HIGH_LOW_ALL_TIME -> "1=1";
-        };
-    }
-
     public String sequenceName() {
         return switch (this) {
             case HIGH_LOW_4W, HIGH_LOW_52W, HIGH_LOW_ALL_TIME -> "sequence_high_low";
