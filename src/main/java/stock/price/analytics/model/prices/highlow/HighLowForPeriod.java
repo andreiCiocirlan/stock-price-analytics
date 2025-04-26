@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -15,7 +14,6 @@ import stock.price.analytics.model.stocks.Stock;
 
 import java.time.LocalDate;
 
-@Slf4j
 @Setter
 @Getter
 @DynamicUpdate

@@ -1,7 +1,6 @@
 package stock.price.analytics.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -11,7 +10,6 @@ import stock.price.analytics.service.HighLowForPeriodService;
 import java.time.LocalDate;
 import java.util.List;
 
-@Slf4j
 @RestController
 @RequestMapping("/high-low")
 @RequiredArgsConstructor

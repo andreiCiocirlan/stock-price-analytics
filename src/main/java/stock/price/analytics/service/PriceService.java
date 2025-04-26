@@ -5,7 +5,6 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.dto.CandleWithDateDTO;
@@ -30,7 +29,6 @@ import static stock.price.analytics.util.TradingDateUtil.isWithinSameTimeframe;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PriceService {

@@ -1,12 +1,10 @@
 package stock.price.analytics.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.service.DeleteTickerService;
 import stock.price.analytics.service.NewTickerService;
 
-@Slf4j
 @RestController
 @RequestMapping("/ticker")
 @RequiredArgsConstructor

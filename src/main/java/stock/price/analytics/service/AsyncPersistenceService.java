@@ -1,6 +1,5 @@
 package stock.price.analytics.service;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -8,7 +7,6 @@ import stock.price.analytics.model.BusinessEntity;
 
 import java.util.List;
 
-@Slf4j
 @Service
 public class AsyncPersistenceService extends SyncPersistenceService {
 
