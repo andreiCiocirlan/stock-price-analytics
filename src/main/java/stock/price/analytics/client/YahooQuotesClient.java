@@ -46,20 +46,20 @@ public class YahooQuotesClient {
         }));
     }
 
-    public List<String> quotePricesFor(List<String> tickerStrings) {
+    public List<String> quotePricesFor(List<String> tickers) {
         int maxTickersPerRequest = 1700;
 
         List<String> res = new ArrayList<>();
         List<String> partitions = new ArrayList<>();
         int start = 0;
-        int end = Math.min(maxTickersPerRequest, tickerStrings.size());
-        while (start < tickerStrings.size()) {
-            List<String> partition = tickerStrings.subList(start, end);
-            String tickers = String.join(",", partition);
-            partitions.add(tickers);
+        int end = Math.min(maxTickersPerRequest, tickers.size());
+        while (start < tickers.size()) {
+            List<String> partition = tickers.subList(start, end);
+            String tickersFormatted = String.join(",", partition);
+            partitions.add(tickersFormatted);
 
             start = end;
-            end = Math.min(start + maxTickersPerRequest, tickerStrings.size());
+            end = Math.min(start + maxTickersPerRequest, tickers.size());
         }
 
         partitions.parallelStream().forEachOrdered(s -> res.add(quotePricesJSON(s)));
