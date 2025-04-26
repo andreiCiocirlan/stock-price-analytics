@@ -22,11 +22,5 @@ public enum HighLowPeriod {
         };
     }
 
-    public String sequenceName() {
-        return switch (this) {
-            case HIGH_LOW_4W, HIGH_LOW_52W, HIGH_LOW_ALL_TIME -> "sequence_high_low";
-        };
-    }
-
 
 }

@@ -56,7 +56,6 @@ public class HighLowForPeriodService {
         for (HighLowPeriod highLowPeriod : values()) {
             String tickersFormatted = tickers.stream().map(ticker -> STR."'\{ticker}'").collect(Collectors.joining(", "));
             String date = tradingDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
-            String sequenceName = highLowPeriod.sequenceName();
             String tableName = highLowPeriod.tableName();
             String intervalPreceding = highLowPeriod.intervalPreceding();
 
@@ -78,7 +77,7 @@ public class HighLowForPeriodService {
                     )
                     INSERT INTO \{tableName} (id, high, low, start_date, end_date, ticker)
                     SELECT
-                        nextval('\{sequenceName}') AS id,
+                        nextval('sequence_high_low') AS id,
                         cp.cumulative_high AS high,
                         cp.cumulative_low AS low,
                         date_trunc('week', wd.start_date::date)::date  AS start_date,
