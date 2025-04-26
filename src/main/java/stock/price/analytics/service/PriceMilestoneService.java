@@ -3,7 +3,6 @@ package stock.price.analytics.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
-import stock.price.analytics.model.prices.ohlc.enums.CandleStickType;
 import stock.price.analytics.model.dto.StockHeatmapRequest;
 import stock.price.analytics.model.json.DailyPriceJSON;
 import stock.price.analytics.model.prices.PriceMilestone;
@@ -12,6 +11,7 @@ import stock.price.analytics.model.prices.context.StockHighLowForPeriodContext;
 import stock.price.analytics.model.prices.enums.*;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
+import stock.price.analytics.model.prices.ohlc.enums.CandleStickType;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.util.PriceMilestoneFactory;
 
