@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DiscrepancieService {
+public class DiscrepanciesService {
 
     private final PriceDiscrepanciesRepository priceDiscrepanciesRepository;
     private final StockDiscrepanciesRepository stockDiscrepanciesRepository;
