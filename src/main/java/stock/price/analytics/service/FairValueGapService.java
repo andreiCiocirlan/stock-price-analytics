@@ -1,5 +1,7 @@
 package stock.price.analytics.service;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +16,7 @@ import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.repository.gaps.FVGRepository;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +34,8 @@ import static stock.price.analytics.util.Constants.*;
 @RequiredArgsConstructor
 public class FairValueGapService {
 
+    @PersistenceContext
+    private final EntityManager entityManager;
     private final FVGRepository fvgRepository;
     private final FVGTaggedService fvgTaggedService;
     private final CacheService cacheService;
@@ -149,15 +154,96 @@ public class FairValueGapService {
         };
     }
 
+    @SuppressWarnings("unchecked")
     private List<FairValueGap> findFVGsForTickersAndTimeframe(List<String> tickers, StockTimeframe timeframe, boolean allHistoricalData) {
-        LocalDate toDate = toFVGDateFor(timeframe, allHistoricalData);
-        return switch (timeframe) {
-            case DAILY -> fvgRepository.findAllDailyFVGsForTickersAfter(tickers, toDate);
-            case WEEKLY -> fvgRepository.findAllWeeklyFVGsForTickersAfter(tickers, toDate);
-            case MONTHLY -> fvgRepository.findAllMonthlyFVGsForTickersAfter(tickers, toDate);
-            case QUARTERLY -> fvgRepository.findAllQuarterlyFVGsForTickersAfter(tickers, toDate);
-            case YEARLY -> fvgRepository.findAllYearlyFVGsForTickersAfter(tickers, toDate);
-        };
+        String query = findFVGsQueryFrom(timeframe, tickers, allHistoricalData);
+        return (List<FairValueGap>) entityManager.createNativeQuery(query, FairValueGap.class).getResultList();
+    }
+
+    private String findFVGsQueryFrom(StockTimeframe timeframe, List<String> tickers, boolean allHistoricalData) {
+        String date = toFVGDateFor(timeframe, allHistoricalData).format(DateTimeFormatter.ISO_LOCAL_DATE);
+        String dateColumn = timeframe == StockTimeframe.DAILY ? "date" : "start_date";
+        String tickersFormatted = tickers.stream().map(ticker -> STR."'\{ticker}'").collect(Collectors.joining(", "));
+        String dateTruncPeriod = timeframe.toDateTruncPeriod();
+        String dbTable = timeframe.dbTableOHLC();
+
+        return STR."""
+                WITH price_data AS (
+                    SELECT
+                        ticker,
+                        date_trunc('\{dateTruncPeriod}', \{dateColumn})::date AS wmy_date,
+                        open, high, low, close,
+                        ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY \{dateColumn}) AS rn
+                    FROM \{dbTable}
+                    WHERE \{dateColumn} >= '\{date}'::date and ticker in (\{tickersFormatted})
+                ),
+                fvg_candidates AS (
+                    SELECT a.ticker,
+                        a.wmy_date AS date1, b.wmy_date AS date2, c.wmy_date AS date3,
+                        a.high AS high1, b.high AS high2, c.high AS high3,
+                        a.low AS low1, b.low AS low2, c.low AS low3
+                    FROM price_data a
+                    JOIN price_data b ON b.rn = a.rn + 1 AND b.ticker = a.ticker
+                    JOIN price_data c ON c.rn = a.rn + 2 AND c.ticker = a.ticker
+                ),
+                identified_fvgs AS (
+                    SELECT
+                        *,
+                        CASE
+                            WHEN low1 > high3 THEN 'BEARISH'
+                            WHEN high1 < low3 THEN 'BULLISH'
+                        END AS type
+                    FROM fvg_candidates
+                    WHERE (low1 > high3 OR high1 < low3)
+                )
+                SELECT
+                    nextval('sequence_fvg') as id,
+                    '\{timeframe}' as timeframe,
+                    'OPEN' as status,
+                    fvg.ticker as ticker,
+                    fvg.date2 as date,
+                    fvg.type,
+                    CASE
+                        WHEN fvg.type = 'BULLISH' THEN
+                            CASE
+                                WHEN low1 > high3 THEN low1
+                                WHEN high1 < low3 THEN high1
+                            END
+                        ELSE
+                            CASE
+                                WHEN low1 > high3 THEN high3
+                                WHEN high1 < low3 THEN low3
+                            END
+                    END AS LOW,
+                    CASE
+                        WHEN fvg.type = 'BULLISH' THEN
+                            CASE
+                                WHEN low1 > high3 THEN high3
+                                WHEN high1 < low3 THEN low3
+                            END
+                        ELSE
+                            CASE
+                                WHEN low1 > high3 THEN low1
+                                WHEN high1 < low3 THEN high1
+                            END
+                    END AS high,
+                    null as unfilled_low1,
+                    null as unfilled_high1,
+                    null as unfilled_low2,
+                    null as unfilled_high2
+                FROM identified_fvgs fvg
+                WHERE
+                    NOT EXISTS (
+                        SELECT 1
+                        FROM price_data next_wmy
+                        WHERE next_wmy.wmy_date >= fvg.date3 AND next_wmy.ticker = fvg.ticker
+                          AND (
+                              (fvg.type = 'BULLISH' AND next_wmy.low <= fvg.high1)
+                              OR (fvg.type = 'BEARISH' AND next_wmy.high >= fvg.low1)
+                          )
+                    )
+                order by ticker, fvg.date2 desc;
+                """;
     }
 
     @Transactional
