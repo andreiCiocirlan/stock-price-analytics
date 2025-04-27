@@ -277,12 +277,12 @@ public final class QueryUtil {
                 """;
     }
 
-    public static String highLowPricesNotDelistedForDateQuery(HighLowPeriod highLowPeriod, LocalDate tradingDate) {
+    public static String highLowPricesNotDelistedForDateQuery(HighLowPeriod highLowPeriod) {
         return STR."""
                 SELECT * FROM \{highLowPeriod.tableName()}
-                where start_date = \{tradingDate}
-                and ticker in (select ticker from stocks where xtb_stock = true and delisted_date is null)
-                """;
+                WHERE start_date = :tradingDate
+                AND ticker IN (SELECT ticker FROM stocks WHERE xtb_stock = true AND delisted_date IS NULL)
+        """;
     }
 
 }

@@ -8,7 +8,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
+import stock.price.analytics.model.prices.highlow.HighLow4w;
+import stock.price.analytics.model.prices.highlow.HighLow52Week;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
+import stock.price.analytics.model.prices.highlow.HighestLowestPrices;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.repository.prices.highlow.HighLowForPeriodRepository;
@@ -63,8 +66,15 @@ public class HighLowForPeriodService {
     }
 
     @SuppressWarnings("unchecked")
-    public List<HighLowForPeriod> highLowPricesNotDelistedForDate(HighLowPeriod highLowPeriod, LocalDate date) {
-        String query = QueryUtil.highLowPricesNotDelistedForDateQuery(highLowPeriod, date);
-        return ((List<HighLowForPeriod>) entityManager.createNativeQuery(query, HighLowForPeriod.class).getResultList());
+    public List<? extends HighLowForPeriod> highLowPricesNotDelistedForDate(HighLowPeriod highLowPeriod, LocalDate date) {
+        Class<? extends HighLowForPeriod> hlClass = switch (highLowPeriod) {
+            case HIGH_LOW_4W -> HighLow4w.class;
+            case HIGH_LOW_52W -> HighLow52Week.class;
+            case HIGH_LOW_ALL_TIME -> HighestLowestPrices.class;
+        };
+        String query = QueryUtil.highLowPricesNotDelistedForDateQuery(highLowPeriod);
+        Query nativeQuery = entityManager.createNativeQuery(query, hlClass);
+        nativeQuery.setParameter("tradingDate", date);
+        return (List<? extends HighLowForPeriod>) nativeQuery.getResultList();
     }
 }
