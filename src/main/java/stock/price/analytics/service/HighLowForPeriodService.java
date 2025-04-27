@@ -66,7 +66,7 @@ public class HighLowForPeriodService {
     }
 
     @SuppressWarnings("unchecked")
-    public List<? extends HighLowForPeriod> highLowPricesNotDelistedForDate(HighLowPeriod highLowPeriod, LocalDate date) {
+    public List<? extends HighLowForPeriod> hlPricesForDate(HighLowPeriod highLowPeriod, LocalDate date) {
         Class<? extends HighLowForPeriod> hlClass = switch (highLowPeriod) {
             case HIGH_LOW_4W -> HighLow4w.class;
             case HIGH_LOW_52W -> HighLow52Week.class;
