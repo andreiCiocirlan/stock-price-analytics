@@ -20,12 +20,13 @@ import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.prices.highlow.HighLowForPeriodRepository;
 import stock.price.analytics.util.Constants;
 import stock.price.analytics.util.JsonUtil;
-import stock.price.analytics.util.TradingDateUtil;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.util.FileUtil.fileExistsFor;
@@ -113,24 +114,15 @@ public class TickerService {
                 .toList();
 
         List<AbstractPrice> latestHTFPrices = htfPricesImported.stream()
-                .filter(this::isLatestHTFPrice)
+                .collect(Collectors.toMap(
+                        p -> p.getTimeframe().name() + "-" + p.getTicker(),
+                        Function.identity(),
+                        BinaryOperator.maxBy(Comparator.comparing(AbstractPrice::getStartDate))
+                ))
+                .values().stream()
                 .toList();
 
         stockService.updateStocksHighLowsAndOHLCFrom(latestDailyPricesImported, latestHTFPrices);
-    }
-
-    private boolean isLatestHTFPrice(AbstractPrice price) {
-        LocalDate startDate = price.getStartDate();
-        LocalDate tradingDateNow = TradingDateUtil.tradingDateNow();
-
-        return switch (price.getTimeframe()) {
-            case WEEKLY -> startDate.isEqual(tradingDateNow.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)));
-            case MONTHLY -> startDate.isEqual(tradingDateNow.with(TemporalAdjusters.firstDayOfMonth()));
-            case QUARTERLY ->
-                    startDate.isEqual(LocalDate.of(tradingDateNow.getYear(), tradingDateNow.getMonth().firstMonthOfQuarter().getValue(), 1));
-            case YEARLY -> startDate.isEqual(tradingDateNow.with(TemporalAdjusters.firstDayOfYear()));
-            default -> false;
-        };
     }
 
     private void saveHighLowPricesForPeriodFrom(List<AbstractPrice> weeklyPricesImported) {
