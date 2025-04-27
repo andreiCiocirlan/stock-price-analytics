@@ -276,4 +276,13 @@ public final class QueryUtil {
                     low = EXCLUDED.low;
                 """;
     }
+
+    public static String highLowPricesNotDelistedForDateQuery(HighLowPeriod highLowPeriod, LocalDate tradingDate) {
+        return STR."""
+                SELECT * FROM \{highLowPeriod.tableName()}
+                where start_date = \{tradingDate}
+                and ticker in (select ticker from stocks where xtb_stock = true and delisted_date is null)
+                """;
+    }
+
 }
