@@ -3,21 +3,19 @@ package stock.price.analytics.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.service.TickerService;
-import stock.price.analytics.service.NewTickerService;
 
 @RestController
 @RequestMapping("/ticker")
 @RequiredArgsConstructor
 public class TickerController {
 
-    private final NewTickerService newTickerService;
     private final TickerService tickerService;
 
     @PostMapping("/import-all-data")
     public void importAllDataFor(@RequestParam(value = "tickers") String tickers,
                                  @RequestParam(value = "cfdMargin") Double cfdMargin,
                                  @RequestParam(value = "shortSell") Boolean shortSell) {
-        newTickerService.importAllDataFor(tickers, cfdMargin, shortSell);
+        tickerService.importAllDataFor(tickers, cfdMargin, shortSell);
     }
 
     @DeleteMapping("/delete-data-for-ticker")
