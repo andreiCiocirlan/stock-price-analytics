@@ -28,7 +28,7 @@ public final class PricesUtil {
     public static List<AbstractPrice> htfPricesForTimeframe(List<DailyPrice> dailyPrices, StockTimeframe stockTimeframe) {
         return pricesWithPerformance(dailyPrices.stream()
                 .collect(Collectors.groupingBy(
-                        shp -> groupingFunctionFor(stockTimeframe).apply(shp.getDate()),
+                        shp -> groupingFunctionFor(stockTimeframe).apply(shp.getDate()) + "-" + shp.getTicker(),
                         Collectors.collectingAndThen(
                                 Collectors.toList(),
                                 prices -> extractPriceForTimeframe(prices, stockTimeframe)
