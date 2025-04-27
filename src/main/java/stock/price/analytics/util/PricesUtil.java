@@ -25,7 +25,7 @@ public final class PricesUtil {
         return htfPrices;
     }
 
-    public static List<AbstractPrice> htfPricesForTimeframe(List<DailyPrice> dailyPrices, StockTimeframe stockTimeframe) {
+    private static List<AbstractPrice> htfPricesForTimeframe(List<DailyPrice> dailyPrices, StockTimeframe stockTimeframe) {
         return pricesWithPerformance(dailyPrices.stream()
                 .collect(Collectors.groupingBy(
                         shp -> groupingFunctionFor(stockTimeframe).apply(shp.getDate()) + "-" + shp.getTicker(),
@@ -36,7 +36,7 @@ public final class PricesUtil {
                 )).values().stream().sorted(Comparator.comparing(AbstractPrice::getStartDate)).toList());
     }
 
-    private static Function<LocalDate, ? extends Temporal> groupingFunctionFor(StockTimeframe stockTimeframe) {
+    private static Function<LocalDate, Temporal> groupingFunctionFor(StockTimeframe stockTimeframe) {
         return switch (stockTimeframe) {
             case WEEKLY -> shp -> shp.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
             case MONTHLY -> YearMonth::from;
