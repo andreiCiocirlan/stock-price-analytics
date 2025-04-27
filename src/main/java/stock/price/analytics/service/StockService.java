@@ -109,8 +109,8 @@ public class StockService {
 
     public LocalDate findLastUpdate() {
         return cacheService.getStocksMap().values().stream()
-                .max(Comparator.comparing(Stock::getLastUpdated))
                 .map(Stock::getLastUpdated)
+                .max(LocalDate::compareTo)
                 .orElseThrow();
     }
 
