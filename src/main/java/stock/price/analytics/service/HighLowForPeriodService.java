@@ -62,4 +62,9 @@ public class HighLowForPeriodService {
         return (Boolean) nativeQuery.getResultList().getFirst();
     }
 
+    @SuppressWarnings("unchecked")
+    public List<HighLowForPeriod> highLowPricesNotDelistedForDate(HighLowPeriod highLowPeriod, LocalDate date) {
+        String query = QueryUtil.highLowPricesNotDelistedForDateQuery(highLowPeriod, date);
+        return ((List<HighLowForPeriod>) entityManager.createNativeQuery(query, HighLowForPeriod.class).getResultList());
+    }
 }
