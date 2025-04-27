@@ -74,6 +74,7 @@ public class TickerService {
             log.info("deleted {} rows for {} ", rowsAffected, table);
         }
     }
+
     // import all data pertaining to the new tickers and create dailyPrices, htfPrices, stocks, highLowPrices etc.
     public void importAllDataFor(String tickers, Double cfdMargin, Boolean shortSell) {
         List<String> tickerList = Arrays.stream(tickers.split(",")).toList();

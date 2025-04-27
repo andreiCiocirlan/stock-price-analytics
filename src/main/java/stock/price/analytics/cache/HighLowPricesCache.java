@@ -20,7 +20,8 @@ import java.util.stream.Collectors;
 @Component
 class HighLowPricesCache {
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private Boolean weeklyHighLowExists;
     private final Map<String, HighLow4w> highLow4wMap = new HashMap<>();
     private final Map<String, HighLow52Week> highLow52wMap = new HashMap<>();

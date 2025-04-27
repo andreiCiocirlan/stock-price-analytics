@@ -19,8 +19,8 @@ public class HighLowForPeriodController {
     @PostMapping("/save-all-hl-4w-52w-ticker")
     @ResponseStatus(HttpStatus.OK)
     public void saveAllHistoricalHighLowPrices(@RequestParam("ticker") String ticker,
-                                                       @RequestParam(name = "tradingDate")
-                                                            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate tradingDate) {
+                                               @RequestParam(name = "tradingDate")
+                                               @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate tradingDate) {
         highLowForPeriodService.saveAllHistoricalHighLowPrices(List.of(ticker), tradingDate);
     }
 
