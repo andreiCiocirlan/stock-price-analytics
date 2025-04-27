@@ -22,18 +22,14 @@ import stock.price.analytics.util.Constants;
 import stock.price.analytics.util.JsonUtil;
 import stock.price.analytics.util.TradingDateUtil;
 
-import java.io.IOException;
-import java.nio.file.Path;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.nio.file.Files.readAllLines;
 import static stock.price.analytics.util.FileUtil.fileExistsFor;
 import static stock.price.analytics.util.PricesUtil.getHigherTimeframePricesFor;
-import static stock.price.analytics.util.PricesUtil.pricesWithPerformance;
 
 @Slf4j
 @Service
@@ -101,7 +97,7 @@ public class TickerService {
         if (!newTickers.isEmpty()) { // call API to get the data and save the files
             yahooQuotesClient.getAllHistoricalPrices_andSaveJSONFileFor(String.join(",", newTickers));
         }
-        List<DailyPrice> dailyPricesImported = getDailyPricesFor(tickerList);
+        List<DailyPrice> dailyPricesImported = JsonUtil.getDailyPricesFromJSONFileFor(tickerList);
         priceService.savePrices(dailyPricesImported);
         List<AbstractPrice> htfPricesImported = getHigherTimeframePricesFor(dailyPricesImported);
         priceService.savePrices(htfPricesImported);
@@ -109,22 +105,6 @@ public class TickerService {
         saveAndUpdateStocksFor(dailyPricesImported, htfPricesImported, lastUpdate);
         priceGapService.saveAllPriceGapsFor(tickerList);
         fairValueGapService.findNewFVGsAndSaveForAllTimeframes(tickerList, true);
-    }
-
-    private List<DailyPrice> getDailyPricesFor(List<String> tickerList) {
-        List<DailyPrice> dailyPricesImported = new ArrayList<>();
-
-        try {
-            for (String ticker : tickerList) {
-                String jsonFilePath = String.join("", "./all-historical-prices/DAILY/", ticker, ".json");
-                String dailyPricesFileContent = String.join("", readAllLines(Path.of(jsonFilePath)));
-                List<DailyPrice> dailyPricesExtracted = JsonUtil.extractDailyPricesFrom(ticker, dailyPricesFileContent).stream().sorted(Comparator.comparing(DailyPrice::getDate)).toList();
-                dailyPricesImported.addAll(pricesWithPerformance(dailyPricesExtracted));
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return dailyPricesImported;
     }
 
     private void saveAndUpdateStocksFor(List<DailyPrice> dailyPricesImported, List<AbstractPrice> htfPricesImported, LocalDate lastUpdate) {

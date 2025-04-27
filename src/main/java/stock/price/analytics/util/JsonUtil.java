@@ -9,13 +9,15 @@ import lombok.extern.slf4j.Slf4j;
 import stock.price.analytics.model.prices.ohlc.CandleOHLC;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static java.nio.file.Files.readAllLines;
+import static stock.price.analytics.util.PricesUtil.pricesWithPerformance;
 
 @Slf4j
 public final class JsonUtil {
@@ -95,4 +97,19 @@ public final class JsonUtil {
         return dailyPrices;
     }
 
+    public static List<DailyPrice> getDailyPricesFromJSONFileFor(List<String> tickerList) {
+        List<DailyPrice> dailyPricesImported = new ArrayList<>();
+
+        try {
+            for (String ticker : tickerList) {
+                String jsonFilePath = String.join("", "./all-historical-prices/DAILY/", ticker, ".json");
+                String dailyPricesFileContent = String.join("", readAllLines(Path.of(jsonFilePath)));
+                List<DailyPrice> dailyPricesExtracted = extractDailyPricesFrom(ticker, dailyPricesFileContent).stream().sorted(Comparator.comparing(DailyPrice::getDate)).toList();
+                dailyPricesImported.addAll(pricesWithPerformance(dailyPricesExtracted));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return dailyPricesImported;
+    }
 }
