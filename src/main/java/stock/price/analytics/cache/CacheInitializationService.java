@@ -135,13 +135,13 @@ public class CacheInitializationService {
                 syncPersistenceService.partitionDataAndSave(highestLowestPrices, highLowForPeriodRepository);
                 highLowPricesCache.addHighLowPrices(highestLowestPrices, highLowPeriod);
             } else { // for 4w, 52w need sql select for the period (for all-time it would simply be a copy)
-                int weekCount = switch (highLowPeriod) {
+                int nrWeeksLookBack = switch (highLowPeriod) {
                     case HIGH_LOW_4W ->
                             3; // last imported date was Friday -> new week -> look back 3 instead of 4 weeks
                     case HIGH_LOW_52W -> 51;
                     case HIGH_LOW_ALL_TIME -> throw new IllegalArgumentException("HIGH_LOW_ALL_TIME is not supported.");
                 };
-                List<HighLowForPeriod> highLowForPeriods = highLowForPeriodRepository.highLowPricesInPastWeeks(startDate, weekCount)
+                List<HighLowForPeriod> highLowForPeriods = highLowForPeriodRepository.highLowPricesInPastWeeks(startDate, nrWeeksLookBack)
                         .stream()
                         .map(dto -> convertToHighLowForPeriod(dto, newWeekStartDate, newWeekEndDate, highLowPeriod))
                         .toList();
