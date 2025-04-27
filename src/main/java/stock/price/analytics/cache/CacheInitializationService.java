@@ -112,7 +112,7 @@ public class CacheInitializationService {
 
     private void initPrevWeekHighLowPricesCache(HighLowPeriod highLowPeriod, LocalDate latestDailyPriceImportDate) {
         LocalDate prevWeekStartDate = latestDailyPriceImportDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-        if (!cacheService.weeklyHighLowExists()) { // on first import of the week need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
+        if (cacheService.weeklyHighLowExists()) { // on first import of the week need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
             prevWeekStartDate = prevWeekStartDate.minusWeeks(1);
         }
         log.info("prevWeekStartDate " + prevWeekStartDate);
@@ -127,7 +127,7 @@ public class CacheInitializationService {
     private void initHighLowPriceCache(HighLowPeriod highLowPeriod, LocalDate latestDailyPriceImportDate) {
         LocalDate startDate = latestDailyPriceImportDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         LocalDate endDate = latestDailyPriceImportDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
-        if (cacheService.weeklyHighLowExists()) { // on first import of the week need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
+        if (!cacheService.weeklyHighLowExists()) { // on first import of the week need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
             LocalDate newWeekStartDate = startDate.plusWeeks(1);
             LocalDate newWeekEndDate = endDate.plusWeeks(1);
             if (highLowPeriod == HighLowPeriod.HIGH_LOW_ALL_TIME) { // for all-time highs/lows simply copy the existing row on Mondays
