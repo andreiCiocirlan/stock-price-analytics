@@ -2,8 +2,6 @@ package stock.price.analytics.model.prices.enums;
 
 import stock.price.analytics.model.prices.PriceMilestone;
 
-import java.util.List;
-
 public enum IntradayPriceSpike implements PriceMilestone {
 
     INTRADAY_SPIKE_UP {
@@ -19,7 +17,4 @@ public enum IntradayPriceSpike implements PriceMilestone {
         }
     };
 
-    public static List<PriceMilestone> intradaySpikes() {
-        return List.of(INTRADAY_SPIKE_UP, INTRADAY_SPIKE_DOWN);
-    }
 }

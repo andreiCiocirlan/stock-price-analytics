@@ -1,10 +1,7 @@
 package stock.price.analytics.model.prices.enums;
 
-import stock.price.analytics.model.prices.PriceMilestone;
 import stock.price.analytics.model.prices.StockPriceMilestone;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
-
-import java.util.List;
 
 public enum PreMarketGap implements StockPriceMilestone<DailyPrice> {
 
@@ -44,10 +41,6 @@ public enum PreMarketGap implements StockPriceMilestone<DailyPrice> {
             return "Gap-Down more than 5%";
         }
     };
-
-    public static List<PriceMilestone> gap_5_10_percent_values() {
-        return List.of(GAP_DOWN_5_PERCENT, GAP_UP_5_PERCENT, GAP_DOWN_10_PERCENT, GAP_UP_10_PERCENT);
-    }
 
     @Override
     public boolean isMetFor(DailyPrice context) {
