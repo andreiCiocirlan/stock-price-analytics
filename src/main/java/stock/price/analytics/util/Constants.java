@@ -26,4 +26,18 @@ public final class Constants {
     public static final Double INTRADAY_SPIKE_PERCENTAGE = 0.02d; // percentage of price movement between imports (20m) used for alerting spikes
     public static final String HTTP_LOCALHOST = "http://localhost:";
     public static final String YAHOO_QUOTES_IMPORT_ENDPOINT = "/yahoo-quotes/import";
+    public static final List<String> DB_TABLES = List.of(
+            "daily_prices_json",
+            "daily_prices",
+            "weekly_prices",
+            "monthly_prices",
+            "quarterly_prices",
+            "yearly_prices",
+            "stocks",
+            "price_gaps",
+            "fvg",
+            "high_low4w",
+            "high_low52w",
+            "highest_lowest"
+    );
 }
