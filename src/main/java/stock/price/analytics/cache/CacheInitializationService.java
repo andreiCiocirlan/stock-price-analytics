@@ -117,9 +117,9 @@ public class CacheInitializationService {
         }
         log.info("prevWeekStartDate " + prevWeekStartDate);
         List<? extends HighLowForPeriod> prevWeekHighLowPrices = switch (highLowPeriod) {
-            case HIGH_LOW_4W -> highLowForPeriodRepository.highLow4wPricesFor(prevWeekStartDate);
-            case HIGH_LOW_52W -> highLowForPeriodRepository.highLow52wPricesFor(prevWeekStartDate);
-            case HIGH_LOW_ALL_TIME -> highLowForPeriodRepository.highestLowestPrices(prevWeekStartDate);
+            case HIGH_LOW_4W -> highLowForPeriodRepository.highLow4wPricesNotDelistedFor(prevWeekStartDate);
+            case HIGH_LOW_52W -> highLowForPeriodRepository.highLow52wPricesNotDelistedFor(prevWeekStartDate);
+            case HIGH_LOW_ALL_TIME -> highLowForPeriodRepository.highestLowestPricesNotDelisted(prevWeekStartDate);
         };
         highLowPricesCache.addPrevWeekHighLowPrices(prevWeekHighLowPrices, highLowPeriod);
     }
@@ -127,12 +127,12 @@ public class CacheInitializationService {
     private void initHighLowPriceCache(HighLowPeriod highLowPeriod, LocalDate latestDailyPriceImportDate) {
         LocalDate startDate = latestDailyPriceImportDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         LocalDate endDate = latestDailyPriceImportDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
-        if (!cacheService.weeklyHighLowExists()) { // on first import of the week need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
+        if (cacheService.weeklyHighLowExists()) { // on first import of the week need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
             LocalDate newWeekStartDate = startDate.plusWeeks(1);
             LocalDate newWeekEndDate = endDate.plusWeeks(1);
             if (highLowPeriod == HighLowPeriod.HIGH_LOW_ALL_TIME) { // for all-time highs/lows simply copy the existing row on Mondays
                 List<HighestLowestPrices> highestLowestPrices = new ArrayList<>();
-                highLowForPeriodRepository.highestLowestPrices(startDate).forEach(hlp -> highestLowestPrices.add(hlp.copyWith(newWeekStartDate)));
+                highLowForPeriodRepository.highestLowestPricesNotDelisted(startDate).forEach(hlp -> highestLowestPrices.add(hlp.copyWith(newWeekStartDate)));
                 syncPersistenceService.partitionDataAndSave(highestLowestPrices, highLowForPeriodRepository);
                 highLowPricesCache.addHighLowPrices(highestLowestPrices, highLowPeriod);
             } else { // for 4w, 52w need sql select for the period (for all-time it would simply be a copy)
@@ -146,9 +146,9 @@ public class CacheInitializationService {
             }
         } else {
             List<? extends HighLowForPeriod> highLowPrices = switch (highLowPeriod) {
-                case HIGH_LOW_4W -> highLowForPeriodRepository.highLow4wPricesFor(startDate);
-                case HIGH_LOW_52W -> highLowForPeriodRepository.highLow52wPricesFor(startDate);
-                case HIGH_LOW_ALL_TIME -> highLowForPeriodRepository.highestLowestPrices(startDate);
+                case HIGH_LOW_4W -> highLowForPeriodRepository.highLow4wPricesNotDelistedFor(startDate);
+                case HIGH_LOW_52W -> highLowForPeriodRepository.highLow52wPricesNotDelistedFor(startDate);
+                case HIGH_LOW_ALL_TIME -> highLowForPeriodRepository.highestLowestPricesNotDelisted(startDate);
             };
             highLowPricesCache.addHighLowPrices(highLowPrices, highLowPeriod);
         }

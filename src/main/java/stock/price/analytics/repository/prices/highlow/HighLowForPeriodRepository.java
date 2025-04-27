@@ -12,14 +12,26 @@ import java.util.List;
 @Repository
 public interface HighLowForPeriodRepository extends JpaRepository<HighLowForPeriod, Long> {
 
-    @Query("SELECT h FROM HighLow4w h WHERE h.startDate = :tradingDate")
-    List<HighLow4w> highLow4wPricesFor(@Param(value = "tradingDate") LocalDate tradingDate);
+    @Query(value = """
+            SELECT * FROM high_low4w
+            where start_date = :tradingDate
+            and ticker in (select ticker from stocks where xtb_stock = true and delisted_date is null)
+            """, nativeQuery = true)
+    List<HighLow4w> highLow4wPricesNotDelistedFor(@Param(value = "tradingDate") LocalDate tradingDate);
 
-    @Query("SELECT h FROM HighLow52Week h WHERE h.startDate = :tradingDate")
-    List<HighLow52Week> highLow52wPricesFor(@Param(value = "tradingDate") LocalDate tradingDate);
+    @Query(value = """
+            SELECT * FROM high_low52w
+            where start_date = :tradingDate
+            and ticker in (select ticker from stocks where xtb_stock = true and delisted_date is null)
+            """, nativeQuery = true)
+    List<HighLow52Week> highLow52wPricesNotDelistedFor(@Param(value = "tradingDate") LocalDate tradingDate);
 
-    @Query("SELECT h FROM HighestLowestPrices h WHERE h.startDate = :tradingDate")
-    List<HighestLowestPrices> highestLowestPrices(@Param(value = "tradingDate") LocalDate tradingDate);
+    @Query(value = """
+            SELECT * FROM highest_lowest
+            where start_date = :tradingDate
+            and ticker in (select ticker from stocks where xtb_stock = true and delisted_date is null)
+            """, nativeQuery = true)
+    List<HighestLowestPrices> highestLowestPricesNotDelisted(@Param(value = "tradingDate") LocalDate tradingDate);
 
     @Query(value = """
             WITH latest_prices AS (
