@@ -58,8 +58,8 @@ public class CacheService {
         }
     }
 
-    public LocalDate latestHighLowDate() {
-        return highLowForPeriodPricesFor(HighLowPeriod.HIGH_LOW_4W).stream()
+    public LocalDate latestHighLowDate(HighLowPeriod highLowPeriod) {
+        return highLowForPeriodPricesFor(highLowPeriod).stream()
                 .map(HighLowForPeriod::getStartDate)
                 .max(LocalDate::compareTo)
                 .orElseThrow();
