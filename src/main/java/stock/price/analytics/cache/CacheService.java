@@ -16,6 +16,7 @@ import stock.price.analytics.model.prices.ohlc.enums.CandleStickType;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.model.stocks.enums.MarketState;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,13 @@ public class CacheService {
         } else {
             return pricesFor(StockTimeframe.DAILY).stream().map(p -> (DailyPrice) p).toList();
         }
+    }
+
+    public LocalDate latestHighLowDate() {
+        return highLowForPeriodPricesFor(HighLowPeriod.HIGH_LOW_4W).stream()
+                .map(HighLowForPeriod::getStartDate)
+                .max(LocalDate::compareTo)
+                .orElseThrow();
     }
 
     public boolean weeklyHighLowExists() {
