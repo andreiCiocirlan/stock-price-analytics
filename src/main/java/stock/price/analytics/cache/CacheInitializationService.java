@@ -141,7 +141,7 @@ public class CacheInitializationService {
                 highLowPricesCache.addHighLowPrices(highLowForPeriods, highLowPeriod);
             }
         } else {
-            List<? extends HighLowForPeriod> highLowPrices = highLowForPeriodService.hlPricesForDate(highLowPeriod, latestDailyPriceImportDate);
+            List<? extends HighLowForPeriod> highLowPrices = highLowForPeriodService.hlPricesForDate(highLowPeriod, startDate);
             highLowPricesCache.addHighLowPrices(highLowPrices, highLowPeriod);
         }
     }
