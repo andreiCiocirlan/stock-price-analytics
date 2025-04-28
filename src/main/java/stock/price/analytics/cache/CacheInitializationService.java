@@ -23,8 +23,10 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static stock.price.analytics.model.prices.enums.StockTimeframe.WEEKLY;
 import static stock.price.analytics.model.prices.highlow.enums.HighLowPeriod.HIGH_LOW_4W;
 import static stock.price.analytics.util.LoggingUtil.logTime;
+import static stock.price.analytics.util.TradingDateUtil.isWithinSameTimeframe;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 @Slf4j
@@ -112,7 +114,8 @@ public class CacheInitializationService {
 
     private void initPrevWeekHighLowPricesCache(HighLowPeriod highLowPeriod, LocalDate latestDailyPriceImportDate) {
         LocalDate prevWeekStartDate = latestDailyPriceImportDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-        if (cacheService.weeklyHighLowExists()) { // on first import of the week need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
+        boolean isSameWeek = isWithinSameTimeframe(cacheService.latestHighLowDate(highLowPeriod), latestDailyPriceImportDate, WEEKLY);
+        if (cacheService.weeklyHighLowExists() && !isSameWeek) {
             prevWeekStartDate = prevWeekStartDate.minusWeeks(1);
         }
         log.info("prevWeekStartDate " + prevWeekStartDate);
