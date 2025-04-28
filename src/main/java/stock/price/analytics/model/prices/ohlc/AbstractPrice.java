@@ -65,18 +65,6 @@ public abstract class AbstractPrice implements BusinessEntity {
 
     public abstract void updateStock(Stock stock);
 
-    public void updateFrom(AbstractPrice that) {
-        this.setOpen(that.getOpen());
-        this.setHigh(that.getHigh());
-        this.setLow(that.getLow());
-        this.setPerformance(that.getPerformance());
-
-        // stock closing price updated last, after htf prices
-        if (that.getTimeframe() == StockTimeframe.DAILY) {
-            this.setClose(that.getClose());
-        }
-    }
-
     public void convertFrom(DailyPrice dailyPrice, Double previousClose) {
         this.setClose(dailyPrice.getClose());
         this.setLow(Math.min(getLow(), dailyPrice.getLow()));
