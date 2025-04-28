@@ -17,10 +17,6 @@ class PriceMilestoneCache {
         tickersByPriceMilestones.put(priceMilestone, tickersForMilestone);
     }
 
-    Map<PriceMilestone, List<String>> tickersByPriceMilestones() {
-        return tickersByPriceMilestones;
-    }
-
     List<String> tickersFor(PriceMilestone priceMilestone) {
         return tickersByPriceMilestones.getOrDefault(priceMilestone, Collections.emptyList());
     }
