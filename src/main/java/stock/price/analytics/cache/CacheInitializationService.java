@@ -115,7 +115,7 @@ public class CacheInitializationService {
     private void initPrevWeekHighLowPricesCache(HighLowPeriod highLowPeriod, LocalDate latestDailyPriceImportDate) {
         LocalDate prevWeekStartDate = latestDailyPriceImportDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         boolean isSameWeek = isWithinSameTimeframe(cacheService.latestHighLowDate(highLowPeriod), latestDailyPriceImportDate, WEEKLY);
-        if (cacheService.weeklyHighLowExists() && !isSameWeek) {
+        if (cacheService.weeklyHighLowExists()) {
             prevWeekStartDate = prevWeekStartDate.minusWeeks(1);
         }
         log.info("prevWeekStartDate " + prevWeekStartDate);
