@@ -285,4 +285,20 @@ public final class QueryUtil {
         """;
     }
 
+    public static String averageCandleLength15DaysQuery() {
+        return """
+                SELECT ticker, AVG(high - low) AS avg_range
+                FROM (
+                    SELECT
+                        ticker,
+                        high,
+                        low,
+                        ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY date DESC) AS rn
+                    FROM daily_prices
+                	where date > current_date - interval '4 week'
+                ) sub
+                WHERE rn <= 15
+                GROUP BY ticker
+                """;
+    }
 }
