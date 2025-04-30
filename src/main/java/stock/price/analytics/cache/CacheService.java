@@ -36,6 +36,7 @@ public class CacheService {
     private final PricesCache pricesCache;
     private final HighLowPricesCache highLowPricesCache;
     private final PriceMilestoneCache priceMilestoneCache;
+    private final CandleStickCache candleStickCache;
 
 
     public List<DailyPriceJSON> dailyPriceJsonCache() {
@@ -166,4 +167,9 @@ public class CacheService {
         cachePriceMilestoneTickers(INTRADAY_SPIKE_UP, spikeUpTickers);
         cachePriceMilestoneTickers(INTRADAY_SPIKE_DOWN, spikeDownTickers);
     }
+
+    public List<String> tickersForCandleStickTypeAndTimeframe(StockTimeframe timeframe, CandleStickType candleStickType) {
+        return candleStickCache.getCandleStickTypeByTickers().get(timeframe).get(candleStickType);
+    }
+
 }
