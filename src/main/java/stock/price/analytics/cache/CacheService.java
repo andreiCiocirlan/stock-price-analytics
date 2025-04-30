@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static stock.price.analytics.model.prices.enums.IntradayPriceSpike.INTRADAY_SPIKE_DOWN;
 import static stock.price.analytics.model.prices.enums.IntradayPriceSpike.INTRADAY_SPIKE_UP;
@@ -142,13 +143,6 @@ public class CacheService {
                 .filter(priceMilestoneCache.tickersFor(priceMilestone)::contains).toList();
     }
 
-    public List<String> tickersWith(StockTimeframe stockTimeframe, CandleStickType candleStickType) {
-        return pricesFor(stockTimeframe).stream()
-                .filter(dp -> dp.toCandleStickType() == candleStickType)
-                .map(AbstractPrice::getTicker)
-                .toList();
-    }
-
     public void updateIntradayPriceSpikesCache(List<DailyPrice> dailyPrices) {
         List<String> spikeUpTickers = new ArrayList<>();
         List<String> spikeDownTickers = new ArrayList<>();
@@ -169,7 +163,7 @@ public class CacheService {
     }
 
     public List<String> tickersFor(StockTimeframe timeframe, CandleStickType candleStickType) {
-        return candleStickCache.getCandleStickTypeByTickers().get(timeframe).get(candleStickType);
+        return candleStickCache.getCandleStickTypeByTickers().get(timeframe).getOrDefault(candleStickType, emptyList());
     }
 
     public Double averageCandleRange15DaysFor(String ticker) {
