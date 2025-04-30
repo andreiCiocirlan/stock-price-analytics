@@ -3,17 +3,27 @@ package stock.price.analytics.cache;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
+import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.enums.CandleStickType;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
+
+@Getter
 @Component
 public class CandleStickCache {
 
-    @Getter @Setter
+    @Setter
     private Map<String, Double> avgCandleLength15Days = new HashMap<>();
-    private final Map<String, CandleStickType> candleStickTypeByTickers = new HashMap<>();
+    private final Map<StockTimeframe, Map<String, CandleStickType>> candleStickTypeByTickers = Map.of(
+            DAILY, new HashMap<>(),
+            WEEKLY, new HashMap<>(),
+            MONTHLY, new HashMap<>(),
+            QUARTERLY, new HashMap<>(),
+            YEARLY, new HashMap<>()
+    );
 
 
 
