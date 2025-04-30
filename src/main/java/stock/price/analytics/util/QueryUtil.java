@@ -285,7 +285,7 @@ public final class QueryUtil {
         """;
     }
 
-    public static String averageCandleLength15DaysQuery() {
+    public static String averageCandleRange15DaysQuery() {
         return """
                 SELECT ticker, AVG(high - low) AS avg_range
                 FROM (

@@ -20,7 +20,7 @@ public class CandleStickService {
     @SuppressWarnings("unchecked")
     public Map<String, Double> averageCandleRange15Days() {
         Map<String, Double> avgCandleRange15DaysByTicker = new HashMap<>();
-        String query = QueryUtil.averageCandleLength15DaysQuery();
+        String query = QueryUtil.averageCandleRange15DaysQuery();
 
         List<Object[]> resultList = entityManager.createNativeQuery(query).getResultList();
         resultList.forEach(row -> avgCandleRange15DaysByTicker.put((String) row[0], (Double) row[1]));
