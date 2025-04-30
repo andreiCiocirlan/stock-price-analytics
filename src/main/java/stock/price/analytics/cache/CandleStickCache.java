@@ -17,7 +17,7 @@ import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
 public class CandleStickCache {
 
     @Setter
-    private Map<String, Double> avgCandleLength15Days = new HashMap<>();
+    private Map<String, Double> avgCandleRange15Days = new HashMap<>();
     private final Map<StockTimeframe, Map<CandleStickType, List<String>>> candleStickTypeByTickers = Map.of(
             DAILY, new HashMap<>(),
             WEEKLY, new HashMap<>(),

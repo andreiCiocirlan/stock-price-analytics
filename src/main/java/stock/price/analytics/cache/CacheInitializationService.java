@@ -62,7 +62,7 @@ public class CacheInitializationService {
         logTime(this::initDailyJSONPricesCache, "initialized daily JSON prices cache");
         logTime(this::initPreMarketDailyPrices, "initialized pre-market daily prices cache");
         logTime(this::initTickersForPriceMilestoneCache, "initialized tickers for price milestone cache");
-        logTime(this::initAvgCandleLength15DaysCache, "initialized average candle length for previous 15 days cache");
+        logTime(this::initAvgCandleRange15DaysCache, "initialized average candle range for previous 15 days cache");
     }
 
     private void initTickersForPriceMilestoneCache() {
@@ -211,7 +211,7 @@ public class CacheInitializationService {
                 .toList();
     }
 
-    private void initAvgCandleLength15DaysCache() {
-        candleStickCache.setAvgCandleLength15Days(candleStickService.averageCandleLength15Days());
+    private void initAvgCandleRange15DaysCache() {
+        candleStickCache.setAvgCandleRange15Days(candleStickService.averageCandleRange15Days());
     }
 }

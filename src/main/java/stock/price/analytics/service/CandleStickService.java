@@ -3,9 +3,7 @@ package stock.price.analytics.service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.util.QueryUtil;
 
 import java.util.HashMap;
@@ -20,13 +18,13 @@ public class CandleStickService {
     private final EntityManager entityManager;
 
     @SuppressWarnings("unchecked")
-    public Map<String, Double> averageCandleLength15Days() {
-        Map<String, Double> avgCandleLength15DaysByTicker = new HashMap<>();
+    public Map<String, Double> averageCandleRange15Days() {
+        Map<String, Double> avgCandleRange15DaysByTicker = new HashMap<>();
         String query = QueryUtil.averageCandleLength15DaysQuery();
 
         List<Object[]> resultList = entityManager.createNativeQuery(query).getResultList();
-        resultList.forEach(row -> avgCandleLength15DaysByTicker.put((String) row[0], (Double) row[1]));
+        resultList.forEach(row -> avgCandleRange15DaysByTicker.put((String) row[0], (Double) row[1]));
 
-        return avgCandleLength15DaysByTicker;
+        return avgCandleRange15DaysByTicker;
     }
 }
