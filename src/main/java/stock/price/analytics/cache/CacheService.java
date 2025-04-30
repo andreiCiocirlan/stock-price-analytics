@@ -172,4 +172,7 @@ public class CacheService {
         return candleStickCache.getCandleStickTypeByTickers().get(timeframe).get(candleStickType);
     }
 
+    public Double averageCandleRange15DaysFor(String ticker) {
+        return candleStickCache.getAvgCandleRange15Days().get(ticker);
+    }
 }
