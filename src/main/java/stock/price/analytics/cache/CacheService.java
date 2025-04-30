@@ -168,7 +168,7 @@ public class CacheService {
         cachePriceMilestoneTickers(INTRADAY_SPIKE_DOWN, spikeDownTickers);
     }
 
-    public List<String> tickersForCandleStickTypeAndTimeframe(StockTimeframe timeframe, CandleStickType candleStickType) {
+    public List<String> tickersFor(StockTimeframe timeframe, CandleStickType candleStickType) {
         return candleStickCache.getCandleStickTypeByTickers().get(timeframe).get(candleStickType);
     }
 
