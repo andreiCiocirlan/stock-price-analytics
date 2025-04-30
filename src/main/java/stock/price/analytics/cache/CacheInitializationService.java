@@ -47,6 +47,8 @@ public class CacheInitializationService {
     private final PriceService priceService;
     private final HighLowForPeriodService highLowForPeriodService;
     private final PriceMilestoneService priceMilestoneService;
+    private final CandleStickCache candleStickCache;
+    private final CandleStickService candleStickService;
 
     @Transactional
     public void initAllCaches() {
@@ -60,6 +62,7 @@ public class CacheInitializationService {
         logTime(this::initDailyJSONPricesCache, "initialized daily JSON prices cache");
         logTime(this::initPreMarketDailyPrices, "initialized pre-market daily prices cache");
         logTime(this::initTickersForPriceMilestoneCache, "initialized tickers for price milestone cache");
+        logTime(this::initAvgCandleLength15DaysCache, "initialized average candle length for previous 15 days cache");
     }
 
     private void initTickersForPriceMilestoneCache() {
@@ -206,5 +209,9 @@ public class CacheInitializationService {
         return latestPrices.stream()
                 .map(price -> new PriceWithPrevClose(price, previousCloseByTicker.get(price.getTicker())))
                 .toList();
+    }
+
+    private void initAvgCandleLength15DaysCache() {
+        candleStickCache.setAvgCandleLength15Days(candleStickService.averageCandleLength15Days());
     }
 }
