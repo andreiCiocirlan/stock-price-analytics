@@ -27,5 +27,7 @@ public class CandleStickCache {
     );
 
 
-
+    public Double getFor(String ticker, StockTimeframe timeframe) {
+        return avgCandleRangesByTickerAndTimeframe.getOrDefault(ticker + "_" + timeframe, 0d);
+    }
 }
