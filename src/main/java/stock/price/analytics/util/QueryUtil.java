@@ -285,17 +285,20 @@ public final class QueryUtil {
         """;
     }
 
-    public static String averageCandleRange15DaysQuery() {
-        return """
+    public static String averageCandleRangeQuery(StockTimeframe timeframe) {
+        String tableName = timeframe.dbTableOHLC();
+        String intervalPeriod = timeframe.toIntervalPeriod();
+        String dateColumn = timeframe == StockTimeframe.DAILY ? "date" : "start_date";
+        return STR."""
                 SELECT ticker, AVG(high - low) AS avg_range
                 FROM (
                     SELECT
                         ticker,
                         high,
                         low,
-                        ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY date DESC) AS rn
-                    FROM daily_prices
-                	where date > current_date - interval '4 week'
+                        ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY \{dateColumn} DESC) AS rn
+                    FROM \{tableName}
+                	where \{dateColumn} > current_date - interval '4 \{intervalPeriod}'
                 ) sub
                 WHERE rn <= 15
                 GROUP BY ticker

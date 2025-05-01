@@ -64,7 +64,7 @@ public class CacheInitializationService {
         logTime(this::initDailyJSONPricesCache, "initialized daily JSON prices cache");
         logTime(this::initPreMarketDailyPrices, "initialized pre-market daily prices cache");
         logTime(this::initTickersForPriceMilestoneCache, "initialized tickers for price milestone cache");
-        logTime(this::initAvgCandleRange15DaysCache, "initialized average candle range for previous 15 days cache");
+        logTime(this::initAvgCandleRangesCache, "initialized average candle range cache");
         logTime(this::initCandleStickTypeCache, "initialized candle stick types cache");
     }
 
@@ -214,8 +214,11 @@ public class CacheInitializationService {
                 .toList();
     }
 
-    private void initAvgCandleRange15DaysCache() {
-        candleStickCache.setAvgCandleRange15Days(candleStickService.averageCandleRange15Days());
+    private void initAvgCandleRangesCache() {
+        for (StockTimeframe timeframe : StockTimeframe.values()) {
+            candleStickService.averageCandleRangesFor(timeframe)
+                    .forEach((key, value) -> candleStickCache.getAvgCandleRangesByTickerAndTimeframe().put(key, value));
+        }
     }
 
     private void initCandleStickTypeCache() {
@@ -224,7 +227,7 @@ public class CacheInitializationService {
             for (AbstractPrice price : pricesForTimeframe) {
                 String ticker = price.getTicker();
                 CandleStickType candleStickType = price.toCandleStickType();
-                if (CandleStickUtil.isTightCandleStick(price, cacheService.averageCandleRange15DaysFor(price.getTicker()))) {
+                if (CandleStickUtil.isTightCandleStick(price, cacheService.averageCandleRangeFor(timeframe, price.getTicker()))) {
                     candleStickType = CandleStickType.TIGHT;
                 }
                 candleStickCache.getCandleStickTypeByTickers().get(timeframe).computeIfAbsent(candleStickType, _ -> new ArrayList<>()).add(ticker);

@@ -166,7 +166,7 @@ public class CacheService {
         return candleStickCache.getCandleStickTypeByTickers().get(timeframe).getOrDefault(candleStickType, emptyList());
     }
 
-    public Double averageCandleRange15DaysFor(String ticker) {
-        return candleStickCache.getAvgCandleRange15Days().get(ticker);
+    public Double averageCandleRangeFor(StockTimeframe timeframe, String ticker) {
+        return candleStickCache.getAvgCandleRangesByTickerAndTimeframe().getOrDefault(ticker + "_" + timeframe, 0d);
     }
 }

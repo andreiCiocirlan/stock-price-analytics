@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.util.QueryUtil;
 
 import java.util.HashMap;
@@ -18,13 +19,16 @@ public class CandleStickService {
     private final EntityManager entityManager;
 
     @SuppressWarnings("unchecked")
-    public Map<String, Double> averageCandleRange15Days() {
-        Map<String, Double> avgCandleRange15DaysByTicker = new HashMap<>();
-        String query = QueryUtil.averageCandleRange15DaysQuery();
+    public Map<String, Double> averageCandleRangesFor(StockTimeframe timeframe) {
+        Map<String, Double> avgCandleRanges = new HashMap<>();
+        String query = QueryUtil.averageCandleRangeQuery(timeframe);
 
         List<Object[]> resultList = entityManager.createNativeQuery(query).getResultList();
-        resultList.forEach(row -> avgCandleRange15DaysByTicker.put((String) row[0], (Double) row[1]));
+        resultList.forEach(row -> {
+            String key = row[0] + "_" + timeframe; // key = ticker_timeframe
+            avgCandleRanges.put(key, (Double) row[1]);
+        });
 
-        return avgCandleRange15DaysByTicker;
+        return avgCandleRanges;
     }
 }
