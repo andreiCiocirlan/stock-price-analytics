@@ -1,13 +1,11 @@
 package stock.price.analytics.cache;
 
-import lombok.Getter;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.enums.CandleStickType;
 
 import java.util.*;
 
-@Getter
 @Component
 public class CandleStickCache {
 
