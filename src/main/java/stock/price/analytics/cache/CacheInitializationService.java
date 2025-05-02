@@ -217,7 +217,7 @@ public class CacheInitializationService {
     private void initAvgCandleRangesCache() {
         for (StockTimeframe timeframe : StockTimeframe.values()) {
             candleStickService.averageCandleRangesFor(timeframe)
-                    .forEach((key, value) -> candleStickCache.getAvgCandleRangesByTickerAndTimeframe().put(key, value));
+                    .forEach((ticker, range) -> candleStickCache.addAvgCandleRangeFor(ticker, timeframe, range));
         }
     }
 

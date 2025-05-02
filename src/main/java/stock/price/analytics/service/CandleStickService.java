@@ -24,10 +24,7 @@ public class CandleStickService {
         String query = QueryUtil.averageCandleRangeQuery(timeframe);
 
         List<Object[]> resultList = entityManager.createNativeQuery(query).getResultList();
-        resultList.forEach(row -> {
-            String key = row[0] + "_" + timeframe; // key = ticker_timeframe
-            avgCandleRanges.put(key, (Double) row[1]);
-        });
+        resultList.forEach(row -> avgCandleRanges.put((String) row[0], (Double) row[1]));
 
         return avgCandleRanges;
     }
