@@ -26,11 +26,11 @@ public class CandleStickCache {
             YEARLY, new HashMap<>()
     );
 
-    public void addAvgCandleRangeFor(String ticker, StockTimeframe timeframe, Double range) {
+    void addAvgCandleRangeFor(String ticker, StockTimeframe timeframe, Double range) {
         avgCandleRangesByTickerAndTimeframe.put(ticker + "_" + timeframe, range);
     }
 
-    public Double averageCandleRangeFor(String ticker, StockTimeframe timeframe) {
+    Double averageCandleRangeFor(String ticker, StockTimeframe timeframe) {
         return avgCandleRangesByTickerAndTimeframe.getOrDefault(ticker + "_" + timeframe, 0d);
     }
 }
