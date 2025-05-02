@@ -26,8 +26,7 @@ public class CandleStickCache {
             YEARLY, new HashMap<>()
     );
 
-
-    public Double getFor(String ticker, StockTimeframe timeframe) {
+    public Double averageCandleRangeFor(String ticker, StockTimeframe timeframe) {
         return avgCandleRangesByTickerAndTimeframe.getOrDefault(ticker + "_" + timeframe, 0d);
     }
 }
