@@ -230,7 +230,7 @@ public class CacheInitializationService {
                 if (CandleStickUtil.isTightCandleStick(price, cacheService.averageCandleRangeFor(timeframe, price.getTicker()))) {
                     candleStickType = CandleStickType.TIGHT;
                 }
-                candleStickCache.getCandleStickTypeByTickers().get(timeframe).computeIfAbsent(candleStickType, _ -> new ArrayList<>()).add(ticker);
+                candleStickCache.addTickerFor(candleStickType, timeframe, ticker);
             }
         }
     }
