@@ -15,20 +15,27 @@ public class CandleStickCache {
     private final Map<String, List<String>> tickersByCandleStickTypeAndTimeframe = new HashMap<>();
 
     void addAvgCandleRangeFor(String ticker, StockTimeframe timeframe, Double range) {
-        avgCandleRangesByTickerAndTimeframe.put(ticker + "_" + timeframe, range);
+        avgCandleRangesByTickerAndTimeframe.put(avgCandleRangeKey(ticker, timeframe), range);
     }
 
     Double averageCandleRangeFor(String ticker, StockTimeframe timeframe) {
-        return avgCandleRangesByTickerAndTimeframe.getOrDefault(ticker + "_" + timeframe, 0d);
+        return avgCandleRangesByTickerAndTimeframe.getOrDefault(avgCandleRangeKey(ticker, timeframe), 0d);
     }
 
-    void addTickerFor(CandleStickType type, StockTimeframe timeframe, String ticker) {
-        String key = type + "_" + timeframe;
-        tickersByCandleStickTypeAndTimeframe.computeIfAbsent(key, _ -> new ArrayList<>()).add(ticker);
+    void addTickerFor(CandleStickType candleStickType, StockTimeframe timeframe, String ticker) {
+        tickersByCandleStickTypeAndTimeframe.computeIfAbsent(candleStickTypeKey(candleStickType, timeframe), _ -> new ArrayList<>()).add(ticker);
     }
 
     List<String> tickersFor(StockTimeframe timeframe, CandleStickType candleStickType) {
-        return tickersByCandleStickTypeAndTimeframe.getOrDefault(candleStickType + "_" + timeframe, Collections.emptyList());
+        return tickersByCandleStickTypeAndTimeframe.getOrDefault(candleStickTypeKey(candleStickType, timeframe), Collections.emptyList());
+    }
+
+    private String avgCandleRangeKey(String ticker, StockTimeframe timeframe) {
+        return ticker + "_" + timeframe;
+    }
+
+    private String candleStickTypeKey(CandleStickType candleStickType, StockTimeframe timeframe) {
+        return candleStickType + "_" + timeframe;
     }
 
 }
