@@ -1,18 +1,18 @@
 [
   {
-    "name": "stock.price.analytics.model.prices.json.Response",
+    "name": "stock.price.analytics.model.json.Response",
     "allDeclaredConstructors": true,
     "allDeclaredMethods": true,
     "allDeclaredFields": true
   },
   {
-    "name": "stock.price.analytics.model.prices.json.QuoteResponse",
+    "name": "stock.price.analytics.model.json.QuoteResponse",
     "allDeclaredConstructors": true,
     "allDeclaredMethods": true,
     "allDeclaredFields": true
   },
   {
-    "name": "stock.price.analytics.model.prices.json.DailyPriceJSON",
+    "name": "stock.price.analytics.model.json.DailyPriceJSON",
     "allDeclaredConstructors": true,
     "allDeclaredMethods": true,
     "allDeclaredFields": true
