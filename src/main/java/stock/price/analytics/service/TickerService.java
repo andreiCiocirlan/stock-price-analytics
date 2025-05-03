@@ -21,9 +21,7 @@ import stock.price.analytics.repository.prices.highlow.HighLowForPeriodRepositor
 import stock.price.analytics.util.Constants;
 import stock.price.analytics.util.JsonUtil;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
@@ -161,15 +159,14 @@ public class TickerService {
                             .orElseThrow();
 
                     LocalDate startDate = prices.get(i).getStartDate();
-                    LocalDate endDate = startDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
 
                     HighLowForPeriod highLowForPeriod = switch (highLowPeriod) {
                         case HIGH_LOW_4W ->
-                                new HighLow4w(ticker, startDate, endDate, lowestPriceForPeriod, highestPriceForPeriod);
+                                new HighLow4w(ticker, startDate, lowestPriceForPeriod, highestPriceForPeriod);
                         case HIGH_LOW_52W ->
-                                new HighLow52Week(ticker, startDate, endDate, lowestPriceForPeriod, highestPriceForPeriod);
+                                new HighLow52Week(ticker, startDate, lowestPriceForPeriod, highestPriceForPeriod);
                         case HIGH_LOW_ALL_TIME ->
-                                new HighestLowestPrices(ticker, startDate, endDate, lowestPriceForPeriod, highestPriceForPeriod);
+                                new HighestLowestPrices(ticker, startDate, lowestPriceForPeriod, highestPriceForPeriod);
                     };
                     highLowForPeriodPrices.computeIfAbsent(highLowPeriod, _ -> new ArrayList<>()).add(highLowForPeriod);
                 }
