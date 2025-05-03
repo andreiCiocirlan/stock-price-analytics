@@ -26,8 +26,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.prices.highlow.enums.HighLowPeriod.HIGH_LOW_4W;
-import static stock.price.analytics.util.Constants.NY_ZONE;
 import static stock.price.analytics.util.LoggingUtil.logTime;
+import static stock.price.analytics.util.TradingDateUtil.dateNowInNY;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 @Slf4j
@@ -118,7 +118,7 @@ public class CacheInitializationService {
     }
 
     private void initPrevWeekHighLowPricesCache(HighLowPeriod highLowPeriod) {
-        LocalDate prevWeekStartDate = LocalDate.now(NY_ZONE).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).minusWeeks(1);
+        LocalDate prevWeekStartDate = dateNowInNY().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).minusWeeks(1);
         log.info("prevWeekStartDate " + prevWeekStartDate);
         List<? extends HighLowForPeriod> prevWeekHighLowPrices = highLowForPeriodService.hlPricesForDate(highLowPeriod, prevWeekStartDate);
         highLowPricesCache.addPrevWeekHighLowPrices(prevWeekHighLowPrices, highLowPeriod);
