@@ -5,7 +5,6 @@ import stock.price.analytics.model.prices.enums.StockTimeframe;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Comparator;
@@ -16,18 +15,20 @@ import static stock.price.analytics.util.Constants.*;
 public final class TradingDateUtil {
 
     private static boolean isBetweenMarketHours() {
-        LocalTime nowInNY = LocalDateTime.now(NY_ZONE).toLocalTime();
-        return nowInNY.isAfter(START_MARKET_HOURS_NYSE) && nowInNY.isBefore(END_MARKET_HOURS_NYSE);
+        LocalTime localTimeNowInNY = localTimeNowInNY();
+        return localTimeNowInNY.isAfter(START_MARKET_HOURS_NYSE) && localTimeNowInNY.isBefore(END_MARKET_HOURS_NYSE);
     }
 
     private static boolean isBeforeMarketHours() {
-        LocalTime nowInNY = LocalDateTime.now(NY_ZONE).toLocalTime();
-        return nowInNY.isBefore(START_MARKET_HOURS_NYSE);
+        return localTimeNowInNY().isBefore(START_MARKET_HOURS_NYSE);
     }
 
     private static boolean isAfterMarketHours() {
-        LocalTime nowInNY = LocalDateTime.now(NY_ZONE).toLocalTime();
-        return nowInNY.isAfter(END_MARKET_HOURS_NYSE);
+        return localTimeNowInNY().isAfter(END_MARKET_HOURS_NYSE);
+    }
+
+    public static LocalTime localTimeNowInNY() {
+        return LocalTime.now(NY_ZONE);
     }
 
     public static LocalDate dateNowInNY() {
