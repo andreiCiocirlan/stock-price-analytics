@@ -248,8 +248,7 @@ public class DailyPriceJSONService {
         QuoteResponse quoteResponse = new QuoteResponse();
         quoteResponse.setResult(dailyPrices);
 
-        Response response = new Response();
-        response.setQuoteResponse(quoteResponse);
+        Response response = new Response(quoteResponse);
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
