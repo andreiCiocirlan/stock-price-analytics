@@ -72,13 +72,7 @@
     "allDeclaredFields": true
   },
   {
-    "name": "stock.price.analytics.controller.StockHistoricalPricesController",
-    "allDeclaredConstructors": true,
-    "allDeclaredMethods": true,
-    "allDeclaredFields": true
-  },
-  {
-    "name": "stock.price.analytics.controller.StockSplitController",
+    "name": "stock.price.analytics.controller.StocksController",
     "allDeclaredConstructors": true,
     "allDeclaredMethods": true,
     "allDeclaredFields": true
@@ -96,13 +90,7 @@
     "allDeclaredFields": true
   },
   {
-    "name": "stock.price.analytics.controller.NewTickerController",
-    "allDeclaredConstructors": true,
-    "allDeclaredMethods": true,
-    "allDeclaredFields": true
-  },
-  {
-    "name": "stock.price.analytics.controller.CacheController",
+    "name": "stock.price.analytics.controller.TickerController",
     "allDeclaredConstructors": true,
     "allDeclaredMethods": true,
     "allDeclaredFields": true
