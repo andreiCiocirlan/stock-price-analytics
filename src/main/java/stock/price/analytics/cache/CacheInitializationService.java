@@ -25,10 +25,9 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static stock.price.analytics.model.prices.enums.StockTimeframe.WEEKLY;
 import static stock.price.analytics.model.prices.highlow.enums.HighLowPeriod.HIGH_LOW_4W;
+import static stock.price.analytics.util.Constants.NY_ZONE;
 import static stock.price.analytics.util.LoggingUtil.logTime;
-import static stock.price.analytics.util.TradingDateUtil.isWithinSameTimeframe;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 @Slf4j
@@ -110,7 +109,7 @@ public class CacheInitializationService {
         LocalDate latestDailyPriceImportDate = stockService.findLastUpdate();
         for (HighLowPeriod highLowPeriod : HighLowPeriod.values()) {
             initHighLowPriceCache(highLowPeriod, latestDailyPriceImportDate);
-            initPrevWeekHighLowPricesCache(highLowPeriod, latestDailyPriceImportDate);
+            initPrevWeekHighLowPricesCache(highLowPeriod);
         }
         if (!cacheService.weeklyHighLowExists()) {
             stockService.updateHighLowForPeriodFromHLCachesAndAdjustWeekend();
@@ -118,12 +117,8 @@ public class CacheInitializationService {
         }
     }
 
-    private void initPrevWeekHighLowPricesCache(HighLowPeriod highLowPeriod, LocalDate latestDailyPriceImportDate) {
-        LocalDate prevWeekStartDate = latestDailyPriceImportDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-        boolean isSameWeek = isWithinSameTimeframe(cacheService.latestHighLowDate(highLowPeriod), latestDailyPriceImportDate, WEEKLY);
-        if (cacheService.weeklyHighLowExists()) {
-            prevWeekStartDate = prevWeekStartDate.minusWeeks(1);
-        }
+    private void initPrevWeekHighLowPricesCache(HighLowPeriod highLowPeriod) {
+        LocalDate prevWeekStartDate = LocalDate.now(NY_ZONE).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         log.info("prevWeekStartDate " + prevWeekStartDate);
         List<? extends HighLowForPeriod> prevWeekHighLowPrices = highLowForPeriodService.hlPricesForDate(highLowPeriod, prevWeekStartDate);
         highLowPricesCache.addPrevWeekHighLowPrices(prevWeekHighLowPrices, highLowPeriod);
