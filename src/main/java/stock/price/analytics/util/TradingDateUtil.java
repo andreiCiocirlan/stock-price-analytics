@@ -30,19 +30,24 @@ public final class TradingDateUtil {
         return nowInNY.isAfter(END_MARKET_HOURS_NYSE);
     }
 
+    public static LocalDate dateNowInNY() {
+        return LocalDate.now(NY_ZONE);
+    }
+
     public static LocalDate tradingDateNow() {
-        DayOfWeek dayOfWeekInNY = LocalDate.now(NY_ZONE).getDayOfWeek();
+        LocalDate nowInNewYork = dateNowInNY();
+        DayOfWeek dayOfWeekInNY = nowInNewYork.getDayOfWeek();
 
         if (dayOfWeekInNY.equals(DayOfWeek.SATURDAY) || dayOfWeekInNY.equals(DayOfWeek.SUNDAY)
             || (dayOfWeekInNY.equals(DayOfWeek.FRIDAY) && isBetweenMarketHours())
             || (dayOfWeekInNY.equals(DayOfWeek.MONDAY) && isBeforeMarketHours())) {
-            return LocalDate.now(NY_ZONE).with(TemporalAdjusters.previousOrSame(DayOfWeek.FRIDAY));
+            return nowInNewYork.with(TemporalAdjusters.previousOrSame(DayOfWeek.FRIDAY));
         }
 
         if (isBetweenMarketHours() || isAfterMarketHours()) {
-            return LocalDate.now(NY_ZONE);
+            return nowInNewYork;
         } else { // Before market hours
-            return LocalDate.now(NY_ZONE).minusDays(1);
+            return nowInNewYork.minusDays(1);
         }
     }
 
