@@ -118,7 +118,7 @@ public class CacheInitializationService {
     }
 
     private void initPrevWeekHighLowPricesCache(HighLowPeriod highLowPeriod) {
-        LocalDate prevWeekStartDate = LocalDate.now(NY_ZONE).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDate prevWeekStartDate = LocalDate.now(NY_ZONE).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).minusWeeks(1);
         log.info("prevWeekStartDate " + prevWeekStartDate);
         List<? extends HighLowForPeriod> prevWeekHighLowPrices = highLowForPeriodService.hlPricesForDate(highLowPeriod, prevWeekStartDate);
         highLowPricesCache.addPrevWeekHighLowPrices(prevWeekHighLowPrices, highLowPeriod);
