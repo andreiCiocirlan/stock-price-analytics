@@ -131,10 +131,8 @@ public class CacheInitializationService {
 
     private void initHighLowPriceCache(HighLowPeriod highLowPeriod, LocalDate latestDailyPriceImportDate) {
         LocalDate startDate = latestDailyPriceImportDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-        LocalDate endDate = latestDailyPriceImportDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
         if (!cacheService.weeklyHighLowExists()) { // on first import of the week need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
             LocalDate newWeekStartDate = startDate.plusWeeks(1);
-            LocalDate newWeekEndDate = endDate.plusWeeks(1);
             if (highLowPeriod == HighLowPeriod.HIGH_LOW_ALL_TIME) { // for all-time highs/lows simply copy the existing row on Mondays
                 List<HighestLowestPrices> highestLowestPrices = new ArrayList<>();
                 highLowForPeriodService.hlPricesForDate(highLowPeriod, startDate).forEach(hlp -> highestLowestPrices.add(((HighestLowestPrices) hlp).copyWith(newWeekStartDate)));
@@ -144,7 +142,7 @@ public class CacheInitializationService {
                 int nrWeeksLookBack = highLowPeriod == HIGH_LOW_4W ? 3 : 51; // new week -> look back 3, 51 instead of 4, 52 weeks
                 List<HighLowForPeriod> highLowForPeriods = highLowForPeriodRepository.highLowPricesInPastWeeks(startDate, nrWeeksLookBack)
                         .stream()
-                        .map(dto -> convertToHighLowForPeriod(dto, newWeekStartDate, newWeekEndDate, highLowPeriod))
+                        .map(dto -> convertToHighLowForPeriod(dto, newWeekStartDate, highLowPeriod))
                         .toList();
                 syncPersistenceService.partitionDataAndSave(highLowForPeriods, highLowForPeriodRepository);
                 highLowPricesCache.addHighLowPrices(highLowForPeriods, highLowPeriod);
@@ -155,10 +153,10 @@ public class CacheInitializationService {
         }
     }
 
-    private HighLowForPeriod convertToHighLowForPeriod(TickerHighLowView dto, LocalDate startDate, LocalDate endDate, HighLowPeriod highLowPeriod) {
+    private HighLowForPeriod convertToHighLowForPeriod(TickerHighLowView dto, LocalDate startDate, HighLowPeriod highLowPeriod) {
         return switch (highLowPeriod) {
-            case HIGH_LOW_4W -> new HighLow4w(dto.getTicker(), startDate, endDate, dto.getLow(), dto.getHigh());
-            case HIGH_LOW_52W -> new HighLow52Week(dto.getTicker(), startDate, endDate, dto.getLow(), dto.getHigh());
+            case HIGH_LOW_4W -> new HighLow4w(dto.getTicker(), startDate, startDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY)), dto.getLow(), dto.getHigh());
+            case HIGH_LOW_52W -> new HighLow52Week(dto.getTicker(), startDate, startDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY)), dto.getLow(), dto.getHigh());
             case HIGH_LOW_ALL_TIME -> throw new IllegalArgumentException("HIGH_LOW_ALL_TIME is not supported.");
         };
     }
