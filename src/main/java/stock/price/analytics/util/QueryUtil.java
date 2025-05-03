@@ -14,8 +14,6 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static stock.price.analytics.util.Constants.NY_ZONE;
-
 public final class QueryUtil {
 
 
@@ -225,7 +223,7 @@ public final class QueryUtil {
     }
 
     public static String weeklyHighLowExistsQuery() {
-        String date = LocalDate.now(NY_ZONE).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).format(DateTimeFormatter.ISO_LOCAL_DATE);
+        String date = TradingDateUtil.dateNowInNY().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).format(DateTimeFormatter.ISO_LOCAL_DATE);
         return STR."""
                 SELECT
                     CASE
