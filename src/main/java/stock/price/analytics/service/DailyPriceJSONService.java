@@ -59,7 +59,6 @@ public class DailyPriceJSONService {
             objectMapper.registerModule(new JavaTimeModule());
             SimpleModule module = new SimpleModule();
             module.addDeserializer(LocalDate.class, new UnixTimestampToLocalDateDeserializer());
-            module.addDeserializer(Response.class, new ResponseDeserializer());
             objectMapper.registerModule(module);
             objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
             Response response = objectMapper.readValue(jsonData, Response.class);

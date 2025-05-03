@@ -6,12 +6,6 @@
     "allDeclaredFields": true
   },
   {
-    "name": "stock.price.analytics.model.prices.json.ResponseDeserializer",
-    "allDeclaredConstructors": true,
-    "allDeclaredMethods": true,
-    "allDeclaredFields": true
-  },
-  {
     "name": "stock.price.analytics.model.prices.json.QuoteResponse",
     "allDeclaredConstructors": true,
     "allDeclaredMethods": true,
