@@ -21,23 +21,17 @@ import java.time.temporal.TemporalAdjusters;
 public class QuarterlyPrice extends AbstractPrice {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Column(name = "end_date")
-    private LocalDate endDate;
-
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "start_date")
     private LocalDate startDate;
 
     public QuarterlyPrice(String ticker, LocalDate date, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
         setStartDateFrom(date);
-        setEndDateFrom(date);
     }
 
     public QuarterlyPrice(String ticker, LocalDate date, double performance, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
         setStartDateFrom(date);
-        setEndDateFrom(date);
         this.setPerformance(performance);
     }
 
@@ -68,18 +62,8 @@ public class QuarterlyPrice extends AbstractPrice {
     }
 
     @Override
-    public void setEndDateFrom(LocalDate date) {
-        int firstMonthOfQuarter = date.getMonth().firstMonthOfQuarter().getValue();
-
-        LocalDate firstDayOfQuarter = LocalDate.of(date.getYear(), firstMonthOfQuarter, 1);
-
-        // Calculate last day of that quarter by adding 2 months and getting last day
-        endDate = firstDayOfQuarter.plusMonths(2).with(TemporalAdjusters.lastDayOfMonth());
-    }
-
-    @Override
     public String toString() {
-        return STR."Quarterly_OHLC {  StartDate=\{startDate} EndDate=\{endDate} \{super.toString()}";
+        return STR."Quarterly_OHLC {  StartDate=\{startDate} \{super.toString()}";
     }
 
 }

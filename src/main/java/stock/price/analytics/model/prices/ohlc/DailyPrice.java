@@ -59,11 +59,6 @@ public class DailyPrice extends AbstractPrice {
     }
 
     @Override
-    public LocalDate getEndDate() {
-        return date;
-    }
-
-    @Override
     public StockTimeframe getTimeframe() {
         return StockTimeframe.DAILY;
     }
@@ -74,12 +69,7 @@ public class DailyPrice extends AbstractPrice {
 
     @Override
     public void setStartDateFrom(LocalDate date) {
-        throw new IllegalStateException("Unexpected setEndDateFrom in DailyPrice");
-    }
-
-    @Override
-    public void setEndDateFrom(LocalDate date) {
-        throw new IllegalStateException("Unexpected setEndDateFrom in DailyPrice");
+        throw new IllegalStateException("Unexpected setStartDateFrom in DailyPrice");
     }
 
     @Override

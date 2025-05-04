@@ -32,9 +32,8 @@ public class HighestLowestPrices extends HighLowForPeriod {
 
     public HighestLowestPrices copyWith(LocalDate startDate) {
         HighestLowestPrices copy = new HighestLowestPrices();
-        BeanUtils.copyProperties(this, copy, "id", "startDate", "endDate");
+        BeanUtils.copyProperties(this, copy, "id", "startDate");
         copy.setStartDate(startDate);
-        copy.setEndDate(startDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY)));
         return copy;
     }
 

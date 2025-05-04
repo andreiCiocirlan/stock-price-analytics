@@ -21,23 +21,17 @@ import java.time.temporal.TemporalAdjusters;
 public class MonthlyPrice extends AbstractPrice {
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Column(name = "end_date")
-    private LocalDate endDate;
-
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "start_date")
     private LocalDate startDate;
 
     public MonthlyPrice(String ticker, LocalDate date, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
         setStartDateFrom(date);
-        setEndDateFrom(date);
     }
 
     public MonthlyPrice(String ticker, LocalDate date, double performance, CandleOHLC candleOHLC) {
         super(ticker, candleOHLC);
         setStartDateFrom(date);
-        setEndDateFrom(date);
         this.setPerformance(performance);
     }
 
@@ -68,13 +62,8 @@ public class MonthlyPrice extends AbstractPrice {
     }
 
     @Override
-    public void setEndDateFrom(LocalDate date) {
-        endDate = date.with(TemporalAdjusters.lastDayOfMonth());
-    }
-
-    @Override
     public String toString() {
-        return STR."Monthly_OHLC { StartDate=\{startDate} EndDate=\{endDate} \{super.toString()}";
+        return STR."Monthly_OHLC { StartDate=\{startDate} \{super.toString()}";
     }
 
 }

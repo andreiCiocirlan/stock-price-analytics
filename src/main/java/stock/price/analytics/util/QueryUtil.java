@@ -258,13 +258,12 @@ public final class QueryUtil {
                     FROM weekly_prices wp
                     WHERE wp.ticker in (\{tickersFormatted})
                 )
-                INSERT INTO \{tableName} (id, high, low, start_date, end_date, ticker)
+                INSERT INTO \{tableName} (id, high, low, start_date, ticker)
                 SELECT
                     nextval('sequence_high_low') AS id,
                     cp.cumulative_high AS high,
                     cp.cumulative_low AS low,
                     date_trunc('week', wd.start_date::date)::date  AS start_date,
-                    (date_trunc('week', wd.start_date::date)  + interval '4 days')::date AS end_date,
                     cp.ticker AS ticker
                 FROM weekly_dates wd
                 JOIN cumulative_prices cp ON cp.start_date = wd.start_date

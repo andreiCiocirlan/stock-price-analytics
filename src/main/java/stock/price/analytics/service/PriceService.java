@@ -184,8 +184,8 @@ public class PriceService {
             String ticker = importedDailyPrice.getTicker();
             PriceWithPrevClose priceWithPrevClose = pricesWithPrevCloseByTicker.get(ticker);
             AbstractPrice price = priceWithPrevClose.price();
-            LocalDate latestEndDateWMQY = price.getEndDate(); // latest cached w,m,q,y end_date per ticker
-            if (isWithinSameTimeframe(importedDailyPrice.getDate(), latestEndDateWMQY, timeframe)) {
+            LocalDate latestDateWMQY = price.getStartDate(); // latest cached w,m,q,y date per ticker
+            if (isWithinSameTimeframe(importedDailyPrice.getDate(), latestDateWMQY, timeframe)) {
                 price.convertFrom(importedDailyPrice, priceWithPrevClose.previousClose());
                 result.add(priceWithPrevClose);
             } else { // new week, month, quarter, year

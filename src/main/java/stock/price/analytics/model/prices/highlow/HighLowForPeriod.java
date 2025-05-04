@@ -33,17 +33,12 @@ public abstract class HighLowForPeriod implements BusinessEntity {
     private String ticker;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Column(name = "end_date")
-    private LocalDate endDate;
-
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @Column(name = "start_date")
     private LocalDate startDate;
 
     public HighLowForPeriod(String ticker, LocalDate startDate, double low, double high) {
         this.ticker = ticker;
         this.startDate = startDate;
-        this.endDate = startDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.FRIDAY));
         this.setLow(low);
         this.setHigh(high);
     }
@@ -81,6 +76,6 @@ public abstract class HighLowForPeriod implements BusinessEntity {
 
     @Override
     public String toString() {
-        return STR."id=\{id}, ticker=\{ticker}, startDate=\{startDate}, endDate=\{endDate}";
+        return STR."id=\{id}, ticker=\{ticker}, startDate=\{startDate}";
     }
 }
