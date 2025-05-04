@@ -234,7 +234,7 @@ public final class QueryUtil {
                     high_low4w
                 WHERE
                     ticker = 'AAPL'
-                    AND start_date = '\{date}'::date;
+                    AND date = '\{date}'::date;
                 """;
     }
 
@@ -258,16 +258,16 @@ public final class QueryUtil {
                     FROM weekly_prices wp
                     WHERE wp.ticker in (\{tickersFormatted})
                 )
-                INSERT INTO \{tableName} (id, high, low, start_date, ticker)
+                INSERT INTO \{tableName} (id, high, low, date, ticker)
                 SELECT
                     nextval('sequence_high_low') AS id,
                     cp.cumulative_high AS high,
                     cp.cumulative_low AS low,
-                    date_trunc('week', wd.start_date::date)::date  AS start_date,
+                    date_trunc('week', wd.start_date::date)::date  AS date,
                     cp.ticker AS ticker
                 FROM weekly_dates wd
                 JOIN cumulative_prices cp ON cp.start_date = wd.start_date
-                ON CONFLICT (ticker, start_date)
+                ON CONFLICT (ticker, date)
                 DO UPDATE SET
                     high = EXCLUDED.high,
                     low = EXCLUDED.low;
@@ -277,7 +277,7 @@ public final class QueryUtil {
     public static String highLowPricesNotDelistedForDateQuery(HighLowPeriod highLowPeriod) {
         return STR."""
                 SELECT * FROM \{highLowPeriod.tableName()}
-                WHERE start_date = :tradingDate
+                WHERE date = :tradingDate
                 AND ticker IN (SELECT ticker FROM stocks WHERE xtb_stock = true AND delisted_date IS NULL)
         """;
     }

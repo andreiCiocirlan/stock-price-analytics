@@ -15,7 +15,7 @@ public interface StockDiscrepanciesRepository extends StockRepository {
             WITH discrepancies AS (
                 SELECT s.ticker, hl.high, hl.low
                 FROM public.stocks s
-                JOIN high_low4w hl ON hl.start_date = DATE_TRUNC('week', s.last_updated)
+                JOIN high_low4w hl ON hl.date = DATE_TRUNC('week', s.last_updated)
                                      AND hl.ticker = s.ticker
                 WHERE s.delisted_date IS NULL AND (hl.high <> s.high4w OR hl.low <> s.low4w)
             )
@@ -31,7 +31,7 @@ public interface StockDiscrepanciesRepository extends StockRepository {
             WITH discrepancies AS (
                 SELECT s.ticker, hl.high, hl.low
                 FROM public.stocks s
-                JOIN high_low52w hl ON hl.start_date = DATE_TRUNC('week', s.last_updated)
+                JOIN high_low52w hl ON hl.date = DATE_TRUNC('week', s.last_updated)
                                      AND hl.ticker = s.ticker
                 WHERE s.delisted_date IS NULL AND (hl.high <> s.high52w OR hl.low <> s.low52w)
             )
@@ -47,7 +47,7 @@ public interface StockDiscrepanciesRepository extends StockRepository {
             WITH discrepancies AS (
                 SELECT s.ticker, hl.high, hl.low
                 FROM public.stocks s
-                JOIN highest_lowest hl ON hl.start_date = DATE_TRUNC('week', s.last_updated) AND hl.ticker = s.ticker
+                JOIN highest_lowest hl ON hl.date = DATE_TRUNC('week', s.last_updated) AND hl.ticker = s.ticker
                 WHERE s.delisted_date IS NULL AND (hl.high <> s.highest OR hl.low <> s.lowest)
             )
             UPDATE public.stocks s
@@ -172,17 +172,17 @@ public interface StockDiscrepanciesRepository extends StockRepository {
             having yp.high <> s.y_high or yp.low <> s.y_low or yp.open <> s.y_open or yp.close <> s.close or yp.performance <> s.y_performance
                 UNION ALL
             SELECT s.ticker, 'highest_lowest_discrepancy' FROM public.stocks s
-            join highest_lowest hl on hl.start_date = DATE_TRUNC('week', s.last_updated) and hl.ticker = s.ticker and s.delisted_date is null
+            join highest_lowest hl on hl.date = DATE_TRUNC('week', s.last_updated) and hl.ticker = s.ticker and s.delisted_date is null
             group by s.ticker, hl.high, s.highest, hl.low, s.lowest
             having hl.high <> s.highest or hl.low <> s.lowest
                 UNION ALL
             SELECT s.ticker, 'high_low52w_discrepancy' FROM public.stocks s
-            join high_low52w hl on hl.start_date = DATE_TRUNC('week', s.last_updated) and hl.ticker = s.ticker and s.delisted_date is null
+            join high_low52w hl on hl.date = DATE_TRUNC('week', s.last_updated) and hl.ticker = s.ticker and s.delisted_date is null
             group by s.ticker, hl.high, s.high52w, hl.low, s.low52w
             having hl.high <> s.high52w or hl.low <> s.low52w
                 UNION ALL
             SELECT s.ticker, 'high_low4w_discrepancy' FROM public.stocks s
-            join high_low4w hl on hl.start_date = DATE_TRUNC('week', s.last_updated) and hl.ticker = s.ticker and s.delisted_date is null
+            join high_low4w hl on hl.date = DATE_TRUNC('week', s.last_updated) and hl.ticker = s.ticker and s.delisted_date is null
             group by s.ticker, hl.high, s.high4w, hl.low, s.low4w
             having hl.high <> s.high4w or hl.low <> s.low4w
             """, nativeQuery = true)

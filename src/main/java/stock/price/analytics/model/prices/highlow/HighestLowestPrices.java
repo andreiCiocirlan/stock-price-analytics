@@ -10,9 +10,7 @@ import org.springframework.beans.BeanUtils;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.model.stocks.Stock;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
 
 @Entity
 @Getter
@@ -26,14 +24,14 @@ public class HighestLowestPrices extends HighLowForPeriod {
     @Column(name = "high")
     private double highest;
 
-    public HighestLowestPrices(String ticker, LocalDate startDate, double low, double high) {
-        super(ticker, startDate, low, high);
+    public HighestLowestPrices(String ticker, LocalDate date, double low, double high) {
+        super(ticker, date, low, high);
     }
 
     public HighestLowestPrices copyWith(LocalDate startDate) {
         HighestLowestPrices copy = new HighestLowestPrices();
-        BeanUtils.copyProperties(this, copy, "id", "startDate");
-        copy.setStartDate(startDate);
+        BeanUtils.copyProperties(this, copy, "id", "date");
+        copy.setDate(startDate);
         return copy;
     }
 

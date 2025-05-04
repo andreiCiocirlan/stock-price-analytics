@@ -12,9 +12,7 @@ import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.Stock;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
 
 @Setter
 @Getter
@@ -33,12 +31,12 @@ public abstract class HighLowForPeriod implements BusinessEntity {
     private String ticker;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Column(name = "start_date")
-    private LocalDate startDate;
+    @Column(name = "date")
+    private LocalDate date;
 
-    public HighLowForPeriod(String ticker, LocalDate startDate, double low, double high) {
+    public HighLowForPeriod(String ticker, LocalDate date, double low, double high) {
         this.ticker = ticker;
-        this.startDate = startDate;
+        this.date = date;
         this.setLow(low);
         this.setHigh(high);
     }
@@ -76,6 +74,6 @@ public abstract class HighLowForPeriod implements BusinessEntity {
 
     @Override
     public String toString() {
-        return STR."id=\{id}, ticker=\{ticker}, startDate=\{startDate}";
+        return STR."id=\{id}, ticker=\{ticker}, date=\{date}";
     }
 }

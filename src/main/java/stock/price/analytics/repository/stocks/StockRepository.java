@@ -72,33 +72,33 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
     @Modifying
     @Query(value = """
             UPDATE stocks
-                SET high52w = dp.high, low52w = dp.low
-                FROM high_low52w dp
-                WHERE dp.ticker = stocks.ticker
-                  AND dp.ticker = :ticker
-                  AND dp.start_date = (SELECT date_trunc('WEEK', last_updated) FROM stocks WHERE ticker = :ticker)
+                SET high52w = hl.high, low52w = hl.low
+                FROM high_low52w hl
+                WHERE hl.ticker = stocks.ticker
+                  AND hl.ticker = :ticker
+                  AND hl.date = (SELECT date_trunc('WEEK', last_updated) FROM stocks WHERE ticker = :ticker)
             """, nativeQuery = true)
     void updateHighLow52wPricesFor(String ticker);
 
     @Modifying
     @Query(value = """
             UPDATE stocks
-                SET high4w = dp.high, low4w = dp.low
-                FROM high_low4w dp
-                WHERE dp.ticker = stocks.ticker
-                  AND dp.ticker = :ticker
-                  AND dp.start_date = (SELECT date_trunc('WEEK', last_updated) FROM stocks WHERE ticker = :ticker)
+                SET high4w = hl.high, low4w = hl.low
+                FROM high_low4w hl
+                WHERE hl.ticker = stocks.ticker
+                  AND hl.ticker = :ticker
+                  AND hl.date = (SELECT date_trunc('WEEK', last_updated) FROM stocks WHERE ticker = :ticker)
             """, nativeQuery = true)
     void updateHighLow4wPricesFor(String ticker);
 
     @Modifying
     @Query(value = """
             UPDATE stocks
-                SET highest = dp.high, lowest = dp.low
-                FROM highest_lowest dp
-                WHERE dp.ticker = stocks.ticker
-                  AND dp.ticker = :ticker
-                  AND dp.start_date = (SELECT date_trunc('WEEK', last_updated) FROM stocks WHERE ticker = :ticker)
+                SET highest = hl.high, lowest = hl.low
+                FROM highest_lowest hl
+                WHERE hl.ticker = stocks.ticker
+                  AND hl.ticker = :ticker
+                  AND hl.date = (SELECT date_trunc('WEEK', last_updated) FROM stocks WHERE ticker = :ticker)
             """, nativeQuery = true)
     void updateHighestLowestPricesFor(String ticker);
 }
