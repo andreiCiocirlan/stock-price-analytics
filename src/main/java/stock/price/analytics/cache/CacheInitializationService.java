@@ -106,9 +106,12 @@ public class CacheInitializationService {
     }
 
     private void initHighLowPricesCache() {
+        LocalDate currentWeekMonday = dateNowInNY().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDate prevWeekMonday = currentWeekMonday.minusWeeks(1);
+        log.info("prevWeekMonday " + prevWeekMonday);
         for (HighLowPeriod highLowPeriod : HighLowPeriod.values()) {
-            initHighLowPriceCache(highLowPeriod);
-            initPrevWeekHighLowPricesCache(highLowPeriod);
+            initHighLowPriceCache(highLowPeriod, currentWeekMonday);
+            initPrevWeekHighLowPricesCache(highLowPeriod, prevWeekMonday);
         }
         if (!cacheService.weeklyHighLowExists()) {
             stockService.updateHighLowForPeriodFromHLCachesAndAdjustWeekend();
@@ -116,15 +119,12 @@ public class CacheInitializationService {
         }
     }
 
-    private void initPrevWeekHighLowPricesCache(HighLowPeriod highLowPeriod) {
-        LocalDate prevWeekMonday = dateNowInNY().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).minusWeeks(1);
-        log.info("prevWeekMonday " + prevWeekMonday);
+    private void initPrevWeekHighLowPricesCache(HighLowPeriod highLowPeriod, LocalDate prevWeekMonday) {
         List<? extends HighLowForPeriod> prevWeekHighLowPrices = highLowForPeriodService.hlPricesForDate(highLowPeriod, prevWeekMonday);
         highLowPricesCache.addPrevWeekHighLowPrices(prevWeekHighLowPrices, highLowPeriod);
     }
 
-    private void initHighLowPriceCache(HighLowPeriod highLowPeriod) {
-        LocalDate currentWeekMonday = dateNowInNY().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+    private void initHighLowPriceCache(HighLowPeriod highLowPeriod, LocalDate currentWeekMonday) {
         if (!cacheService.weeklyHighLowExists()) { // on first import of the week need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
             LocalDate prevWeekMonday = currentWeekMonday.minusWeeks(1);
             if (highLowPeriod == HighLowPeriod.HIGH_LOW_ALL_TIME) { // for all-time highs/lows simply copy the existing row on Mondays
