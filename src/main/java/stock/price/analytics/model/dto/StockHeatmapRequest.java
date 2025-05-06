@@ -2,7 +2,6 @@ package stock.price.analytics.model.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import stock.price.analytics.model.prices.PriceMilestone;
 import stock.price.analytics.model.prices.ohlc.enums.CandleStickType;
 import stock.price.analytics.model.stocks.enums.MarketState;
@@ -11,7 +10,6 @@ import stock.price.analytics.util.PriceMilestoneFactory;
 import java.util.List;
 
 @Getter
-@Setter
 @NoArgsConstructor
 public class StockHeatmapRequest {
     private String timeFrame;
