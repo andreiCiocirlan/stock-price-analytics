@@ -158,15 +158,15 @@ public class TickerService {
                             .min()
                             .orElseThrow();
 
-                    LocalDate startDate = prices.get(i).getStartDate();
+                    LocalDate date = prices.get(i).getStartDate();
 
                     HighLowForPeriod highLowForPeriod = switch (highLowPeriod) {
                         case HIGH_LOW_4W ->
-                                new HighLow4w(ticker, startDate, lowestPriceForPeriod, highestPriceForPeriod);
+                                new HighLow4w(ticker, date, lowestPriceForPeriod, highestPriceForPeriod);
                         case HIGH_LOW_52W ->
-                                new HighLow52Week(ticker, startDate, lowestPriceForPeriod, highestPriceForPeriod);
+                                new HighLow52Week(ticker, date, lowestPriceForPeriod, highestPriceForPeriod);
                         case HIGH_LOW_ALL_TIME ->
-                                new HighestLowestPrices(ticker, startDate, lowestPriceForPeriod, highestPriceForPeriod);
+                                new HighestLowestPrices(ticker, date, lowestPriceForPeriod, highestPriceForPeriod);
                     };
                     highLowForPeriodPrices.computeIfAbsent(highLowPeriod, _ -> new ArrayList<>()).add(highLowForPeriod);
                 }
