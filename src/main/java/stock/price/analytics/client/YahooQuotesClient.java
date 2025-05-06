@@ -136,7 +136,7 @@ public class YahooQuotesClient {
         int maxRetries = 3;
         int retryCount = 0;
 
-        log.info("quotePricesJSON called");
+        log.info("quotePricesJSON called {} {}", CRUMB_COOKIE, COOKIE_FC_YAHOO);
 
         while (quoteResponse == null || quoteResponse.isEmpty()) {
             if (retryCount >= maxRetries) {
@@ -155,7 +155,7 @@ public class YahooQuotesClient {
                 if (entity != null) {
                     quoteResponse = EntityUtils.toString(entity);
                     if (quoteResponse != null && !quoteResponse.contains("\"error\":null")) {
-                        log.warn("ERROR for tickers {}", tickers);
+                        log.warn("ERROR for URL {}", URL);
                         log.warn("quoteResponse {}", quoteResponse);
                     }
                 } else {
