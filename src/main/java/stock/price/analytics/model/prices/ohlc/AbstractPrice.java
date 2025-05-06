@@ -63,7 +63,7 @@ public abstract class AbstractPrice implements BusinessEntity {
 
     private void setDateFrom(LocalDate date) {
         switch (getTimeframe()) {
-            case DAILY -> throw new IllegalStateException("Unexpected setDateFrom in DailyPrice");
+            case DAILY -> this.setDate(date);
             case WEEKLY -> this.setDate(date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)));
             case MONTHLY -> this.setDate(date.with(TemporalAdjusters.firstDayOfMonth()));
             case QUARTERLY -> this.setDate(LocalDate.of(date.getYear(), date.getMonth().firstMonthOfQuarter().getValue(), 1));
