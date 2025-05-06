@@ -47,7 +47,7 @@ public class FairValueGapService {
             fvg.setUnfilledHigh1(fvg.getHigh());
         }
         for (AbstractPrice price : pricesForTicker) {
-            boolean isBeforeOrEqualFVGDate = price.getStartDate().isBefore(fvg.getDate()) || price.getStartDate().isEqual(fvg.getDate());
+            boolean isBeforeOrEqualFVGDate = price.getDate().isBefore(fvg.getDate()) || price.getDate().isEqual(fvg.getDate());
             boolean isImmediatelyAfterFVG = price.isImmediatelyAfter(fvg);
             if (isBeforeOrEqualFVGDate || isImmediatelyAfterFVG) {
                 // Skip prices before, or immediately after FVG date

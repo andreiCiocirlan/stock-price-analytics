@@ -32,7 +32,7 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
                 FROM weekly_prices dp
                 WHERE dp.ticker = stocks.ticker
                   AND dp.ticker = :ticker
-                  AND dp.start_date = (SELECT date_trunc('WEEK', last_updated) FROM stocks WHERE ticker = :ticker)
+                  AND dp.date = (SELECT date_trunc('WEEK', last_updated) FROM stocks WHERE ticker = :ticker)
             """, nativeQuery = true)
     void updateStockWeeklyPricesFor(String ticker);
 
@@ -43,7 +43,7 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
                 FROM monthly_prices dp
                 WHERE dp.ticker = stocks.ticker
                   AND dp.ticker = :ticker
-                  AND dp.start_date = (SELECT date_trunc('MONTH', last_updated) FROM stocks WHERE ticker = :ticker)
+                  AND dp.date = (SELECT date_trunc('MONTH', last_updated) FROM stocks WHERE ticker = :ticker)
             """, nativeQuery = true)
     void updateStockMonthlyPricesFor(String ticker);
 
@@ -54,7 +54,7 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
                 FROM quarterly_prices dp
                 WHERE dp.ticker = stocks.ticker
                   AND dp.ticker = :ticker
-                  AND dp.start_date = (SELECT date_trunc('QUARTER', last_updated) FROM stocks WHERE ticker = :ticker)
+                  AND dp.date = (SELECT date_trunc('QUARTER', last_updated) FROM stocks WHERE ticker = :ticker)
             """, nativeQuery = true)
     void updateStockQuarterlyPricesFor(String ticker);
 
@@ -65,7 +65,7 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
                 FROM yearly_prices dp
                 WHERE dp.ticker = stocks.ticker
                   AND dp.ticker = :ticker
-                  AND dp.start_date = (SELECT date_trunc('YEAR', last_updated) FROM stocks WHERE ticker = :ticker)
+                  AND dp.date = (SELECT date_trunc('YEAR', last_updated) FROM stocks WHERE ticker = :ticker)
             """, nativeQuery = true)
     void updateStockYearlyPricesFor(String ticker);
 

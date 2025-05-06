@@ -13,23 +13,23 @@ public interface QuarterlyPriceRepository extends JpaRepository<QuarterlyPrice, 
     @Query(value = """
                 SELECT *
                 FROM quarterly_prices
-                WHERE start_date BETWEEN (DATE_TRUNC('quarter', CURRENT_DATE) - INTERVAL '6 month') AND CURRENT_DATE
+                WHERE date BETWEEN (DATE_TRUNC('quarter', CURRENT_DATE) - INTERVAL '6 month') AND CURRENT_DATE
                 AND ticker in (:tickers)
-                ORDER BY ticker, start_date DESC
+                ORDER BY ticker, date DESC
             """, nativeQuery = true)
     List<QuarterlyPrice> findPreviousThreeQuarterlyPricesForTickers(List<String> tickers);
 
-    List<QuarterlyPrice> findByTickerAndStartDateLessThanEqual(String ticker, LocalDate date);
+    List<QuarterlyPrice> findByTickerAndDateLessThanEqual(String ticker, LocalDate date);
 
     @Modifying
     @Query(value = """
             WITH quarters_prev_close AS (
             	SELECT
             		ticker,
-            		start_date,
+            		date,
             		open as opening_price,
             		close as closing_price,
-            		LAG(close) OVER (PARTITION BY ticker ORDER BY start_date) AS previous_close
+            		LAG(close) OVER (PARTITION BY ticker ORDER BY date) AS previous_close
             	FROM
             		quarterly_prices
             )
@@ -40,7 +40,7 @@ public interface QuarterlyPriceRepository extends JpaRepository<QuarterlyPrice, 
             		ELSE ROUND((closing_price::numeric - previous_close::numeric) / previous_close::numeric * 100, 2)
             	END
             FROM quarters_prev_close qpc
-            WHERE quarterly_prices.ticker = qpc.ticker and quarterly_prices.start_date = qpc.start_date;
+            WHERE quarterly_prices.ticker = qpc.ticker and quarterly_prices.date = qpc.date;
             """, nativeQuery = true)
     void quarterlyPricesUpdatePerformance();
 }

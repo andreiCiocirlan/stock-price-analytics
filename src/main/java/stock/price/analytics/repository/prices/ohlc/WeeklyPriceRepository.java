@@ -13,12 +13,12 @@ public interface WeeklyPriceRepository extends JpaRepository<WeeklyPrice, Long> 
     @Query(value = """
                 SELECT *
                 FROM weekly_prices
-                WHERE start_date BETWEEN (DATE_TRUNC('week', CURRENT_DATE) - INTERVAL '2 week') AND CURRENT_DATE
+                WHERE date BETWEEN (DATE_TRUNC('week', CURRENT_DATE) - INTERVAL '2 week') AND CURRENT_DATE
                 AND ticker in (:tickers)
-                ORDER BY ticker, start_date DESC
+                ORDER BY ticker, date DESC
             """, nativeQuery = true)
     List<WeeklyPrice> findPreviousThreeWeeklyPricesForTickers(@Param("tickers") List<String> tickers);
 
-    List<WeeklyPrice> findByTickerAndStartDateLessThanEqual(String ticker, LocalDate date);
+    List<WeeklyPrice> findByTickerAndDateLessThanEqual(String ticker, LocalDate date);
 
 }

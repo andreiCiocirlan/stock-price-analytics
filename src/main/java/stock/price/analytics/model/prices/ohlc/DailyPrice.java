@@ -1,12 +1,10 @@
 package stock.price.analytics.model.prices.ohlc;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.springframework.format.annotation.DateTimeFormat;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.stocks.Stock;
 
@@ -20,18 +18,12 @@ import java.util.Objects;
 @NoArgsConstructor
 public class DailyPrice extends AbstractPrice {
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Column(name = "date")
-    private LocalDate date;
-
     public DailyPrice(String ticker, @NonNull LocalDate date, CandleOHLC candleOHLC) {
-        super(ticker, candleOHLC);
-        this.date = date;
+        super(ticker, date, candleOHLC);
     }
 
     public DailyPrice(String ticker, @NonNull LocalDate date, double performance, CandleOHLC candleOHLC) {
-        super(ticker, candleOHLC);
-        this.date = date;
+        super(ticker, date, candleOHLC);
         this.setPerformance(performance);
     }
 
@@ -54,11 +46,6 @@ public class DailyPrice extends AbstractPrice {
     }
 
     @Override
-    public LocalDate getStartDate() {
-        return date;
-    }
-
-    @Override
     public StockTimeframe getTimeframe() {
         return StockTimeframe.DAILY;
     }
@@ -68,13 +55,8 @@ public class DailyPrice extends AbstractPrice {
     }
 
     @Override
-    public void setStartDateFrom(LocalDate date) {
-        throw new IllegalStateException("Unexpected setStartDateFrom in DailyPrice");
-    }
-
-    @Override
     public String toString() {
-        return STR."Daily_OHLC {  date=\{date} \{super.toString()}";
+        return STR."Daily_OHLC {  \{super.toString()}";
     }
 
     @Override
@@ -84,7 +66,7 @@ public class DailyPrice extends AbstractPrice {
         DailyPrice that = (DailyPrice) o;
 
         return Objects.equals(getTicker(), that.getTicker()) &&
-               Objects.equals(date, that.date) &&
+               Objects.equals(getDate(), that.getDate()) &&
                Double.compare(getOpen(), that.getOpen()) == 0 &&
                Double.compare(getHigh(), that.getHigh()) == 0 &&
                Double.compare(getLow(), that.getLow()) == 0 &&
@@ -93,6 +75,6 @@ public class DailyPrice extends AbstractPrice {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getTicker(), date, getOpen(), getHigh(), getLow(), getClose());
+        return Objects.hash(getTicker(), getDate(), getOpen(), getHigh(), getLow(), getClose());
     }
 }

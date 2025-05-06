@@ -191,7 +191,7 @@ public class CacheInitializationService {
                 .stream()
                 .collect(Collectors.groupingBy(AbstractPrice::getTicker))
                 .values().stream()
-                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(AbstractPrice::getStartDate).reversed()).limit(2))
+                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(AbstractPrice::getDate).reversed()).limit(2))
                 .collect(Collectors.groupingBy(AbstractPrice::getTicker));
         List<stock.price.analytics.model.prices.ohlc.AbstractPrice> latestPrices = new ArrayList<>();
         Map<String, Double> previousCloseByTicker = new HashMap<>();

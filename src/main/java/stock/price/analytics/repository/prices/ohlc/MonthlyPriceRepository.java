@@ -13,12 +13,12 @@ public interface MonthlyPriceRepository extends JpaRepository<MonthlyPrice, Long
     @Query(value = """
                 SELECT *
                 FROM monthly_prices
-                WHERE start_date BETWEEN (DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '2 month') AND CURRENT_DATE
+                WHERE date BETWEEN (DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '2 month') AND CURRENT_DATE
                 AND ticker in (:tickers)
-                ORDER BY ticker, start_date DESC
+                ORDER BY ticker, date DESC
             """, nativeQuery = true)
     List<MonthlyPrice> findPreviousThreeMonthlyPricesForTickers(@Param("tickers") List<String> tickers);
 
-    List<MonthlyPrice> findByTickerAndStartDateLessThanEqual(String ticker, LocalDate date);
+    List<MonthlyPrice> findByTickerAndDateLessThanEqual(String ticker, LocalDate date);
 
 }

@@ -17,19 +17,19 @@ public interface HighLowForPeriodRepository extends JpaRepository<HighLowForPeri
             WITH latest_prices AS (
                 SELECT
                     wp.ticker,
-                    start_date,
+                    date,
                     wp.high,
                     wp.low,
-                    ROW_NUMBER() OVER (PARTITION BY wp.ticker ORDER BY wp.start_date DESC) AS rn
+                    ROW_NUMBER() OVER (PARTITION BY wp.ticker ORDER BY wp.date DESC) AS rn
                 FROM weekly_prices wp
                 WHERE
-                    wp.start_date >= CAST(:tradingDate AS DATE) - INTERVAL '75 weeks'  -- Adjust to get the last 75 weeks (buffer zone for inactive tickers between periods)
+                    wp.date >= CAST(:tradingDate AS DATE) - INTERVAL '75 weeks'  -- Adjust to get the last 75 weeks (buffer zone for inactive tickers between periods)
             	and wp.ticker in (select ticker from stocks where xtb_stock = true and delisted_date is null)
             ),
             filtered_prices AS (
                 SELECT
                     lp.ticker,
-                    lp.start_date,
+                    lp.date,
                     lp.high,
                     lp.low
                 FROM latest_prices lp

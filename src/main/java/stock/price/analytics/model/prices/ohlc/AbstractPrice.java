@@ -6,13 +6,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.format.annotation.DateTimeFormat;
 import stock.price.analytics.model.BusinessEntity;
 import stock.price.analytics.model.gaps.FairValueGap;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.enums.CandleStickType;
 import stock.price.analytics.model.stocks.Stock;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 
 @Getter
 @Setter
@@ -45,17 +48,28 @@ public abstract class AbstractPrice implements BusinessEntity {
     @Column(name = "performance")
     private double performance;
 
-    public AbstractPrice(String ticker, CandleOHLC candleOHLC) {
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @Column(name = "date")
+    private LocalDate date;
+    
+    public AbstractPrice(String ticker, LocalDate date, CandleOHLC candleOHLC) {
         this.ticker = ticker;
         this.high = candleOHLC.high();
         this.low = candleOHLC.low();
         this.open = candleOHLC.open();
         this.close = candleOHLC.close();
+        setDateFrom(date);
     }
 
-    public abstract LocalDate getStartDate();
-
-    public abstract void setStartDateFrom(LocalDate date);
+    private void setDateFrom(LocalDate date) {
+        switch (getTimeframe()) {
+            case DAILY -> throw new IllegalStateException("Unexpected setDateFrom in DailyPrice");
+            case WEEKLY -> this.setDate(date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)));
+            case MONTHLY -> this.setDate(date.with(TemporalAdjusters.firstDayOfMonth()));
+            case QUARTERLY -> this.setDate(LocalDate.of(date.getYear(), date.getMonth().firstMonthOfQuarter().getValue(), 1));
+            case YEARLY -> this.setDate(date.with(TemporalAdjusters.firstDayOfYear()));
+        }
+    }
 
     public abstract StockTimeframe getTimeframe();
 
@@ -83,11 +97,11 @@ public abstract class AbstractPrice implements BusinessEntity {
     // Check if the price date is immediately after the FVG date based on the timeframe
     public boolean isImmediatelyAfter(FairValueGap fvg) {
         return (switch (this.getTimeframe()) {
-            case DAILY -> this.getStartDate().minusDays(1);
-            case WEEKLY -> this.getStartDate().minusWeeks(1);
-            case MONTHLY -> this.getStartDate().minusMonths(1);
-            case QUARTERLY -> this.getStartDate().minusMonths(3);
-            case YEARLY -> this.getStartDate().minusYears(1);
+            case DAILY -> this.getDate().minusDays(1);
+            case WEEKLY -> this.getDate().minusWeeks(1);
+            case MONTHLY -> this.getDate().minusMonths(1);
+            case QUARTERLY -> this.getDate().minusMonths(3);
+            case YEARLY -> this.getDate().minusYears(1);
         }).isEqual(fvg.getDate());
     }
 

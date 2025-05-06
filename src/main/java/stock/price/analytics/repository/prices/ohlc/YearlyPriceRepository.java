@@ -13,12 +13,12 @@ public interface YearlyPriceRepository extends JpaRepository<YearlyPrice, Long> 
     @Query(value = """
                 SELECT *
                 FROM yearly_prices
-                WHERE start_date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '2 year') AND CURRENT_DATE
+                WHERE date BETWEEN (DATE_TRUNC('year', CURRENT_DATE) - INTERVAL '2 year') AND CURRENT_DATE
                 AND ticker in (:tickers)
-                ORDER BY ticker, start_date DESC
+                ORDER BY ticker, date DESC
             """, nativeQuery = true)
     List<YearlyPrice> findPreviousThreeYearlyPricesForTickers(@Param("tickers") List<String> tickers);
 
-    List<YearlyPrice> findByTickerAndStartDateLessThanEqual(String ticker, LocalDate date);
+    List<YearlyPrice> findByTickerAndDateLessThanEqual(String ticker, LocalDate date);
 
 }

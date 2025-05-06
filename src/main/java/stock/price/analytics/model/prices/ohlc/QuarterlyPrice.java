@@ -1,17 +1,14 @@
 package stock.price.analytics.model.prices.ohlc;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.stocks.Stock;
 
 import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
 
 @Entity
 @Table(name = "quarterly_prices")
@@ -20,18 +17,12 @@ import java.time.temporal.TemporalAdjusters;
 @NoArgsConstructor
 public class QuarterlyPrice extends AbstractPrice {
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Column(name = "start_date")
-    private LocalDate startDate;
-
     public QuarterlyPrice(String ticker, LocalDate date, CandleOHLC candleOHLC) {
-        super(ticker, candleOHLC);
-        setStartDateFrom(date);
+        super(ticker, date, candleOHLC);
     }
 
     public QuarterlyPrice(String ticker, LocalDate date, double performance, CandleOHLC candleOHLC) {
-        super(ticker, candleOHLC);
-        setStartDateFrom(date);
+        super(ticker, date, candleOHLC);
         this.setPerformance(performance);
     }
 
@@ -57,13 +48,8 @@ public class QuarterlyPrice extends AbstractPrice {
     }
 
     @Override
-    public void setStartDateFrom(LocalDate date) {
-        startDate = LocalDate.of(date.getYear(), date.getMonth().firstMonthOfQuarter().getValue(), 1);
-    }
-
-    @Override
     public String toString() {
-        return STR."Quarterly_OHLC {  StartDate=\{startDate} \{super.toString()}";
+        return STR."Quarterly_OHLC {  \{super.toString()}";
     }
 
 }

@@ -116,7 +116,7 @@ public class TickerService {
                 .collect(Collectors.toMap(
                         p -> p.getTimeframe().name() + "-" + p.getTicker(),
                         Function.identity(),
-                        BinaryOperator.maxBy(Comparator.comparing(AbstractPrice::getStartDate))
+                        BinaryOperator.maxBy(Comparator.comparing(AbstractPrice::getDate))
                 ))
                 .values().stream()
                 .toList();
@@ -139,7 +139,7 @@ public class TickerService {
             for (Map.Entry<String, List<AbstractPrice>> entry : weeklyPricesByTicker.entrySet()) {
                 String ticker = entry.getKey();
                 List<AbstractPrice> prices = entry.getValue();
-                prices.sort(Comparator.comparing(AbstractPrice::getStartDate).reversed());
+                prices.sort(Comparator.comparing(AbstractPrice::getDate).reversed());
 
                 // NBIS is a newer ticker, for high_52w it had only 26 weeks of data
                 if (prices.size() < intervalNrWeeks) {
@@ -158,7 +158,7 @@ public class TickerService {
                             .min()
                             .orElseThrow();
 
-                    LocalDate date = prices.get(i).getStartDate();
+                    LocalDate date = prices.get(i).getDate();
 
                     HighLowForPeriod highLowForPeriod = switch (highLowPeriod) {
                         case HIGH_LOW_4W ->

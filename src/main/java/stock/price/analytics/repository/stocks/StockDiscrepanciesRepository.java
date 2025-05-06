@@ -60,7 +60,7 @@ public interface StockDiscrepanciesRepository extends StockRepository {
     @Query(value = """
             SELECT s.*
             FROM public.stocks s
-            JOIN weekly_prices wp ON wp.start_date = DATE_TRUNC('week', s.last_updated) AND wp.ticker = s.ticker
+            JOIN weekly_prices wp ON wp.date = DATE_TRUNC('week', s.last_updated) AND wp.ticker = s.ticker
             WHERE s.delisted_date IS NULL AND (wp.open <> s.w_open)
             """, nativeQuery = true)
     List<Stock> findStocksWithWeeklyOpeningDiscrepancy();
@@ -68,7 +68,7 @@ public interface StockDiscrepanciesRepository extends StockRepository {
     @Query(value = """
             SELECT s.*
             FROM public.stocks s
-            JOIN monthly_prices mp ON mp.start_date = DATE_TRUNC('month', s.last_updated) AND mp.ticker = s.ticker
+            JOIN monthly_prices mp ON mp.date = DATE_TRUNC('month', s.last_updated) AND mp.ticker = s.ticker
             WHERE s.delisted_date IS NULL AND (mp.open <> s.m_open)
             """, nativeQuery = true)
     List<Stock> findStocksWithMonthlyOpeningDiscrepancy();
@@ -76,7 +76,7 @@ public interface StockDiscrepanciesRepository extends StockRepository {
     @Query(value = """
             SELECT s.*
             FROM public.stocks s
-            JOIN quarterly_prices qp ON qp.start_date = DATE_TRUNC('quarter', s.last_updated) AND qp.ticker = s.ticker
+            JOIN quarterly_prices qp ON qp.date = DATE_TRUNC('quarter', s.last_updated) AND qp.ticker = s.ticker
             WHERE s.delisted_date IS NULL AND (qp.open <> s.q_open)
             """, nativeQuery = true)
     List<Stock> findStocksWithQuarterlyOpeningDiscrepancy();
@@ -84,7 +84,7 @@ public interface StockDiscrepanciesRepository extends StockRepository {
     @Query(value = """
             SELECT s.*
             FROM public.stocks s
-            JOIN yearly_prices yp ON yp.start_date = DATE_TRUNC('year', s.last_updated) AND yp.ticker = s.ticker
+            JOIN yearly_prices yp ON yp.date = DATE_TRUNC('year', s.last_updated) AND yp.ticker = s.ticker
             WHERE s.delisted_date IS NULL AND (yp.open <> s.y_open)
             """, nativeQuery = true)
     List<Stock> findStocksWithYearlyOpeningDiscrepancy();
@@ -94,7 +94,7 @@ public interface StockDiscrepanciesRepository extends StockRepository {
             WITH discrepancies AS (
                 SELECT s.ticker, wp.open
                 FROM public.stocks s
-                JOIN weekly_prices wp ON wp.start_date = DATE_TRUNC('week', s.last_updated) AND wp.ticker = s.ticker
+                JOIN weekly_prices wp ON wp.date = DATE_TRUNC('week', s.last_updated) AND wp.ticker = s.ticker
                 WHERE s.delisted_date IS NULL AND (wp.open <> s.w_open)
             )
             UPDATE stocks s SET w_open = dscr.open
@@ -108,7 +108,7 @@ public interface StockDiscrepanciesRepository extends StockRepository {
             WITH discrepancies AS (
                 SELECT s.ticker, mp.open
                 FROM public.stocks s
-                JOIN monthly_prices mp ON mp.start_date = DATE_TRUNC('month', s.last_updated) AND mp.ticker = s.ticker
+                JOIN monthly_prices mp ON mp.date = DATE_TRUNC('month', s.last_updated) AND mp.ticker = s.ticker
                 WHERE s.delisted_date IS NULL AND (mp.open <> s.m_open)
             )
             UPDATE stocks s SET m_open = dscr.open
@@ -122,7 +122,7 @@ public interface StockDiscrepanciesRepository extends StockRepository {
             WITH discrepancies AS (
                 SELECT s.ticker, qp.open
                 FROM public.stocks s
-                JOIN quarterly_prices qp ON qp.start_date = DATE_TRUNC('quarter', s.last_updated) AND qp.ticker = s.ticker
+                JOIN quarterly_prices qp ON qp.date = DATE_TRUNC('quarter', s.last_updated) AND qp.ticker = s.ticker
                 WHERE s.delisted_date IS NULL AND (qp.open <> s.q_open)
             )
             UPDATE stocks s SET q_open = dscr.open
@@ -136,7 +136,7 @@ public interface StockDiscrepanciesRepository extends StockRepository {
             WITH discrepancies AS (
                 SELECT s.ticker, yp.open
                 FROM public.stocks s
-                JOIN yearly_prices yp ON yp.start_date = DATE_TRUNC('year', s.last_updated) AND yp.ticker = s.ticker
+                JOIN yearly_prices yp ON yp.date = DATE_TRUNC('year', s.last_updated) AND yp.ticker = s.ticker
                 WHERE s.delisted_date IS NULL AND (yp.open <> s.y_open)
             )
             UPDATE stocks s SET y_open = dscr.open
@@ -152,22 +152,22 @@ public interface StockDiscrepanciesRepository extends StockRepository {
             having dp.high <> s.d_high or dp.low <> s.d_low or dp.open <> s.d_open or dp.close <> s.close or dp.performance <> s.d_performance
                 UNION ALL
             SELECT s.ticker, 'week_discrepancy' FROM public.stocks s
-            join weekly_prices wp on wp.start_date = DATE_TRUNC('week', s.last_updated) and wp.ticker = s.ticker and s.delisted_date is null
+            join weekly_prices wp on wp.date = DATE_TRUNC('week', s.last_updated) and wp.ticker = s.ticker and s.delisted_date is null
             group by s.ticker, wp.high, wp.low, wp.open, wp.close, wp.performance, s.w_high, s.w_low, s.w_open, s.close, s.w_performance
             having wp.high <> s.w_high or wp.low <> s.w_low or wp.open <> s.w_open or wp.close <> s.close or wp.performance <> s.w_performance
                 UNION ALL
             SELECT s.ticker, 'month_discrepancy' FROM public.stocks s
-            join monthly_prices mp on mp.start_date = DATE_TRUNC('month', s.last_updated) and mp.ticker = s.ticker and s.delisted_date is null
+            join monthly_prices mp on mp.date = DATE_TRUNC('month', s.last_updated) and mp.ticker = s.ticker and s.delisted_date is null
             group by s.ticker, mp.high, mp.low, mp.open, mp.close, mp.performance, s.m_high, s.m_low, s.m_open, s.close, s.m_performance
             having mp.high <> s.m_high or mp.low <> s.m_low or mp.open <> s.m_open or mp.close <> s.close or mp.performance <> s.m_performance
                 UNION ALL
             SELECT s.ticker, 'quarter_discrepancy' FROM public.stocks s
-            join quarterly_prices qp on qp.start_date = DATE_TRUNC('quarter', s.last_updated) and qp.ticker = s.ticker and s.delisted_date is null
+            join quarterly_prices qp on qp.date = DATE_TRUNC('quarter', s.last_updated) and qp.ticker = s.ticker and s.delisted_date is null
             group by s.ticker, qp.high, qp.low, qp.open, qp.close, qp.performance, s.q_high, s.q_low, s.q_open, s.close, s.q_performance
             having qp.high <> s.q_high or qp.low <> s.q_low or qp.open <> s.q_open or qp.close <> s.close or qp.performance <> s.q_performance
                 UNION ALL
             SELECT s.ticker, 'year_discrepancy' FROM public.stocks s
-            join yearly_prices yp on yp.start_date = DATE_TRUNC('year', s.last_updated) and yp.ticker = s.ticker and s.delisted_date is null
+            join yearly_prices yp on yp.date = DATE_TRUNC('year', s.last_updated) and yp.ticker = s.ticker and s.delisted_date is null
             group by s.ticker, yp.high, yp.low, yp.open, yp.close, yp.performance, s.y_high, s.y_low, s.y_open, s.close, s.y_performance
             having yp.high <> s.y_high or yp.low <> s.y_low or yp.open <> s.y_open or yp.close <> s.close or yp.performance <> s.y_performance
                 UNION ALL

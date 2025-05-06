@@ -68,7 +68,6 @@ public final class QueryUtil {
     public static String savePriceGapsQueryFor(List<String> tickers, StockTimeframe timeframe, boolean allHistoricalData, boolean firstWeeklyImportDone) {
         String tickersFormatted = tickers.stream().map(ticker -> STR."'\{ticker}'").collect(Collectors.joining(", "));
         String dbTable = timeframe.dbTableOHLC();
-        String dateColumn = timeframe == StockTimeframe.DAILY ? "date" : "start_date";
         String dateTruncPeriod = timeframe.toDateTruncPeriod();
         String interval = timeframe.toInterval();
         String intervalPeriod = timeframe.toIntervalPeriod();
@@ -91,12 +90,12 @@ public final class QueryUtil {
                 SELECT
                     ticker,
                     close AS closing_price,
-                    \{dateColumn} AS closing_date,
-                    ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY \{dateColumn} DESC) AS row_num
+                    date AS closing_date,
+                    ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY date DESC) AS row_num
                 FROM \{dbTable}
                 WHERE ticker in (\{tickersFormatted})
             	    AND ticker in (select ticker from stocks where cfd_margin in (0.2, 0.25, 0.33, 0.5))
-                    AND \{dateColumn} between CURRENT_DATE - INTERVAL '\{lookBackCount} \{intervalPeriod}' and (SELECT max_date from max_date_cte)
+                    AND date between CURRENT_DATE - INTERVAL '\{lookBackCount} \{intervalPeriod}' and (SELECT max_date from max_date_cte)
             ),
             unfilled_gaps AS (
                 SELECT
@@ -108,7 +107,7 @@ public final class QueryUtil {
                     SELECT 1
                     FROM \{dbTable} p2
                     WHERE p2.ticker = p1.ticker
-                    AND p2.\{dateColumn} > p1.closing_date
+                    AND p2.date > p1.closing_date
                     AND p1.closing_price BETWEEN p2.low AND p2.high
                 )
             )
@@ -126,7 +125,6 @@ public final class QueryUtil {
 
     public static String findFVGsQueryFrom(StockTimeframe timeframe, List<String> tickers, boolean allHistoricalData) {
         String date = lookbackDateFor(timeframe, allHistoricalData).format(DateTimeFormatter.ISO_LOCAL_DATE);
-        String dateColumn = timeframe == StockTimeframe.DAILY ? "date" : "start_date";
         String tickersFormatted = tickers.stream().map(ticker -> STR."'\{ticker}'").collect(Collectors.joining(", "));
         String dateTruncPeriod = timeframe.toDateTruncPeriod();
         String dbTable = timeframe.dbTableOHLC();
@@ -135,11 +133,11 @@ public final class QueryUtil {
                 WITH price_data AS (
                     SELECT
                         ticker,
-                        date_trunc('\{dateTruncPeriod}', \{dateColumn})::date AS wmy_date,
+                        date_trunc('\{dateTruncPeriod}', date)::date AS wmy_date,
                         open, high, low, close,
-                        ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY \{dateColumn}) AS rn
+                        ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY date) AS rn
                     FROM \{dbTable}
-                    WHERE \{dateColumn} >= '\{date}'::date and ticker in (\{tickersFormatted})
+                    WHERE date >= '\{date}'::date and ticker in (\{tickersFormatted})
                 ),
                 fvg_candidates AS (
                     SELECT a.ticker,
@@ -247,14 +245,14 @@ public final class QueryUtil {
 
         return STR."""
                 WITH weekly_dates AS (
-                    SELECT DATE_TRUNC('week', '\{date}'::date) \{allTimeHistoricalInterval} AS start_date
+                    SELECT DATE_TRUNC('week', '\{date}'::date) \{allTimeHistoricalInterval} AS date
                 ),
                 cumulative_prices AS (
                     SELECT
                         wp.ticker,
-                        DATE_TRUNC('week', wp.start_date) AS start_date,
-                        MAX(wp.high) OVER (PARTITION BY wp.ticker ORDER BY wp.start_date ROWS BETWEEN \{intervalPreceding} PRECEDING AND CURRENT ROW) AS cumulative_high,
-                        MIN(wp.low) OVER (PARTITION BY wp.ticker ORDER BY wp.start_date ROWS BETWEEN \{intervalPreceding} PRECEDING AND CURRENT ROW) AS cumulative_low
+                        DATE_TRUNC('week', wp.date) AS date,
+                        MAX(wp.high) OVER (PARTITION BY wp.ticker ORDER BY wp.date ROWS BETWEEN \{intervalPreceding} PRECEDING AND CURRENT ROW) AS cumulative_high,
+                        MIN(wp.low) OVER (PARTITION BY wp.ticker ORDER BY wp.date ROWS BETWEEN \{intervalPreceding} PRECEDING AND CURRENT ROW) AS cumulative_low
                     FROM weekly_prices wp
                     WHERE wp.ticker in (\{tickersFormatted})
                 )
@@ -263,10 +261,10 @@ public final class QueryUtil {
                     nextval('sequence_high_low') AS id,
                     cp.cumulative_high AS high,
                     cp.cumulative_low AS low,
-                    date_trunc('week', wd.start_date::date)::date  AS date,
+                    date_trunc('week', wd.date::date)::date  AS date,
                     cp.ticker AS ticker
                 FROM weekly_dates wd
-                JOIN cumulative_prices cp ON cp.start_date = wd.start_date
+                JOIN cumulative_prices cp ON cp.date = wd.date
                 ON CONFLICT (ticker, date)
                 DO UPDATE SET
                     high = EXCLUDED.high,
@@ -285,7 +283,6 @@ public final class QueryUtil {
     public static String averageCandleRangeQuery(StockTimeframe timeframe) {
         String tableName = timeframe.dbTableOHLC();
         String intervalPeriod = timeframe.toIntervalPeriod();
-        String dateColumn = timeframe == StockTimeframe.DAILY ? "date" : "start_date";
         return STR."""
                 SELECT ticker, AVG(high - low) AS avg_range
                 FROM (
@@ -293,9 +290,9 @@ public final class QueryUtil {
                         ticker,
                         high,
                         low,
-                        ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY \{dateColumn} DESC) AS rn
+                        ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY date DESC) AS rn
                     FROM \{tableName}
-                	where \{dateColumn} > current_date - interval '4 \{intervalPeriod}'
+                	where date > current_date - interval '4 \{intervalPeriod}'
                 ) sub
                 WHERE rn <= 15
                 GROUP BY ticker

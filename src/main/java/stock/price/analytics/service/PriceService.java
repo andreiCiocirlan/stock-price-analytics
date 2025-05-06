@@ -53,10 +53,10 @@ public class PriceService {
         LocalDate splitDateMonthlyCutoff = stockSplitDate.with(firstDayOfMonth());
         LocalDate splitDateQuarterlyCutoff = LocalDate.of(stockSplitDate.getYear(), stockSplitDate.getMonth().firstMonthOfQuarter().getValue(), 1);
         LocalDate splitDateYearlyCutoff = stockSplitDate.with(firstDayOfYear());
-        List<WeeklyPrice> weeklyPricesToUpdate = weeklyPriceRepository.findByTickerAndStartDateLessThanEqual(ticker, splitDateWeeklyCutoff);
-        List<MonthlyPrice> monthlyPricesToUpdate = monthlyPriceRepository.findByTickerAndStartDateLessThanEqual(ticker, splitDateMonthlyCutoff);
-        List<QuarterlyPrice> quarterlyPricesToUpdate = quarterlyPriceRepository.findByTickerAndStartDateLessThanEqual(ticker, splitDateQuarterlyCutoff);
-        List<YearlyPrice> yearlyPricesToUpdate = yearlyPriceRepository.findByTickerAndStartDateLessThanEqual(ticker, splitDateYearlyCutoff);
+        List<WeeklyPrice> weeklyPricesToUpdate = weeklyPriceRepository.findByTickerAndDateLessThanEqual(ticker, splitDateWeeklyCutoff);
+        List<MonthlyPrice> monthlyPricesToUpdate = monthlyPriceRepository.findByTickerAndDateLessThanEqual(ticker, splitDateMonthlyCutoff);
+        List<QuarterlyPrice> quarterlyPricesToUpdate = quarterlyPriceRepository.findByTickerAndDateLessThanEqual(ticker, splitDateQuarterlyCutoff);
+        List<YearlyPrice> yearlyPricesToUpdate = yearlyPriceRepository.findByTickerAndDateLessThanEqual(ticker, splitDateYearlyCutoff);
 
         // Update daily prices before stockSplitDate and keep others unchanged
         List<DailyPrice> updatedDailyPrices = dailyPricesToUpdate.stream()
@@ -78,7 +78,7 @@ public class PriceService {
                         Map.Entry::getKey,
                         e -> e.getValue().stream()
                                 .collect(Collectors.toMap(
-                                        p -> p.getTicker() + "|" + p.getStartDate(),
+                                        p -> p.getTicker() + "|" + p.getDate(),
                                         p -> (AbstractPrice) p
                                 ))
                 ));
@@ -89,7 +89,7 @@ public class PriceService {
             Map<String, AbstractPrice> dbPriceMap = timeframeToDbPriceMap.get(timeframe);
             if (dbPriceMap == null) continue;
 
-            String key = updatedPrice.getTicker() + "|" + updatedPrice.getStartDate();
+            String key = updatedPrice.getTicker() + "|" + updatedPrice.getDate();
             AbstractPrice existingPrice = dbPriceMap.get(key);
             if (existingPrice != null) {
                 existingPrice.setOpen(updatedPrice.getOpen());
@@ -124,7 +124,7 @@ public class PriceService {
                 .stream()
                 .collect(Collectors.groupingBy(DailyPrice::getTicker))
                 .values().stream()
-                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(AbstractPrice::getStartDate).reversed()).limit(3))
+                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(AbstractPrice::getDate).reversed()).limit(3))
                 .toList();
     }
 
@@ -146,8 +146,7 @@ public class PriceService {
 
     public List<CandleWithDateDTO> findFor(String ticker, StockTimeframe timeframe) {
         String tableNameOHLC = timeframe.dbTableOHLC();
-        String orderByIdField = timeframe == DAILY ? "date" : "start_date";
-        String queryStr = STR."SELECT \{orderByIdField}, open, high, low, close FROM \{tableNameOHLC} WHERE ticker = :ticker ORDER BY \{orderByIdField} ASC";
+        String queryStr = STR."SELECT date, open, high, low, close FROM \{tableNameOHLC} WHERE ticker = :ticker ORDER BY date ASC";
 
         Query nativeQuery = entityManager.createNativeQuery(queryStr, CandleWithDateDTO.class);
         nativeQuery.setParameter("ticker", ticker);
@@ -184,7 +183,7 @@ public class PriceService {
             String ticker = importedDailyPrice.getTicker();
             PriceWithPrevClose priceWithPrevClose = pricesWithPrevCloseByTicker.get(ticker);
             AbstractPrice price = priceWithPrevClose.price();
-            LocalDate latestDateWMQY = price.getStartDate(); // latest cached w,m,q,y date per ticker
+            LocalDate latestDateWMQY = price.getDate(); // latest cached w,m,q,y date per ticker
             if (isWithinSameTimeframe(importedDailyPrice.getDate(), latestDateWMQY, timeframe)) {
                 price.convertFrom(importedDailyPrice, priceWithPrevClose.previousClose());
                 result.add(priceWithPrevClose);

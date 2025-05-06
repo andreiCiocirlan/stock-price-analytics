@@ -33,7 +33,7 @@ public final class PricesUtil {
                                 Collectors.toList(),
                                 prices -> extractPriceForTimeframe(prices, stockTimeframe)
                         )
-                )).values().stream().sorted(Comparator.comparing(AbstractPrice::getStartDate)).toList());
+                )).values().stream().sorted(Comparator.comparing(AbstractPrice::getDate)).toList());
     }
 
     private static Function<LocalDate, Temporal> groupingFunctionFor(StockTimeframe stockTimeframe) {
@@ -50,7 +50,7 @@ public final class PricesUtil {
         DailyPrice firstInChronologicalOrder = pricesGroupedByTimeFrame.getFirst(); // already sorted
         DailyPrice lastInChronologicalOrder = pricesGroupedByTimeFrame.getLast();
         String ticker = firstInChronologicalOrder.getTicker();
-        LocalDate startDate = firstInChronologicalOrder.getDate();
+        LocalDate date = firstInChronologicalOrder.getDate();
         double open = firstInChronologicalOrder.getOpen();
         double close = lastInChronologicalOrder.getClose();
         double high = pricesGroupedByTimeFrame.stream()
@@ -64,10 +64,10 @@ public final class PricesUtil {
 
         CandleOHLC candleOHLC = new CandleOHLC(open, high, low, close);
         return switch (stockTimeframe) {
-            case WEEKLY -> new WeeklyPrice(ticker, startDate, candleOHLC);
-            case MONTHLY -> new MonthlyPrice(ticker, startDate, candleOHLC);
-            case QUARTERLY -> new QuarterlyPrice(ticker, startDate, candleOHLC);
-            case YEARLY -> new YearlyPrice(ticker, startDate, candleOHLC);
+            case WEEKLY -> new WeeklyPrice(ticker, date, candleOHLC);
+            case MONTHLY -> new MonthlyPrice(ticker, date, candleOHLC);
+            case QUARTERLY -> new QuarterlyPrice(ticker, date, candleOHLC);
+            case YEARLY -> new YearlyPrice(ticker, date, candleOHLC);
             case DAILY -> throw new IllegalStateException("Unexpected value DAILY");
         };
     }

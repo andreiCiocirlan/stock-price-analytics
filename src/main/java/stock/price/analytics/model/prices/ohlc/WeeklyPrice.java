@@ -1,18 +1,14 @@
 package stock.price.analytics.model.prices.ohlc;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.stocks.Stock;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
 
 @Entity
 @Table(name = "weekly_prices")
@@ -21,18 +17,12 @@ import java.time.temporal.TemporalAdjusters;
 @NoArgsConstructor
 public class WeeklyPrice extends AbstractPrice {
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @Column(name = "start_date")
-    private LocalDate startDate;
-
     public WeeklyPrice(String ticker, LocalDate date, CandleOHLC candleOHLC) {
-        super(ticker, candleOHLC);
-        setStartDateFrom(date);
+        super(ticker, date, candleOHLC);
     }
 
     public WeeklyPrice(String ticker, LocalDate date, double performance, CandleOHLC candleOHLC) {
-        super(ticker, candleOHLC);
-        setStartDateFrom(date);
+        super(ticker, date, candleOHLC);
         this.setPerformance(performance);
     }
 
@@ -58,13 +48,8 @@ public class WeeklyPrice extends AbstractPrice {
     }
 
     @Override
-    public void setStartDateFrom(LocalDate date) {
-        startDate = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-    }
-
-    @Override
     public String toString() {
-        return STR."Weekly_OHLC {  StartDate=\{startDate} \{super.toString()}";
+        return STR."Weekly_OHLC {  \{super.toString()}";
     }
 
 }
