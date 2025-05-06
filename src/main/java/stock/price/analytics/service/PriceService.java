@@ -23,7 +23,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.time.temporal.TemporalAdjusters.*;
-import static stock.price.analytics.model.prices.enums.StockTimeframe.DAILY;
 import static stock.price.analytics.util.PricesUtil.getHigherTimeframePricesFor;
 import static stock.price.analytics.util.PricesUtil.multiplyWith;
 import static stock.price.analytics.util.TradingDateUtil.isWithinSameTimeframe;
