@@ -28,10 +28,10 @@ public class HighestLowestPrices extends HighLowForPeriod {
         super(ticker, date, low, high);
     }
 
-    public HighestLowestPrices copyWith(LocalDate startDate) {
+    public HighestLowestPrices copyWith(LocalDate date) {
         HighestLowestPrices copy = new HighestLowestPrices();
         BeanUtils.copyProperties(this, copy, "id", "date");
-        copy.setDate(startDate);
+        copy.setDate(date);
         return copy;
     }
 
