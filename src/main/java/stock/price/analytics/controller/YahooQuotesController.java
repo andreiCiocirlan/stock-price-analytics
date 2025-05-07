@@ -63,6 +63,8 @@ public class YahooQuotesController {
                 logTime(stockService::updateStocksHighLowsAndOHLCFrom, "updated stocks highs-lows 4w,52w,all-time and higher-timeframe OHLC prices");
             }
         }
+        webSocketNotificationService.broadcastStockChartUpdate();
+        logTime(priceMilestoneService::cacheTickersForMilestones, "cached tickers for price milestones");
         long duration = (System.nanoTime() - start) / 1_000_000;
         log.info("Import from file done in {} ms", duration);
         return dailyImportedPrices;
