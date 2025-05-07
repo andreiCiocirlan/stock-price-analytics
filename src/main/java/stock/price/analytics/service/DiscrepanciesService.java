@@ -114,6 +114,7 @@ public class DiscrepanciesService {
     @Transactional
     public void updateStocksWithOpeningPriceDiscrepancyFor(StockTimeframe timeframe) {
         switch (timeframe) {
+            case DAILY -> stockDiscrepanciesRepository.updateStocksWithDailyOpeningDiscrepancy();
             case WEEKLY -> stockDiscrepanciesRepository.updateStocksWithWeeklyOpeningDiscrepancy();
             case MONTHLY -> stockDiscrepanciesRepository.updateStocksWithMonthlyOpeningDiscrepancy();
             case QUARTERLY -> stockDiscrepanciesRepository.updateStocksWithQuarterlyOpeningDiscrepancy();
