@@ -145,6 +145,20 @@ public interface StockDiscrepanciesRepository extends StockRepository {
             """, nativeQuery = true)
     void updateStocksWithYearlyOpeningDiscrepancy();
 
+    @Modifying
+    @Query(value = """
+           WITH discrepancies AS (
+               SELECT s.ticker, dp.open
+               FROM public.stocks s
+               JOIN daily_prices dp ON dp.date = DATE_TRUNC('DAY', s.last_updated) AND dp.ticker = s.ticker
+               WHERE s.delisted_date IS NULL AND (dp.open <> s.d_open)
+           )
+           UPDATE stocks s SET d_open = dscr.open
+           FROM discrepancies dscr
+           WHERE s.ticker = dscr.ticker;
+           """, nativeQuery = true)
+    void updateStocksWithDailyOpeningDiscrepancy();
+
     @Query(value = """
             SELECT s.ticker, 'day_discrepancy' FROM public.stocks s
             join daily_prices dp on dp.date = s.last_updated and dp.ticker = s.ticker and s.delisted_date is null
