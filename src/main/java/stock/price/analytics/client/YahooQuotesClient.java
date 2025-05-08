@@ -53,8 +53,8 @@ public class YahooQuotesClient {
 
     private final RestTemplate restTemplate;
     private int RETRY_COUNT_CRUMB = 0;
-    private String COOKIE_FC_YAHOO = "EuConsent=CQONUAAQONUAAAOACKROBgFgAAAAAAAAACiQAAAAAAAA; A1S=d=AQABBHu40mcCECI3dDTimCiMyiAvT34B1oUFEgABCAH-02cCaPF3ziMAAiAAAAcIdrfSZ2r5DG4&S=AQAAAszl9s9YvJYIkeFU0a_zZTg; A1=d=AQABBHu40mcCECI3dDTimCiMyiAvT34B1oUFEgABCAH-02cCaPF3ziMAAiAAAAcIdrfSZ2r5DG4&S=AQAAAszl9s9YvJYIkeFU0a_zZTg; GUC=AQABCAFn0_5oAkIdNgR3&s=AQAAAL3PAraG&g=Z9K4hQ; A3=d=AQABBHu40mcCECI3dDTimCiMyiAvT34B1oUFEgABCAH-02cCaPF3ziMAAiAAAAcIdrfSZ2r5DG4&S=AQAAAszl9s9YvJYIkeFU0a_zZTg; PRF=theme%3Dauto";
-    private String CRUMB_COOKIE = "Ux/F/1Q/D1k";
+    private String COOKIE_FC_YAHOO = "A3=d=AQABBFl6HGgCEHllFybzlOVa_yghvNVSeWoFEgEBAQHLHWgmaPF3ziMA_eMCAA&S=AQAAAsHQb0b9SQITLwet7DOVPXM";
+    private String CRUMB_COOKIE = "Xi3czC/stuX";
 
     private static CloseableHttpClient createHttpClient() {
         RequestConfig requestConfig = RequestConfig.custom()
