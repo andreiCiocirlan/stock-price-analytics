@@ -65,49 +65,6 @@ public class YahooQuotesClient {
                 .build();
     }
 
-    public void getAllHistoricalPrices_andSaveJSONFileFor(String tickers) {
-        int lowerBound = 100;
-        int upperBound = 200;
-        int range = (upperBound - lowerBound) + 1;
-        try {
-            for (String ticker : tickers.split(",")) {
-                long currentTime = System.currentTimeMillis();
-                ResponseEntity<String> response;
-                try {
-                    HttpHeaders headers = new HttpHeaders();
-                    headers.add("Cookie", cookieFromFcYahoo());
-                    headers.add(HttpHeaders.USER_AGENT, USER_AGENT_VALUE);
-
-                    org.springframework.http.HttpEntity<String> entity = new org.springframework.http.HttpEntity<>(null, headers);
-                    response = restTemplate.exchange(
-                            QUERY1_BASE_URL + V7_FINANCE + "/chart/{ticker}?range=60y&interval=1d&indicators=quote&includeTimestamps=true",
-                            HttpMethod.GET,
-                            entity,
-                            String.class,
-                            ticker
-                    );
-
-                    String responseBody = response.getBody();
-                    if (responseBody != null) {
-                        String fileName = ticker + ".json";
-                        String path = "./all-historical-prices/DAILY/" + fileName;
-                        writeToFile(path, responseBody);
-                    } else {
-                        log.error("response body is null for ticker {}", ticker);
-                    }
-                } catch (RestClientException e) {
-                    log.error("Failed retrieving prices data for ticker {}: {}", ticker, e.getMessage());
-                }
-                log.info("saving JSON historical prices for {} took {} ms", ticker, (System.currentTimeMillis() - currentTime));
-                int sleepTime = (int) (Math.random() * range) + lowerBound;
-                Thread.sleep(sleepTime);
-                log.info("sleeping for {} ms", sleepTime);
-            }
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public List<String> quotePricesFor(List<String> tickers) {
         int maxTickersPerRequest = 1700;
 
@@ -235,6 +192,49 @@ public class YahooQuotesClient {
         // If we reach this point, all retries have been exhausted
         log.error("Maximum number of retries reached. Unable to get crumb.");
         throw new RuntimeException("Unable to get crumb after multiple attempts.");
+    }
+
+    public void getAllHistoricalPrices_andSaveJSONFileFor(String tickers) {
+        int lowerBound = 100;
+        int upperBound = 200;
+        int range = (upperBound - lowerBound) + 1;
+        try {
+            for (String ticker : tickers.split(",")) {
+                long currentTime = System.currentTimeMillis();
+                ResponseEntity<String> response;
+                try {
+                    HttpHeaders headers = new HttpHeaders();
+                    headers.add("Cookie", cookieFromFcYahoo());
+                    headers.add(HttpHeaders.USER_AGENT, USER_AGENT_VALUE);
+
+                    org.springframework.http.HttpEntity<String> entity = new org.springframework.http.HttpEntity<>(null, headers);
+                    response = restTemplate.exchange(
+                            QUERY1_BASE_URL + V7_FINANCE + "/chart/{ticker}?range=60y&interval=1d&indicators=quote&includeTimestamps=true",
+                            HttpMethod.GET,
+                            entity,
+                            String.class,
+                            ticker
+                    );
+
+                    String responseBody = response.getBody();
+                    if (responseBody != null) {
+                        String fileName = ticker + ".json";
+                        String path = "./all-historical-prices/DAILY/" + fileName;
+                        writeToFile(path, responseBody);
+                    } else {
+                        log.error("response body is null for ticker {}", ticker);
+                    }
+                } catch (RestClientException e) {
+                    log.error("Failed retrieving prices data for ticker {}: {}", ticker, e.getMessage());
+                }
+                log.info("saving JSON historical prices for {} took {} ms", ticker, (System.currentTimeMillis() - currentTime));
+                int sleepTime = (int) (Math.random() * range) + lowerBound;
+                Thread.sleep(sleepTime);
+                log.info("sleeping for {} ms", sleepTime);
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
