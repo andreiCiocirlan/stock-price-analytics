@@ -9,6 +9,7 @@ import stock.price.analytics.client.YahooQuotesClient;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 
 import static stock.price.analytics.util.Constants.MAX_TICKER_COUNT_PRINT;
@@ -36,6 +37,7 @@ public class YahooQuoteService {
     public List<DailyPrice> yahooQuotesImport() {
         List<String> cachedTickers = cacheService.getCachedTickers();
         List<String> tickersNotImported = cacheService.getCachedTickers();
+        Collections.shuffle(cachedTickers); // randomize tickers order
         List<String> pricesJSONs = logTimeAndReturn(() -> yahooQuotesClient.quotePricesFor(cachedTickers), "Yahoo API call and JSON result");
         String pricesJSON = mergedPricesJSONs(pricesJSONs);
         List<DailyPrice> dailyImportedPrices = dailyPriceJSONService.extractDailyPricesFromJSON(pricesJSON);
