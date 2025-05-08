@@ -6,7 +6,7 @@ import java.util.List;
 
 public final class Constants {
 
-    public static final String USER_AGENT_VALUE = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0";
+    public static final String USER_AGENT_VALUE = "Mozilla/5.0";
     public static final ZoneId NY_ZONE = ZoneId.of("America/New_York");
     public static final LocalTime START_MARKET_HOURS_NYSE = LocalTime.of(9, 30);
     public static final LocalTime END_MARKET_HOURS_NYSE = LocalTime.of(16, 0);
