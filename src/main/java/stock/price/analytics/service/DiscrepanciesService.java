@@ -1,5 +1,7 @@
 package stock.price.analytics.service;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +12,7 @@ import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.gaps.FVGRepository;
 import stock.price.analytics.repository.prices.ohlc.PriceDiscrepanciesRepository;
 import stock.price.analytics.repository.stocks.StockDiscrepanciesRepository;
+import stock.price.analytics.util.QueryUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +24,8 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor
 public class DiscrepanciesService {
 
+    @PersistenceContext
+    private final EntityManager entityManager;
     private final PriceDiscrepanciesRepository priceDiscrepanciesRepository;
     private final StockDiscrepanciesRepository stockDiscrepanciesRepository;
     private final FVGRepository fvgRepository;
@@ -113,13 +118,9 @@ public class DiscrepanciesService {
 
     @Transactional
     public void updateStocksWithOpeningPriceDiscrepancyFor(StockTimeframe timeframe) {
-        switch (timeframe) {
-            case DAILY -> stockDiscrepanciesRepository.updateStocksWithDailyOpeningDiscrepancy();
-            case WEEKLY -> stockDiscrepanciesRepository.updateStocksWithWeeklyOpeningDiscrepancy();
-            case MONTHLY -> stockDiscrepanciesRepository.updateStocksWithMonthlyOpeningDiscrepancy();
-            case QUARTERLY -> stockDiscrepanciesRepository.updateStocksWithQuarterlyOpeningDiscrepancy();
-            case YEARLY -> stockDiscrepanciesRepository.updateStocksWithYearlyOpeningDiscrepancy();
-        }
+        String query = QueryUtil.updateStocksWithOpeningPriceDiscrepancyFor(timeframe);
+        int rowsAffected = entityManager.createNativeQuery(query).executeUpdate();
+        log.info("updated {} rows stocks  {} opening prices", rowsAffected, timeframe);
     }
 
     @Transactional
