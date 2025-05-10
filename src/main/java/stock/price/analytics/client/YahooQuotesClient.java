@@ -218,9 +218,7 @@ public class YahooQuotesClient {
 
                     String responseBody = response.getBody();
                     if (responseBody != null) {
-                        String fileName = ticker + ".json";
-                        String path = "./all-historical-prices/DAILY/" + fileName;
-                        writeToFile(path, responseBody);
+                        writeToFile("./all-historical-prices/DAILY/" + ticker + ".json", responseBody);
                     } else {
                         log.error("response body is null for ticker {}", ticker);
                     }
