@@ -18,6 +18,7 @@ import stock.price.analytics.repository.prices.highlow.HighLowForPeriodRepositor
 import stock.price.analytics.util.QueryUtil;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static stock.price.analytics.model.prices.highlow.enums.HighLowPeriod.values;
@@ -76,5 +77,17 @@ public class HighLowForPeriodService {
         Query nativeQuery = entityManager.createNativeQuery(query, hlClass);
         nativeQuery.setParameter("tradingDate", date);
         return (List<? extends HighLowForPeriod>) nativeQuery.getResultList();
+    }
+
+    public void logNewHighLowsThisWeek() {
+        List<String> newHighLowResult = new ArrayList<>();
+        for (Object[] newHighLowThisWeek : highLowForPeriodRepository.newHighLowsThisWeek()) {
+            for (Object newHL_col : newHighLowThisWeek) {
+                newHighLowResult.add(String.valueOf(newHL_col));
+            }
+        }
+        String newHighLowResultFormatted = String.join("\t", newHighLowResult);
+
+        log.warn("-- {}", newHighLowResultFormatted);
     }
 }
