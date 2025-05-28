@@ -7,10 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.service.DiscrepanciesService;
-import stock.price.analytics.service.PriceGapService;
-import stock.price.analytics.service.PriceService;
-import stock.price.analytics.service.WebSocketNotificationService;
+import stock.price.analytics.service.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +22,7 @@ public class EndOfDayScheduler {
     private final PriceService priceService;
     private final CacheService cacheService;
     private final DiscrepanciesService discrepanciesService;
+    private final HighLowForPeriodService highLowForPeriodService;
     private final WebSocketNotificationService webSocketNotificationService;
     private final PriceGapService priceGapService;
 
@@ -49,6 +47,9 @@ public class EndOfDayScheduler {
 
         // save daily price gaps at EOD
         priceGapService.savePriceGapsTodayFor(cacheService.getCachedTickers(), StockTimeframe.DAILY);
+
+        // log new high lows this week
+        highLowForPeriodService.logNewHighLowsThisWeek();
     }
 
     private Map<String, List<String>> checkDiscrepancies() {
