@@ -268,10 +268,10 @@ public class DailyPriceJSONService {
 
     private void logInconsistentHighLowImportedPrices() {
         if (!inconsistentHighs.isEmpty()) {
-            log.warn("Inconsistent DAILY PRICES JSON imported highs for {}", inconsistentHighs);
+            log.info("Inconsistent DAILY PRICES JSON imported highs for {}", inconsistentHighs);
         }
         if (!inconsistentLows.isEmpty()) {
-            log.warn("Inconsistent DAILY PRICES JSON imported lows for {}", inconsistentLows);
+            log.info("Inconsistent DAILY PRICES JSON imported lows for {}", inconsistentLows);
         }
         inconsistentHighs.clear();
         inconsistentLows.clear();
