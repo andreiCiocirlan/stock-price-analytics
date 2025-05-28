@@ -45,4 +45,25 @@ public interface HighLowForPeriodRepository extends JpaRepository<HighLowForPeri
             """, nativeQuery = true)
     List<TickerHighLowView> highLowPricesInPastWeeks(@Param(value = "tradingDate") LocalDate tradingDate, @Param(value = "week_count") Integer week_count);
 
+    @Query(value = """
+            select
+                date_trunc('week', wp.date)::date AS date,
+                SUM(CASE WHEN wp.high > hl_all_prev.high THEN 1 END) AS new_highest,
+                SUM(CASE WHEN wp.high > hl52w_prev.high THEN 1 END) AS new_high_52w,
+                SUM(CASE WHEN wp.high > hl4w_prev.high THEN 1 END) AS new_high_4w,
+                SUM(CASE WHEN wp.low < hl_all_prev.low THEN 1 END) AS new_lowest,
+                SUM(CASE WHEN wp.low < hl52w_prev.low THEN 1 END) AS new_low_52w,
+                SUM(CASE WHEN wp.low < hl4w_prev.low THEN 1 END) AS new_low_4w
+            FROM weekly_prices wp
+                join highest_lowest hl_all_prev on hl_all_prev.ticker = wp.ticker AND hl_all_prev.date = wp.date - INTERVAL '7 days'
+                join high_low52w hl52w_prev on hl52w_prev.ticker = wp.ticker AND  hl52w_prev.date = wp.date - INTERVAL '7 days'
+                JOIN high_low4w hl4w_prev ON hl4w_prev.ticker = wp.ticker AND hl4w_prev.date = wp.date - INTERVAL '7 days'
+            WHERE
+                (wp.date between (CURRENT_DATE - INTERVAL '7 days') and CURRENT_DATE) AND
+                wp.ticker in (select ticker from stocks where xtb_stock = true)\s
+            GROUP BY date_trunc('week', wp.date)
+            ORDER BY date_trunc('week', wp.date) DESC;
+            """, nativeQuery = true)
+    List<Object[]> newHighLowsThisWeek();
+
 }
