@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.annotation.Schedules;
 import org.springframework.stereotype.Component;
+import stock.price.analytics.service.HighLowForPeriodService;
 import stock.price.analytics.service.PriceMilestoneService;
 import stock.price.analytics.service.WebSocketNotificationService;
 import stock.price.analytics.util.PriceMilestoneFactory;
@@ -14,6 +15,7 @@ import static stock.price.analytics.util.Constants.CFD_MARGINS_5X_4X_3X;
 @RequiredArgsConstructor
 public class PreMarketScheduler {
 
+    private final HighLowForPeriodService highLowForPeriodService;
     private final PriceMilestoneService priceMilestoneService;
     private final WebSocketNotificationService webSocketNotificationService;
 
@@ -24,6 +26,7 @@ public class PreMarketScheduler {
     public void alertPreMarketGaps_moreThan_10Percent() {
         priceMilestoneService.findTickersForMilestones(PriceMilestoneFactory.preMarketSchedulerValues(), CFD_MARGINS_5X_4X_3X)
                 .forEach((priceMilestone, tickers) -> webSocketNotificationService.broadcastDesktopNotification("Pre-Market alert", String.join(" ", priceMilestone.toString(), tickers.toString())));
+        highLowForPeriodService.logNewHighLowsThisWeek();
     }
 
 }
