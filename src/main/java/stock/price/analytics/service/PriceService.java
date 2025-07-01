@@ -23,7 +23,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.time.temporal.TemporalAdjusters.*;
-import static stock.price.analytics.util.PricesUtil.getHigherTimeframePricesFor;
+import static stock.price.analytics.util.PricesUtil.getHigherTimeframePricesMapFor;
 import static stock.price.analytics.util.PricesUtil.multiplyWith;
 import static stock.price.analytics.util.TradingDateUtil.isWithinSameTimeframe;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
@@ -63,7 +63,10 @@ public class PriceService {
                 .toList();
 
         // compute all higher timeframe prices using the updated daily prices
-        List<AbstractPrice> htfPricesUpdated = getHigherTimeframePricesFor(updatedDailyPrices);
+        List<AbstractPrice> htfPricesUpdated = new ArrayList<>();
+        for (Map.Entry<StockTimeframe, List<AbstractPrice>> entry : getHigherTimeframePricesMapFor(updatedDailyPrices).entrySet()) {
+            htfPricesUpdated.addAll(entry.getValue());
+        }
 
         Map<StockTimeframe, List<? extends AbstractPrice>> timeframeToDbPrices = Map.of(
                 StockTimeframe.WEEKLY, weeklyPricesToUpdate,

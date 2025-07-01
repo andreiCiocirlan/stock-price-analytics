@@ -9,20 +9,21 @@ import java.time.Year;
 import java.time.YearMonth;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public final class PricesUtil {
 
-    public static List<AbstractPrice> getHigherTimeframePricesFor(List<DailyPrice> dailyPricesImported) {
-        List<AbstractPrice> htfPrices = new ArrayList<>();
+    public static Map<StockTimeframe, List<AbstractPrice>> getHigherTimeframePricesMapFor(List<DailyPrice> dailyPricesImported) {
+        Map<StockTimeframe, List<AbstractPrice>> timeframeToPrices = new HashMap<>();
         for (StockTimeframe higherTimeframe : StockTimeframe.higherTimeframes()) {
-            htfPrices.addAll(htfPricesForTimeframe(dailyPricesImported, higherTimeframe));
+            timeframeToPrices.put(higherTimeframe, htfPricesForTimeframe(dailyPricesImported, higherTimeframe));
         }
-        return htfPrices;
+        return timeframeToPrices;
     }
 
     private static List<AbstractPrice> htfPricesForTimeframe(List<DailyPrice> dailyPrices, StockTimeframe stockTimeframe) {
