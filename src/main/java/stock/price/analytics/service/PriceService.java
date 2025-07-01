@@ -5,6 +5,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.dto.CandleWithDateDTO;
@@ -29,6 +30,7 @@ import static stock.price.analytics.util.TradingDateUtil.isWithinSameTimeframe;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PriceService {
@@ -212,4 +214,37 @@ public class PriceService {
     public void savePrices(List<? extends AbstractPrice> prices) {
         syncPersistenceService.partitionDataAndSave(prices, priceRepository);
     }
+
+    @Transactional
+    public void updatePrices(List<? extends AbstractPrice> prices, StockTimeframe timeframe) {
+        String tableName = timeframe.dbTableOHLC();
+
+        int batchSize = 250;
+        for (int i = 0; i < prices.size(); i++) {
+            AbstractPrice price = prices.get(i);
+            int updatedCount = entityManager.createNativeQuery(
+                            STR."""
+                                UPDATE \{tableName}
+                                SET open = :open, high = :high, low = :low, close = :close
+                                WHERE date = :date AND ticker = :ticker
+                            """)
+                    .setParameter("open", price.getOpen())
+                    .setParameter("high", price.getHigh())
+                    .setParameter("low", price.getLow())
+                    .setParameter("close", price.getClose())
+                    .setParameter("date", price.getDate())
+                    .setParameter("ticker", price.getTicker())
+                    .executeUpdate();
+
+            if (updatedCount != 0) {
+                log.info("updated {} {} rows", updatedCount, tableName);
+            }
+
+            if (i % batchSize == 0) {
+                entityManager.flush();
+                entityManager.clear();
+            }
+        }
+    }
+
 }
