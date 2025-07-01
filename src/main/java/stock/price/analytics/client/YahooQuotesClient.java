@@ -196,7 +196,7 @@ public class YahooQuotesClient {
 
     public void getAllHistoricalPrices_andSaveJSONFileFor(String tickers) {
         int lowerBound = 100;
-        int upperBound = 200;
+        int upperBound = 150;
         int range = (upperBound - lowerBound) + 1;
         try {
             for (String ticker : tickers.split(",")) {
@@ -204,7 +204,7 @@ public class YahooQuotesClient {
                 ResponseEntity<String> response;
                 try {
                     HttpHeaders headers = new HttpHeaders();
-                    headers.add("Cookie", cookieFromFcYahoo());
+                    headers.add("Cookie", COOKIE_FC_YAHOO);
                     headers.add(HttpHeaders.USER_AGENT, USER_AGENT_VALUE);
 
                     org.springframework.http.HttpEntity<String> entity = new org.springframework.http.HttpEntity<>(null, headers);
