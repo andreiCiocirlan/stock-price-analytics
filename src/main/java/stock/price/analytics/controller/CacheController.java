@@ -18,6 +18,7 @@ import stock.price.analytics.util.PriceMilestoneFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.prices.highlow.enums.HighLowPeriod.*;
 import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
@@ -32,8 +33,10 @@ public class CacheController {
 
     @GetMapping("/stocks")
     @ResponseStatus(HttpStatus.OK)
-    public List<Stock> getCachedStocks() {
-        return cacheService.getCachedStocks();
+    public List<Stock> getCachedStocks(@RequestParam(name = "ticker", required = false) String ticker) {
+        return cacheService.getCachedStocks().stream()
+                .filter(stock -> ticker == null || ticker.isEmpty() || ticker.equalsIgnoreCase(stock.getTicker()))
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/tickers")
