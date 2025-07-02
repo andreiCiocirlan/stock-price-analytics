@@ -23,7 +23,7 @@ public interface HighLowForPeriodRepository extends JpaRepository<HighLowForPeri
                     ROW_NUMBER() OVER (PARTITION BY wp.ticker ORDER BY wp.date DESC) AS rn
                 FROM weekly_prices wp
                 WHERE
-                    wp.date >= CAST(:tradingDate AS DATE) - INTERVAL '75 weeks'  -- Adjust to get the last 75 weeks (buffer zone for inactive tickers between periods)
+                    wp.date BETWEEN (CAST(:tradingDate AS DATE) - INTERVAL '75 weeks') AND CAST(:tradingDate AS DATE)  -- Adjust to get the last 75 weeks (buffer zone for inactive tickers between periods)
             	and wp.ticker in (select ticker from stocks where xtb_stock = true and delisted_date is null)
             ),
             filtered_prices AS (
