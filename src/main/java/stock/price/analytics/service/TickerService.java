@@ -28,7 +28,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.util.FileUtil.fileExistsFor;
-import static stock.price.analytics.util.PricesUtil.getHigherTimeframePricesFor;
+import static stock.price.analytics.util.PricesUtil.getHigherTimeframePricesMapFor;
 
 @Slf4j
 @Service
@@ -99,7 +99,10 @@ public class TickerService {
         }
         List<DailyPrice> dailyPricesImported = JsonUtil.getDailyPricesFromJSONFileFor(tickerList);
         priceService.savePrices(dailyPricesImported);
-        List<AbstractPrice> htfPricesImported = getHigherTimeframePricesFor(dailyPricesImported);
+        List<AbstractPrice> htfPricesImported = new ArrayList<>();
+        for (Map.Entry<StockTimeframe, List<AbstractPrice>> entry : getHigherTimeframePricesMapFor(dailyPricesImported).entrySet()) {
+            htfPricesImported.addAll(entry.getValue());
+        }
         priceService.savePrices(htfPricesImported);
         saveHighLowPricesForPeriodFrom(htfPricesImported);
         saveAndUpdateStocksFor(dailyPricesImported, htfPricesImported, lastUpdate);
@@ -161,8 +164,7 @@ public class TickerService {
                     LocalDate date = prices.get(i).getDate();
 
                     HighLowForPeriod highLowForPeriod = switch (highLowPeriod) {
-                        case HIGH_LOW_4W ->
-                                new HighLow4w(ticker, date, lowestPriceForPeriod, highestPriceForPeriod);
+                        case HIGH_LOW_4W -> new HighLow4w(ticker, date, lowestPriceForPeriod, highestPriceForPeriod);
                         case HIGH_LOW_52W ->
                                 new HighLow52Week(ticker, date, lowestPriceForPeriod, highestPriceForPeriod);
                         case HIGH_LOW_ALL_TIME ->
