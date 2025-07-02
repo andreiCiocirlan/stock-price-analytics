@@ -194,6 +194,7 @@ function updateOHLCChart(stockData) {
                         }
                     }
                });
+               ohlcContainer = document.getElementById('ohlc-container');
                ohlcContainer.addEventListener('resize', () => {
                    if (!isResizing) {
                        chart.reflow();
