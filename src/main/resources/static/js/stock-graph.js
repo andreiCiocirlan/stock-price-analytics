@@ -3,54 +3,6 @@ let ohlcContainer;
 let chart;
 let isResizing = false;
 
-function openStockGraph(stockData) {
-    // Check if the window is already open
-    if (ohlcWindow && !ohlcWindow.closed) {
-        // If the window is open, focus on it and update the chart
-        ohlcWindow.focus();
-        updateOHLCChart(stockData);
-    } else {
-        // If the window is not open, create a new one
-        ohlcWindow = window.open('', 'OHLC Chart', 'width=1200,height=750');
-        ohlcWindow.onload = () => {
-            // Set the background color of the <body> element
-            ohlcWindow.document.body.style.backgroundColor = '#171B26';
-
-            // Create the OHLC chart container in the new window
-            ohlcContainer = ohlcWindow.document.createElement('div');
-            ohlcContainer.id = 'ohlc-container';
-            ohlcContainer.style.height = '100%';
-            ohlcWindow.document.body.appendChild(ohlcContainer);
-
-            // Add a resize event listener to the window
-            ohlcWindow.addEventListener('resize', () => {
-                isResizing = true;
-                if (chart) {
-                    chart.reflow();
-                }
-                isResizing = false;
-            });
-
-            // Add an unload event listener to the window
-            ohlcWindow.addEventListener('unload', () => {
-                // Remove the chart container when the window is closed
-                ohlcContainer.remove();
-                ohlcContainer = null;
-                chart = null;
-            });
-
-            // Add a keydown event listener to the window
-            ohlcWindow.addEventListener('keydown', (event) => {
-                if (event.key === 'Escape') {
-                    ohlcWindow.close();
-                }
-            });
-
-            // Fetch the price data and render the OHLC chart
-            updateOHLCChart(stockData);
-        };
-    }
-}
 
 function updateOHLCChart(stockData) {
     const urlParams = new URLSearchParams(window.location.search);
