@@ -2,7 +2,7 @@ package stock.price.analytics.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import stock.price.analytics.controller.dto.StandardDeviationProjectionDTO;
+import stock.price.analytics.model.dto.StandardDeviationProjectionDTO;
 import stock.price.analytics.service.StandardDeviationProjectionService;
 
 import java.util.List;
