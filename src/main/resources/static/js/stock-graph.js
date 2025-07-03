@@ -3,55 +3,6 @@ let ohlcContainer;
 let chart;
 let isResizing = false;
 
-function addProjectionBandsSVG2(chart, proj) {
-    if (!chart || !proj) return;
-    if (!chart.xAxis || !chart.xAxis[0] || !chart.yAxis || !chart.yAxis[0]) return;
-
-    // Destroy previous group if exists
-    if (chart.customProjectionGroup) {
-        chart.customProjectionGroup.destroy();
-    }
-
-    // Create new group
-    const group = chart.renderer.g('custom-projection-bands').add();
-
-    // Convert data to pixels
-    const x1 = chart.xAxis[0].toPixels(new Date(proj.localTopDate));
-    const x2 = chart.xAxis[0].toPixels(new Date(proj.secondPointDate));
-
-    const level0 = proj.level0;
-    const level1 = proj.level1;
-    const diff = proj.diff;
-
-    const yLevels = [
-        { from: level1 - diff, to: level0, color: 'rgba(128,128,128,0.3)', label: '-1 to 0' },
-        { from: level0, to: level1, color: 'rgba(128,128,128,0.15)', label: '0 to 1' },
-        { from: level1, to: level1 - 2.5 * diff, color: 'rgba(255,255,0,0.3)', label: '1 to 2.5' },
-        { from: level1 - 2.5 * diff, to: level1 - 4.5 * diff, color: 'rgba(255,0,0,0.3)', label: '2.5 to 4.5' }
-    ];
-
-    yLevels.forEach(({ from, to, color, label }) => {
-    const yFrom = chart.yAxis[0].toPixels(from);
-    const yTo = chart.yAxis[0].toPixels(to);
-
-    const rectX = Math.min(x1, x2);
-    const rectY = Math.min(yFrom, yTo);
-    const rectWidth = Math.abs(x2 - x1);
-    const rectHeight = Math.abs(yTo - yFrom);
-
-    const rect = chart.renderer.rect(rectX, rectY, rectWidth, rectHeight)
-      .attr({ fill: color, zIndex: 5 })
-      .add(group);
-
-    // Optionally add label text near the rectangle
-    chart.renderer.text(label, rectX + 5, rectY + 15)
-      .css({ color: '#666', fontSize: '10px' })
-      .add(group);
-    });
-
-    chart.customProjectionGroup = group;
-}
-
 function addProjectionBandsSVG(chart, proj) {
   if (!chart || !proj) return;
   if (!chart.xAxis || !chart.xAxis[0] || !chart.yAxis || !chart.yAxis[0]) return;
