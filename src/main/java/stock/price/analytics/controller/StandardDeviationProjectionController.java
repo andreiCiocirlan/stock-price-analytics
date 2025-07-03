@@ -14,8 +14,13 @@ public class StandardDeviationProjectionController {
 
     private final StandardDeviationProjectionService projectionService;
 
-    @GetMapping("/{ticker}")
-    public List<StandardDeviationProjectionDTO> getProjections(@PathVariable String ticker) {
-        return projectionService.getLast3Projections(ticker.toUpperCase());
+    @GetMapping("/top/{ticker}")
+    public List<StandardDeviationProjectionDTO> getLast3TopProjections(@PathVariable String ticker) {
+        return projectionService.getLast3TopProjections(ticker.toUpperCase());
+    }
+
+    @GetMapping("/bottom/{ticker}")
+    public List<StandardDeviationProjectionDTO> getLast3BottomProjections(@PathVariable String ticker) {
+        return projectionService.getLast3BottomProjections(ticker.toUpperCase());
     }
 }

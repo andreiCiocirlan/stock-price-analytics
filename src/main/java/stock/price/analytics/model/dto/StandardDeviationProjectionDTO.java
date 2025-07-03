@@ -1,6 +1,9 @@
 package stock.price.analytics.model.dto;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.Getter;
+import stock.price.analytics.model.projections.enums.StandardDeviationType;
 
 import java.time.LocalDate;
 
@@ -12,6 +15,8 @@ public class StandardDeviationProjectionDTO {
     private double diff;
     private double level0;
     private double level1;
+    @Enumerated(EnumType.STRING)
+    private StandardDeviationType standardDeviationType;
 
     public StandardDeviationProjectionDTO(String ticker, LocalDate localTopDate, LocalDate secondPointDate, double diff, double level0, double level1) {
         this.ticker = ticker;
