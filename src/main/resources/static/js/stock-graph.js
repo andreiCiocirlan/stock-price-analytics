@@ -123,6 +123,13 @@ function updateOHLCChart(stockData, projection) {
                 chart.currentProjection = projection;  // update projection on existing chart
                 if (projection) {
                     addProjectionBandsSVG(chart, projection);
+                } else {
+                    // No projection found: clear previous bands if any
+                    if (chart.customProjectionGroup) {
+                        chart.customProjectionGroup.destroy();
+                        chart.customProjectionGroup = null;
+                    }
+                    chart.currentProjection = null; // Clear stored projection
                 }
             } else {
                // If the chart doesn't exist, create a new one
@@ -271,7 +278,15 @@ function updateOHLCChart(stockData, projection) {
               // Draw bands initially
               if (projection) {
                 addProjectionBandsSVG(chart, projection);
+              } else {
+                // No projection found: clear previous bands if any
+                if (chart.customProjectionGroup) {
+                    chart.customProjectionGroup.destroy();
+                    chart.customProjectionGroup = null;
+                }
+                chart.currentProjection = null; // Clear stored projection
               }
+
            }
        })
        .catch(error => console.error(error));
