@@ -73,16 +73,21 @@ public class ProjectionRepositoryCustomImpl implements ProjectionRepositoryCusto
                         AND rp.high > tlb.low  -- second point must be above local bottom low
                     )
                     SELECT
-                      tlb.ticker,
-                      tlb.date AS local_bottom_date,
-                      sp.second_point_date,
-                      tlb.low AS level_0,
-                      tlb.low + (sp.second_point_max_high - tlb.low) * 1 AS level_1,
-                      ABS(sp.second_point_max_high - tlb.low) AS diff
-                    FROM top3_local_bottoms tlb
-                    JOIN second_points sp ON sp.ticker = tlb.ticker AND sp.rn = tlb.rn
-                    WHERE sp.rn_rank = 1
-                    ORDER BY tlb.ticker, tlb.date DESC;
+                         tlb.ticker,
+                         tlb.date AS local_bottom_date,
+                         sp.second_point_date,
+                         tlb.low AS level_1,
+                         sp.second_point_max_high AS level_0,
+                         ABS(sp.second_point_max_high - tlb.low) AS diff,
+                         sp.second_point_max_high + ABS(sp.second_point_max_high - tlb.low) * 1 AS level_minus1,
+                         sp.second_point_max_high + ABS(sp.second_point_max_high - tlb.low) * 2 AS level_minus2,
+                         sp.second_point_max_high + ABS(sp.second_point_max_high - tlb.low) * 2.5 AS level_minus2_5,
+                         sp.second_point_max_high + ABS(sp.second_point_max_high - tlb.low) * 4 AS level_minus4,
+                         sp.second_point_max_high + ABS(sp.second_point_max_high - tlb.low) * 4.5 AS level_minus4_5
+                   FROM top3_local_bottoms tlb
+                   JOIN second_points sp ON sp.ticker = tlb.ticker AND sp.rn = tlb.rn
+                   WHERE sp.rn_rank = 1
+                   ORDER BY tlb.ticker, tlb.date DESC;
                 """;
         Query query = entityManager.createNativeQuery(sql);
         query.setParameter("ticker", ticker);
@@ -97,39 +102,40 @@ public class ProjectionRepositoryCustomImpl implements ProjectionRepositoryCusto
     public List<StandardDeviationProjectionDTO> findLast3TopProjections(String ticker) {
         String sql = """
                     WITH ranked_prices AS (
-                        SELECT
-                            dp.ticker,
-                            dp.date,
-                            dp.high,
-                            dp.low,
-                            dp.close,
-                            ROW_NUMBER() OVER (PARTITION BY dp.ticker ORDER BY dp.date) AS rn
-                        FROM daily_prices dp
-                        JOIN stocks s ON dp.ticker = s.ticker
-                        WHERE ((s.delisted_date IS NULL
-                          AND s.highest <= dp.close * 1.15) AND (dp.ticker = :ticker))
-                          AND dp.date BETWEEN current_date - interval '52 week' AND current_date
+                      SELECT
+                        dp.ticker,
+                        dp.date,
+                        dp.high,
+                        dp.low,
+                        dp.close,
+                        ROW_NUMBER() OVER (PARTITION BY dp.ticker ORDER BY dp.date) AS rn
+                      FROM daily_prices dp
+                      JOIN stocks s ON dp.ticker = s.ticker
+                      WHERE ((s.delisted_date IS NULL
+                        AND dp.close >= s.highest * 0.85) -- close within 15% of all-time high
+                        AND (dp.ticker = :ticker))
+                        AND dp.date BETWEEN current_date - interval '52 week' AND current_date
                     ),
                     local_tops AS (
-                        SELECT
-                            rp.*
-                        FROM ranked_prices rp
-                        WHERE rp.high > COALESCE((
-                            SELECT MAX(high)
-                            FROM ranked_prices
-                            WHERE ticker = rp.ticker
-                              AND rn BETWEEN rp.rn - 3 AND rp.rn + 3
-                              AND rn <> rp.rn
-                        ), 0)
+                      SELECT
+                        rp.*
+                      FROM ranked_prices rp
+                      WHERE rp.high > COALESCE((
+                        SELECT MAX(high)
+                        FROM ranked_prices
+                        WHERE ticker = rp.ticker
+                          AND rn BETWEEN rp.rn - 3 AND rp.rn + 3
+                          AND rn <> rp.rn
+                      ), 0)
                     ),
                     ranked_local_tops AS (
                       SELECT
                         lt.*,
-                        ROW_NUMBER() OVER (PARTITION BY lt.ticker ORDER BY lt.high DESC) AS peak_rank
+                        ROW_NUMBER() OVER (PARTITION BY lt.ticker ORDER BY lt.high DESC) AS top_rank
                       FROM local_tops lt
                     ),
                     top3_local_tops AS (
-                      SELECT * FROM ranked_local_tops WHERE peak_rank <= 3
+                      SELECT * FROM ranked_local_tops WHERE top_rank <= 3
                     ),
                     second_points AS (
                       SELECT
@@ -145,14 +151,20 @@ public class ProjectionRepositoryCustomImpl implements ProjectionRepositoryCusto
                       JOIN ranked_prices rp ON rp.ticker = tlt.ticker
                         AND rp.rn BETWEEN tlt.rn - 3 AND tlt.rn + 3
                         AND rp.rn <> tlt.rn
+                        AND rp.low < tlt.high  -- second point must be below local top high
                     )
                     SELECT
                       tlt.ticker,
                       tlt.date AS local_top_date,
                       sp.second_point_date,
+                      sp.second_point_min_low AS level_1,
                       tlt.high AS level_0,
-                      tlt.high + (sp.second_point_min_low - tlt.high) * 1 AS level_1,
-                      ABS(sp.second_point_min_low - tlt.high) AS diff
+                      ABS(tlt.high - sp.second_point_min_low) AS diff,
+                      sp.second_point_min_low - ABS(tlt.high - sp.second_point_min_low) * 1 AS level_plus1,
+                      sp.second_point_min_low - ABS(tlt.high - sp.second_point_min_low) * 2 AS level_plus2,
+                      sp.second_point_min_low - ABS(tlt.high - sp.second_point_min_low) * 2.5 AS level_plus2_5,
+                      sp.second_point_min_low - ABS(tlt.high - sp.second_point_min_low) * 4 AS level_plus4,
+                      sp.second_point_min_low - ABS(tlt.high - sp.second_point_min_low) * 4.5 AS level_plus4_5
                     FROM top3_local_tops tlt
                     JOIN second_points sp ON sp.ticker = tlt.ticker AND sp.rn = tlt.rn
                     WHERE sp.rn_rank = 1
@@ -170,19 +182,29 @@ public class ProjectionRepositoryCustomImpl implements ProjectionRepositoryCusto
     public List<StandardDeviationProjectionDTO> mapToDTO(List<Object[]> results) {
         return results.stream().map(row -> {
             String ticker = (String) row[0];
-            LocalDate localTopDate = ((java.sql.Date) row[1]).toLocalDate();
+            LocalDate firstPointDate = ((java.sql.Date) row[1]).toLocalDate();
             LocalDate secondPointDate = ((java.sql.Date) row[2]).toLocalDate();
             double level1 = ((Number) row[3]).doubleValue();
             double level0 = ((Number) row[4]).doubleValue();
             double diff = ((Number) row[5]).doubleValue();
+            double level_minus1 = ((Number) row[6]).doubleValue();
+            double level_minus2 = ((Number) row[7]).doubleValue();
+            double level_minus2_5 = ((Number) row[8]).doubleValue();
+            double level_minus4 = ((Number) row[9]).doubleValue();
+            double level_minus4_5 = ((Number) row[10]).doubleValue();
 
             return new StandardDeviationProjectionDTO(
                     ticker,
-                    localTopDate,
+                    firstPointDate,
                     secondPointDate,
                     diff,
                     level0,
-                    level1
+                    level1,
+                    level_minus1,
+                    level_minus2,
+                    level_minus2_5,
+                    level_minus4,
+                    level_minus4_5
             );
         }).collect(Collectors.toList());
     }

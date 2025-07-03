@@ -61,8 +61,13 @@ function calculateGridSize(mapSize) {
     };
 }
 
-function fetchProjections(ticker) {
-  return fetch(`/api/projections/${ticker}?limit=3`)
+function fetchTopProjections(ticker) {
+  return fetch(`/api/projections/top/${ticker}`)
+    .then(response => response.json());
+}
+
+function fetchBottomProjections(ticker) {
+  return fetch(`/api/projections/bottom/${ticker}`)
     .then(response => response.json());
 }
 
@@ -178,14 +183,26 @@ function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, 
             point: {
                 events: {
                     click: function() {
+                        const projections = [];
                         const ticker = data[this.index].ticker;
-                        fetchProjections(ticker).then(projections => {
-                            const proj = (projections && projections.length > 0) ? projections[0] : null;
-                            updateOHLCChart({ ticker }, proj);
-                        }).catch(err => {
-                            console.error('Error fetching projections:', err);
-                            updateOHLCChart({ ticker }, null); // fallback without projections
-                        });
+                        fetchTopProjections(ticker)
+                          .then(topProjections => {
+                            // Add top projections to the array
+                            projections.push(...topProjections);
+                            // Return the bottom projections fetch promise
+                            return fetchBottomProjections(ticker);
+                          })
+                          .then(bottomProjections => {
+                            // Add bottom projections to the array
+                            projections.push(...bottomProjections);
+                            // Now call updateOHLCChart with combined projections
+                            updateOHLCChart({ ticker }, projections);
+                          })
+                          .catch(error => {
+                            console.error('Error fetching projections:', error);
+                            // Even if error, call update with whatever projections collected so far or empty array
+                            updateOHLCChart({ ticker }, projections);
+                          });
                     }
                 }
             },
