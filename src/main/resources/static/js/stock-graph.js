@@ -3,20 +3,12 @@ let ohlcContainer;
 let chart;
 let isResizing = false;
 
-let currentProj = null;  // store the current projection globally or in your module scope
-
-function fetchProjections(ticker) {
-  return fetch(`/api/projections/${ticker}?limit=3`)
-    .then(response => response.json());
-}
-
-function addProjectionBandsSVG(chart, proj) {
+function addProjectionBandsSVG2(chart, proj) {
     if (!chart || !proj) return;
     if (!chart.xAxis || !chart.xAxis[0] || !chart.yAxis || !chart.yAxis[0]) return;
 
     // Destroy previous group if exists
     if (chart.customProjectionGroup) {
-        console.log('Destroying previous projection group');
         chart.customProjectionGroup.destroy();
     }
 
@@ -60,8 +52,58 @@ function addProjectionBandsSVG(chart, proj) {
     chart.customProjectionGroup = group;
 }
 
+function addProjectionBandsSVG(chart, proj) {
+  if (!chart || !proj) return;
+  if (!chart.xAxis || !chart.xAxis[0] || !chart.yAxis || !chart.yAxis[0]) return;
 
-function updateOHLCChart(stockData) {
+  // Destroy previous group if exists
+  if (chart.customProjectionGroup) {
+    chart.customProjectionGroup.destroy();
+    chart.customProjectionGroup = null;  // Clear reference after destroy
+  }
+
+  // Create new group and assign it immediately
+  const group = chart.renderer.g('custom-projection-bands').add();
+  chart.customProjectionGroup = group;
+
+  // Convert data to pixels
+  const x1 = chart.xAxis[0].toPixels(new Date(proj.localTopDate));
+  const x2 = chart.xAxis[0].toPixels(new Date(proj.secondPointDate));
+
+  const level0 = proj.level0;
+  const level1 = proj.level1;
+  const diff = proj.diff;
+
+  const yLevels = [
+    { from: level1 - diff, to: level0, color: 'rgba(128,128,128,0.3)', label: '-1 to 0' },
+    { from: level0, to: level1, color: 'rgba(128,128,128,0.15)', label: '0 to 1' },
+    { from: level1, to: level1 - 2.5 * diff, color: 'rgba(255,255,0,0.3)', label: '1 to 2.5' },
+    { from: level1 - 2.5 * diff, to: level1 - 4.5 * diff, color: 'rgba(255,0,0,0.3)', label: '2.5 to 4.5' }
+  ];
+
+  yLevels.forEach(({ from, to, color, label }) => {
+    const yFrom = chart.yAxis[0].toPixels(from);
+    const yTo = chart.yAxis[0].toPixels(to);
+
+    const rectX = Math.min(x1, x2);
+    const rectY = Math.min(yFrom, yTo);
+    const rectWidth = Math.abs(x2 - x1);
+    const rectHeight = Math.abs(yTo - yFrom);
+
+    // Add rectangle to the group
+    chart.renderer.rect(rectX, rectY, rectWidth, rectHeight)
+      .attr({ fill: color, zIndex: 5 })
+      .add(group);
+
+    // Add label text to the group
+    chart.renderer.text(label, rectX + 5, rectY + 15)
+      .css({ color: '#666', fontSize: '10px' })
+      .add(group);
+  });
+}
+
+
+function updateOHLCChart(stockData, projection) {
     const urlParams = new URLSearchParams(window.location.search);
     const timeFrame = (urlParams.get('timeFrame') || 'daily').toLowerCase();
 
@@ -109,6 +151,9 @@ function updateOHLCChart(stockData) {
         .then(response => response.json())
         .then(priceData => {
             if (chart) {
+                // Store the current projection on the chart object
+                chart.currentProjection = projection;
+
                 chart.update({
                     title: {
                         text: `${stockData.ticker}`
@@ -123,7 +168,11 @@ function updateOHLCChart(stockData) {
                             item.close
                         ])
                     }]
-                });
+                }, true);
+                chart.currentProjection = projection;  // update projection on existing chart
+                if (projection) {
+                    addProjectionBandsSVG(chart, projection);
+                }
             } else {
                // If the chart doesn't exist, create a new one
                chart = Highcharts.stockChart('ohlc-container', {
@@ -132,10 +181,10 @@ function updateOHLCChart(stockData) {
                         backgroundColor: '#171B26',
                         events: {
                             load: function () {
-                                addProjectionBandsSVG(this, currentProj);
+                                if (this.currentProjection) addProjectionBandsSVG(this, this.currentProjection);
                             },
                             redraw: function () {
-                                addProjectionBandsSVG(this, currentProj);
+                                if (this.currentProjection) addProjectionBandsSVG(this, this.currentProjection);
                             }
                         }
                     },
@@ -265,17 +314,13 @@ function updateOHLCChart(stockData) {
                        chart.reflow();
                    }
                });
-               fetchProjections(stockData.ticker)
-                     .then(projections => {
-                         if (projections && projections.length > 0) {
-                            currentProj = projections[0];
-                            console.log(currentProj);
-                            if (chart) {
-                                addProjectionBandsSVG(chart, currentProj);
-                            }
-                         }
-                     });
 
+              // Assign currentProjection to the newly created chart
+              chart.currentProjection = projection;
+              // Draw bands initially
+              if (projection) {
+                addProjectionBandsSVG(chart, projection);
+              }
            }
        })
        .catch(error => console.error(error));

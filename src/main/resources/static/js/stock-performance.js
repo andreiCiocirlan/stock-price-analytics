@@ -61,6 +61,11 @@ function calculateGridSize(mapSize) {
     };
 }
 
+function fetchProjections(ticker) {
+  return fetch(`/api/projections/${ticker}?limit=3`)
+    .then(response => response.json());
+}
+
 function updateStockPerformanceChartCurrentTimeframe() {
     updateStockPerformanceChart(currentTimeFrame);
 }
@@ -173,7 +178,14 @@ function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, 
             point: {
                 events: {
                     click: function() {
-                        updateOHLCChart({ ticker: data[this.index].ticker });
+                        const ticker = data[this.index].ticker;
+                        fetchProjections(ticker).then(projections => {
+                            const proj = (projections && projections.length > 0) ? projections[0] : null;
+                            updateOHLCChart({ ticker }, proj);
+                        }).catch(err => {
+                            console.error('Error fetching projections:', err);
+                            updateOHLCChart({ ticker }, null); // fallback without projections
+                        });
                     }
                 }
             },
