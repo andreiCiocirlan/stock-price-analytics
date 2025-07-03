@@ -15,7 +15,6 @@ public class StandardDeviationProjectionService {
 
     public List<StandardDeviationProjectionDTO> getLast3Projections(String ticker) {
         // Delegate the call to the custom repository implementation
-        System.out.println("CALLED FOR TICKER: " + ticker);
         return projectionRepositoryCustom.findLast3ProjectionsByTicker(ticker);
     }
 }
