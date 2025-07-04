@@ -7,26 +7,26 @@ function addProjectionBandsSVG(chart, projections) {
     if (!chart || !projections || !Array.isArray(projections) || projections.length === 0) return;
     if (!chart.xAxis || !chart.xAxis[0] || !chart.yAxis || !chart.yAxis[0]) return;
 
-  // Destroy previous group if exists
-  if (chart.customProjectionGroup) {
+    // Destroy previous group if exists
+    if (chart.customProjectionGroup) {
     chart.customProjectionGroup.destroy();
     chart.customProjectionGroup = null;  // Clear reference after destroy
-  }
+    }
 
-  // Create new group and assign it immediately
-  const group = chart.renderer.g('custom-projection-bands').add();
-  chart.customProjectionGroup = group;
+    // Create new group and assign it immediately
+    const group = chart.renderer.g('custom-projection-bands').add();
+    chart.customProjectionGroup = group;
 
     // Loop over each projection and draw its bands
     projections.forEach((proj, index) => {
         if (!proj) return;
 
 
-      // Convert data to pixels
-      const x1 = chart.xAxis[0].toPixels(new Date(proj.firstPointDate));
-      const x2 = chart.xAxis[0].toPixels(new Date(proj.secondPointDate));
+    // Convert data to pixels
+    const x1 = chart.xAxis[0].toPixels(new Date(proj.firstPointDate));
+    const x2 = chart.xAxis[0].toPixels(new Date(proj.secondPointDate));
 
-      const yLevels = [
+    const yLevels = [
         { from: proj.level1, to: proj.level0, color: 'rgba(128,128,128,0.3)', label: '1' },
         { from: proj.level0, to: proj.level_minus1, color: 'rgba(128,128,128,0.3)', label: '0' },
         { from: proj.level_minus1, to: proj.level_minus2, color: 'rgba(255,255,0,0.3)', label: '-1' },
@@ -34,7 +34,7 @@ function addProjectionBandsSVG(chart, projections) {
         { from: proj.level_minus2_5, to: proj.level_minus4, color: 'rgba(255,0,0,0.3)', label: '2.5' },
         { from: proj.level_minus4, to: proj.level_minus4_5, color: 'rgba(255,0,0,0.3)', label: '4' },
         { from: proj.level_minus4_5, to: proj.level_minus4_5, color: 'rgba(255,0,0,0.3)', label: '4.5' }
-      ];
+    ];
 
       yLevels.forEach(({ from, to, color, label }) => {
         const yFrom = chart.yAxis[0].toPixels(from);
