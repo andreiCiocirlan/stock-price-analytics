@@ -54,7 +54,7 @@ public class ProjectionRepositoryCustomImpl implements ProjectionRepositoryCusto
                       FROM local_bottoms lb
                     ),
                     top3_local_bottoms AS (
-                      SELECT * FROM ranked_local_bottoms WHERE bottom_rank <= 1
+                      SELECT * FROM ranked_local_bottoms WHERE bottom_rank <= 5
                     ),
                     second_points AS (
                       SELECT
@@ -134,7 +134,7 @@ public class ProjectionRepositoryCustomImpl implements ProjectionRepositoryCusto
                       FROM local_tops lt
                     ),
                     top3_local_tops AS (
-                      SELECT * FROM ranked_local_tops WHERE top_rank <= 1
+                      SELECT * FROM ranked_local_tops WHERE top_rank <= 5
                     ),
                     second_points AS (
                       SELECT
