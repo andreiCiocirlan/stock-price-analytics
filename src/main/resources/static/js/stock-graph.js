@@ -27,17 +27,17 @@ function addProjectionBandsSVG(chart, projections) {
     const x2 = chart.xAxis[0].toPixels(new Date(proj.secondPointDate));
 
     const yLevels = [
-        { from: proj.level1, to: proj.level0, color: 'rgba(128,128,128,0.3)', label: '1' },
-        { from: proj.level0, to: proj.level_minus1, color: 'rgba(128,128,128,0.3)', label: '0' },
+        { from: proj.level0, to: proj.level1, color: 'rgba(128,128,128,0.3)', label: '1' },
+        { from: proj.level1, to: proj.level_minus1, color: 'rgba(128,128,128,0.3)', label: '0' },
         { from: proj.level_minus1, to: proj.level_minus2, color: 'rgba(255,255,0,0.3)', label: '-1' },
-        { from: proj.level_minus2, to: proj.level_minus2_5, color: 'rgba(255,255,0,0.3)', label: '2' },
-        { from: proj.level_minus2_5, to: proj.level_minus4, color: 'rgba(255,0,0,0.3)', label: '2.5' },
-        { from: proj.level_minus4, to: proj.level_minus4_5, color: 'rgba(255,0,0,0.3)', label: '4' },
-        { from: proj.level_minus4_5, to: proj.level_minus4_5, color: 'rgba(255,0,0,0.3)', label: '4.5' }
+        { from: proj.level_minus2, to: proj.level_minus2_5, color: 'rgba(255,255,0,0.3)', label: '-2' },
+        { from: proj.level_minus2_5, to: proj.level_minus4, color: 'rgba(255,0,0,0.3)', label: '-2.5' },
+        { from: proj.level_minus4, to: proj.level_minus4_5, color: 'rgba(255,0,0,0.3)', label: '-4' },
+        { from: proj.level_minus4_5, to: proj.level_minus4_5, color: 'rgba(255,0,0,0.3)', label: '-4.5' }
     ];
 
       yLevels.forEach(({ from, to, color, label }) => {
-        const yFrom = chart.yAxis[0].toPixels(from);
+          const yFrom = chart.yAxis[0].toPixels(from);
           const yTo = chart.yAxis[0].toPixels(to);
 
           const rectX = Math.min(x1, x2);
@@ -75,8 +75,8 @@ function addProjectionBandsSVG(chart, projections) {
           .add(group);
 
           // Anchor label to top line:
-            const labelX = rectX - 10; // tweak as needed
-            const labelY = rectY + 4;  // small vertical offset for baseline
+            const labelX = rectX - 10;
+            const labelY = proj.level0 < proj.level1 ? rectY + rectHeight : rectY + 1;
 
             chart.renderer.text(label, labelX, labelY)
               .css({ color: '#666', fontSize: '10px', fontWeight: 'bold' })

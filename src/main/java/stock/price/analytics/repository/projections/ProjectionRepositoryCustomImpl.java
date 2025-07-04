@@ -33,7 +33,7 @@ public class ProjectionRepositoryCustomImpl implements ProjectionRepositoryCusto
                       JOIN stocks s ON dp.ticker = s.ticker
                       WHERE s.delisted_date IS NULL
                       AND dp.ticker = :ticker
-                      AND dp.date BETWEEN current_date - interval '104 week' AND current_date
+                      AND dp.date BETWEEN current_date - interval '52 week' AND current_date
                     ),
                     local_bottoms AS (
                       SELECT
@@ -54,7 +54,7 @@ public class ProjectionRepositoryCustomImpl implements ProjectionRepositoryCusto
                       FROM local_bottoms lb
                     ),
                     top3_local_bottoms AS (
-                      SELECT * FROM ranked_local_bottoms WHERE bottom_rank <= 10
+                      SELECT * FROM ranked_local_bottoms WHERE bottom_rank <= 1
                     ),
                     second_points AS (
                       SELECT
@@ -76,8 +76,8 @@ public class ProjectionRepositoryCustomImpl implements ProjectionRepositoryCusto
                          tlb.ticker,
                          tlb.date AS local_bottom_date,
                          sp.second_point_date,
-                         tlb.low AS level_1,
                          sp.second_point_max_high AS level_0,
+                         tlb.low AS level_1,
                          ABS(sp.second_point_max_high - tlb.low) AS diff,
                          sp.second_point_max_high + ABS(sp.second_point_max_high - tlb.low) * 1 AS level_minus1,
                          sp.second_point_max_high + ABS(sp.second_point_max_high - tlb.low) * 2 AS level_minus2,
@@ -113,7 +113,7 @@ public class ProjectionRepositoryCustomImpl implements ProjectionRepositoryCusto
                       JOIN stocks s ON dp.ticker = s.ticker
                       WHERE s.delisted_date IS NULL
                       AND dp.ticker = :ticker
-                      AND dp.date BETWEEN current_date - interval '104 week' AND current_date
+                      AND dp.date BETWEEN current_date - interval '52 week' AND current_date
                     ),
                     local_tops AS (
                       SELECT
@@ -134,7 +134,7 @@ public class ProjectionRepositoryCustomImpl implements ProjectionRepositoryCusto
                       FROM local_tops lt
                     ),
                     top3_local_tops AS (
-                      SELECT * FROM ranked_local_tops WHERE top_rank <= 10
+                      SELECT * FROM ranked_local_tops WHERE top_rank <= 1
                     ),
                     second_points AS (
                       SELECT
