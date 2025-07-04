@@ -31,9 +31,9 @@ public class ProjectionRepositoryCustomImpl implements ProjectionRepositoryCusto
                         ROW_NUMBER() OVER (PARTITION BY dp.ticker ORDER BY dp.date) AS rn
                       FROM daily_prices dp
                       JOIN stocks s ON dp.ticker = s.ticker
-                      WHERE ((s.delisted_date IS NULL
-                        AND dp.close <= s.lowest * 1.15) AND (dp.ticker = :ticker))
-                        AND dp.date BETWEEN current_date - interval '52 week' AND current_date
+                      WHERE s.delisted_date IS NULL
+                      AND dp.ticker = :ticker
+                      AND dp.date BETWEEN current_date - interval '104 week' AND current_date
                     ),
                     local_bottoms AS (
                       SELECT
@@ -54,7 +54,7 @@ public class ProjectionRepositoryCustomImpl implements ProjectionRepositoryCusto
                       FROM local_bottoms lb
                     ),
                     top3_local_bottoms AS (
-                      SELECT * FROM ranked_local_bottoms WHERE bottom_rank <= 3
+                      SELECT * FROM ranked_local_bottoms WHERE bottom_rank <= 10
                     ),
                     second_points AS (
                       SELECT
@@ -111,10 +111,9 @@ public class ProjectionRepositoryCustomImpl implements ProjectionRepositoryCusto
                         ROW_NUMBER() OVER (PARTITION BY dp.ticker ORDER BY dp.date) AS rn
                       FROM daily_prices dp
                       JOIN stocks s ON dp.ticker = s.ticker
-                      WHERE ((s.delisted_date IS NULL
-                        AND dp.close >= s.highest * 0.85) -- close within 15% of all-time high
-                        AND (dp.ticker = :ticker))
-                        AND dp.date BETWEEN current_date - interval '52 week' AND current_date
+                      WHERE s.delisted_date IS NULL
+                      AND dp.ticker = :ticker
+                      AND dp.date BETWEEN current_date - interval '104 week' AND current_date
                     ),
                     local_tops AS (
                       SELECT
@@ -135,7 +134,7 @@ public class ProjectionRepositoryCustomImpl implements ProjectionRepositoryCusto
                       FROM local_tops lt
                     ),
                     top3_local_tops AS (
-                      SELECT * FROM ranked_local_tops WHERE top_rank <= 3
+                      SELECT * FROM ranked_local_tops WHERE top_rank <= 10
                     ),
                     second_points AS (
                       SELECT
