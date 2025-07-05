@@ -251,7 +251,7 @@ function updateOHLCChart(stockData, projections) {
                         {
                             type: 'sma',
                             id: 'sma-200',
-                            name: '200SMA',
+                            name: '200 SMA',
                             color: 'red',
                             linkedTo: 'main-series',
                             params: { period: 200 },
@@ -264,7 +264,7 @@ function updateOHLCChart(stockData, projections) {
                         {
                             type: 'sma',
                             id: 'sma-21',
-                            name: '21SMA',
+                            name: '21 SMA',
                             color: 'yellow',
                             linkedTo: 'main-series',
                             params: { period: 21 },
@@ -277,7 +277,7 @@ function updateOHLCChart(stockData, projections) {
                         {
                             type: 'sma',
                             id: 'sma-100',
-                            name: '100SMA',
+                            name: '100 SMA',
                             color: 'orange',
                             linkedTo: 'main-series',
                             params: { period: 100 },
