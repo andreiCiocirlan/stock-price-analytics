@@ -147,9 +147,12 @@ public class FairValueGapService {
 
     @Transactional
     public void findNewFVGsAndSaveFor(List<String> tickers, StockTimeframe timeframe, boolean allHistoricalData) {
-        List<FairValueGap> newFVGs = findNewFVGsFor(tickers, timeframe, allHistoricalData);
-        if (!newFVGs.isEmpty()) {
-            asyncPersistenceService.partitionDataAndSaveNoLogging(newFVGs, fvgRepository);
+        List<FairValueGap> allNewFVGs = tickers.parallelStream()
+                .flatMap(ticker -> findNewFVGsFor(Collections.singletonList(ticker), timeframe, allHistoricalData).stream())
+                .collect(Collectors.toList());
+
+        if (!allNewFVGs.isEmpty()) {
+            asyncPersistenceService.partitionDataAndSaveNoLogging(allNewFVGs, fvgRepository);
         }
     }
 
