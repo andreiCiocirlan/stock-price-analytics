@@ -5,7 +5,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import stock.price.analytics.model.dto.StandardDeviationProjectionDTO;
+import stock.price.analytics.model.dto.StdDevProjectionDTO;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,7 +19,7 @@ public class ProjectionRepositoryCustomImpl implements ProjectionRepositoryCusto
     private final EntityManager entityManager;
 
     @Override
-    public List<StandardDeviationProjectionDTO> findLast3BottomProjections(String ticker) {
+    public List<StdDevProjectionDTO> findLast3BottomProjections(String ticker) {
         String sql = """
                     WITH ranked_prices AS (
                       SELECT
@@ -99,7 +99,7 @@ public class ProjectionRepositoryCustomImpl implements ProjectionRepositoryCusto
     }
 
     @Override
-    public List<StandardDeviationProjectionDTO> findLast3TopProjections(String ticker) {
+    public List<StdDevProjectionDTO> findLast3TopProjections(String ticker) {
         String sql = """
                     WITH ranked_prices AS (
                       SELECT
@@ -178,7 +178,7 @@ public class ProjectionRepositoryCustomImpl implements ProjectionRepositoryCusto
         return mapToDTO(results);
     }
 
-    public List<StandardDeviationProjectionDTO> mapToDTO(List<Object[]> results) {
+    public List<StdDevProjectionDTO> mapToDTO(List<Object[]> results) {
         return results.stream().map(row -> {
             String ticker = (String) row[0];
             LocalDate firstPointDate = ((java.sql.Date) row[1]).toLocalDate();
@@ -192,7 +192,7 @@ public class ProjectionRepositoryCustomImpl implements ProjectionRepositoryCusto
             double level_minus4 = ((Number) row[9]).doubleValue();
             double level_minus4_5 = ((Number) row[10]).doubleValue();
 
-            return new StandardDeviationProjectionDTO(
+            return new StdDevProjectionDTO(
                     ticker,
                     firstPointDate,
                     secondPointDate,
