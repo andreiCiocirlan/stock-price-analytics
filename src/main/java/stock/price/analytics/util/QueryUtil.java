@@ -13,19 +13,6 @@ import java.util.stream.Collectors;
 public final class QueryUtil {
 
 
-    public static String checkImportStatusQueryFor(StockTimeframe timeframe, boolean checkFirstImport) {
-        String timeframePeriod = timeframe.toDateTruncPeriod();
-        return STR."""
-                SELECT
-                    COUNT(*) = \{checkFirstImport ? "0" : "1"}
-                FROM
-                    daily_prices
-                WHERE
-                    ticker = 'AAPL'
-                    AND date_trunc('\{timeframePeriod}', date) = date_trunc('\{timeframePeriod}', current_date);
-                """;
-    }
-
     public static String savePriceGapsQueryFor(List<String> tickers, StockTimeframe timeframe, boolean allHistoricalData, boolean firstWeeklyImportDone) {
         String tickersFormatted = tickers.stream().map(ticker -> STR."'\{ticker}'").collect(Collectors.joining(", "));
         String dbTable = timeframe.dbTableOHLC();

@@ -12,7 +12,7 @@ import stock.price.analytics.model.dto.CandleWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.repository.prices.ohlc.*;
-import stock.price.analytics.util.QueryUtil;
+import stock.price.analytics.util.importstatus.ImportStatusQueryProvider;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -47,6 +47,7 @@ public class PriceService {
     private final CacheService cacheService;
     private final AsyncPersistenceService asyncPersistenceService;
     private final SyncPersistenceService syncPersistenceService;
+    private final ImportStatusQueryProvider importStatusQueryProvider;
 
     public void adjustPricesFor(String ticker, LocalDate stockSplitDate, double priceMultiplier) {
         List<DailyPrice> dailyPricesToUpdate = dailyPriceRepository.findByTickerAndDateLessThanEqual(ticker, tradingDateNow());
@@ -143,7 +144,7 @@ public class PriceService {
     // checkFirstImport false -> first import not done for timeframe
     // checkFirstImport true -> first import done for timeframe
     private boolean checkImportStatusFor(StockTimeframe timeframe, boolean checkFirstImport) {
-        String query = QueryUtil.checkImportStatusQueryFor(timeframe, checkFirstImport);
+        String query = importStatusQueryProvider.checkImportStatusQueryFor(timeframe, checkFirstImport);
         Query nativeQuery = entityManager.createNativeQuery(query, Boolean.class);
         return (Boolean) nativeQuery.getResultList().getFirst();
     }
