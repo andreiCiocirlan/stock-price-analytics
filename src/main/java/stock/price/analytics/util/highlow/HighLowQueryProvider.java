@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface HighLowQueryProvider {
     String weeklyHighLowExistsQuery();
+
     String queryAllHistoricalHighLowPricesFor(List<String> tickers, LocalDate tradingDate, HighLowPeriod highLowPeriod);
+
     String highLowPricesNotDelistedForDateQuery(HighLowPeriod highLowPeriod);
 }
