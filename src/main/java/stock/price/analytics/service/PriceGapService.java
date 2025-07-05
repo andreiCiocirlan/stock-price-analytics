@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.repository.gaps.PriceGapRepository;
-import stock.price.analytics.util.QueryUtil;
+import stock.price.analytics.util.pricegaps.PriceGapsQueryProvider;
 
 import java.util.List;
 
@@ -24,6 +24,7 @@ public class PriceGapService {
 
     @PersistenceContext
     private final EntityManager entityManager;
+    private final PriceGapsQueryProvider priceGapsQueryProvider;
 
     @Transactional
     public void saveAllPriceGapsFor(List<String> tickers) {
@@ -39,7 +40,7 @@ public class PriceGapService {
 
     @Transactional
     private void savePriceGapsFor(List<String> tickers, StockTimeframe timeframe, boolean allHistoricalData) {
-        String query = QueryUtil.savePriceGapsQueryFor(tickers, timeframe, allHistoricalData, priceService.isFirstImportDoneFor(WEEKLY));
+        String query = priceGapsQueryProvider.savePriceGapsQueryFor(tickers, timeframe, allHistoricalData, priceService.isFirstImportDoneFor(WEEKLY));
         int rowsAffected = entityManager.createNativeQuery(query).executeUpdate();
         log.info("saved {} rows for {} price gaps", rowsAffected, timeframe);
     }
