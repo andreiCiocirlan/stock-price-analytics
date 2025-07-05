@@ -15,7 +15,7 @@ import stock.price.analytics.model.prices.highlow.HighestLowestPrices;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.repository.prices.highlow.HighLowForPeriodRepository;
-import stock.price.analytics.util.QueryUtil;
+import stock.price.analytics.util.highlow.HighLowQueryProvider;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -34,6 +34,7 @@ public class HighLowForPeriodService {
     private final HighLowForPeriodRepository highLowForPeriodRepository;
     private final CacheService cacheService;
     private final AsyncPersistenceService asyncPersistenceService;
+    private final HighLowQueryProvider highLowQueryProvider;
 
     @Transactional
     public void saveCurrentWeekHighLowPricesFrom(List<DailyPrice> dailyPrices) {
@@ -54,14 +55,14 @@ public class HighLowForPeriodService {
 
     private void executeQueryAllHistoricalHLPrices(List<String> tickers, LocalDate tradingDate) {
         for (HighLowPeriod highLowPeriod : values()) {
-            String query = QueryUtil.queryAllHistoricalHighLowPricesFor(tickers, tradingDate, highLowPeriod);
+            String query = highLowQueryProvider.queryAllHistoricalHighLowPricesFor(tickers, tradingDate, highLowPeriod);
             int rowsAffected = entityManager.createNativeQuery(query).executeUpdate();
             log.info("saved {} rows for {} and high low period {}", rowsAffected, tickers, highLowPeriod);
         }
     }
 
     public boolean weeklyHighLowExists() {
-        String query = QueryUtil.weeklyHighLowExistsQuery();
+        String query = highLowQueryProvider.weeklyHighLowExistsQuery();
         Query nativeQuery = entityManager.createNativeQuery(query, Boolean.class);
         return (Boolean) nativeQuery.getResultList().getFirst();
     }
@@ -73,7 +74,7 @@ public class HighLowForPeriodService {
             case HIGH_LOW_52W -> HighLow52Week.class;
             case HIGH_LOW_ALL_TIME -> HighestLowestPrices.class;
         };
-        String query = QueryUtil.highLowPricesNotDelistedForDateQuery(highLowPeriod);
+        String query = highLowQueryProvider.highLowPricesNotDelistedForDateQuery(highLowPeriod);
         Query nativeQuery = entityManager.createNativeQuery(query, hlClass);
         nativeQuery.setParameter("tradingDate", date);
         return (List<? extends HighLowForPeriod>) nativeQuery.getResultList();
