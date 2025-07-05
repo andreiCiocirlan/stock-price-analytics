@@ -14,7 +14,7 @@ import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.repository.gaps.FVGRepository;
-import stock.price.analytics.util.QueryUtil;
+import stock.price.analytics.util.fvg.FvgQueryProvider;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -36,6 +36,7 @@ public class FairValueGapService {
     private final FVGRepository fvgRepository;
     private final CacheService cacheService;
     private final AsyncPersistenceService asyncPersistenceService;
+    private final FvgQueryProvider fvgQueryProvider;
 
     private boolean updateUnfilledGapsHighLowAndStatus(FairValueGap fvg, List<AbstractPrice> pricesForTicker) {
         // copy original state and compare at the end
@@ -140,7 +141,7 @@ public class FairValueGapService {
 
     @SuppressWarnings("unchecked")
     private List<FairValueGap> findFVGsForTickersAndTimeframe(List<String> tickers, StockTimeframe timeframe, boolean allHistoricalData) {
-        String query = QueryUtil.findFVGsQueryFrom(timeframe, tickers, allHistoricalData);
+        String query = fvgQueryProvider.findFVGsQueryFrom(timeframe, tickers, allHistoricalData);
         return (List<FairValueGap>) entityManager.createNativeQuery(query, FairValueGap.class).getResultList();
     }
 
@@ -264,7 +265,7 @@ public class FairValueGapService {
 
     @SuppressWarnings("unchecked")
     public Set<String> findTickersFVGsTaggedFor(StockTimeframe timeframe, FvgType fvgType, PricePerformanceMilestone pricePerformanceMilestone, String cfdMargins) {
-        String query = QueryUtil.findTickersFVGsTaggedQueryFor(timeframe, fvgType, pricePerformanceMilestone, cfdMargins);
+        String query = fvgQueryProvider.findTickersFVGsTaggedQueryFor(timeframe, fvgType, pricePerformanceMilestone, cfdMargins);
         return ((List<FairValueGap>) entityManager.createNativeQuery(query, FairValueGap.class).getResultList())
                 .stream()
                 .map(FairValueGap::getTicker)
