@@ -9,7 +9,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class StandardDeviationProjectionService {
+public class StdDevProjectionService {
 
     private final ProjectionRepositoryCustom projectionRepositoryCustom;
 
