@@ -12,7 +12,7 @@ import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.gaps.FVGRepository;
 import stock.price.analytics.repository.prices.ohlc.PriceDiscrepanciesRepository;
 import stock.price.analytics.repository.stocks.StockDiscrepanciesRepository;
-import stock.price.analytics.util.QueryUtil;
+import stock.price.analytics.util.pricediscrepancy.PriceDiscrepancyQueryProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +29,7 @@ public class DiscrepanciesService {
     private final PriceDiscrepanciesRepository priceDiscrepanciesRepository;
     private final StockDiscrepanciesRepository stockDiscrepanciesRepository;
     private final FVGRepository fvgRepository;
+    private final PriceDiscrepancyQueryProvider priceDiscrepancyQueryProvider;
 
     public List<String> findFvgDateDiscrepancies() {
         List<String> fvgDateDiscrepanciesResult = new ArrayList<>();
@@ -118,7 +119,7 @@ public class DiscrepanciesService {
 
     @Transactional
     public void updateStocksWithOpeningPriceDiscrepancyFor(StockTimeframe timeframe) {
-        String query = QueryUtil.updateStocksWithOpeningPriceDiscrepancyFor(timeframe);
+        String query = priceDiscrepancyQueryProvider.updateStocksWithOpeningPriceDiscrepancyFor(timeframe);
         int rowsAffected = entityManager.createNativeQuery(query).executeUpdate();
         log.info("updated {} rows stocks  {} opening prices", rowsAffected, timeframe);
     }

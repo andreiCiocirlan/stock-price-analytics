@@ -1,16 +1,12 @@
-package stock.price.analytics.util;
+package stock.price.analytics.util.pricediscrepancy.impl;
 
 import stock.price.analytics.model.prices.enums.StockTimeframe;
+import stock.price.analytics.util.pricediscrepancy.PriceDiscrepancyQueryProvider;
 
-import java.util.List;
-import java.util.stream.Collectors;
+public class PriceDiscrepancyQueryProviderImpl implements PriceDiscrepancyQueryProvider {
 
-public final class QueryUtil {
-
-
-
-
-    public static String updateStocksWithOpeningPriceDiscrepancyFor(StockTimeframe timeframe) {
+    @Override
+    public String updateStocksWithOpeningPriceDiscrepancyFor(StockTimeframe timeframe) {
         String prefix = timeframe.stockPrefix();
         String dbTable = timeframe.dbTableOHLC();
         String intervalPeriod = timeframe.toIntervalPeriod();
