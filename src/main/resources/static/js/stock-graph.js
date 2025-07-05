@@ -13,6 +13,11 @@ function addProjectionBandsSVG(chart, projections) {
     chart.customProjectionGroup = null;  // Clear reference after destroy
     }
 
+    const xAxis = chart.xAxis[0];
+    const yAxis = chart.yAxis[0];
+    const minVisible = xAxis.min; // timestamp of left visible edge
+    const maxVisible = xAxis.max; // timestamp of right visible edge
+
     // Create new group and assign it immediately
     const group = chart.renderer.g('custom-projection-bands').add();
     chart.customProjectionGroup = group;
@@ -21,20 +26,32 @@ function addProjectionBandsSVG(chart, projections) {
     projections.forEach((proj, index) => {
         if (!proj) return;
 
+        const firstDate = new Date(proj.firstPointDate).getTime();
+        const secondDate = new Date(proj.secondPointDate).getTime();
 
-    // Convert data to pixels
-    const x1 = chart.xAxis[0].toPixels(new Date(proj.firstPointDate));
-    const x2 = chart.xAxis[0].toPixels(new Date(proj.secondPointDate));
+        // Skip if both projection points are outside the visible range on the right
+        if (firstDate > maxVisible && secondDate > maxVisible) {
+            return; // Do not render this projection band
+        }
 
-    const yLevels = [
-        { from: proj.level0, to: proj.level1, color: 'rgba(128,128,128,0.3)', label: '1' },
-        { from: proj.level1, to: proj.level_minus1, color: 'rgba(128,128,128,0.3)', label: '0' },
-        { from: proj.level_minus1, to: proj.level_minus2, color: 'rgba(255,255,0,0.3)', label: '-1' },
-        { from: proj.level_minus2, to: proj.level_minus2_5, color: 'rgba(255,255,0,0.3)', label: '-2' },
-        { from: proj.level_minus2_5, to: proj.level_minus4, color: 'rgba(255,0,0,0.3)', label: '-2.5' },
-        { from: proj.level_minus4, to: proj.level_minus4_5, color: 'rgba(255,0,0,0.3)', label: '-4' },
-        { from: proj.level_minus4_5, to: proj.level_minus4_5, color: 'rgba(255,0,0,0.3)', label: '-4.5' }
-    ];
+        // Optionally, also skip if both points are left of visible range (off screen left)
+        if (firstDate < minVisible && secondDate < minVisible) {
+            return;
+        }
+
+        // Convert data to pixels
+        const x1 = chart.xAxis[0].toPixels(new Date(proj.firstPointDate));
+        const x2 = chart.xAxis[0].toPixels(new Date(proj.secondPointDate));
+
+        const yLevels = [
+            { from: proj.level0, to: proj.level1, color: 'rgba(128,128,128,0.3)', label: '1' },
+            { from: proj.level1, to: proj.level_minus1, color: 'rgba(128,128,128,0.3)', label: '0' },
+            { from: proj.level_minus1, to: proj.level_minus2, color: 'rgba(255,255,0,0.3)', label: '-1' },
+            { from: proj.level_minus2, to: proj.level_minus2_5, color: 'rgba(255,255,0,0.3)', label: '-2' },
+            { from: proj.level_minus2_5, to: proj.level_minus4, color: 'rgba(255,0,0,0.3)', label: '-2.5' },
+            { from: proj.level_minus4, to: proj.level_minus4_5, color: 'rgba(255,0,0,0.3)', label: '-4' },
+            { from: proj.level_minus4_5, to: proj.level_minus4_5, color: 'rgba(255,0,0,0.3)', label: '-4.5' }
+        ];
 
       yLevels.forEach(({ from, to, color, label }) => {
           const yFrom = chart.yAxis[0].toPixels(from);
