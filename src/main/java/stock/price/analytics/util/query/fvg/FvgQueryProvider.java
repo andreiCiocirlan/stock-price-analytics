@@ -1,4 +1,4 @@
-package stock.price.analytics.util.fvg;
+package stock.price.analytics.util.query.fvg;
 
 import stock.price.analytics.model.gaps.enums.FvgType;
 import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;

@@ -1,4 +1,4 @@
-package stock.price.analytics.util.candle;
+package stock.price.analytics.util.query.candle;
 
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 

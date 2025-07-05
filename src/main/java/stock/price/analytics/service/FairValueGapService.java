@@ -14,7 +14,7 @@ import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.repository.gaps.FVGRepository;
-import stock.price.analytics.util.fvg.FvgQueryProvider;
+import stock.price.analytics.util.query.fvg.FvgQueryProvider;
 
 import java.time.LocalDate;
 import java.util.*;

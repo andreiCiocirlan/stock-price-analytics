@@ -1,4 +1,4 @@
-package stock.price.analytics.util.importstatus;
+package stock.price.analytics.util.query.importstatus;
 
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 

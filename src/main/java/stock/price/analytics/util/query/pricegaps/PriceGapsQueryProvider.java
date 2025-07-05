@@ -1,4 +1,4 @@
-package stock.price.analytics.util.pricegaps;
+package stock.price.analytics.util.query.pricegaps;
 
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 

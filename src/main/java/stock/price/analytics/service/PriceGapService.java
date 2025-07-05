@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.repository.gaps.PriceGapRepository;
-import stock.price.analytics.util.pricegaps.PriceGapsQueryProvider;
+import stock.price.analytics.util.query.pricegaps.PriceGapsQueryProvider;
 
 import java.util.List;
 

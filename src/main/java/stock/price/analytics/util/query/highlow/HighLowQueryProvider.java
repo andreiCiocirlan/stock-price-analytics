@@ -1,4 +1,4 @@
-package stock.price.analytics.util.highlow;
+package stock.price.analytics.util.query.highlow;
 
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 

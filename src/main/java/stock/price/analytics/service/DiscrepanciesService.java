@@ -12,7 +12,7 @@ import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.gaps.FVGRepository;
 import stock.price.analytics.repository.prices.ohlc.PriceDiscrepanciesRepository;
 import stock.price.analytics.repository.stocks.StockDiscrepanciesRepository;
-import stock.price.analytics.util.pricediscrepancy.PriceDiscrepancyQueryProvider;
+import stock.price.analytics.util.query.pricediscrepancy.PriceDiscrepancyQueryProvider;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,9 +1,9 @@
-package stock.price.analytics.util.highlow.impl;
+package stock.price.analytics.util.query.highlow.impl;
 
 import org.springframework.stereotype.Component;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.util.TradingDateUtil;
-import stock.price.analytics.util.highlow.HighLowQueryProvider;
+import stock.price.analytics.util.query.highlow.HighLowQueryProvider;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;

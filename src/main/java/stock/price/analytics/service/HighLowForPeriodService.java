@@ -15,7 +15,7 @@ import stock.price.analytics.model.prices.highlow.HighestLowestPrices;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.repository.prices.highlow.HighLowForPeriodRepository;
-import stock.price.analytics.util.highlow.HighLowQueryProvider;
+import stock.price.analytics.util.query.highlow.HighLowQueryProvider;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

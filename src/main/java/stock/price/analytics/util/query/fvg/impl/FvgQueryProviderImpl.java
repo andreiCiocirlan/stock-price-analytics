@@ -1,4 +1,4 @@
-package stock.price.analytics.util.fvg.impl;
+package stock.price.analytics.util.query.fvg.impl;
 
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import stock.price.analytics.model.gaps.enums.FvgType;
 import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.util.fvg.FvgQueryProvider;
+import stock.price.analytics.util.query.fvg.FvgQueryProvider;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

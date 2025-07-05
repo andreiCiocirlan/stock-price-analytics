@@ -12,7 +12,7 @@ import stock.price.analytics.model.dto.CandleWithDateDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.*;
 import stock.price.analytics.repository.prices.ohlc.*;
-import stock.price.analytics.util.importstatus.ImportStatusQueryProvider;
+import stock.price.analytics.util.query.importstatus.ImportStatusQueryProvider;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;

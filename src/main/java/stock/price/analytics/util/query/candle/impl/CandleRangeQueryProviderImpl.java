@@ -1,8 +1,8 @@
-package stock.price.analytics.util.candle.impl;
+package stock.price.analytics.util.query.candle.impl;
 
 import org.springframework.stereotype.Component;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.util.candle.CandleRangeQueryProvider;
+import stock.price.analytics.util.query.candle.CandleRangeQueryProvider;
 
 @Component
 public class CandleRangeQueryProviderImpl implements CandleRangeQueryProvider {

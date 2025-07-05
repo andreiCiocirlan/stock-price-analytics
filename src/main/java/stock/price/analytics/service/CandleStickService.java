@@ -5,7 +5,7 @@ import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.util.candle.CandleRangeQueryProvider;
+import stock.price.analytics.util.query.candle.CandleRangeQueryProvider;
 
 import java.util.HashMap;
 import java.util.List;
