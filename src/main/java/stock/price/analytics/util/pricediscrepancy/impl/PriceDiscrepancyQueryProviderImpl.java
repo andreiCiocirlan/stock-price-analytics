@@ -1,8 +1,10 @@
 package stock.price.analytics.util.pricediscrepancy.impl;
 
+import org.springframework.stereotype.Component;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.util.pricediscrepancy.PriceDiscrepancyQueryProvider;
 
+@Component
 public class PriceDiscrepancyQueryProviderImpl implements PriceDiscrepancyQueryProvider {
 
     @Override

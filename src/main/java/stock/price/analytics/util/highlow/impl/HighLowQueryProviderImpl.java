@@ -1,5 +1,6 @@
 package stock.price.analytics.util.highlow.impl;
 
+import org.springframework.stereotype.Component;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.util.TradingDateUtil;
 import stock.price.analytics.util.highlow.HighLowQueryProvider;
@@ -11,6 +12,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public class HighLowQueryProviderImpl implements HighLowQueryProvider {
 
     @Override

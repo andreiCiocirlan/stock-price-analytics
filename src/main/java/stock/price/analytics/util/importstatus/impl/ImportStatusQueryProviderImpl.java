@@ -1,8 +1,10 @@
 package stock.price.analytics.util.importstatus.impl;
 
+import org.springframework.stereotype.Component;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.util.importstatus.ImportStatusQueryProvider;
 
+@Component
 public class ImportStatusQueryProviderImpl implements ImportStatusQueryProvider {
 
     @Override

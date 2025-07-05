@@ -1,11 +1,13 @@
 package stock.price.analytics.util.pricegaps.impl;
 
+import org.springframework.stereotype.Component;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.util.pricegaps.PriceGapsQueryProvider;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public class PriceGapsQueryProviderImpl implements PriceGapsQueryProvider {
 
 
