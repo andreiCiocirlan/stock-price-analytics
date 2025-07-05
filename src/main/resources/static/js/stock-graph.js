@@ -40,8 +40,8 @@ function addProjectionBandsSVG(chart, projections) {
         }
 
         // Convert data to pixels
-        const x1 = chart.xAxis[0].toPixels(new Date(proj.firstPointDate));
-        const x2 = chart.xAxis[0].toPixels(new Date(proj.secondPointDate));
+        const x1 = Math.round(Math.max(0, Math.min(chart.plotWidth, xAxis.toPixels(firstDate))));
+        const x2 = Math.round(Math.max(0, Math.min(chart.plotWidth, xAxis.toPixels(secondDate))));
 
         const yLevels = [
             { from: proj.level0, to: proj.level1, color: 'rgba(128,128,128,0.3)', label: '1' },
@@ -61,6 +61,7 @@ function addProjectionBandsSVG(chart, projections) {
           const rectY = Math.min(yFrom, yTo);
           const rectWidth = Math.abs(x2 - x1);
           const rectHeight = Math.abs(yTo - yFrom);
+          if (rectWidth <= 1) return; // Skip very narrow or zero-width bands
 
           // Draw rectangle
           chart.renderer.rect(rectX, rectY, rectWidth, rectHeight)
