@@ -200,7 +200,21 @@ function updateOHLCChart(stockData, projections) {
                     title: { text: `${stockData.ticker}`, style: { color: '#FFFFFF' } },
                     navigation: { buttonOptions: { enabled: false}}, // remove corner button tooltip
                     xAxis: {
-                        crosshair: { width: 1, color: 'gray', dashStyle: 'Dash' },
+                        crosshair: {
+                            width: 1,
+                            color: 'gray',
+                            dashStyle: 'Dash',
+                            label: {
+                                enabled: true,
+                                backgroundColor: '#444444',  // Solid gray background
+                                borderRadius: 3,
+                                style: {
+                                    color: '#FFFFFF',       // White text for contrast
+                                    fontWeight: 'bold',
+                                    padding: '5px 10px'
+                                },
+                            }
+                        },
                         type: 'datetime',
                         labels: { style: { color: '#FFFFFF' } }
                     },
@@ -289,6 +303,7 @@ function updateOHLCChart(stockData, projections) {
                         }
                     ],
                     tooltip: {
+                        headerFormat: '',
                         enabled: true,
                         shared: true,
                         useHTML: true,
