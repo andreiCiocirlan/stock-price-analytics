@@ -24,7 +24,7 @@
             <div class="checkbox-group">
                 <div class="checkbox-item">
                     <label for="positivePerfFirst">Sort</label>
-                    <input type="checkbox" id="positivePerfFirst" onchange="dispatchTimeFrameChangeEvent()" checked>
+                    <input type="checkbox" id="positivePerfFirst" checked>
                 </div>
             </div>
         </div>
@@ -43,7 +43,7 @@
             <div>
                 <div class="form-group">
                     <label for="intraday-spike" class="dropdown-label">Intraday Spike</label>
-                    <select class="form-control" id="intraday-spike" data-type="price-milestone" onchange="dispatchTimeFrameChangeEvent()">
+                    <select class="form-control" id="intraday-spike" data-type="price-milestone">
                         <option value="ANY">Any</option>
                         <option value="INTRADAY_SPIKE_UP">Spike Up</option>
                         <option value="INTRADAY_SPIKE_DOWN">Spike Down</option>
@@ -51,7 +51,7 @@
                 </div>
                 <div id="pre-market-dropdown" class="form-group">
                     <label for="pre-market" class="dropdown-label">Pre-market</label>
-                    <select class="form-control" id="pre-market" data-type="price-milestone" onchange="dispatchTimeFrameChangeEvent()">
+                    <select class="form-control" id="pre-market" data-type="price-milestone">
                         <option value="ANY">Any</option>
                         <option value="GAP_UP">Gap up</option>
                         <option value="GAP_DOWN">Gap down</option>
@@ -72,7 +72,7 @@
             <div class="ml-2">
                 <div class="form-group">
                     <label for="all-time" class="dropdown-label">All-Time High/Low</label>
-                    <select class="form-control" id="all-time" data-type="price-milestone" onchange="dispatchTimeFrameChangeEvent()">
+                    <select class="form-control" id="all-time" data-type="price-milestone">
                         <option value="ANY">Any</option>
                         <option value="NEW_ALL_TIME_HIGH">New High</option>
                         <option value="HIGH_ALL_TIME_95">0-5% below High</option>
@@ -84,7 +84,7 @@
                 </div>
                 <div class="form-group">
                     <label for="sma-200" class="dropdown-label">200-Day SMA</label>
-                    <select class="form-control" id="sma-200" data-type="price-milestone" onchange="dispatchTimeFrameChangeEvent()">
+                    <select class="form-control" id="sma-200" data-type="price-milestone">
                         <option value="ANY">Any</option>
                         <option value="ABOVE_200_SMA">Above</option>
                         <option value="BELOW_200_SMA">Below</option>
@@ -95,7 +95,7 @@
             <div class="ml-2">
                 <div class="form-group">
                     <label for="52-week" class="dropdown-label">52-Week High/Low</label>
-                    <select class="form-control" id="52-week" data-type="price-milestone" onchange="dispatchTimeFrameChangeEvent()">
+                    <select class="form-control" id="52-week" data-type="price-milestone">
                         <option value="ANY">Any</option>
                         <option value="NEW_52W_HIGH">New High</option>
                         <option value="HIGH_52W_95">0-5% below High</option>
@@ -107,7 +107,7 @@
                 </div>
                 <div class="form-group">
                     <label for="sma-50" class="dropdown-label">50-Day SMA</label>
-                    <select class="form-control" id="sma-50" data-type="price-milestone" onchange="dispatchTimeFrameChangeEvent()">
+                    <select class="form-control" id="sma-50" data-type="price-milestone">
                         <option value="ANY">Any</option>
                         <option value="ABOVE_50_SMA">Above</option>
                         <option value="BELOW_50_SMA">Below</option>
@@ -117,7 +117,7 @@
             <div class="ml-2">
                 <div class="form-group">
                     <label for="4-week" class="dropdown-label">4-Week High/Low</label>
-                    <select class="form-control" id="4-week" data-type="price-milestone" onchange="dispatchTimeFrameChangeEvent()">
+                    <select class="form-control" id="4-week" data-type="price-milestone">
                         <option value="ANY">Any</option>
                         <option value="NEW_4W_HIGH">New High</option>
                         <option value="HIGH_4W_95">0-5% below High</option>
@@ -129,7 +129,7 @@
                 </div>
                 <div class="form-group">
                     <label for="candlestick-type" class="dropdown-label">Candlestick type</label>
-                    <select class="form-control" id="candlestick-type" data-type="candlestick" onchange="dispatchTimeFrameChangeEvent()">
+                    <select class="form-control" id="candlestick-type" data-type="candlestick">
                         <option value="ANY">Any</option>
                         <option value="TIGHT">Tight</option>
                         <option value="DOJI">Doji</option>
