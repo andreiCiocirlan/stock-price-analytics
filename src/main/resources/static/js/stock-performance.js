@@ -1,7 +1,8 @@
 let currentTimeFrame = 'WEEKLY';
 let stockPerformanceChart;
+import { updateOHLCChart } from './stock-graph.js';
 
-function dispatchTimeFrameChangeEvent() {
+export function dispatchTimeFrameChangeEvent() {
     currentTimeFrame = determineSelectedTimeFrame();
     window.dispatchEvent(new CustomEvent('timeFrameChange', { detail: { timeFrame: currentTimeFrame } }));
 }
@@ -11,25 +12,36 @@ window.addEventListener('timeFrameChange', (event) => {
 });
 
 function determineSelectedTimeFrame() {
-    let selectedButton = document.querySelector('.time-frame-button-group button.active');
-    if (!selectedButton) {
-        selectedButton = document.querySelector('.time-frame-button-group button[onclick*="WEEKLY"]');
-        selectedButton.classList.add('active');
-        currentTimeFrame = 'WEEKLY';
+  let selectedButton = document.querySelector('.time-frame-button-group button.active');
+  if (!selectedButton) {
+    selectedButton = document.querySelector('.time-frame-button-group button[onclick*="WEEKLY"]');
+    if (selectedButton) {
+      selectedButton.classList.add('active');
+      currentTimeFrame = 'WEEKLY';
     } else {
-        currentTimeFrame = selectedButton.textContent.trim().toUpperCase();
+      // fallback if button not found
+      currentTimeFrame = 'WEEKLY';
+      console.warn('Weekly button not found; defaulting to WEEKLY');
     }
-    return currentTimeFrame;
+  } else {
+    currentTimeFrame = selectedButton.textContent.trim().toUpperCase();
+  }
+
+  return currentTimeFrame;
 }
 
-function handleTimeFrameButtonClick(timeFrame) {
+export function handleTimeFrameButtonClick(timeFrame) {
     // Remove 'active' class from all buttons
     const buttons = document.querySelectorAll('.time-frame-button-group button');
     buttons.forEach(button => button.classList.remove('active'));
 
     // Add 'active' class to the selected button
-    const selectedButton = document.querySelector(`.time-frame-button-group button[onclick*="${timeFrame}"]`);
-    selectedButton.classList.add('active');
+    const selectedButton = document.getElementById(`btn-${timeFrame.toLowerCase()}`);
+    if (selectedButton) {
+      selectedButton.classList.add('active');
+    } else {
+      console.warn(`No button found for timeFrame: ${timeFrame}`);
+    }
 
     currentTimeFrame = timeFrame;
     updateStockPerformanceChart(currentTimeFrame);
@@ -265,6 +277,8 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Call the function to determine the selected timeframe
-const selectedTimeFrame = determineSelectedTimeFrame();
-
+document.addEventListener('DOMContentLoaded', () => {
+  const selectedTimeFrame = determineSelectedTimeFrame();
+  // other initialization code
+});
 updateStockPerformanceChart();
