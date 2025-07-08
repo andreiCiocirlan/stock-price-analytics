@@ -4,6 +4,7 @@ let chart = null;
 let isResizing = false;
 
 import { getChartConfig  } from './chartConfig.js';
+import { addProjectionBandsSVG  } from './projection-utils.js';
 
 export function updateOHLCChart(stockData, projections) {
     const urlParams = new URLSearchParams(window.location.search);
