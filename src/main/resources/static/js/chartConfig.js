@@ -50,7 +50,16 @@ const tooltipConfig = {
     shadow: false,
     xDateFormat: '%d %b \'%y',
     positioner: function(labelWidth, labelHeight, point) {
-        // your positioner code here
+        const chart = this.chart;
+        let x, y;
+        if (point.isHeader) {
+            return {
+                x: point.plotX + this.chart.plotLeft - labelWidth / 2,
+                y: this.chart.chartHeight - labelHeight
+            };
+        } else {
+            return { x : 10, y : 0 };
+        }
     }
 };
 
