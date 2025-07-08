@@ -14,19 +14,12 @@ document.addEventListener('DOMContentLoaded', () => {
       el.addEventListener('change', dispatchTimeFrameChangeEvent);
     });
 
-  document.getElementById('btn-daily').addEventListener('click', () => {
-    handleTimeFrameButtonClick('DAILY');
-  });
-  document.getElementById('btn-weekly').addEventListener('click', () => {
-    handleTimeFrameButtonClick('WEEKLY');
-  });
-  document.getElementById('btn-monthly').addEventListener('click', () => {
-    handleTimeFrameButtonClick('MONTHLY');
-  });
-  document.getElementById('btn-quarterly').addEventListener('click', () => {
-    handleTimeFrameButtonClick('QUARTERLY');
-  });
-  document.getElementById('btn-yearly').addEventListener('click', () => {
-    handleTimeFrameButtonClick('YEARLY');
-  });
+    const timeFrames = ['DAILY', 'WEEKLY', 'MONTHLY', 'QUARTERLY', 'YEARLY'];
+
+    timeFrames.forEach(tf => {
+      const btn = document.getElementById(`btn-${tf.toLowerCase()}`);
+      if (btn) {
+        btn.addEventListener('click', () => handleTimeFrameButtonClick(tf));
+      }
+    });
 });
