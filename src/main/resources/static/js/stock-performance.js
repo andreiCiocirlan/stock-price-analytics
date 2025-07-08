@@ -14,7 +14,7 @@ window.addEventListener('timeFrameChange', (event) => {
 function determineSelectedTimeFrame() {
   let selectedButton = document.querySelector('.time-frame-button-group button.active');
   if (!selectedButton) {
-    selectedButton = document.querySelector('.time-frame-button-group button[onclick*="WEEKLY"]');
+    selectedButton = document.getElementById('btn-weekly');
     if (selectedButton) {
       selectedButton.classList.add('active');
       currentTimeFrame = 'WEEKLY';
