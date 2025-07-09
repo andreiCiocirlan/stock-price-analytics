@@ -10,13 +10,14 @@ const rangeSelect = {
 	selected: 2 // Default to 1 week
 };
 
-const crosshairLabelConfig = {
+const xAxisCrosshairLabelConfig = {
 	enabled: true,
 	backgroundColor: '#444444',
 	borderRadius: 3,
 	style: {
 		color: '#FFFFFF',
 		fontWeight: 'bold',
+        fontSize: '14px',
 		padding: '5px 10px'
 	},
 	snap: false,
@@ -28,7 +29,7 @@ const xAxisCrosshairConfig = {
 	width: 1,
 	color: 'gray',
 	dashStyle: 'Dash',
-	label: crosshairLabelConfig
+	label: xAxisCrosshairLabelConfig
 };
 
 const tooltipConfig = {
