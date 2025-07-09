@@ -90,7 +90,15 @@ export function getChartConfig(stockData, priceData, projections) {
 				color: 'gray',
 				dashStyle: 'Dash',
 				snap: false,
-				label: { enabled: true, style: { color: '#FFFFFF' } }
+				label: {
+                	enabled: true,
+                	format: '{value:.2f}',
+                	style: {
+                		color: '#FFFFFF',
+                        fontWeight: 'bold',
+                		fontSize: '14px'
+                	}
+                }
 			},
 			gridLineWidth: 0.2,
 			title: { text: 'Price' },
