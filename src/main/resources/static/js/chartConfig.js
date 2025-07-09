@@ -63,6 +63,80 @@ const tooltipConfig = {
 	}
 };
 
+function seriesConfig(priceData) {
+	return [{
+			id: 'main-series',
+			name: 'Stock Data',
+			type: 'candlestick',
+			data: priceData.map(item => [
+				new Date(item.date).getTime(),
+				item.open,
+				item.high,
+				item.low,
+				item.close
+			]),
+			tooltip: {
+				pointFormat: '<span style="font-size:15px;color:white">' +
+					'O<span style="color:{point.color}">{point.open:.2f}</span> ' +
+					'H<span style="color:{point.color}">{point.high:.2f}</span> ' +
+					'L<span style="color:{point.color}">{point.low:.2f}</span> ' +
+					'C<span style="color:{point.color}">{point.close:.2f}</span></span>'
+			}
+		},
+		{
+			type: 'sma',
+			id: 'sma-200',
+			name: '200 SMA',
+			color: 'red',
+			linkedTo: 'main-series',
+			params: {
+				period: 200
+			},
+			lineWidth: 0.5,
+			marker: {
+				enabled: false
+			},
+			tooltip: {
+				pointFormat: '<span style="font-size:15px;color:red">{series.name}: {point.y:.2f}</span>'
+			}
+		},
+		{
+			type: 'sma',
+			id: 'sma-21',
+			name: '21 SMA',
+			color: 'yellow',
+			linkedTo: 'main-series',
+			params: {
+				period: 21
+			},
+			lineWidth: 0.5,
+			marker: {
+				enabled: false
+			},
+			tooltip: {
+				pointFormat: '<span style="font-size:15px;color:yellow">{series.name}: {point.y:.2f}</span>'
+			}
+		},
+		{
+			type: 'sma',
+			id: 'sma-100',
+			name: '100 SMA',
+			color: 'orange',
+			linkedTo: 'main-series',
+			params: {
+				period: 100
+			},
+			lineWidth: 0.5,
+			marker: {
+				enabled: false
+			},
+			tooltip: {
+				pointFormat: '<span style="font-size:15px;color:orange">{series.name}: {point.y:.2f}</span>'
+			}
+		}
+	]
+}
+
 export function getChartConfig(stockData, priceData, projections) {
 	return {
 		chart: {
@@ -122,64 +196,6 @@ export function getChartConfig(stockData, priceData, projections) {
 		},
 		rangeSelector: rangeSelect, // your existing external config
 		tooltip: tooltipConfig, // use the external tooltip config
-		series: [{
-				id: 'main-series',
-				name: 'Stock Data',
-				type: 'candlestick',
-				data: priceData.map(item => [
-					new Date(item.date).getTime(),
-					item.open,
-					item.high,
-					item.low,
-					item.close
-				]),
-				tooltip: {
-					pointFormat: '<span style="font-size:15px;color:white">' +
-						'O<span style="color:{point.color}">{point.open:.2f}</span> ' +
-						'H<span style="color:{point.color}">{point.high:.2f}</span> ' +
-						'L<span style="color:{point.color}">{point.low:.2f}</span> ' +
-						'C<span style="color:{point.color}">{point.close:.2f}</span></span>'
-				}
-			},
-			{
-				type: 'sma',
-				id: 'sma-200',
-				name: '200 SMA',
-				color: 'red',
-				linkedTo: 'main-series',
-				params: { period: 200 },
-				lineWidth: 0.5,
-				marker: { enabled: false },
-				tooltip: {
-					pointFormat: '<span style="font-size:15px;color:red">{series.name}: {point.y:.2f}</span>'
-				}
-			},
-			{
-				type: 'sma',
-				id: 'sma-21',
-				name: '21 SMA',
-				color: 'yellow',
-				linkedTo: 'main-series',
-				params: { period: 21 },
-				lineWidth: 0.5,
-				marker: { enabled: false },
-				tooltip: {
-					pointFormat: '<span style="font-size:15px;color:yellow">{series.name}: {point.y:.2f}</span>'
-				}
-			},
-			{
-				type: 'sma',
-				id: 'sma-100',
-				name: '100 SMA',
-				color: 'orange',
-				linkedTo: 'main-series',
-				params: { period: 100 },
-				lineWidth: 0.5,
-				marker: { enabled: false },
-				tooltip: {
-					pointFormat: '<span style="font-size:15px;color:orange">{series.name}: {point.y:.2f}</span>'
-				}
-			}
-		]
+		series: seriesConfig(priceData)
 	};
 }
