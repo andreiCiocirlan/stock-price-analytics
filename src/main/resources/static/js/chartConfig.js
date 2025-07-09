@@ -20,7 +20,6 @@ const xAxisCrosshairLabelConfig = {
         fontSize: '14px',
 		padding: '5px 10px'
 	},
-	snap: false,
 	verticalAlign: 'top',
 	y: -10
 };
@@ -156,7 +155,8 @@ export function getChartConfig(stockData, priceData, projections) {
 		xAxis: {
 			type: 'datetime',
 			labels: { style: { color: '#FFFFFF' } },
-			crosshair: xAxisCrosshairConfig
+			crosshair: xAxisCrosshairConfig,
+            snap: false,
 		},
 		yAxis: {
 			crosshair: {
