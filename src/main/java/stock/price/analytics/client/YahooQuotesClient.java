@@ -53,8 +53,8 @@ public class YahooQuotesClient {
 
     private final RestTemplate restTemplate;
     private int RETRY_COUNT_CRUMB = 0;
-    private String COOKIE_FC_YAHOO = "A3=d=AQABBFl6HGgCEHllFybzlOVa_yghvNVSeWoFEgEBAQHLHWgmaPF3ziMA_eMCAA&S=AQAAAsHQb0b9SQITLwet7DOVPXM";
-    private String CRUMB_COOKIE = "Xi3czC/stuX";
+    private String COOKIE_FC_YAHOO = "A3=d=AQABBEeneGgCEO9df3RCJARKg5NAEZZZkZ4FEgABCAHteWinaPF3ziMAAiAAAAcI9aV4aDbSIy8";
+    private String CRUMB_COOKIE = "CrdDH35mR3k";
 
     private static CloseableHttpClient createHttpClient() {
         RequestConfig requestConfig = RequestConfig.custom()
