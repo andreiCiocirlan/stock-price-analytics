@@ -155,7 +155,7 @@ public class Stock implements BusinessEntity {
         price.updateStock(this);
     }
 
-    public double performanceFor(StockTimeframe timeFrame) {
+    public Double performanceFor(StockTimeframe timeFrame) {
         return switch (timeFrame) {
             case DAILY -> getDailyPerformance();
             case WEEKLY -> getWeeklyPerformance();
@@ -166,7 +166,10 @@ public class Stock implements BusinessEntity {
     }
 
     public boolean needsUpdate(AbstractPrice p) {
-        double performance = performanceFor(p.getTimeframe());
+        Double performance = performanceFor(p.getTimeframe());
+        if (performance == null) {
+            return true;
+        }
         if (this.getClose() != p.getClose() || performance != p.getPerformance()) return true;
 
         return switch (p.getTimeframe()) {
