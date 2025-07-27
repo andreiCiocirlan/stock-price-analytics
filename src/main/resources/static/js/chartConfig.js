@@ -141,14 +141,14 @@ export function getChartConfig(stockData, priceData, projections) {
 		chart: {
 			type: 'candlestick',
 			backgroundColor: '#171B26',
-			events: {
-				load: function() {
-					if (this.currentProjections) addProjectionBandsSVG(this, this.currentProjections);
-				},
-				redraw: function() {
-					if (this.currentProjections) addProjectionBandsSVG(this, this.currentProjections);
-				}
-			}
+//			events: {
+//				load: function() {
+//					if (this.currentProjections) addProjectionBandsSVG(this, this.currentProjections);
+//				},
+//				redraw: function() {
+//					if (this.currentProjections) addProjectionBandsSVG(this, this.currentProjections);
+//				}
+//			}
 		},
 		title: { text: `${stockData.ticker}`, style: { color: '#FFFFFF' } },
 		navigation: { buttonOptions: { enabled: false } },

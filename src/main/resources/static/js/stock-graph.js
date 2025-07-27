@@ -45,7 +45,7 @@ export function updateOHLCChart(stockData, projections) {
 		.then(priceData => {
 			if (chart) {
 				// Store the current projections on the chart object
-				chart.currentProjections = projections;
+//				chart.currentProjections = projections;
 
 				chart.update({
 					title: {
@@ -62,18 +62,18 @@ export function updateOHLCChart(stockData, projections) {
 						])
 					}]
 				}, true);
-				chart.currentProjections = projections; // update projections on existing chart
-				if (projections) {
-					addProjectionBandsSVG(chart, projections);
-				}
-				else {
+//				chart.currentProjections = projections; // update projections on existing chart
+//				if (projections) {
+//					addProjectionBandsSVG(chart, projections);
+//				}
+//				else {
 					// No projection found: clear previous bands if any
-					if (chart.customProjectionGroup) {
-						chart.customProjectionGroup.destroy();
-						chart.customProjectionGroup = null;
-					}
-					chart.currentProjections = null; // Clear stored projections
-				}
+//					if (chart.customProjectionGroup) {
+//						chart.customProjectionGroup.destroy();
+//						chart.customProjectionGroup = null;
+//					}
+//					chart.currentProjections = null; // Clear stored projections
+//				}
 			}
 			else {
 				// If the chart doesn't exist, create a new one
@@ -88,19 +88,19 @@ export function updateOHLCChart(stockData, projections) {
 				});
 
 				// Assign currentProjection to the newly created chart
-				chart.currentProjections = projections;
+//				chart.currentProjections = projections;
 				// Draw bands initially
-				if (projections) {
-					addProjectionBandsSVG(chart, projections);
-				}
-				else {
-					// No projection found: clear previous bands if any
-					if (chart.customProjectionGroup) {
-						chart.customProjectionGroup.destroy();
-						chart.customProjectionGroup = null;
-					}
-					chart.currentProjections = null; // Clear stored projection
-				}
+//				if (projections) {
+//					addProjectionBandsSVG(chart, projections);
+//				}
+//				else {
+//					// No projection found: clear previous bands if any
+//					if (chart.customProjectionGroup) {
+//						chart.customProjectionGroup.destroy();
+//						chart.customProjectionGroup = null;
+//					}
+//					chart.currentProjections = null; // Clear stored projection
+//				}
 
 			}
 		})
