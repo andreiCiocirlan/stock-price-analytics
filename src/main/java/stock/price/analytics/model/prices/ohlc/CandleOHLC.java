@@ -26,7 +26,7 @@ public record CandleOHLC(double open, double high, double low, double close) {
             if (open == 0 || (Math.abs(open) >= 0.1 * low && Math.abs(open) <= 0.1 * high)) {
                 open = close;
             } else if (open < low * 0.9 || open > high * 1.1) { // way off the mark (manual error)
-                log.warn(STR."Opening price \{open} must be between: \{low} and \{high}");
+//                log.warn(STR."Opening price \{open} must be between: \{low} and \{high}");
             }
         }
 
@@ -35,7 +35,7 @@ public record CandleOHLC(double open, double high, double low, double close) {
             if (Math.abs(close) >= 0.10 * low && Math.abs(close) <= 0.10 * high) {
                 close = 10 * close;
             } else if (close < low * 0.9 || close > high * 1.1) { // way off the mark (manual error)
-                log.warn(STR."Closing price \{close}  must be between \{high} high and low \{low}");
+//                log.warn(STR."Closing price \{close}  must be between \{high} high and low \{low}");
             }
         }
 
