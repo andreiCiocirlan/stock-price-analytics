@@ -20,9 +20,7 @@ public class IntradayScheduler {
     @Scheduled(cron = "${cron.intraday.gaps.update}", zone = "${cron.timezone}")
     public void updateGapsIntraday() {
         fairValueGapService.saveNewFVGsAndUpdateHighLowAndClosedAllTimeframes();
-        for (StockTimeframe timeframe : StockTimeframe.values()) {
-            priceGapService.savePriceGapsTodayFor(cacheService.getCachedTickers(), timeframe);
-        }
+        priceGapService.savePriceGapsTodayForAllTickers();
         priceGapService.closePriceGaps();
     }
 
