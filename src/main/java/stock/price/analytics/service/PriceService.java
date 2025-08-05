@@ -114,7 +114,7 @@ public class PriceService {
 
     public List<? extends AbstractPrice> previousThreePricesFor(List<String> tickers, StockTimeframe timeframe) {
         return switch (timeframe) {
-            case DAILY -> findPreviousThreeDailyPricesForTickers(tickers);
+            case DAILY -> findPreviousSevenDailyPricesForTickers(tickers);
             case WEEKLY -> weeklyPriceRepository.findPreviousThreeWeeklyPricesForTickers(tickers);
             case MONTHLY -> monthlyPriceRepository.findPreviousThreeMonthlyPricesForTickers(tickers);
             case QUARTERLY -> quarterlyPriceRepository.findPreviousThreeQuarterlyPricesForTickers(tickers);
@@ -122,14 +122,14 @@ public class PriceService {
         };
     }
 
-    private List<? extends AbstractPrice> findPreviousThreeDailyPricesForTickers(List<String> tickers) {
+    private List<? extends AbstractPrice> findPreviousSevenDailyPricesForTickers(List<String> tickers) {
         List<DailyPrice> previousSevenDailyPricesForTickers = dailyPriceRepository.findPreviousSevenDailyPricesForTickers(tickers);
 
         return previousSevenDailyPricesForTickers
                 .stream()
                 .collect(Collectors.groupingBy(DailyPrice::getTicker))
                 .values().stream()
-                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(AbstractPrice::getDate).reversed()).limit(3))
+                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(AbstractPrice::getDate).reversed()).limit(7))
                 .toList();
     }
 
