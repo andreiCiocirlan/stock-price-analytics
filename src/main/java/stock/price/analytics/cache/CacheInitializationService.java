@@ -113,7 +113,7 @@ public class CacheInitializationService {
             initHighLowPriceCache(highLowPeriod, currentWeekMonday);
             initPrevWeekHighLowPricesCache(highLowPeriod, prevWeekMonday);
         }
-        if (!cacheService.weeklyHighLowExists()) {
+        if (cacheService.weeklyHighLowDoesntExist()) {
             stockService.updateHighLowForPeriodFromHLCachesAndAdjustWeekend();
             highLowPricesCache.setWeeklyHighLowExists(true);
         }
@@ -125,7 +125,7 @@ public class CacheInitializationService {
     }
 
     private void initHighLowPriceCache(HighLowPeriod highLowPeriod, LocalDate currentWeekMonday) {
-        if (!cacheService.weeklyHighLowExists()) { // on first import of the week need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
+        if (cacheService.weeklyHighLowDoesntExist()) { // on first import of the week need to find min/max prices for the past 3 weeks and 51 weeks respectively (new objects)
             LocalDate prevWeekMonday = currentWeekMonday.minusWeeks(1);
             if (highLowPeriod == HighLowPeriod.HIGH_LOW_ALL_TIME) { // for all-time highs/lows simply copy the existing row on Mondays
                 List<HighestLowestPrices> highestLowestPrices = new ArrayList<>();

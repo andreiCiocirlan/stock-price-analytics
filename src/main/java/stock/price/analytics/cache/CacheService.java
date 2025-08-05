@@ -58,8 +58,8 @@ public class CacheService {
         }
     }
 
-    public boolean weeklyHighLowExists() {
-        return highLowPricesCache.getWeeklyHighLowExists();
+    public boolean weeklyHighLowDoesntExist() {
+        return !highLowPricesCache.getWeeklyHighLowExists();
     }
 
     public List<? extends HighLowForPeriod> highLowForPeriodPricesFor(HighLowPeriod period) {
