@@ -123,13 +123,13 @@ public class PriceService {
     }
 
     private List<? extends AbstractPrice> findPreviousSevenDailyPricesForTickers(List<String> tickers) {
-        List<DailyPrice> previousSevenDailyPricesForTickers = dailyPriceRepository.findPreviousSevenDailyPricesForTickers(tickers);
+        List<DailyPrice> previousSevenDailyPricesForTickers = dailyPriceRepository.findDailyPricesForTickersFromLastWeekToDate(tickers);
 
         return previousSevenDailyPricesForTickers
                 .stream()
                 .collect(Collectors.groupingBy(DailyPrice::getTicker))
                 .values().stream()
-                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(AbstractPrice::getDate).reversed()).limit(7))
+                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(AbstractPrice::getDate).reversed()).limit(3))
                 .toList();
     }
 

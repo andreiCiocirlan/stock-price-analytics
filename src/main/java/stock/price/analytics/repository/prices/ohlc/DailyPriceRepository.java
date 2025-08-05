@@ -21,5 +21,5 @@ public interface DailyPriceRepository extends JpaRepository<DailyPrice, Long> {
                 AND ticker in (:tickers)
                 ORDER BY ticker, date DESC
             """, nativeQuery = true)
-    List<DailyPrice> findPreviousSevenDailyPricesForTickers(List<String> tickers);
+    List<DailyPrice> findDailyPricesForTickersFromLastWeekToDate(List<String> tickers);
 }
