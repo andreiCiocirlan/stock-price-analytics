@@ -187,27 +187,47 @@ public class DailyPriceJSONService {
         return dailyJSONPrices;
     }
 
-    private void compareAndAddToList(DailyPriceJSON importedDailyPriceJSON, Map<String, DailyPriceJSON> recentJsonPricesById, List<DailyPriceJSON> dailyJSONPrices, List<DailyPrice> preMarketPrices, List<String> sameDailyPrices, String ticker) {
-        String key = importedDailyPriceJSON.getCompositeId();
-        if (recentJsonPricesById.containsKey(key)) {
-            DailyPriceJSON storedDailyPriceJSON = recentJsonPricesById.get(key);
-            Pair<Double, Double> highLowPrices = getHighLowImportedPrices(importedDailyPriceJSON, storedDailyPriceJSON);
-            if (importedDailyPriceJSON.getPreMarketPrice() != 0d || storedDailyPriceJSON.differentPrices(importedDailyPriceJSON)) { // compare OHLC, performance, or if pre-market price
-                DailyPriceJSON updatedPrice = storedDailyPriceJSON.updateFrom(importedDailyPriceJSON);
-                updatedPrice.setRegularMarketDayHigh(highLowPrices.getLeft());
-                updatedPrice.setRegularMarketDayLow(highLowPrices.getRight());
-                if (importedDailyPriceJSON.getPreMarketPrice() != 0d) { // add to pre-market prices (to be cached)
-                    preMarketPrices.add(updatedPrice.convertToDailyPrice(true));
-                } else { // add to imported json prices (to be stored)
-                    dailyJSONPrices.add(updatedPrice);
-                }
-            } else {
-                sameDailyPrices.add(ticker);
-            }
+    private boolean shouldUpdatePrice(DailyPriceJSON imported, DailyPriceJSON stored) {
+        return imported.getPreMarketPrice() != 0d || stored.differentPrices(imported);
+    }
+
+    private void updateAndAddPrice(DailyPriceJSON stored, DailyPriceJSON imported, List<DailyPriceJSON> dailyJSONPrices, List<DailyPrice> preMarketPrices) {
+        Pair<Double, Double> highLowPrices = getHighLowImportedPrices(imported, stored);
+        DailyPriceJSON updatedPrice = stored.updateFrom(imported);
+        updatedPrice.setRegularMarketDayHigh(highLowPrices.getLeft());
+        updatedPrice.setRegularMarketDayLow(highLowPrices.getRight());
+
+        if (imported.getPreMarketPrice() != 0d) {
+            preMarketPrices.add(updatedPrice.convertToDailyPrice(true));
         } else {
-            dailyJSONPrices.add(importedDailyPriceJSON);
+            dailyJSONPrices.add(updatedPrice);
         }
     }
+
+    private void compareAndAddToList(DailyPriceJSON importedDailyPriceJSON,
+                                     Map<String, DailyPriceJSON> recentJsonPricesById,
+                                     List<DailyPriceJSON> dailyJSONPrices,
+                                     List<DailyPrice> preMarketPrices,
+                                     List<String> sameDailyPrices,
+                                     String ticker) {
+
+        String key = importedDailyPriceJSON.getCompositeId();
+
+        if (!recentJsonPricesById.containsKey(key)) {
+            dailyJSONPrices.add(importedDailyPriceJSON);
+            return;
+        }
+
+        DailyPriceJSON storedDailyPriceJSON = recentJsonPricesById.get(key);
+
+        if (!shouldUpdatePrice(importedDailyPriceJSON, storedDailyPriceJSON)) {
+            sameDailyPrices.add(ticker);
+            return;
+        }
+
+        updateAndAddPrice(storedDailyPriceJSON, importedDailyPriceJSON, dailyJSONPrices, preMarketPrices);
+    }
+
 
     // utility method to find inconsistencies between imported high-low prices and already stored prices
     private Pair<Double, Double> getHighLowImportedPrices(DailyPriceJSON importedDailyPriceJSON, DailyPriceJSON storedDailyPriceJSON) {
