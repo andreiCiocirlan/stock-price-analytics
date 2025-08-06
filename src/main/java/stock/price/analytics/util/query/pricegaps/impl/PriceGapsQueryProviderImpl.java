@@ -66,7 +66,12 @@ public class PriceGapsQueryProviderImpl implements PriceGapsQueryProvider {
             	'\{timeframe}',
             	'OPEN',
             	closing_date
-            FROM unfilled_gaps;
+            FROM unfilled_gaps
+            ON CONFLICT (ticker, timeframe, date)
+            DO UPDATE SET
+                close = EXCLUDED.close,
+                status = EXCLUDED.status,
+                id = EXCLUDED.id;
             """;
     }
 }
