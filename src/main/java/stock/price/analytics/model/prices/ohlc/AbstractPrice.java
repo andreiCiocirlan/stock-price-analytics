@@ -15,6 +15,7 @@ import stock.price.analytics.model.stocks.Stock;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 
 @Getter
@@ -142,6 +143,10 @@ public abstract class AbstractPrice implements BusinessEntity {
         }
 
         return CandleStickType.ANY;
+    }
+
+    public String getCompositeId() {
+        return ticker + "_" + date.format(DateTimeFormatter.ISO_LOCAL_DATE);
     }
 
     @Override

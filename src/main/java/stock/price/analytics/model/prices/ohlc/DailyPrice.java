@@ -50,10 +50,6 @@ public class DailyPrice extends AbstractPrice {
         return StockTimeframe.DAILY;
     }
 
-    public String getCompositeId() {
-        return getTicker() + "_" + getDate().format(DateTimeFormatter.ISO_LOCAL_DATE);
-    }
-
     @Override
     public String toString() {
         return STR."Daily_OHLC {  \{super.toString()}";
