@@ -77,6 +77,7 @@ public class DailyPriceJSONService {
         List<DailyPrice> preMarketPrices = new ArrayList<>();
         Map<String, DailyPriceJSON> recentJsonPricesById = recentJsonPrices.stream().collect(Collectors.toMap(DailyPriceJSON::getCompositeId, Function.identity()));
         LocalDate tradingDateNow = tradingDateNow();
+        LocalDate previousTradingDate = dailyPriceJSONRepository.getPreviousTradingDate();
         for (DailyPriceJSON dailyPriceJson : dailyPriceJSONs) {
             String ticker = dailyPriceJson.getSymbol();
             LocalDate tradingDate = dailyPriceJson.getDate();
@@ -84,12 +85,10 @@ public class DailyPriceJSONService {
                 if (tradingDate == null) {
                     log.warn("trading date missing for ticker {}", ticker);
                     continue;
-                } else if (tradingDate.plusDays(5).isBefore(tradingDateNow)) {
-                    // more than 5 days passed since last intraDay price
+                } else if (tradingDate.isBefore(previousTradingDate)) { // delisted most likely
                     log.info("Not extracting delisted stock daily prices for ticker {} and date {}", ticker, tradingDate);
                     continue;
-                } else {
-                    // less than 5 days passed since last intraDay price
+                } else if (tradingDate.isEqual(previousTradingDate)) {
                     log.info("Extracting stock daily prices for ticker {} and date {}", ticker, tradingDate);
                 }
             }
