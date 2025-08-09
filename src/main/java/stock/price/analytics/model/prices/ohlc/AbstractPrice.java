@@ -146,7 +146,7 @@ public abstract class AbstractPrice implements BusinessEntity {
 
     @Override
     public String toString() {
-        return STR."ticker=\{ticker}, O=\{open}, H=\{high}, L=\{low}, C=\{close}, P=\{performance}\{'}'}";
+        return STR."ticker=\{ticker}, date=\{date}, O=\{open}, H=\{high}, L=\{low}, C=\{close}, P=\{performance}\{'}'}";
     }
 
 }
