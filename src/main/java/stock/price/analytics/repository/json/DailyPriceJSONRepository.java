@@ -17,4 +17,12 @@ public interface DailyPriceJSONRepository extends JpaRepository<DailyPriceJSON, 
 
     List<DailyPriceJSON> findByDate(LocalDate date);
 
+    @Query(value = """
+               SELECT MAX(date)
+               FROM daily_prices_json
+               WHERE symbol = 'AAPL' and date < (
+                   SELECT MAX(date) FROM daily_prices_json WHERE symbol = 'AAPL'
+               );
+            """, nativeQuery = true)
+    LocalDate getPreviousTradingDate();
 }
