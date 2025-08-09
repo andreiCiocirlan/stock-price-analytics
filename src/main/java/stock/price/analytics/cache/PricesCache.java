@@ -6,10 +6,7 @@ import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.prices.ohlc.PriceWithPrevClose;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
@@ -39,15 +36,14 @@ class PricesCache {
         if (pricesWithPrevClose == null || pricesWithPrevClose.isEmpty())
             return; // Handle null or empty list case to avoid exceptions
         Map<String, PriceWithPrevClose> pricesWithPrevCloseByTicker = pricesWithPrevCloseByTimeframe.get(timeframe);
-        pricesWithPrevClose.forEach(p -> pricesWithPrevCloseByTicker.put(p.price().getTicker(), p));
+        pricesWithPrevClose.forEach(p -> pricesWithPrevCloseByTicker.put(p.price().getCompositeId(), p));
     }
 
-    List<PriceWithPrevClose> pricesWithPrevCloseFor(List<String> tickers, StockTimeframe timeframe) {
-        Map<String, PriceWithPrevClose> pricesWithPrevCloseByTicker = pricesWithPrevCloseByTimeframe.get(timeframe);
-        return tickers.stream()
-                .flatMap(ticker -> pricesWithPrevCloseByTicker.entrySet().stream()
-                        .filter(entry -> entry.getKey().equals(ticker))
-                        .map(Map.Entry::getValue))
+    List<PriceWithPrevClose> pricesWithPrevCloseFor(List<String> compositeIds, StockTimeframe timeframe) {
+        Map<String, PriceWithPrevClose> cacheMap = pricesWithPrevCloseByTimeframe.get(timeframe);
+        return compositeIds.stream()
+                .map(cacheMap::get)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 

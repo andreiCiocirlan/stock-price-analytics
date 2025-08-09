@@ -114,8 +114,8 @@ public class CacheService {
         return new ArrayList<>(pricesCache.pricesFor(timeframe));
     }
 
-    public List<PriceWithPrevClose> pricesWithPrevCloseFor(List<String> tickers, StockTimeframe timeframe) {
-        return pricesCache.pricesWithPrevCloseFor(tickers, timeframe);
+    public List<PriceWithPrevClose> pricesWithPrevCloseFor(List<String> compositeIds, StockTimeframe timeframe) {
+        return pricesCache.pricesWithPrevCloseFor(compositeIds, timeframe);
     }
 
     public void addPricesWithPrevClose(List<PriceWithPrevClose> pricesWithPrevClose, StockTimeframe timeframe) {

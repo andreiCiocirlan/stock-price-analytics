@@ -16,6 +16,7 @@ import stock.price.analytics.util.query.importstatus.ImportStatusQueryProvider;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -24,6 +25,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.time.temporal.TemporalAdjusters.*;
+import static stock.price.analytics.util.DateUtil.convertDateToTimeframe;
 import static stock.price.analytics.util.PricesUtil.getHigherTimeframePricesMapFor;
 import static stock.price.analytics.util.PricesUtil.multiplyWith;
 import static stock.price.analytics.util.TradingDateUtil.isWithinSameTimeframe;
@@ -162,15 +164,22 @@ public class PriceService {
         return candles;
     }
 
+    private List<String> compositeIdsFromDailyPricesForTimeframe(List<DailyPrice> dailyPrices, StockTimeframe timeframe) {
+        return dailyPrices.stream()
+                .map(dp -> dp.getTicker() + "_" +
+                           convertDateToTimeframe(dp.getDate(), timeframe).format(DateTimeFormatter.ISO_LOCAL_DATE))
+                .distinct()
+                .toList();
+    }
+
     @Transactional
     public void updateAllTimeframePrices(List<DailyPrice> importedDailyPrices) {
-        List<String> tickers = new ArrayList<>(importedDailyPrices.stream().map(DailyPrice::getTicker).toList());
-
         // Update prices for each timeframe
         List<AbstractPrice> pricesUpdated = new ArrayList<>();
         for (StockTimeframe timeframe : StockTimeframe.values()) {
+            List<String> compositeIdsForTimeframe = compositeIdsFromDailyPricesForTimeframe(importedDailyPrices, timeframe);
             List<PriceWithPrevClose> pricesWithPrevCloseUpdated = updateAndSavePrices(importedDailyPrices, timeframe,
-                    cacheService.pricesWithPrevCloseFor(tickers, timeframe));
+                    cacheService.pricesWithPrevCloseFor(compositeIdsForTimeframe, timeframe));
             pricesUpdated.addAll(pricesWithPrevCloseUpdated.stream().map(PriceWithPrevClose::price).toList());
             cacheService.addPricesWithPrevClose(pricesWithPrevCloseUpdated, timeframe);
         }
@@ -180,20 +189,29 @@ public class PriceService {
 
     private List<PriceWithPrevClose> updateAndSavePrices(List<DailyPrice> importedDailyPrices,
                                                          StockTimeframe timeframe,
-                                                         List<PriceWithPrevClose> pricesWithPrevClose) {
+                                                         List<PriceWithPrevClose> cachedPricesWithPrevClose) {
         List<PriceWithPrevClose> result = new ArrayList<>();
-        Map<String, PriceWithPrevClose> pricesWithPrevCloseByTicker = pricesWithPrevClose.stream()
-                .collect(Collectors.toMap(priceWithPrevClose -> priceWithPrevClose.price().getTicker(), Function.identity()));
+        Map<String, PriceWithPrevClose> cachedPricesByCompositeId = cachedPricesWithPrevClose.stream()
+                .collect(Collectors.toMap(p -> p.price().getCompositeId(), Function.identity()));
         for (DailyPrice importedDailyPrice : importedDailyPrices) {
-            String ticker = importedDailyPrice.getTicker();
-            PriceWithPrevClose priceWithPrevClose = pricesWithPrevCloseByTicker.get(ticker);
-            AbstractPrice price = priceWithPrevClose.price();
-            LocalDate latestDateWMQY = price.getDate(); // latest cached w,m,q,y date per ticker
-            if (isWithinSameTimeframe(importedDailyPrice.getDate(), latestDateWMQY, timeframe)) {
-                price.convertFrom(importedDailyPrice, priceWithPrevClose.previousClose());
-                result.add(priceWithPrevClose);
-            } else { // new week, month, quarter, year
-                result.add(newPriceWithPrevCloseFrom(importedDailyPrice, timeframe, price.getClose()));
+            LocalDate periodDate = convertDateToTimeframe(importedDailyPrice.getDate(), timeframe);
+            String compositeId = importedDailyPrice.getTicker() + "_" + periodDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
+
+            PriceWithPrevClose priceWithPrevClose = cachedPricesByCompositeId.get(compositeId);
+            if (priceWithPrevClose != null) {
+                AbstractPrice price = priceWithPrevClose.price();
+                LocalDate latestDateWMQY = price.getDate(); // latest cached w,m,q,y date per ticker
+
+                if (isWithinSameTimeframe(importedDailyPrice.getDate(), latestDateWMQY, timeframe)) {
+                    price.convertFrom(importedDailyPrice, priceWithPrevClose.previousClose());
+                    result.add(priceWithPrevClose);
+                } else {
+                    // New timeframe period: create new PriceWithPrevClose object
+                    result.add(newPriceWithPrevCloseFrom(importedDailyPrice, timeframe, price.getClose()));
+                }
+            } else {
+                // No cached price for this compositeId, so create a new one
+                result.add(newPriceWithPrevCloseFrom(importedDailyPrice, timeframe, importedDailyPrice.getOpen()));
             }
         }
 
