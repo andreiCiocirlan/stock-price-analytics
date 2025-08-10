@@ -52,14 +52,15 @@ public class YahooQuotesController {
     @ResponseStatus(HttpStatus.OK)
     public List<DailyPrice> yahooQuotesImportFromFile(@RequestParam(value = "tradingDate", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate tradingDate) {
         long start = System.nanoTime();
-        LocalDate date = Objects.requireNonNullElseGet(tradingDate, stockService::findLastUpdate);
+        LocalDate lastUpdate = stockService.findLastUpdate();
+        LocalDate date = Objects.requireNonNullElse(tradingDate, lastUpdate);
         String fileName = date.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
         List<DailyPrice> dailyImportedPrices = logTimeAndReturn(() -> yahooQuoteService.yahooQuotesFromFile(fileName), "imported daily prices");
         if (dailyImportedPrices != null && !dailyImportedPrices.isEmpty()) {
             logTime(() -> priceService.updateAllTimeframePrices(dailyImportedPrices), "updated prices for all timeframes");
             logTime(() -> highLowForPeriodService.saveCurrentWeekHighLowPricesFrom(dailyImportedPrices), "saved current week HighLow prices");
             // update stocks only if the most recent trading date was imported
-            if (date.isEqual(dailyImportedPrices.getFirst().getDate())) {
+            if (date.isEqual(lastUpdate)) {
                 logTime(stockService::updateStocksHighLowsAndOHLCFrom, "updated stocks highs-lows 4w,52w,all-time and higher-timeframe OHLC prices");
             }
         }
