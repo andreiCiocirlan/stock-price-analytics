@@ -5,10 +5,13 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.dto.StockPerformanceDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
+import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.model.stocks.enums.MarketState;
 
 import java.util.*;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -31,7 +34,10 @@ public class StockHeatmapPerformanceService {
     }
 
     public List<StockPerformanceDTO> stockPerformanceFor(StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, List<Double> cfdMargins, List<String> tickers, MarketState marketState) {
-        Map<String, StockPerformanceDTO> dailyPricesCache = cacheService.getCachedDailyPrices(marketState).stream()
+        Collection<DailyPrice> latestPrices = cacheService.getCachedDailyPrices(marketState).stream()
+                .collect(Collectors.toMap(DailyPrice::getTicker, Function.identity(), BinaryOperator.maxBy(Comparator.comparing(DailyPrice::getDate)))).values();
+
+        Map<String, StockPerformanceDTO> dailyPricesCache = latestPrices.stream()
                 .filter(dp -> tickers.contains(dp.getTicker()))
                 .map(dp -> new StockPerformanceDTO(dp.getTicker(), dp.getPerformance()))
                 .collect(Collectors.toMap(StockPerformanceDTO::ticker, dto -> dto));
