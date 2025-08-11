@@ -36,14 +36,15 @@ class PricesCache {
         if (pricesWithPrevClose == null || pricesWithPrevClose.isEmpty())
             return; // Handle null or empty list case to avoid exceptions
         Map<String, PriceWithPrevClose> pricesWithPrevCloseByTicker = pricesWithPrevCloseByTimeframe.get(timeframe);
-        pricesWithPrevClose.forEach(p -> pricesWithPrevCloseByTicker.put(p.price().getCompositeId(), p));
+        pricesWithPrevClose.forEach(p -> pricesWithPrevCloseByTicker.put(p.price().getTicker(), p));
     }
 
-    List<PriceWithPrevClose> pricesWithPrevCloseFor(List<String> compositeIds, StockTimeframe timeframe) {
-        Map<String, PriceWithPrevClose> cacheMap = pricesWithPrevCloseByTimeframe.get(timeframe);
-        return compositeIds.stream()
-                .map(cacheMap::get)
-                .filter(Objects::nonNull)
+    List<PriceWithPrevClose> pricesWithPrevCloseFor(List<String> tickers, StockTimeframe timeframe) {
+        Map<String, PriceWithPrevClose> pricesWithPrevCloseByTicker = pricesWithPrevCloseByTimeframe.get(timeframe);
+        return tickers.stream()
+                .flatMap(ticker -> pricesWithPrevCloseByTicker.entrySet().stream()
+                        .filter(entry -> entry.getKey().equals(ticker))
+                        .map(Map.Entry::getValue))
                 .collect(Collectors.toList());
     }
 

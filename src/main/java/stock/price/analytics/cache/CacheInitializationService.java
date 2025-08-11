@@ -22,10 +22,7 @@ import stock.price.analytics.util.CandleStickUtil;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.prices.highlow.enums.HighLowPeriod.HIGH_LOW_4W;
@@ -190,34 +187,23 @@ public class CacheInitializationService {
     }
 
     private List<PriceWithPrevClose> pricesWithPrevCloseByTickerFrom(List<? extends AbstractPrice> previousThreePricesForTickers) {
-        Map<String, List<AbstractPrice>> pricesByTicker = previousThreePricesForTickers.stream()
+        Map<String, List<AbstractPrice>> previousTwoPricesByTicker = previousThreePricesForTickers
+                .stream()
+                .collect(Collectors.groupingBy(AbstractPrice::getTicker))
+                .values().stream()
+                .flatMap(prices -> prices.stream().sorted(Comparator.comparing(AbstractPrice::getDate).reversed()).limit(2))
                 .collect(Collectors.groupingBy(AbstractPrice::getTicker));
-
-        List<PriceWithPrevClose> latestPricesWithPrevCloses = new ArrayList<>();
-        for (Map.Entry<String, List<AbstractPrice>> entry : pricesByTicker.entrySet()) {
-            List<AbstractPrice> prices = entry.getValue();
-            prices.sort(Comparator.comparing(AbstractPrice::getDate).reversed());
-
-            // Limit to only the latest two prices per ticker
-            int limit = Math.min(2, prices.size());
-
-            for (int i = 0; i < limit; i++) {
-                AbstractPrice currentPrice = prices.get(i);
-
-                // Previous close comes from the next price (older), if exists
-                double prevClose;
-                if (i + 1 < prices.size()) {
-                    prevClose = prices.get(i + 1).getClose();
-                } else {
-                    // If no older price, fall back to open price (as before)
-                    prevClose = currentPrice.getOpen();
-                }
-
-                latestPricesWithPrevCloses.add(new PriceWithPrevClose(currentPrice, prevClose));
-            }
+        List<stock.price.analytics.model.prices.ohlc.AbstractPrice> latestPrices = new ArrayList<>();
+        Map<String, Double> previousCloseByTicker = new HashMap<>();
+        for (List<stock.price.analytics.model.prices.ohlc.AbstractPrice> prices : previousTwoPricesByTicker.values()) {
+            latestPrices.add(prices.get(0)); // most recent price
+            previousCloseByTicker.put(prices.get(0).getTicker(),
+                    prices.size() > 1 ? prices.get(1).getClose() : prices.get(0).getOpen()); // if IPO week, month, quarter, year -> take opening price
         }
 
-        return latestPricesWithPrevCloses;
+        return latestPrices.stream()
+                .map(price -> new PriceWithPrevClose(price, previousCloseByTicker.get(price.getTicker())))
+                .toList();
     }
 
     private void initAvgCandleRangesCache() {
