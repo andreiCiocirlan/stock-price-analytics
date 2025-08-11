@@ -2,10 +2,10 @@ package stock.price.analytics.service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.client.YahooQuotesClient;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
@@ -74,6 +74,7 @@ public class TickerService {
     }
 
     // import all data pertaining to the new tickers and create dailyPrices, htfPrices, stocks, highLowPrices etc.
+    @Transactional
     public void importAllDataFor(String tickers, Double cfdMargin, Boolean shortSell) {
         List<String> tickerList = Arrays.stream(tickers.split(",")).toList();
         List<String> newTickers = new ArrayList<>();
