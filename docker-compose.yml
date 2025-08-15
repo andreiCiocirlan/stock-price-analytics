@@ -3,10 +3,10 @@ version: '3'
 services:
   db:
     image: postgres:latest
-    container_name: stock-data
+    container_name: stock-prices
     restart: always
     environment:
-      POSTGRES_DB: stock-data
+      POSTGRES_DB: stock-prices
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
