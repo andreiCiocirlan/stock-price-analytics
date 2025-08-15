@@ -2,7 +2,7 @@
 access pg:psql:
 	- heroku pg:psql --app stock-price-analytics
 
-heroku run sql script : heroku pg:psql DATABASE_URL < "D:\stocks-data\historical_prices\dump\database_dump\stock-data-27-07-2025"
+heroku run sql script : heroku pg:psql DATABASE_URL < "D:\stocks-data\historical_prices\dump\database_dump\stock-prices-27-07-2025"
 
 
 1. deploy from heroku to create table schema
@@ -13,4 +13,9 @@ heroku run sql script : heroku pg:psql DATABASE_URL < "D:\stocks-data\historical
 C:\Windows\System32>heroku config:get DATABASE_URL -a stock-price-analytics
 postgres://u3rt7gnkp5r56p:p4d85166db37d556aff6aacdf46b893fafd49531f096c7c80b27d5651ac0d9c3b@c4uljrch9k8rpm.cluster-czz5s0kz4scl.eu-west-1.rds.amazonaws.com:5432/d355d4f25euunc
 
-pg_restore --verbose --clean --no-acl --no-owner -d postgres://u3rt7gnkp5r56p:p4d85166db37d556aff6aacdf46b893fafd49531f096c7c80b27d5651ac0d9c3b@c4uljrch9k8rpm.cluster-czz5s0kz4scl.eu-west-1.rds.amazonaws.com:5432/d355d4f25euunc "D:\stocks-data\historical_prices\dump\database_dump\stock-data-25"
+pg_restore --verbose --clean --no-acl --no-owner -d postgres://u3rt7gnkp5r56p:p4d85166db37d556aff6aacdf46b893fafd49531f096c7c80b27d5651ac0d9c3b@c4uljrch9k8rpm.cluster-czz5s0kz4scl.eu-west-1.rds.amazonaws.com:5432/d355d4f25euunc "D:\stocks-data\historical_prices\dump\database_dump\stock-prices-25"
+
+
+FOR RESTORE (SCHEMA + DATA):
+docker cp "D:\stocks-data\historical_prices\dump\database_dump\stock-data-aug" pgadmin4_container:/var/lib/pgadmin/storage/pgadmin4_pgadmin.org/stock-data-aug
+docker cp "D:\stocks-data\historical_prices\dump\database_dump\stock-data-schema" pgadmin4_container:/var/lib/pgadmin/storage/pgadmin4_pgadmin.org/stock-data-schema
