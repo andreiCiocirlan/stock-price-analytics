@@ -139,14 +139,16 @@ public class CacheService {
         List<String> spikeDownTickers = new ArrayList<>();
         for (DailyPrice dailyPrice : dailyPrices) {
             String ticker = dailyPrice.getTicker();
-            double oldClosingPrice = getStocksMap().get(ticker).getClose();
-            double newClosingPrice = dailyPrice.getClose();
-            boolean spikeUp = newClosingPrice > oldClosingPrice * (1 + INTRADAY_SPIKE_PERCENTAGE);
-            boolean spikeDown = newClosingPrice < oldClosingPrice * (1 - INTRADAY_SPIKE_PERCENTAGE);
-            if (spikeUp) {
-                spikeUpTickers.add(ticker);
-            } else if (spikeDown) {
-                spikeDownTickers.add(ticker);
+            if (getStocksMap().get(ticker) != null) {
+                double oldClosingPrice = getStocksMap().get(ticker).getClose();
+                double newClosingPrice = dailyPrice.getClose();
+                boolean spikeUp = newClosingPrice > oldClosingPrice * (1 + INTRADAY_SPIKE_PERCENTAGE);
+                boolean spikeDown = newClosingPrice < oldClosingPrice * (1 - INTRADAY_SPIKE_PERCENTAGE);
+                if (spikeUp) {
+                    spikeUpTickers.add(ticker);
+                } else if (spikeDown) {
+                    spikeDownTickers.add(ticker);
+                }
             }
         }
         cachePriceMilestoneTickers(INTRADAY_SPIKE_UP, spikeUpTickers);
