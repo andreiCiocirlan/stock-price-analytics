@@ -16,11 +16,12 @@ public final class LoggingUtil {
 
     public static <T> T logTimeAndReturn(Callable<T> func, String actionName) {
         long start = System.nanoTime();
-        T result = null;
+        T result;
         try {
             result = func.call();
         } catch (Exception e) {
             log.error("Error executing {}: {}", actionName, e.getMessage());
+            throw new RuntimeException(e);
         }
         long duration = (System.nanoTime() - start) / 1_000_000;
         log.info("{} in {} ms", actionName, duration);
