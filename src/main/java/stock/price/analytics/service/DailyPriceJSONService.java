@@ -79,6 +79,9 @@ public class DailyPriceJSONService {
         LocalDate tradingDateNow = tradingDateNow();
         LocalDate previousTradingDate = dailyPriceJSONRepository.getPreviousTradingDate();
         for (DailyPriceJSON dailyPriceJson : dailyPriceJSONs) {
+            if (!cacheService.getStocksMap().containsKey(dailyPriceJson.getSymbol())) {
+                continue;
+            }
             String ticker = dailyPriceJson.getSymbol();
             LocalDate tradingDate = dailyPriceJson.getDate();
             if (!tradingDateNow.equals(tradingDate)) {
