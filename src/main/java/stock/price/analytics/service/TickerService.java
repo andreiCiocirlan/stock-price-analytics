@@ -88,7 +88,7 @@ public class TickerService {
             }
         }
 
-        LocalDate lastUpdate = stockService.findLastUpdate();
+        LocalDate lastUpdate = stockService.findLastUpdate(); // use tradingDateNow() for empty DB
         if (!tickersToCache.isEmpty()) {
             cacheService.addStocks(tickersToCache.stream()
                     .map(ticker -> new Stock(ticker, Boolean.TRUE, shortSell, cfdMargin, lastUpdate))
