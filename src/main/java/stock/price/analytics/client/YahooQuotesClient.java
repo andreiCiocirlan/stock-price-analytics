@@ -86,14 +86,14 @@ public class YahooQuotesClient {
     }
 
     public String quotePricesJSON(String tickers) {
-        String crumb = CRUMB_COOKIE.isEmpty() ? getCrumb() : CRUMB_COOKIE;
+        String crumb = getCrumb();
         String URL = String.join("", QUERY2_BASE_URL + V7_FINANCE + "/quote?lang=en-US&region=US&corsDomain=finance.yahoo.com&symbols=",
                 tickers, "&crumb=", crumb);
         String quoteResponse = null;
         int maxRetries = 3;
         int retryCount = 0;
 
-        log.info("quotePricesJSON called {} {}", CRUMB_COOKIE, COOKIE_FC_YAHOO);
+        log.info("quotePricesJSON called {} {}", crumb, COOKIE_FC_YAHOO);
 
         while (quoteResponse == null || quoteResponse.isEmpty()) {
             if (retryCount >= maxRetries) {
@@ -155,9 +155,6 @@ public class YahooQuotesClient {
     }
 
     private String getCrumb() {
-        if (!CRUMB_COOKIE.isBlank()) {
-            return CRUMB_COOKIE;
-        }
         while (RETRY_COUNT_CRUMB < MAX_RETRIES_CRUMB) {
             String crumb = null;
             try {
