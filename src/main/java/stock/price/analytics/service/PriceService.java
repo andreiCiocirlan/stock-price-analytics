@@ -166,7 +166,7 @@ public class PriceService {
 
     @Transactional
     public void updateAllTimeframePrices(List<DailyPrice> importedDailyPrices) {
-        List<String> tickers = new ArrayList<>(importedDailyPrices.stream().map(DailyPrice::getTicker).toList());
+        List<String> tickers = importedDailyPrices.stream().map(DailyPrice::getTicker).toList();
 
         // Update prices for each timeframe
         List<AbstractPrice> pricesUpdated = new ArrayList<>();
