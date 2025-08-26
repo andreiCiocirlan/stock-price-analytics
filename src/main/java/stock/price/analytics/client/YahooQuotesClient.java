@@ -53,8 +53,8 @@ public class YahooQuotesClient {
 
     private final RestTemplate restTemplate;
     private int RETRY_COUNT_CRUMB = 0;
-    private String COOKIE_FC_YAHOO = "A3=d=AQABBIA-emgCEG1NsTBoGBrM0CFTw8WhAnUFEgABAQGBe2iDaPF3ziMAAAAAgA&S=AQAAAsNRNvKK7IjX_5HU2P9ro64";
-    private String CRUMB_COOKIE = "xbNVbfq7K.O";
+    private String COOKIE_FC_YAHOO = "A3=d=AQABBOF0rWgCEGE6E9wXUSno-qoN--2j250FEgEBAQHGrmi3aPF3ziMA_eMCAA&S=AQAAAjLnjxgBM6TK1x42_QGmao8";
+    private String CRUMB_COOKIE = "FBmyrTAvidM";
 
     private static CloseableHttpClient createHttpClient() {
         RequestConfig requestConfig = RequestConfig.custom()
@@ -86,7 +86,7 @@ public class YahooQuotesClient {
     }
 
     public String quotePricesJSON(String tickers) {
-        String crumb = getCrumb();
+        String crumb = CRUMB_COOKIE.isEmpty() ? getCrumb() : CRUMB_COOKIE;
         String URL = String.join("", QUERY2_BASE_URL + V7_FINANCE + "/quote?lang=en-US&region=US&corsDomain=finance.yahoo.com&symbols=",
                 tickers, "&crumb=", crumb);
         String quoteResponse = null;
