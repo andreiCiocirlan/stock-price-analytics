@@ -147,9 +147,7 @@ public class FairValueGapService {
 
     @Transactional
     public void findNewFVGsAndSaveFor(List<String> tickers, StockTimeframe timeframe, boolean allHistoricalData) {
-        List<FairValueGap> allNewFVGs = tickers.parallelStream()
-                .flatMap(ticker -> findNewFVGsFor(Collections.singletonList(ticker), timeframe, allHistoricalData).stream())
-                .collect(Collectors.toList());
+        List<FairValueGap> allNewFVGs = findNewFVGsFor(tickers, timeframe, allHistoricalData);
 
         if (!allNewFVGs.isEmpty()) {
             asyncPersistenceService.partitionDataAndSaveNoLogging(allNewFVGs, fvgRepository);
@@ -163,19 +161,33 @@ public class FairValueGapService {
     }
 
     public List<FairValueGap> findNewFVGsFor(List<String> tickers, StockTimeframe timeframe, boolean allHistoricalData) {
-        List<FairValueGap> newFVGsFound = new ArrayList<>();
+        // Fetch all current FVGs for the given tickers and timeframe in one call
         List<FairValueGap> currentFVGs = findFVGsForTickersAndTimeframe(tickers, timeframe, allHistoricalData);
 
-        Map<String, FairValueGap> dbFVGsByCompositeId = fvgRepository.findByTimeframe(timeframe.name()).stream().collect(Collectors.toMap(FairValueGap::compositeId, Function.identity()));
-        Map<String, FairValueGap> currentFVGsByCompositeId = currentFVGs.stream().collect(Collectors.toMap(FairValueGap::compositeId, Function.identity()));
-        currentFVGsByCompositeId.forEach((compositeKey, fvg) -> {
-            if (!dbFVGsByCompositeId.containsKey(compositeKey)) {
-                FairValueGap newFVG = new FairValueGap(fvg.getTicker(), fvg.getTimeframe(), fvg.getDate(), fvg.getType(), fvg.getStatus(), fvg.getLow(), fvg.getHigh());
+        // Fetch all FVGs for the timeframe from the DB once
+        Map<String, FairValueGap> dbFVGsByCompositeId = fvgRepository.findByTimeframe(timeframe.name())
+                .stream()
+                .collect(Collectors.toMap(FairValueGap::compositeId, Function.identity()));
+
+        // Map current FVGs by compositeId for efficient lookup
+        Map<String, FairValueGap> currentFVGsByCompositeId = currentFVGs.stream()
+                .collect(Collectors.toMap(FairValueGap::compositeId, Function.identity()));
+
+        // Initialize result list with expected size to reduce resizing overhead
+        List<FairValueGap> newFVGsFound = new ArrayList<>(currentFVGs.size());
+
+        // Find new FVGs by filtering out the ones already in DB
+        for (Map.Entry<String, FairValueGap> entry : currentFVGsByCompositeId.entrySet()) {
+            if (!dbFVGsByCompositeId.containsKey(entry.getKey())) {
+                FairValueGap fvg = entry.getValue();
+                FairValueGap newFVG = new FairValueGap(fvg.getTicker(), fvg.getTimeframe(), fvg.getDate(),
+                        fvg.getType(), fvg.getStatus(), fvg.getLow(), fvg.getHigh());
                 newFVG.setUnfilledLow1(fvg.getLow());
                 newFVG.setUnfilledHigh1(fvg.getHigh());
                 newFVGsFound.add(newFVG);
             }
-        });
+        }
+
         if (!newFVGsFound.isEmpty()) {
             log.info("Found {} new {} FVGs", newFVGsFound.size(), timeframe);
         }
