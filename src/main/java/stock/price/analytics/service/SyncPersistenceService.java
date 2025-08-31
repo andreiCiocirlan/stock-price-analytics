@@ -47,11 +47,15 @@ public class SyncPersistenceService {
             log.info("entities isEmpty");
             return;
         }
+        List<List<T>> partitions = new ArrayList<>();
         for (int i = 0; i < entities.size(); i += BATCH_SIZE) {
-            List<T> partition = entities.subList(i, Math.min(i + BATCH_SIZE, entities.size()));
+            partitions.add(entities.subList(i, Math.min(i + BATCH_SIZE, entities.size())));
+        }
+
+        partitions.parallelStream().forEach(partition -> {
             @SuppressWarnings("unchecked")
             List<R> entitiesToSave = (List<R>) partition;
             repository.saveAll(entitiesToSave);
-        }
+        });
     }
 }
