@@ -47,18 +47,11 @@ public class SyncPersistenceService {
             log.info("entities isEmpty");
             return;
         }
-        List<List<T>> partitions = new ArrayList<>();
-        for (int i = 0; i < entities.size(); i += BATCH_SIZE) { // default batchSize to 250 like in application.properties
-            partitions.add(entities.subList(i, Math.min(i + BATCH_SIZE, entities.size())));
+        for (int i = 0; i < entities.size(); i += BATCH_SIZE) {
+            List<T> partition = entities.subList(i, Math.min(i + BATCH_SIZE, entities.size()));
+            @SuppressWarnings("unchecked")
+            List<R> entitiesToSave = (List<R>) partition;
+            repository.saveAll(entitiesToSave);
         }
-        List<CompletableFuture<Void>> futures = partitions.parallelStream()
-                .map(partition -> CompletableFuture.runAsync(() -> {
-                    @SuppressWarnings("unchecked")
-                    List<R> entitiesToSave = (List<R>) partition;
-                    repository.saveAll(entitiesToSave);
-                }))
-                .toList();
-
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
     }
 }
