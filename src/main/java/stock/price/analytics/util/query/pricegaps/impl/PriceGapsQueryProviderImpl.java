@@ -21,7 +21,7 @@ public class PriceGapsQueryProviderImpl implements PriceGapsQueryProvider {
         int lookBackCount = timeframe == StockTimeframe.DAILY && firstWeeklyImportDone ? 3 : 1;
         if (allHistoricalData) {
             lookBackCount = switch (timeframe) {
-                case DAILY -> 1000;
+                case DAILY -> 500;
                 case WEEKLY -> 300;
                 case MONTHLY -> 200;
                 case QUARTERLY -> 100;

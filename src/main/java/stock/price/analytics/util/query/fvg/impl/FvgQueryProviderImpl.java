@@ -139,7 +139,13 @@ public class FvgQueryProviderImpl implements FvgQueryProvider {
     }
 
     private LocalDate lookbackDateFor(StockTimeframe timeframe, boolean allHistoricalData) {
-        if (allHistoricalData) return LocalDate.of(1990, 1, 1);
+        if (allHistoricalData) return   switch (timeframe) {
+            case DAILY -> LocalDate.now().minusDays(500);
+            case WEEKLY -> LocalDate.now().minusWeeks(300);
+            case MONTHLY -> LocalDate.now().minusMonths(200);
+            case QUARTERLY -> LocalDate.now().minusMonths(100);
+            case YEARLY -> LocalDate.now().minusYears(10);
+        };
 
         return switch (timeframe) {
             case DAILY -> LocalDate.now().minusWeeks(1);
