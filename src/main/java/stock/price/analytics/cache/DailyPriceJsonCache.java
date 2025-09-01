@@ -12,7 +12,7 @@ import java.util.Map;
 
 @Getter
 @Component
-class DailyPriceJsonCache {
+final class DailyPriceJsonCache {
 
     private final Map<String, DailyPriceJSON> dailyPriceJSONByTicker = new HashMap<>();
 

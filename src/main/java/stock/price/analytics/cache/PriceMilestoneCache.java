@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-class PriceMilestoneCache {
+final class PriceMilestoneCache {
 
     private final Map<PriceMilestone, List<String>> tickersByPriceMilestones = new HashMap<>();
 

@@ -11,7 +11,7 @@ import java.util.Map;
 
 @Getter
 @Component
-class StocksCache {
+final class StocksCache {
 
     private final Map<String, Stock> stocksMap = new HashMap<>();
 

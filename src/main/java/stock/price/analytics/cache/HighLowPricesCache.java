@@ -18,7 +18,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
-class HighLowPricesCache {
+final class HighLowPricesCache {
 
     @Getter
     @Setter

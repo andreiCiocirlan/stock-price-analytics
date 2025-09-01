@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
 
 @Component
-class PricesCache {
+final class PricesCache {
 
     private final Map<StockTimeframe, Map<String, PriceWithPrevClose>> pricesWithPrevCloseByTimeframe = Map.of(
             DAILY, new HashMap<>(),

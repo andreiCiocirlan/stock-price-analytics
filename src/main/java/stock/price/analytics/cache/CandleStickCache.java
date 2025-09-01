@@ -7,7 +7,7 @@ import stock.price.analytics.model.prices.ohlc.enums.CandleStickType;
 import java.util.*;
 
 @Component
-class CandleStickCache {
+final class CandleStickCache {
 
     private final Map<String, Double> avgCandleRangesByTickerAndTimeframe = new HashMap<>();
     private final Map<String, List<String>> tickersByCandleStickTypeAndTimeframe = new HashMap<>();
