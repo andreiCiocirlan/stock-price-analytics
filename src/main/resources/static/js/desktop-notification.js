@@ -1,4 +1,5 @@
 var stompClient = null;
+import { updateStockPerformanceChartCurrentTimeframe } from './stock-performance.js';
 
 function connect() {
 	var socket = new SockJS('/ws');

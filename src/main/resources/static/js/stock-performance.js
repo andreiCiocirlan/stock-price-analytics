@@ -86,7 +86,7 @@ function fetchBottomProjections(ticker) {
 		.then(response => response.json());
 }
 
-function updateStockPerformanceChartCurrentTimeframe() {
+export function updateStockPerformanceChartCurrentTimeframe() {
 	updateStockPerformanceChart(currentTimeFrame);
 }
 
