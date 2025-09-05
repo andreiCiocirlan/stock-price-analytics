@@ -60,7 +60,7 @@ public interface HighLowForPeriodRepository extends JpaRepository<HighLowForPeri
                 JOIN high_low4w hl4w_prev ON hl4w_prev.ticker = wp.ticker AND hl4w_prev.date = wp.date - INTERVAL '7 days'
             WHERE
                 (wp.date between (CURRENT_DATE - INTERVAL '7 days') and CURRENT_DATE) AND
-                wp.ticker in (select ticker from stocks where xtb_stock = true)\s
+                wp.ticker in (select ticker from stocks where xtb_stock = true)
             GROUP BY date_trunc('week', wp.date)
             ORDER BY date_trunc('week', wp.date) DESC;
             """, nativeQuery = true)
