@@ -74,7 +74,7 @@ public class DailyPriceJSONService {
     public List<DailyPriceJSON> extractDailyJSONPricesAndSave(List<DailyPriceJSON> dailyPriceJSONs, List<DailyPriceJSON> recentJsonPrices) {
         List<String> sameDailyPrices = new ArrayList<>();
         List<DailyPriceJSON> dailyJSONPrices = new ArrayList<>();
-        List<DailyPrice> preMarketPrices = new ArrayList<>();
+
         Map<String, DailyPriceJSON> recentJsonPricesById = recentJsonPrices.stream().collect(Collectors.toMap(DailyPriceJSON::getCompositeId, Function.identity()));
         LocalDate tradingDateNow = tradingDateNow();
         LocalDate previousTradingDate = dailyPriceJSONRepository.getPreviousTradingDate();
@@ -95,11 +95,7 @@ public class DailyPriceJSONService {
                     log.info("Extracting stock daily prices for ticker {} and date {}", ticker, tradingDate);
                 }
             }
-            compareAndAddToList(dailyPriceJson, recentJsonPricesById, dailyJSONPrices, preMarketPrices, sameDailyPrices, ticker);
-        }
-
-        if (!preMarketPrices.isEmpty()) {
-            cacheService.addPreMarketDailyPrices(preMarketPrices);
+            compareAndAddToList(dailyPriceJson, recentJsonPricesById, dailyJSONPrices, sameDailyPrices, ticker);
         }
 
         logInconsistentHighLowImportedPrices();
@@ -161,7 +157,7 @@ public class DailyPriceJSONService {
     public List<DailyPriceJSON> extractAllDailyPriceJSONsFrom(List<DailyPriceJSON> dailyPriceJSONs, List<DailyPriceJSON> recentJsonPrices) {
         List<String> sameDailyPrices = new ArrayList<>();
         List<DailyPriceJSON> dailyJSONPrices = new ArrayList<>();
-        List<DailyPrice> preMarketPrices = new ArrayList<>();
+
         Map<String, DailyPriceJSON> recentJsonPricesById = recentJsonPrices.stream().collect(Collectors.toMap(DailyPriceJSON::getCompositeId, Function.identity()));
 
         for (DailyPriceJSON dailyPriceJson : dailyPriceJSONs) {
@@ -171,10 +167,7 @@ public class DailyPriceJSONService {
                 log.warn("trading date missing from json file for ticker {}", ticker);
                 continue;
             }
-            compareAndAddToList(dailyPriceJson, recentJsonPricesById, dailyJSONPrices, preMarketPrices, sameDailyPrices, ticker);
-        }
-        if (!preMarketPrices.isEmpty()) {
-            cacheService.addPreMarketDailyPrices(preMarketPrices);
+            compareAndAddToList(dailyPriceJson, recentJsonPricesById, dailyJSONPrices, sameDailyPrices, ticker);
         }
 
         if (!sameDailyPrices.isEmpty()) {
@@ -190,26 +183,21 @@ public class DailyPriceJSONService {
     }
 
     private boolean shouldUpdatePrice(DailyPriceJSON imported, DailyPriceJSON stored) {
-        return imported.getPreMarketPrice() != 0d || stored.differentPrices(imported);
+        return stored.differentPrices(imported);
     }
 
-    private void updateAndAddPrice(DailyPriceJSON stored, DailyPriceJSON imported, List<DailyPriceJSON> dailyJSONPrices, List<DailyPrice> preMarketPrices) {
+    private void updateAndAddPrice(DailyPriceJSON stored, DailyPriceJSON imported, List<DailyPriceJSON> dailyJSONPrices) {
         Pair<Double, Double> highLowPrices = getHighLowImportedPrices(imported, stored);
         DailyPriceJSON updatedPrice = stored.updateFrom(imported);
         updatedPrice.setRegularMarketDayHigh(highLowPrices.getLeft());
         updatedPrice.setRegularMarketDayLow(highLowPrices.getRight());
-
-        if (imported.getPreMarketPrice() != 0d) {
-            preMarketPrices.add(updatedPrice.convertToDailyPrice(true));
-        } else {
-            dailyJSONPrices.add(updatedPrice);
-        }
+        dailyJSONPrices.add(updatedPrice);
     }
 
     private void compareAndAddToList(DailyPriceJSON importedDailyPriceJSON,
                                      Map<String, DailyPriceJSON> recentJsonPricesById,
                                      List<DailyPriceJSON> dailyJSONPrices,
-                                     List<DailyPrice> preMarketPrices,
+
                                      List<String> sameDailyPrices,
                                      String ticker) {
 
@@ -227,7 +215,7 @@ public class DailyPriceJSONService {
             return;
         }
 
-        updateAndAddPrice(storedDailyPriceJSON, importedDailyPriceJSON, dailyJSONPrices, preMarketPrices);
+        updateAndAddPrice(storedDailyPriceJSON, importedDailyPriceJSON, dailyJSONPrices);
     }
 
 
