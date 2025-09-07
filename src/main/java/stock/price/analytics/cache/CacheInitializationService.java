@@ -9,7 +9,6 @@ import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.highlow.*;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
-import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.prices.ohlc.PriceWithPrevClose;
 import stock.price.analytics.model.prices.ohlc.enums.CandleStickType;
 import stock.price.analytics.model.stocks.Stock;
@@ -61,7 +60,6 @@ public class CacheInitializationService {
         logTime(() -> initStocksCache(stocks), "initialized xtb stocks cache");
         logTime(this::initHighLowPricesCache, "initialized high low prices cache");
         logTime(this::initDailyJSONPricesCache, "initialized daily JSON prices cache");
-        logTime(this::initPreMarketDailyPrices, "initialized pre-market daily prices cache");
         logTime(this::initTickersForPriceMilestoneCache, "initialized tickers for price milestone cache");
         logTime(this::initAvgCandleRangesCache, "initialized average candle range cache");
         logTime(this::initCandleStickTypeCache, "initialized candle stick types cache");
@@ -87,22 +85,6 @@ public class CacheInitializationService {
                         .sorted(Comparator.comparing(DailyPriceJSON::getDate).reversed())
                         .limit(2))
                 .toList());
-    }
-
-    private void initPreMarketDailyPrices() {
-        Map<String, List<DailyPriceJSON>> dailyPriceJSONsByTicker = dailyPriceJsonCache.getDailyPriceJSONByTicker().values().stream()
-                .sorted(Comparator.comparing(DailyPriceJSON::getDate).reversed()) // order by date desc
-                .collect(Collectors.groupingBy(DailyPriceJSON::getSymbol));
-
-        List<DailyPrice> latestPreMarketDailyPrices = new ArrayList<>();
-
-        for (List<DailyPriceJSON> dailyPriceJSONs : dailyPriceJSONsByTicker.values()) {
-            DailyPriceJSON latestPrice = dailyPriceJSONs.getFirst(); // take the first (latest) daily price per ticker
-            if (latestPrice.getPreMarketPrice() != 0d) {
-                latestPreMarketDailyPrices.add(latestPrice.convertToDailyPrice(true));
-            }
-        }
-        pricesCache.addPreMarketPrices(latestPreMarketDailyPrices);
     }
 
     private void initHighLowPricesCache() {

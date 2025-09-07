@@ -3,10 +3,11 @@ package stock.price.analytics.cache;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
-import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.prices.ohlc.PriceWithPrevClose;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.prices.enums.StockTimeframe.*;
@@ -21,16 +22,6 @@ final class PricesCache {
             QUARTERLY, new HashMap<>(),
             YEARLY, new HashMap<>()
     );
-
-    private final Map<String, DailyPrice> preMarketDailyPricesByTicker = new HashMap<>();
-
-    void addPreMarketPrices(List<DailyPrice> dailyPrices) {
-        dailyPrices.forEach(price -> preMarketDailyPricesByTicker.put(price.getTicker(), price));
-    }
-
-    List<DailyPrice> preMarketPrices() {
-        return new ArrayList<>(preMarketDailyPricesByTicker.values());
-    }
 
     void addPricesWithPrevClose(List<PriceWithPrevClose> pricesWithPrevClose, StockTimeframe timeframe) {
         if (pricesWithPrevClose == null || pricesWithPrevClose.isEmpty())

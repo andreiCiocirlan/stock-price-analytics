@@ -9,7 +9,6 @@ import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
 import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
-import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.prices.ohlc.PriceWithPrevClose;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.util.Constants;
@@ -21,7 +20,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static stock.price.analytics.model.prices.highlow.enums.HighLowPeriod.*;
-import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
 
 
 @RestController
@@ -50,14 +48,6 @@ public class CacheController {
     public List<DailyPriceJSON> getDailyPriceJsonCache(@RequestParam(required = false, value = "ticker") String ticker) {
         return cacheService.dailyPriceJsonCache().stream()
                 .filter(p -> ticker == null || p.getSymbol().equals(ticker))
-                .toList();
-    }
-
-    @GetMapping("/pre-market-prices")
-    @ResponseStatus(HttpStatus.OK)
-    public List<DailyPrice> getPreMarketDailyPricesCache(@RequestParam(required = false, value = "ticker") String ticker) {
-        return cacheService.getCachedDailyPrices(PRE).stream()
-                .filter(p -> ticker == null || p.getTicker().equals(ticker))
                 .toList();
     }
 

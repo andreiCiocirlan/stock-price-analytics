@@ -11,7 +11,6 @@ import stock.price.analytics.model.prices.highlow.enums.HighLowPeriod;
 import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.Stock;
-import stock.price.analytics.model.stocks.enums.MarketState;
 import stock.price.analytics.repository.stocks.StockRepository;
 
 import java.time.DayOfWeek;
@@ -84,7 +83,7 @@ public class StockService {
 
     @Transactional
     public void updateStocksHighLowsAndOHLCFrom() {
-        List<DailyPrice> dailyPrices = cacheService.getCachedDailyPrices(MarketState.REGULAR);
+        List<DailyPrice> dailyPrices = cacheService.getCachedDailyPrices();
         List<AbstractPrice> htfPrices = cacheService.pricesFor(StockTimeframe.WEEKLY);
         htfPrices.addAll(cacheService.pricesFor(StockTimeframe.MONTHLY));
         htfPrices.addAll(cacheService.pricesFor(StockTimeframe.QUARTERLY));

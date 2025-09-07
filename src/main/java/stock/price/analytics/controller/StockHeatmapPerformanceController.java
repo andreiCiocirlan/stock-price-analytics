@@ -44,8 +44,7 @@ public class StockHeatmapPerformanceController {
                 request.getPositivePerfFirst(),
                 request.getLimit(),
                 request.getCfdMargins(),
-                tickers,
-                request.getMarketState()
+                tickers
         );
     }
 

@@ -49,22 +49,16 @@
                         <option value="INTRADAY_SPIKE_DOWN">Spike Down</option>
                     </select>
                 </div>
-                <div id="pre-market-dropdown" class="form-group">
-                    <label for="pre-market" class="dropdown-label">Pre-market</label>
-                    <select class="form-control" id="pre-market" data-type="price-milestone">
+                <div class="form-group">
+                    <label for="candlestick-type" class="dropdown-label">Candlestick</label>
+                    <select class="form-control" id="candlestick-type" data-type="candlestick">
                         <option value="ANY">Any</option>
-                        <option value="GAP_UP">Gap up</option>
-                        <option value="GAP_DOWN">Gap down</option>
-                        <option value="GAP_UP_5_PERCENT">Gap up 5%</option>
-                        <option value="GAP_UP_10_PERCENT">Gap up 10%</option>
-                        <option value="GAP_DOWN_5_PERCENT">Gap down 5%</option>
-                        <option value="GAP_DOWN_10_PERCENT">Gap down 10%</option>
-                        <option value="KICKING_CANDLE_UP">Kicking candle up</option>
-                        <option value="KICKING_CANDLE_DOWN">Kicking candle down</option>
-                        <option value="PRE_NEW_ALL_TIME_LOW">New All-Time Low</option>
-                        <option value="PRE_NEW_52W_LOW">New 52w Low</option>
-                        <option value="PRE_NEW_ALL_TIME_HIGH">New All-Time High</option>
-                        <option value="PRE_NEW_52W_HIGH">New 52w High</option>
+                        <option value="TIGHT">Tight</option>
+                        <option value="DOJI">Doji</option>
+                        <option value="GRAVESTONE_DOJI">Gravestone Doji</option>
+                        <option value="DRAGONFLY_DOJI">Dragonfly Doji</option>
+                        <option value="HAMMER">Hammer</option>
+                        <option value="INVERTED_HAMMER">Inverted Hammer</option>
                     </select>
                 </div>
             </div>
@@ -125,18 +119,6 @@
                         <option value="NEW_4W_LOW">New Low</option>
                         <option value="LOW_4W_95">0-5% above Low</option>
                         <option value="LOW_4W_90">0-10% above Low</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="candlestick-type" class="dropdown-label">Candlestick type</label>
-                    <select class="form-control" id="candlestick-type" data-type="candlestick">
-                        <option value="ANY">Any</option>
-                        <option value="TIGHT">Tight</option>
-                        <option value="DOJI">Doji</option>
-                        <option value="GRAVESTONE_DOJI">Gravestone Doji</option>
-                        <option value="DRAGONFLY_DOJI">Dragonfly Doji</option>
-                        <option value="HAMMER">Hammer</option>
-                        <option value="INVERTED_HAMMER">Inverted Hammer</option>
                     </select>
                 </div>
             </div>

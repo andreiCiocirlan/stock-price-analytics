@@ -7,7 +7,6 @@ import stock.price.analytics.model.dto.StockPerformanceDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.Stock;
-import stock.price.analytics.model.stocks.enums.MarketState;
 
 import java.util.*;
 import java.util.function.BinaryOperator;
@@ -21,20 +20,8 @@ public class StockHeatmapPerformanceService {
 
     private final CacheService cacheService;
 
-    private static void addPreMarketPriceOrStockPrice(Stock stock, MarketState marketState, StockTimeframe timeFrame, Map<String, StockPerformanceDTO> preMarketMap, List<StockPerformanceDTO> result) {
-        String ticker = stock.getTicker();
-        StockPerformanceDTO preMarketPrice = preMarketMap.get(ticker);
-
-        if (marketState == MarketState.PRE) {
-            // If the ticker is found in preMarketPrices, use that; otherwise, use the stock's performance
-            result.add(Objects.requireNonNullElseGet(preMarketPrice, () -> new StockPerformanceDTO(ticker, stock.performanceFor(timeFrame))));
-        } else {
-            result.add(new StockPerformanceDTO(ticker, stock.performanceFor(timeFrame)));
-        }
-    }
-
-    public List<StockPerformanceDTO> stockPerformanceFor(StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, List<Double> cfdMargins, List<String> tickers, MarketState marketState) {
-        Collection<DailyPrice> latestPrices = cacheService.getCachedDailyPrices(marketState).stream()
+    public List<StockPerformanceDTO> stockPerformanceFor(StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, List<Double> cfdMargins, List<String> tickers) {
+        Collection<DailyPrice> latestPrices = cacheService.getCachedDailyPrices().stream()
                 .collect(Collectors.toMap(DailyPrice::getTicker, Function.identity(), BinaryOperator.maxBy(Comparator.comparing(DailyPrice::getDate)))).values();
 
         Map<String, StockPerformanceDTO> dailyPricesCache = latestPrices.stream()
@@ -45,7 +32,7 @@ public class StockHeatmapPerformanceService {
         List<StockPerformanceDTO> result = new ArrayList<>();
         cacheService.getStocksMap().values().stream()
                 .filter(stockFilterPredicate(tickers, cfdMargins))
-                .forEach(stock -> addPreMarketPriceOrStockPrice(stock, marketState, timeFrame, dailyPricesCache, result)); // pre-market price takes precedence
+                .forEach(stock -> result.add(new StockPerformanceDTO(stock.getTicker(), stock.performanceFor(timeFrame))));
 
         List<StockPerformanceDTO> performanceDTOs = result.stream()
                 .sorted(Comparator.comparingDouble(StockPerformanceDTO::performance)

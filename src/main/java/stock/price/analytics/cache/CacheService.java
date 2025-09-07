@@ -14,7 +14,6 @@ import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.prices.ohlc.PriceWithPrevClose;
 import stock.price.analytics.model.prices.ohlc.enums.CandleStickType;
 import stock.price.analytics.model.stocks.Stock;
-import stock.price.analytics.model.stocks.enums.MarketState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +22,6 @@ import java.util.Map;
 import static java.util.Collections.emptySet;
 import static stock.price.analytics.model.prices.enums.IntradayPriceSpike.INTRADAY_SPIKE_DOWN;
 import static stock.price.analytics.model.prices.enums.IntradayPriceSpike.INTRADAY_SPIKE_UP;
-import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
 import static stock.price.analytics.util.Constants.INTRADAY_SPIKE_PERCENTAGE;
 
 @Service
@@ -46,16 +44,8 @@ public class CacheService {
         return dailyPriceJsonCache.cacheAndReturn(dailyPriceJsons);
     }
 
-    public void addPreMarketDailyPrices(List<DailyPrice> preMarketPrices) {
-        pricesCache.addPreMarketPrices(preMarketPrices);
-    }
-
-    public List<DailyPrice> getCachedDailyPrices(MarketState marketState) {
-        if (marketState == PRE) {
-            return pricesCache.preMarketPrices();
-        } else {
-            return pricesFor(StockTimeframe.DAILY).stream().map(p -> (DailyPrice) p).toList();
-        }
+    public List<DailyPrice> getCachedDailyPrices() {
+        return pricesFor(StockTimeframe.DAILY).stream().map(p -> (DailyPrice) p).toList();
     }
 
     public boolean weeklyHighLowDoesntExist() {

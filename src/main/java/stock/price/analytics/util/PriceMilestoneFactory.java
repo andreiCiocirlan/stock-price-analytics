@@ -1,7 +1,10 @@
 package stock.price.analytics.util;
 
 import stock.price.analytics.model.prices.PriceMilestone;
-import stock.price.analytics.model.prices.enums.*;
+import stock.price.analytics.model.prices.enums.IntradayPriceSpike;
+import stock.price.analytics.model.prices.enums.NewHighLowMilestone;
+import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
+import stock.price.analytics.model.prices.enums.SimpleMovingAverageMilestone;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,8 +14,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static stock.price.analytics.model.prices.enums.PreMarketGap.*;
-import static stock.price.analytics.model.prices.enums.PreMarketPriceMilestone.*;
 
 public final class PriceMilestoneFactory {
 
@@ -23,8 +24,6 @@ public final class PriceMilestoneFactory {
                         PricePerformanceMilestone.values(),
                         NewHighLowMilestone.values(),
                         IntradayPriceSpike.values(),
-                        PreMarketPriceMilestone.values(),
-                        PreMarketGap.values(),
                         SimpleMovingAverageMilestone.values()
                 )
                 .flatMap(Arrays::stream)
@@ -46,10 +45,6 @@ public final class PriceMilestoneFactory {
             throw new IllegalArgumentException("Invalid milestone milestoneCode: " + milestoneCode);
         }
         return milestone;
-    }
-
-    public static List<PriceMilestone> preMarketSchedulerValues() {
-        return List.of(PRE_NEW_52W_HIGH, PRE_NEW_52W_LOW, PRE_NEW_ALL_TIME_LOW, PRE_NEW_ALL_TIME_HIGH, GAP_DOWN_5_PERCENT, GAP_DOWN_10_PERCENT, GAP_UP_5_PERCENT, GAP_UP_10_PERCENT);
     }
 
     public static List<PriceMilestone> registry() {

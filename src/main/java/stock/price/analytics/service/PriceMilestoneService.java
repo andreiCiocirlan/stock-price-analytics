@@ -6,11 +6,9 @@ import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.dto.StockHeatmapRequest;
 import stock.price.analytics.model.json.DailyPriceJSON;
 import stock.price.analytics.model.prices.PriceMilestone;
-import stock.price.analytics.model.prices.context.StockDailyPriceContext;
 import stock.price.analytics.model.prices.context.StockHighLowForPeriodContext;
 import stock.price.analytics.model.prices.enums.*;
 import stock.price.analytics.model.prices.highlow.HighLowForPeriod;
-import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.prices.ohlc.enums.CandleStickType;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.util.PriceMilestoneFactory;
@@ -19,7 +17,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static stock.price.analytics.model.stocks.enums.MarketState.PRE;
 import static stock.price.analytics.util.Constants.CFD_MARGINS_5X_4X_3X_2X_1X;
 
 @Service
@@ -70,9 +67,6 @@ public class PriceMilestoneService {
                     filterByNewHighLowMilestone(newHighLowMilestone, cfdMargins);
             case PricePerformanceMilestone pricePerformanceMilestone ->
                     filterByPerformanceMilestone(pricePerformanceMilestone, cfdMargins);
-            case PreMarketPriceMilestone preMarketMilestone ->
-                    filterByPreMarketMilestone(preMarketMilestone, cfdMargins);
-            case PreMarketGap preMarketGap -> filterByPreMarketGap(preMarketGap, cfdMargins);
             case SimpleMovingAverageMilestone smaMilestone ->
                     filterBySimpleMovingAvgMilestone(smaMilestone, cfdMargins);
             default -> throw new IllegalArgumentException("Invalid milestone type");
@@ -102,32 +96,6 @@ public class PriceMilestoneService {
                 .filter(stock -> hlPricesCache.containsKey(stock.getTicker()))
                 .filter(stock -> newHighLowMilestone.isMetFor(new StockHighLowForPeriodContext(stock, hlPricesCache.get(stock.getTicker()))))
                 .map(Stock::getTicker)
-                .toList();
-    }
-
-    private List<String> filterByPreMarketMilestone(PreMarketPriceMilestone preMarketMilestone, List<Double> cfdMargins) {
-        Map<String, DailyPrice> preMarketPricesCache = cacheService.getCachedDailyPrices(PRE)
-                .stream()
-                .collect(Collectors.toMap(DailyPrice::getTicker, Function.identity()));
-
-        return cacheService.getCachedStocks().stream()
-                .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
-                .filter(stock -> preMarketPricesCache.containsKey(stock.getTicker()))
-                .filter(stock -> preMarketMilestone.isMetFor(new StockDailyPriceContext(stock, preMarketPricesCache.get(stock.getTicker()))))
-                .map(Stock::getTicker)
-                .toList();
-    }
-
-    private List<String> filterByPreMarketGap(PreMarketGap preMarketGap, List<Double> cfdMargins) {
-        Map<String, DailyPrice> preMarketPricesCache = cacheService.getCachedDailyPrices(PRE)
-                .stream()
-                .collect(Collectors.toMap(DailyPrice::getTicker, Function.identity()));
-
-        return cacheService.getCachedStocks().stream()
-                .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
-                .map(Stock::getTicker)
-                .filter(preMarketPricesCache::containsKey)
-                .filter(ticker -> preMarketGap.isMetFor(preMarketPricesCache.get(ticker)))
                 .toList();
     }
 

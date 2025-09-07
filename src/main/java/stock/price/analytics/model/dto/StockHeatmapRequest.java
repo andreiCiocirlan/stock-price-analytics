@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import stock.price.analytics.model.prices.PriceMilestone;
 import stock.price.analytics.model.prices.ohlc.enums.CandleStickType;
-import stock.price.analytics.model.stocks.enums.MarketState;
 import stock.price.analytics.util.PriceMilestoneFactory;
 
 import java.util.List;
@@ -17,7 +16,6 @@ public class StockHeatmapRequest {
     private Integer limit;
     private List<Double> cfdMargins;
     private List<String> priceMilestones;
-    private MarketState marketState;
     private CandleStickType candleStickType;
 
     public List<PriceMilestone> priceMilestones() {
