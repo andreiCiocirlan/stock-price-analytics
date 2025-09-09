@@ -26,10 +26,10 @@ public class PriceMilestoneService {
     private final CacheService cacheService;
 
     public List<String> tickersFor(StockHeatmapRequest request, StockTimeframe stockTimeframe) {
-        List<String> tickers = request.getCandleStickType() != CandleStickType.ANY ? cacheService.tickersFor(stockTimeframe, request.getCandleStickType()) : new ArrayList<>();
+        List<String> tickers = request.candleStickType() != CandleStickType.ANY ? cacheService.tickersFor(stockTimeframe, request.candleStickType()) : new ArrayList<>();
 
-        for (PriceMilestone priceMilestone : request.priceMilestones()) {
-            List<String> filteredTickers = cacheService.tickersFor(priceMilestone, request.getCfdMargins());
+        for (PriceMilestone priceMilestone : request.priceMilestonesFrom()) {
+            List<String> filteredTickers = cacheService.tickersFor(priceMilestone, request.cfdMargins());
 
             if (filteredTickers.isEmpty()) {
                 return Collections.emptyList();

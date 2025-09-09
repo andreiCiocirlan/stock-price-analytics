@@ -30,7 +30,7 @@ public class StockHeatmapPerformanceController {
     @PostMapping("/stock-performance-json")
     @ResponseBody
     public List<StockPerformanceDTO> getStockPerformance(@RequestBody StockHeatmapRequest request) {
-        StockTimeframe stockTimeframe = ("undefined".equals(request.getTimeFrame())) ? StockTimeframe.MONTHLY : StockTimeframe.valueOf(request.getTimeFrame());
+        StockTimeframe stockTimeframe = ("undefined".equals(request.timeFrame())) ? StockTimeframe.MONTHLY : StockTimeframe.valueOf(request.timeFrame());
         List<String> tickers = emptyList();
         if (request.hasMilestonesOrCandlestickFilters()) {
             tickers = priceMilestoneService.tickersFor(request, stockTimeframe);
@@ -41,9 +41,9 @@ public class StockHeatmapPerformanceController {
         }
         return stockHeatmapPerformanceService.stockPerformanceFor(
                 stockTimeframe,
-                request.getPositivePerfFirst(),
-                request.getLimit(),
-                request.getCfdMargins(),
+                request.positivePerfFirst(),
+                request.limit(),
+                request.cfdMargins(),
                 tickers
         );
     }

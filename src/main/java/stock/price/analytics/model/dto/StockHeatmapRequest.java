@@ -1,28 +1,24 @@
 package stock.price.analytics.model.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import stock.price.analytics.model.prices.PriceMilestone;
 import stock.price.analytics.model.prices.ohlc.enums.CandleStickType;
 import stock.price.analytics.util.PriceMilestoneFactory;
 
 import java.util.List;
 
-@Getter
-@NoArgsConstructor
-public class StockHeatmapRequest {
-    private String timeFrame;
-    private Boolean positivePerfFirst;
-    private Integer limit;
-    private List<Double> cfdMargins;
-    private List<String> priceMilestones;
-    private CandleStickType candleStickType;
-
-    public List<PriceMilestone> priceMilestones() {
-        return PriceMilestoneFactory.priceMilestonesFrom(this.getPriceMilestones());
+public record StockHeatmapRequest(
+        String timeFrame,
+        Boolean positivePerfFirst,
+        Integer limit,
+        List<Double> cfdMargins,
+        List<String> priceMilestones,
+        CandleStickType candleStickType
+) {
+    public List<PriceMilestone> priceMilestonesFrom() {
+        return PriceMilestoneFactory.priceMilestonesFrom(this.priceMilestones());
     }
 
     public boolean hasMilestonesOrCandlestickFilters() {
-        return !this.getPriceMilestones().isEmpty() || this.getCandleStickType() != CandleStickType.ANY;
+        return !this.priceMilestones().isEmpty() || this.candleStickType() != CandleStickType.ANY;
     }
 }
