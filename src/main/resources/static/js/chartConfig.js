@@ -132,7 +132,12 @@ function seriesConfig(priceData) {
 			tooltip: {
 				pointFormat: '<span style="font-size:15px;color:orange">{series.name}: {point.y:.2f}</span>'
 			}
-		}
+		},
+		{
+            type: 'bb',
+            linkedTo: 'main-series',
+            showInLegend: false
+        }
 	]
 }
 
