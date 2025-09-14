@@ -7,7 +7,8 @@ import stock.price.analytics.model.BusinessEntity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static stock.price.analytics.util.LoggingUtil.logTime;
 
@@ -52,10 +53,14 @@ public class SyncPersistenceService {
             partitions.add(entities.subList(i, Math.min(i + BATCH_SIZE, entities.size())));
         }
 
-        partitions.parallelStream().forEach(partition -> {
-            @SuppressWarnings("unchecked")
-            List<R> entitiesToSave = (List<R>) partition;
-            repository.saveAll(entitiesToSave);
-        });
+        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            for (List<T> partition : partitions) {
+                executor.execute(() -> {
+                    @SuppressWarnings("unchecked")
+                    List<R> entitiesToSave = (List<R>) partition;
+                    repository.saveAll(entitiesToSave);
+                });
+            }
+        }
     }
 }
