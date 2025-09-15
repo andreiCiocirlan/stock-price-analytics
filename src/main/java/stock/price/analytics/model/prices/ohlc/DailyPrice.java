@@ -15,7 +15,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "daily_prices")
 @NoArgsConstructor
-public class DailyPrice extends AbstractPrice {
+public final class DailyPrice extends AbstractPrice {
 
     public DailyPrice(String ticker, @NonNull LocalDate date, CandleOHLC candleOHLC) {
         super(ticker, date, candleOHLC);

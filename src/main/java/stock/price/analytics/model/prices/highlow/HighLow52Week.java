@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @Table(name = "high_low52w")
-public class HighLow52Week extends HighLowForPeriod {
+public final class HighLow52Week extends HighLowForPeriod {
 
     @Column(name = "low")
     private double low52w;

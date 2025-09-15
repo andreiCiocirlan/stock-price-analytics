@@ -23,7 +23,7 @@ import java.time.temporal.TemporalAdjusters;
 @DynamicUpdate
 @MappedSuperclass
 @NoArgsConstructor
-public abstract class AbstractPrice implements BusinessEntity {
+public sealed abstract class AbstractPrice implements BusinessEntity permits DailyPrice, WeeklyPrice, MonthlyPrice, QuarterlyPrice, YearlyPrice {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequence_prices")

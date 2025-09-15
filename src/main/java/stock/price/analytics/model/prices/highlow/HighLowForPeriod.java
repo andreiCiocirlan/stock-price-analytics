@@ -19,7 +19,7 @@ import java.time.LocalDate;
 @DynamicUpdate
 @MappedSuperclass
 @NoArgsConstructor
-public abstract class HighLowForPeriod implements BusinessEntity {
+public sealed abstract class HighLowForPeriod implements BusinessEntity permits HighLow4w, HighLow52Week, HighestLowestPrices {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequence_high_low")

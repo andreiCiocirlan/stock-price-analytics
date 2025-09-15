@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
-public class QuarterlyPrice extends AbstractPrice {
+public final class QuarterlyPrice extends AbstractPrice {
 
     public QuarterlyPrice(String ticker, LocalDate date, CandleOHLC candleOHLC) {
         super(ticker, date, candleOHLC);

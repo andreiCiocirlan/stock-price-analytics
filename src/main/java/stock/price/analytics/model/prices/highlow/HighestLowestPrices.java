@@ -17,7 +17,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @Table(name = "highest_lowest")
-public class HighestLowestPrices extends HighLowForPeriod {
+public final class HighestLowestPrices extends HighLowForPeriod {
 
     @Column(name = "low")
     private double lowest;
