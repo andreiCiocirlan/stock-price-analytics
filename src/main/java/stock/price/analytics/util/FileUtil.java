@@ -9,10 +9,19 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Slf4j
 public final class FileUtil {
 
+    public static String readFile(String filePath) {
+        try {
+            return new String(Files.readAllBytes(Paths.get(filePath)));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null; // or handle error as needed
+        }
+    }
 
     public static void writeToFile(String filePath, String jsonData) {
         try {
