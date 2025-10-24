@@ -105,8 +105,8 @@ public class TickerService {
 //        writeToFile("C:\\Users\\andre\\IdeaProjects\\stock-price-analytics\\yahoo-daily-prices\\TEST_MODIFIED.json", modifiedJsonData);
         // update single day steps:
         // 0. comment everything below
-        // 1. dload files for the tickers of that day
-        // 2. create TEST.json with the contents of the json file
+        // 1. dload files for the tickers of that day (delete everything from /DAILY)
+        // 2. create TEST.json with the contents of the daily json file
         // 3. make sure to use extractDailySinglePricesFrom and set lastIndex accordingly
         // 4. replace the filtered date for the stream().filter
         // 5. replace contents of json file using TEST_MODIFIED.json
