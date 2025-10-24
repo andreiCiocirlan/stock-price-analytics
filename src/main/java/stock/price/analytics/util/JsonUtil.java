@@ -82,6 +82,73 @@ public final class JsonUtil {
         }
     }
 
+    public static List<DailyPrice> extractDailySinglePricesFrom(String ticker, String jsonResponse) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<DailyPrice> dailyPrices = new ArrayList<>();
+        Map<String, List<LocalDate>> anomalies = new HashMap<>();
+
+        JsonNode rootNode = objectMapper.readTree(jsonResponse);
+        JsonNode resultNode = rootNode.path("chart").path("result").get(0);
+        JsonNode timestampsNode = resultNode.path("timestamp");
+        JsonNode quoteNode = resultNode.path("indicators").path("quote").get(0);
+
+        int size = timestampsNode.size();
+        if (size < 2) {
+            // Not enough data for performance calculation, handle accordingly
+            log.warn("Not enough data in JSON response for ticker {}", ticker);
+            return dailyPrices;
+        }
+
+        int lastIndex = size - 2;
+        int secondLastIndex = size - 3;
+
+        // Helper to process a single index
+        java.util.function.IntConsumer processIndex = (index) -> {
+            long timestamp = timestampsNode.get(index).asLong();
+            LocalDate date = Instant.ofEpochSecond(timestamp).atZone(ZoneId.systemDefault()).toLocalDate();
+
+            double open = quoteNode.path("open").get(index).asDouble();
+            double high = quoteNode.path("high").get(index).asDouble();
+            double low = quoteNode.path("low").get(index).asDouble();
+            double close = quoteNode.path("close").get(index).asDouble();
+
+            boolean anomalyFound = false;
+            if (open == 0d) {
+                anomalies.computeIfAbsent("open", _ -> new ArrayList<>()).add(date);
+                anomalyFound = true;
+            }
+            if (low == 0d) {
+                anomalies.computeIfAbsent("low", _ -> new ArrayList<>()).add(date);
+                anomalyFound = true;
+            }
+            if (high == 0d) {
+                anomalies.computeIfAbsent("high", _ -> new ArrayList<>()).add(date);
+                anomalyFound = true;
+            }
+            if (close == 0d) {
+                anomalies.computeIfAbsent("close", _ -> new ArrayList<>()).add(date);
+                anomalyFound = true;
+            }
+
+            if (!anomalyFound) {
+                dailyPrices.add(PricesUtil.dailyPriceWithRoundedDecimals(new DailyPrice(ticker, date, new CandleOHLC(open, high, low, close))));
+            }
+        };
+
+        processIndex.accept(secondLastIndex);
+        processIndex.accept(lastIndex);
+
+        for (Map.Entry<String, List<LocalDate>> entry : anomalies.entrySet()) {
+            List<LocalDate> dates = entry.getValue().stream()
+                    .filter(d -> d.isAfter(LocalDate.of(2000, 1, 1)))
+                    .toList();
+            if (!dates.isEmpty())
+                log.warn("{} price 0 found for ticker {} and dates {}", entry.getKey(), ticker, dates);
+        }
+
+        return dailyPrices;
+    }
+
     public static List<DailyPrice> extractDailyPricesFrom(String ticker, String jsonResponse) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         List<DailyPrice> dailyPrices = new ArrayList<>();
