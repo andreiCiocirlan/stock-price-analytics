@@ -45,6 +45,43 @@ public final class JsonUtil {
         }
     }
 
+    public static String updateJsonMarketPrices(String jsonData, List<DailyPrice> dailyPrices) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(jsonData);
+            JsonNode results = root.path("quoteResponse").path("result");
+
+            if (!results.isArray()) {
+                return jsonData; // No changes if no results array
+            }
+
+            // Loop through each result and update if a matching ticker is found
+            for (JsonNode item : results) {
+                if (item.has("symbol") && item instanceof ObjectNode) {
+                    String symbol = item.get("symbol").asText();
+
+                    for (DailyPrice dp : dailyPrices) {
+                        if (dp.getTicker().equalsIgnoreCase(symbol)) {
+                            ObjectNode itemObj = (ObjectNode) item;
+                            itemObj.put("regularMarketPrice", dp.getClose());
+                            itemObj.put("regularMarketDayHigh", dp.getHigh());
+                            itemObj.put("regularMarketDayLow", dp.getLow());
+                            itemObj.put("regularMarketOpen", dp.getOpen());
+                            itemObj.put("regularMarketChangePercent", dp.getPerformance());
+                            break; // Move to next item after update
+                        }
+                    }
+                }
+            }
+
+            // Return the updated JSON as string
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return jsonData; // Return original JSON on error
+        }
+    }
+
     public static List<DailyPrice> extractDailyPricesFrom(String ticker, String jsonResponse) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         List<DailyPrice> dailyPrices = new ArrayList<>();
