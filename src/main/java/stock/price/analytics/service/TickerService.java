@@ -110,7 +110,7 @@ public class TickerService {
         // 3. make sure to use extractDailySinglePricesFrom and set lastIndex accordingly
         // 4. replace the filtered date for the stream().filter
         // 5. replace contents of json file using TEST_MODIFIED.json
-        // 6. import the json using /yahoo-quotes/from-file
+        // 6. import the json file using /yahoo-quotes/from-file
 
         List<DailyPrice> dailyPricesImported = JsonUtil.getDailyPricesFromJSONFileFor(tickerList);
         priceService.savePrices(dailyPricesImported);
