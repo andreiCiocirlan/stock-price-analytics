@@ -104,7 +104,7 @@ public class TickerService {
 //        String modifiedJsonData = JsonUtil.updateJsonMarketPrices(jsonData, dailyPricesImported.stream().filter(dp -> dp.getDate().isEqual(LocalDate.of(2025,10,23))).toList());
 //        writeToFile("C:\\Users\\andre\\IdeaProjects\\stock-price-analytics\\yahoo-daily-prices\\TEST_MODIFIED.json", modifiedJsonData);
         // update single day steps:
-        // 0. comment everything below
+        // 0. make sure scheduling.enabled = false and comment everything below
         // 1. dload files for the tickers of that day (delete everything from /DAILY)
         // 2. create TEST.json with the contents of the daily json file
         // 3. make sure to use extractDailySinglePricesFrom and set lastIndex accordingly
