@@ -11,6 +11,8 @@ public class CandleRangeQueryProviderImpl implements CandleRangeQueryProvider {
     public String averageCandleRangeQuery(StockTimeframe timeframe) {
         String tableName = timeframe.dbTableOHLC();
         String intervalPeriod = timeframe.toIntervalPeriod();
+        String dateTruncPeriod = timeframe.toDateTruncPeriod();
+        int lookbackCount = timeframe == StockTimeframe.QUARTERLY ? 12 : 4;
         return STR."""
                 SELECT ticker, AVG(high - low) AS avg_range
                 FROM (
@@ -20,7 +22,7 @@ public class CandleRangeQueryProviderImpl implements CandleRangeQueryProvider {
                         low,
                         ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY date DESC) AS rn
                     FROM \{tableName}
-                	where date > current_date - interval '4 \{intervalPeriod}'
+                	where date > date_trunc('\{dateTruncPeriod}', current_date)::date - interval '\{lookbackCount} \{intervalPeriod}'
                 ) sub
                 WHERE rn <= 15
                 GROUP BY ticker
