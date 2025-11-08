@@ -2,6 +2,7 @@ package stock.price.analytics.service;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -20,7 +21,9 @@ import stock.price.analytics.repository.json.DailyPriceJSONRepository;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
@@ -64,9 +67,39 @@ public class DailyPriceJSONService {
             Response response = objectMapper.readValue(jsonData, Response.class);
             List<DailyPriceJSON> dailyPriceJSONs = response.getQuoteResponse().getResult();
 
+            logUpcomingStockSplits(jsonData, objectMapper, dailyPriceJSONs);
+
             return extractDailyJSONPricesAndSave(dailyPriceJSONs, cacheService.dailyPriceJsonCache());
         } catch (JsonProcessingException ex) {
             throw new RuntimeException(ex);
+        }
+    }
+
+    private void logUpcomingStockSplits(String jsonData, ObjectMapper objectMapper, List<DailyPriceJSON> dailyPriceJSONs) throws JsonProcessingException {
+        JsonNode rootNode = objectMapper.readTree(jsonData);
+        JsonNode resultArray = rootNode.path("quoteResponse").path("result");
+
+        for (int i = 0; i < dailyPriceJSONs.size(); i++) {
+            DailyPriceJSON dailyPrice = dailyPriceJSONs.get(i);
+            JsonNode dailyNode = resultArray.get(i);
+            JsonNode corporateActionsNode = dailyNode.path("corporateActions");
+
+            if (corporateActionsNode.isArray()) {
+                for (JsonNode actionNode : corporateActionsNode) {
+                    JsonNode meta = actionNode.path("meta");
+                    if ("SPLIT".equalsIgnoreCase(meta.path("eventType").asText())) {
+                        String splitRatio = meta.path("splitRatio").asText(null);
+                        long dateEpochMs = meta.path("dateEpochMs").asLong(0);
+                        String splitDate = Instant.ofEpochMilli(dateEpochMs)
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDate()
+                                .format(DateTimeFormatter.ISO_LOCAL_DATE);
+
+                        log.warn("Upcoming stock split: {} {} {}", dailyPrice.getSymbol(), splitDate, splitRatio);
+                        break;
+                    }
+                }
+            }
         }
     }
 
