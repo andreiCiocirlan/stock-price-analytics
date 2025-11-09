@@ -14,6 +14,9 @@ public class CandleRangeQueryProviderImpl implements CandleRangeQueryProvider {
         String intervalPeriod = timeframe.toIntervalPeriod();
         String dateTruncPeriod = timeframe.toDateTruncPeriod();
         int lookbackCount = timeframe == StockTimeframe.QUARTERLY ? 15 : 5;
+        if (cfdMargins.isBlank()) {
+            cfdMargins = "0.2, 0.25, 0.33, 0.5, 0";
+        }
         return STR."""
                 WITH avg_ranges AS (
                     SELECT ticker, AVG(high - low) AS avg_range
