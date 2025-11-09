@@ -22,7 +22,8 @@ public class StockHeatmapPerformanceService {
     public List<StockPerformanceDTO> stockPerformanceFor(StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, List<Double> cfdMargins, List<String> tickers) {
         List<StockPerformanceDTO> result = new ArrayList<>();
         cacheService.getStocksMap().values().stream()
-                .filter(stockFilterPredicate(tickers, cfdMargins))
+                .filter( s -> (cfdMargins.isEmpty() || cfdMargins.contains(s.getCfdMargin())) &&
+                                                             (tickers.isEmpty() || tickers.contains(s.getTicker())))
                 .forEach(stock -> result.add(new StockPerformanceDTO(stock.getTicker(), stock.performanceFor(timeFrame))));
 
         List<StockPerformanceDTO> performanceDTOs = result.stream()
@@ -41,11 +42,6 @@ public class StockHeatmapPerformanceService {
         }
 
         return performanceDTOs;
-    }
-
-    private Predicate<? super Stock> stockFilterPredicate(List<String> tickers, List<Double> cfdMargins) {
-        return stock -> (cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin())) &&
-                        (tickers.isEmpty() || tickers.contains(stock.getTicker()));
     }
 
 }
