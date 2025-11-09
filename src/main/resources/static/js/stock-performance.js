@@ -125,6 +125,9 @@ function updateStockPerformanceChart(timeFrame) {
 					priceMilestones.push(selectedValue);
 				}
 			}
+			else if (dataType == 'trading-idea') {
+                requestBody.tradingIdea = selectedValue;
+			}
 		});
 		requestBody.priceMilestones = priceMilestones;
 	}

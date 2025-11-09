@@ -1,6 +1,7 @@
 package stock.price.analytics.model.dto;
 
 import stock.price.analytics.model.prices.PriceMilestone;
+import stock.price.analytics.model.prices.enums.TradingIdea;
 import stock.price.analytics.model.prices.ohlc.enums.CandleStickType;
 import stock.price.analytics.util.PriceMilestoneFactory;
 
@@ -12,7 +13,8 @@ public record StockHeatmapRequest(
         Integer limit,
         List<Double> cfdMargins,
         List<String> priceMilestones,
-        CandleStickType candleStickType
+        CandleStickType candleStickType,
+        TradingIdea tradingIdea
 ) {
     public List<PriceMilestone> priceMilestonesFrom() {
         return PriceMilestoneFactory.priceMilestonesFrom(this.priceMilestones());
@@ -20,5 +22,9 @@ public record StockHeatmapRequest(
 
     public boolean hasMilestonesOrCandlestickFilters() {
         return !this.priceMilestones().isEmpty() || this.candleStickType() != CandleStickType.ANY;
+    }
+
+    public boolean hasTradingIdea() {
+        return this.tradingIdea != TradingIdea.NONE;
     }
 }
