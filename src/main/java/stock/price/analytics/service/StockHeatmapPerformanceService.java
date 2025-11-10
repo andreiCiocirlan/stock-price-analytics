@@ -8,60 +8,18 @@ import stock.price.analytics.model.dto.StockPerformanceDTO;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static java.util.Collections.emptyList;
 
 @Service
 @RequiredArgsConstructor
 public class StockHeatmapPerformanceService {
 
     private final CacheService cacheService;
-    private final CandleStickService candleStickService;
     private final PriceMilestoneService priceMilestoneService;
-
-    public List<StockPerformanceDTO> stockPerformanceFor(StockHeatmapRequest request) {
-        StockTimeframe stockTimeframe = ("undefined".equals(request.timeFrame())) ? StockTimeframe.MONTHLY : StockTimeframe.valueOf(request.timeFrame());
-        List<String> tickers = emptyList();
-        if (request.hasMilestonesOrCandlestickFilters()) {
-            tickers = priceMilestoneService.tickersFor(request, stockTimeframe);
-
-            if (tickers.isEmpty()) {
-                return emptyList();
-            }
-        }
-        if (request.hasTradingIdea()) {
-            String cfdMargins = request.cfdMargins().stream().map(cfdMargin -> STR."'\{cfdMargin}'").collect(Collectors.joining(", "));
-            List<String> tradingIdeaTickers = switch (request.tradingIdea()) {
-                case COMPRESSED_PRICE -> candleStickService.compressedPriceFor(stockTimeframe, cfdMargins);
-                default -> emptyList();
-            };
-
-            if (tradingIdeaTickers.isEmpty()) {
-                return emptyList();
-            }
-
-            if (!tickers.isEmpty()) {
-                tickers = new ArrayList<>(tickers);
-                tickers.retainAll(tradingIdeaTickers);
-                if (tickers.isEmpty()) {
-                    return emptyList();
-                }
-            } else {
-                tickers = tradingIdeaTickers;
-            }
-        }
-
-        return getStockPerformance(
-                stockTimeframe,
-                request.positivePerfFirst(),
-                request.limit(),
-                request.cfdMargins(),
-                tickers
-        );
-    }
+    private final CandleStickService candleStickService;
 
     public List<StockPerformanceDTO> getStockPerformance(StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, List<Double> cfdMargins, List<String> tickers) {
         List<StockPerformanceDTO> result = new ArrayList<>();
@@ -88,4 +46,60 @@ public class StockHeatmapPerformanceService {
         return performanceDTOs;
     }
 
+    public List<StockPerformanceDTO> stockPerformanceFor(StockHeatmapRequest request) {
+        StockTimeframe stockTimeframe = parseTimeframe(request.timeFrame());
+
+        List<String> tickers = filterTickersForRequestCriteria(request, stockTimeframe);
+        if (tickers.isEmpty() && (request.hasMilestonesOrCandlestickFilters() || request.hasTradingIdea())) {
+            return Collections.emptyList();
+        }
+
+        return getStockPerformance(
+                stockTimeframe,
+                request.positivePerfFirst(),
+                request.limit(),
+                request.cfdMargins(),
+                tickers
+        );
+    }
+
+    private StockTimeframe parseTimeframe(String timeFrameStr) {
+        return "undefined".equals(timeFrameStr) ? StockTimeframe.MONTHLY : StockTimeframe.valueOf(timeFrameStr);
+    }
+
+    private List<String> filterTickersForRequestCriteria(StockHeatmapRequest request, StockTimeframe stockTimeframe) {
+        List<String> tickers = Collections.emptyList();
+
+        if (request.hasMilestonesOrCandlestickFilters()) {
+            tickers = priceMilestoneService.tickersFor(request, stockTimeframe);
+            if (tickers.isEmpty()) {
+                return Collections.emptyList();
+            }
+        }
+
+        if (request.hasTradingIdea()) {
+            String cfdMarginsString = request.cfdMargins().stream()
+                    .map(cfdMargin -> String.format("'%s'", cfdMargin))
+                    .collect(Collectors.joining(", "));
+
+            List<String> tradingIdeaTickers = switch (request.tradingIdea()) {
+                case COMPRESSED_PRICE -> candleStickService.compressedPriceFor(stockTimeframe, cfdMarginsString);
+                default -> Collections.emptyList();
+            };
+
+            if (tradingIdeaTickers.isEmpty()) {
+                return Collections.emptyList();
+            }
+
+            if (!tickers.isEmpty()) {
+                List<String> filteredTickers = new ArrayList<>(tickers);
+                filteredTickers.retainAll(tradingIdeaTickers);
+                tickers = filteredTickers.isEmpty() ? Collections.emptyList() : filteredTickers;
+            } else {
+                tickers = tradingIdeaTickers;
+            }
+        }
+
+        return tickers;
+    }
 }
