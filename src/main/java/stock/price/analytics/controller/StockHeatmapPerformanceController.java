@@ -22,8 +22,6 @@ import static java.util.Collections.emptyList;
 public class StockHeatmapPerformanceController {
 
     private final StockHeatmapPerformanceService stockHeatmapPerformanceService;
-    private final PriceMilestoneService priceMilestoneService;
-    private final CandleStickService candleStickService;
 
     @GetMapping("/stock-performance")
     @ResponseBody
@@ -34,44 +32,8 @@ public class StockHeatmapPerformanceController {
     @PostMapping("/stock-performance-json")
     @ResponseBody
     public List<StockPerformanceDTO> getStockPerformance(@RequestBody StockHeatmapRequest request) {
-        StockTimeframe stockTimeframe = ("undefined".equals(request.timeFrame())) ? StockTimeframe.MONTHLY : StockTimeframe.valueOf(request.timeFrame());
-        List<String> tickers = emptyList();
-        if (request.hasMilestonesOrCandlestickFilters()) {
-            tickers = priceMilestoneService.tickersFor(request, stockTimeframe);
+        return stockHeatmapPerformanceService.stockPerformanceFor(request);
 
-            if (tickers.isEmpty()) {
-                return emptyList();
-            }
-        }
-        if (request.hasTradingIdea()) {
-            String cfdMargins = request.cfdMargins().stream().map(cfdMargin -> STR."'\{cfdMargin}'").collect(Collectors.joining(", "));
-            List<String> tradingIdeaTickers = switch (request.tradingIdea()) {
-                case COMPRESSED_PRICE -> candleStickService.compressedPriceFor(stockTimeframe, cfdMargins);
-                default -> emptyList();
-            };
-
-            if (tradingIdeaTickers.isEmpty()) {
-                return emptyList();
-            }
-
-            if (!tickers.isEmpty()) {
-                tickers = new ArrayList<>(tickers);
-                tickers.retainAll(tradingIdeaTickers);
-                if (tickers.isEmpty()) {
-                    return emptyList();
-                }
-            } else {
-                tickers = tradingIdeaTickers;
-            }
-        }
-
-        return stockHeatmapPerformanceService.stockPerformanceFor(
-                stockTimeframe,
-                request.positivePerfFirst(),
-                request.limit(),
-                request.cfdMargins(),
-                tickers
-        );
     }
 
 }
