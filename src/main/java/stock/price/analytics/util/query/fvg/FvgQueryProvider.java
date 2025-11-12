@@ -10,4 +10,6 @@ public interface FvgQueryProvider {
     String findTickersFVGsTaggedQueryFor(StockTimeframe timeframe, FvgType fvgType, PricePerformanceMilestone pricePerformanceMilestone, String cfdMargins);
 
     String findFVGsQueryFrom(StockTimeframe timeframe, List<String> tickers, boolean allHistoricalData);
+
+    String priceInsideFvgFor(StockTimeframe timeframe, String cfdMargins);
 }

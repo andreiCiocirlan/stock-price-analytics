@@ -287,6 +287,13 @@ public class FairValueGapService {
                 .collect(Collectors.toSet());
     }
 
+    @SuppressWarnings("unchecked")
+    public List<String> priceInsideFvgFor(StockTimeframe timeframe, String cfdMargins) {
+        String query = fvgQueryProvider.priceInsideFvgFor(timeframe, cfdMargins);
+
+        return (List<String>) entityManager.createNativeQuery(query).getResultList();
+    }
+
     public String fvgLabelFrom(PricePerformanceMilestone pricePerformanceMilestone, FvgType fvgType, StockTimeframe stockTimeframe) {
         String highLowTimeframeCorrelation = timeframeFrom(pricePerformanceMilestone);
         boolean isLow95thPercentile = pricePerformanceMilestone.isLow95thPercentile();

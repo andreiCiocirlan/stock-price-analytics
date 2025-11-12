@@ -20,6 +20,7 @@ public class StockHeatmapPerformanceService {
     private final CacheService cacheService;
     private final PriceMilestoneService priceMilestoneService;
     private final CandleStickService candleStickService;
+    private final FairValueGapService fairValueGapService;
 
     public List<StockPerformanceDTO> getStockPerformance(StockTimeframe timeFrame, Boolean positivePerfFirst, Integer limit, List<Double> cfdMargins, List<String> tickers) {
         List<StockPerformanceDTO> result = new ArrayList<>();
@@ -84,6 +85,7 @@ public class StockHeatmapPerformanceService {
 
             List<String> tradingIdeaTickers = switch (request.tradingIdea()) {
                 case COMPRESSED_PRICE -> candleStickService.compressedPriceFor(stockTimeframe, cfdMarginsString);
+                case PRICE_INSIDE_FVG -> fairValueGapService.priceInsideFvgFor(stockTimeframe, cfdMarginsString);
                 default -> Collections.emptyList();
             };
 

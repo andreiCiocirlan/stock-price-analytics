@@ -16,6 +16,20 @@ import java.util.stream.Collectors;
 @Component
 public class FvgQueryProviderImpl implements FvgQueryProvider {
 
+
+    @Override
+    public String priceInsideFvgFor(StockTimeframe timeframe, String cfdMargins) {
+        return STR."""
+                SELECT distinct s.ticker
+                FROM stocks s
+                JOIN fvg ON fvg.ticker = s.ticker
+                AND fvg.status = 'OPEN'
+                WHERE s.cfd_margin IN (\{cfdMargins})
+                  AND s.close BETWEEN fvg.low AND fvg.high
+                  AND fvg.timeframe = '\{timeframe}'
+                """;
+    }
+
     @Override
     public String findTickersFVGsTaggedQueryFor(StockTimeframe timeframe, FvgType fvgType, PricePerformanceMilestone pricePerformanceMilestone, String cfdMargins) {
         String prefix = timeframe.stockPrefix();
