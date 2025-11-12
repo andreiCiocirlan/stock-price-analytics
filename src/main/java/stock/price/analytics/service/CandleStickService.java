@@ -22,13 +22,9 @@ public class CandleStickService {
 
     @SuppressWarnings("unchecked")
     public List<String> compressedPriceFor(StockTimeframe timeframe, String cfdMargins) {
-        List<String> tickersCompressedPrice = new ArrayList<>();
         String query = candleRangeQueryProvider.compressedPriceQuery(timeframe, cfdMargins);
 
-        List<Object[]> resultList = entityManager.createNativeQuery(query).getResultList();
-        resultList.forEach(row -> tickersCompressedPrice.add((String) row[0]));
-
-        return tickersCompressedPrice;
+        return (List<String>) entityManager.createNativeQuery(query).getResultList();
     }
 
     @SuppressWarnings("unchecked")
