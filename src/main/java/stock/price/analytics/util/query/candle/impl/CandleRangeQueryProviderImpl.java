@@ -43,9 +43,7 @@ public class CandleRangeQueryProviderImpl implements CandleRangeQueryProvider {
                     )
                 )
                 SELECT
-                    c.ticker,
-                    c.current_range,
-                    a.avg_range
+                    c.ticker
                 FROM
                     current_quarter c
                 JOIN
