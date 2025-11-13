@@ -149,7 +149,4 @@ public class CacheService {
         return candleStickCache.tickersFor(timeframe, candleStickType);
     }
 
-    public Double averageCandleRangeFor(StockTimeframe timeframe, String ticker) {
-        return candleStickCache.averageCandleRangeFor(ticker, timeframe);
-    }
 }

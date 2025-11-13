@@ -7,10 +7,7 @@ import org.springframework.stereotype.Service;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.util.query.candle.CandleRangeQueryProvider;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -27,14 +24,4 @@ public class CandleStickService {
         return (List<String>) entityManager.createNativeQuery(query).getResultList();
     }
 
-    @SuppressWarnings("unchecked")
-    public Map<String, Double> averageCandleRangesFor(StockTimeframe timeframe) {
-        Map<String, Double> avgCandleRanges = new HashMap<>();
-        String query = candleRangeQueryProvider.averageCandleRangeQuery(timeframe);
-
-        List<Object[]> resultList = entityManager.createNativeQuery(query).getResultList();
-        resultList.forEach(row -> avgCandleRanges.put((String) row[0], (Double) row[1]));
-
-        return avgCandleRanges;
-    }
 }

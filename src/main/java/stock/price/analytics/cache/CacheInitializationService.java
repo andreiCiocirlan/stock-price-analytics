@@ -16,7 +16,6 @@ import stock.price.analytics.repository.json.DailyPriceJSONRepository;
 import stock.price.analytics.repository.prices.highlow.HighLowForPeriodRepository;
 import stock.price.analytics.repository.stocks.StockRepository;
 import stock.price.analytics.service.*;
-import stock.price.analytics.util.CandleStickUtil;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -61,7 +60,6 @@ public class CacheInitializationService {
         logTime(this::initHighLowPricesCache, "initialized high low prices cache");
         logTime(this::initDailyJSONPricesCache, "initialized daily JSON prices cache");
         logTime(this::initTickersForPriceMilestoneCache, "initialized tickers for price milestone cache");
-        logTime(this::initAvgCandleRangesCache, "initialized average candle range cache");
         logTime(this::initCandleStickTypeCache, "initialized candle stick types cache");
     }
 
@@ -184,22 +182,12 @@ public class CacheInitializationService {
                 .toList();
     }
 
-    private void initAvgCandleRangesCache() {
-        for (StockTimeframe timeframe : StockTimeframe.values()) {
-            candleStickService.averageCandleRangesFor(timeframe)
-                    .forEach((ticker, range) -> candleStickCache.addAvgCandleRangeFor(ticker, timeframe, range));
-        }
-    }
-
     private void initCandleStickTypeCache() {
         for (StockTimeframe timeframe : StockTimeframe.values()) {
             List<AbstractPrice> pricesForTimeframe = cacheService.pricesFor(timeframe);
             for (AbstractPrice price : pricesForTimeframe) {
                 String ticker = price.getTicker();
                 CandleStickType candleStickType = price.toCandleStickType();
-                if (CandleStickUtil.isTightCandleStick(price, cacheService.averageCandleRangeFor(timeframe, price.getTicker()))) {
-                    candleStickType = CandleStickType.TIGHT;
-                }
                 candleStickCache.addTickerFor(candleStickType, timeframe, ticker);
             }
         }
