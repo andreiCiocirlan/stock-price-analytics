@@ -18,12 +18,27 @@ public class FvgQueryProviderImpl implements FvgQueryProvider {
 
 
     @Override
+    public String priceHLInsideFvgFor(StockTimeframe timeframe, String cfdMargins) {
+        String prefix = timeframe.stockPrefix();
+        String dateTruncPeriod = timeframe.toDateTruncPeriod();
+        String intervalPeriod = timeframe.toIntervalPeriod();
+        return STR."""
+                SELECT distinct s.ticker
+                FROM stocks s
+                JOIN fvg ON fvg.ticker = s.ticker AND fvg.status = 'OPEN'
+                WHERE s.cfd_margin IN (\{cfdMargins})
+                    AND (s.\{prefix}high between fvg.low AND fvg.high OR s.\{prefix}low between fvg.low AND fvg.high)
+                    AND fvg.timeframe = '\{timeframe}'
+                    AND fvg.date < date_trunc('\{dateTruncPeriod}', current_date) - interval '2 \{intervalPeriod}'
+                """;
+    }
+
+    @Override
     public String priceInsideFvgFor(StockTimeframe timeframe, String cfdMargins) {
         return STR."""
                 SELECT distinct s.ticker
                 FROM stocks s
-                JOIN fvg ON fvg.ticker = s.ticker
-                AND fvg.status = 'OPEN'
+                JOIN fvg ON fvg.ticker = s.ticker AND fvg.status = 'OPEN'
                 WHERE s.cfd_margin IN (\{cfdMargins})
                   AND s.close BETWEEN fvg.low AND fvg.high
                   AND fvg.timeframe = '\{timeframe}'

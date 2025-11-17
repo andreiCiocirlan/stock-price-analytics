@@ -290,7 +290,12 @@ public class FairValueGapService {
     @SuppressWarnings("unchecked")
     public List<String> priceInsideFvgFor(StockTimeframe timeframe, String cfdMargins) {
         String query = fvgQueryProvider.priceInsideFvgFor(timeframe, cfdMargins);
+        return (List<String>) entityManager.createNativeQuery(query).getResultList();
+    }
 
+    @SuppressWarnings("unchecked")
+    public List<String> priceHLInsideFvgFor(StockTimeframe timeframe, String cfdMargins) {
+        String query = fvgQueryProvider.priceHLInsideFvgFor(timeframe, cfdMargins);
         return (List<String>) entityManager.createNativeQuery(query).getResultList();
     }
 

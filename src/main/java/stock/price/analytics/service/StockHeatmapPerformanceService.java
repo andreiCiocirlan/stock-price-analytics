@@ -86,6 +86,7 @@ public class StockHeatmapPerformanceService {
             List<String> tradingIdeaTickers = switch (request.tradingIdea()) {
                 case COMPRESSED_PRICE -> candleStickService.compressedPriceFor(stockTimeframe, cfdMarginsString);
                 case PRICE_INSIDE_FVG -> fairValueGapService.priceInsideFvgFor(stockTimeframe, cfdMarginsString);
+                case PRICE_HL_INSIDE_FVG -> fairValueGapService.priceHLInsideFvgFor(stockTimeframe, cfdMarginsString);
                 default -> Collections.emptyList();
             };
 
