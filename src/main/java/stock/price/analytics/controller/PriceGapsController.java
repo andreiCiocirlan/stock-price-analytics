@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.service.PriceGapService;
 import stock.price.analytics.service.PriceService;
@@ -16,7 +15,6 @@ import stock.price.analytics.service.PriceService;
 @RequestMapping("/price-gaps")
 public class PriceGapsController {
 
-    private final CacheService cacheService;
     private final PriceService priceService;
     private final PriceGapService priceGapService;
 
