@@ -121,7 +121,7 @@ public class TickerService {
         priceService.savePrices(htfPricesImported);
         saveHighLowPricesForPeriodFrom(htfPricesImported);
         saveAndUpdateStocksFor(dailyPricesImported, htfPricesImported, lastUpdate);
-        priceGapService.saveAllPriceGapsFor(tickerList);
+        priceGapService.saveHistoricalPriceGapsFor(tickerList);
         fairValueGapService.findNewFVGsAndSaveForAllTimeframes(tickerList, true);
     }
 

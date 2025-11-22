@@ -1,33 +1,39 @@
 package stock.price.analytics.util.query.pricegaps.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
+import stock.price.analytics.repository.json.DailyPriceJSONRepository;
 import stock.price.analytics.util.query.pricegaps.PriceGapsQueryProvider;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
+
+@RequiredArgsConstructor
 @Component
 public class PriceGapsQueryProviderImpl implements PriceGapsQueryProvider {
 
+    private final DailyPriceJSONRepository dailyPriceJSONRepository;
 
     @Override
-    public String savePriceGapsQueryFor(List<String> tickers, StockTimeframe timeframe, boolean allHistoricalData, boolean firstWeeklyImportDone) {
+    public String saveHistoricalPriceGapsQueryFor(List<String> tickers, StockTimeframe timeframe) {
         String tickersFormatted = tickers.stream().map(ticker -> STR."'\{ticker}'").collect(Collectors.joining(", "));
         String dbTable = timeframe.dbTableOHLC();
         String dateTruncPeriod = timeframe.toDateTruncPeriod();
         String interval = timeframe.toInterval();
         String intervalPeriod = timeframe.toIntervalPeriod();
-        int lookBackCount = timeframe == StockTimeframe.DAILY && firstWeeklyImportDone ? 3 : 1;
-        if (allHistoricalData) {
-            lookBackCount = switch (timeframe) {
-                case DAILY -> 500;
-                case WEEKLY -> 300;
-                case MONTHLY -> 200;
-                case QUARTERLY -> 100;
-                case YEARLY -> 10;
-            };
-        }
+        int lookBackCount = switch (timeframe) {
+            case DAILY -> 500;
+            case WEEKLY -> 300;
+            case MONTHLY -> 200;
+            case QUARTERLY -> 100;
+            case YEARLY -> 10;
+        };
 
         return STR."""
             WITH max_date_cte AS (
@@ -73,6 +79,47 @@ public class PriceGapsQueryProviderImpl implements PriceGapsQueryProvider {
                 status = EXCLUDED.status,
                 id = EXCLUDED.id;
             """;
+    }
+
+    @Override
+    public String saveTodayPriceGapsQueryFor(StockTimeframe timeframe) {
+        String dbTable = timeframe.dbTableOHLC();
+        LocalDate tradingDateNow = tradingDateNow();
+        LocalDate curr_date = switch (timeframe) {
+            case DAILY -> tradingDateNow;
+            case WEEKLY -> tradingDateNow.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+            case MONTHLY -> tradingDateNow.with(TemporalAdjusters.firstDayOfMonth());
+            case QUARTERLY -> LocalDate.of(tradingDateNow.getYear(), tradingDateNow.getMonth().firstMonthOfQuarter().getValue(), 1);
+            case YEARLY -> tradingDateNow.with(TemporalAdjusters.firstDayOfYear());
+        };
+        LocalDate prev_date = switch (timeframe) {
+            case DAILY -> dailyPriceJSONRepository.getPreviousTradingDate();
+            case WEEKLY -> curr_date.minusWeeks(1);
+            case MONTHLY -> curr_date.minusMonths(1);
+            case QUARTERLY -> curr_date.minusMonths(3);
+            case YEARLY -> curr_date.minusYears(1);
+        };
+
+        return STR."""
+                INSERT INTO price_gaps (id, ticker, close, timeframe, status, date)
+                SELECT
+                  nextval('sequence_prices_gaps') AS id,
+                  p.ticker,
+                  prev_p.close,
+                  '\{timeframe}',
+                  'OPEN',
+                  prev_p.date
+                FROM \{dbTable} p
+                JOIN \{dbTable} prev_p ON prev_p.ticker = p.ticker
+                WHERE p.date = '\{curr_date}'
+                  AND prev_p.date = '\{prev_date}'
+                  AND p.ticker in (select ticker from stocks where delisted_date is null and cfd_margin in (0.2, 0.25, 0.33, 0.5))
+                  AND (prev_p.close < p.low OR prev_p.close > p.high)
+                ON CONFLICT (ticker, timeframe, date)
+                DO UPDATE SET
+                  close = EXCLUDED.close,
+                  status = EXCLUDED.status;
+                """;
     }
 }
 

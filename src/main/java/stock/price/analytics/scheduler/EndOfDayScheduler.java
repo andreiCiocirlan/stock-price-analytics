@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.service.*;
 
@@ -20,7 +19,6 @@ import java.util.function.Supplier;
 public class EndOfDayScheduler {
 
     private final PriceService priceService;
-    private final CacheService cacheService;
     private final DiscrepanciesService discrepanciesService;
     private final HighLowForPeriodService highLowForPeriodService;
     private final WebSocketNotificationService webSocketNotificationService;
@@ -42,11 +40,11 @@ public class EndOfDayScheduler {
                         discrepanciesService.updateHTFOpeningPricesDiscrepancyFor(timeframe);
                         discrepanciesService.updateStocksWithOpeningPriceDiscrepancyFor(timeframe);
                     }
-                    priceGapService.savePriceGapsTodayFor(cacheService.getCachedTickers(), timeframe);
+                    priceGapService.savePriceGapsTodayFor(timeframe);
                 });
 
         // save daily price gaps at EOD
-        priceGapService.savePriceGapsTodayFor(cacheService.getCachedTickers(), StockTimeframe.DAILY);
+        priceGapService.savePriceGapsTodayFor(StockTimeframe.DAILY);
 
         // log new high lows this week
         highLowForPeriodService.logNewHighLowsThisWeek();

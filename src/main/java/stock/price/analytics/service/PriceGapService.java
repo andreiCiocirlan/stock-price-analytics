@@ -13,8 +13,6 @@ import stock.price.analytics.util.query.pricegaps.PriceGapsQueryProvider;
 
 import java.util.List;
 
-import static stock.price.analytics.model.prices.enums.StockTimeframe.WEEKLY;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -29,27 +27,22 @@ public class PriceGapService {
     private final PriceGapsQueryProvider priceGapsQueryProvider;
 
     @Transactional
-    public void saveAllPriceGapsFor(List<String> tickers) {
+    public void saveHistoricalPriceGapsFor(List<String> tickers) {
         for (StockTimeframe timeframe : StockTimeframe.values()) {
-            savePriceGapsFor(tickers, timeframe, true);
+            saveHistoricalPriceGapsFor(tickers, timeframe);
         }
     }
 
     @Transactional
-    public void savePriceGapsTodayFor(List<String> tickers, StockTimeframe timeframe) {
-        savePriceGapsFor(tickers, timeframe, false);
+    public void savePriceGapsTodayFor(StockTimeframe timeframe) {
+        String query = priceGapsQueryProvider.saveTodayPriceGapsQueryFor(timeframe);
+        int rowsAffected = entityManager.createNativeQuery(query).executeUpdate();
+        log.info("saved {} rows for {} price gaps", rowsAffected, timeframe);
     }
 
     @Transactional
-    public void savePriceGapsTodayForAllTickers() {
-        for (StockTimeframe timeframe : StockTimeframe.values()) {
-            savePriceGapsFor(cacheService.getCachedTickers(), timeframe, false);
-        }
-    }
-
-    @Transactional
-    private void savePriceGapsFor(List<String> tickers, StockTimeframe timeframe, boolean allHistoricalData) {
-        String query = priceGapsQueryProvider.savePriceGapsQueryFor(tickers, timeframe, allHistoricalData, priceService.isFirstImportDoneFor(WEEKLY));
+    private void saveHistoricalPriceGapsFor(List<String> tickers, StockTimeframe timeframe) {
+        String query = priceGapsQueryProvider.saveHistoricalPriceGapsQueryFor(tickers, timeframe);
         int rowsAffected = entityManager.createNativeQuery(query).executeUpdate();
         log.info("saved {} rows for {} price gaps", rowsAffected, timeframe);
     }
