@@ -47,7 +47,6 @@ public class CacheInitializationService {
     private final HighLowForPeriodService highLowForPeriodService;
     private final PriceMilestoneService priceMilestoneService;
     private final CandleStickCache candleStickCache;
-    private final CandleStickService candleStickService;
 
     @Transactional
     public void initAllCaches() {
