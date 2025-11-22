@@ -34,6 +34,35 @@ public class FvgQueryProviderImpl implements FvgQueryProvider {
     }
 
     @Override
+    public String closeFVGsUpdateFor(StockTimeframe timeframe) {
+        String dbTable = timeframe.dbTableOHLC();
+        String intervalPeriod = timeframe.toIntervalPeriod();
+        int lookbackCount = timeframe == StockTimeframe.QUARTERLY ? 21 : 7;
+        return STR."""
+                WITH ClosedFVG AS (
+                  SELECT DISTINCT fvg.ticker, fvg.date
+                  FROM fvg
+                  JOIN \{dbTable} p
+                    ON fvg.ticker = p.ticker
+                   AND p.date > fvg.date
+                   AND fvg.status = 'OPEN'
+                  WHERE
+                		p.date > current_date - interval '\{lookbackCount} \{intervalPeriod}'
+                	AND p.low <= fvg.low
+                    AND p.high >= fvg.high
+                    AND fvg.timeframe = '\{timeframe}'
+                )
+                UPDATE fvg
+                SET status = 'CLOSED'
+                FROM ClosedFVG cfvg
+                WHERE fvg.ticker = cfvg.ticker
+                  AND fvg.date = cfvg.date
+                  AND fvg.status = 'OPEN'
+                  AND fvg.timeframe = '\{timeframe}';
+                """;
+    }
+
+    @Override
     public String priceInsideFvgFor(StockTimeframe timeframe, String cfdMargins) {
         return STR."""
                 SELECT distinct s.ticker

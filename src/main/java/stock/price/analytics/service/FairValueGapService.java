@@ -299,6 +299,18 @@ public class FairValueGapService {
         return (List<String>) entityManager.createNativeQuery(query).getResultList();
     }
 
+    public void closeFVGsForAllTimeframes() {
+        for (StockTimeframe timeframe : StockTimeframe.values()) {
+            closeFVGsFor(timeframe);
+        }
+    }
+
+    public void closeFVGsFor(StockTimeframe timeframe) {
+        String query = fvgQueryProvider.closeFVGsUpdateFor(timeframe);
+        int rowsAffected = entityManager.createNativeQuery(query).executeUpdate();
+        log.info("Closed {} {} FVGs", rowsAffected, timeframe);
+    }
+
     public String fvgLabelFrom(PricePerformanceMilestone pricePerformanceMilestone, FvgType fvgType, StockTimeframe stockTimeframe) {
         String highLowTimeframeCorrelation = timeframeFrom(pricePerformanceMilestone);
         boolean isLow95thPercentile = pricePerformanceMilestone.isLow95thPercentile();

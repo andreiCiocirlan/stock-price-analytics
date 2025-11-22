@@ -14,4 +14,6 @@ public interface FvgQueryProvider {
     String priceInsideFvgFor(StockTimeframe timeframe, String cfdMargins);
 
     String priceHLInsideFvgFor(StockTimeframe timeframe, String cfdMargins);
+
+    String closeFVGsUpdateFor(StockTimeframe timeframe);
 }
