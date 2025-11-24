@@ -299,6 +299,7 @@ public class FairValueGapService {
         return (List<String>) entityManager.createNativeQuery(query).getResultList();
     }
 
+    @Transactional
     public void closeFVGsForAllTimeframes() {
         for (StockTimeframe timeframe : StockTimeframe.values()) {
             closeFVGsFor(timeframe);
