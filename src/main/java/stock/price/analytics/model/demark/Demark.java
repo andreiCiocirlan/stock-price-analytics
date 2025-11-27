@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
+import stock.price.analytics.model.demark.enums.TDType;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 
 import java.time.LocalDate;
@@ -36,6 +37,10 @@ public class Demark {
 
     @Column(name = "td")
     private int td;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type")
+    private TDType type;
 
     public Demark(String ticker, LocalDate date, StockTimeframe timeframe, int td) {
         this.ticker = ticker;
