@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import stock.price.analytics.cache.CacheService;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.repository.gaps.PriceGapRepository;
 import stock.price.analytics.util.query.pricegaps.PriceGapsQueryProvider;
@@ -19,8 +18,6 @@ import java.util.List;
 public class PriceGapService {
 
     private final PriceGapRepository priceGapRepository;
-    private final PriceService priceService;
-    private final CacheService cacheService;
 
     @PersistenceContext
     private final EntityManager entityManager;
