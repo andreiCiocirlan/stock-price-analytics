@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.util.query.demark.DemarkQueryProvider;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -23,6 +25,15 @@ public class DemarkService {
         String query = demarkQueryProvider.demarkForTimeframeQuery(timeframe);
         int rowsAffected = entityManager.createNativeQuery(query).executeUpdate();
         log.warn("Inserted/Updated {} {} Demark indicator rows", rowsAffected, timeframe);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<String> tickersForTimeframeTdAndCfdMargins(StockTimeframe timeframe, int tdCount, String cfdMargins) {
+        if (timeframe == StockTimeframe.DAILY) { // higher timeframes allowed only
+            timeframe = StockTimeframe.WEEKLY;
+        }
+        String query = demarkQueryProvider.tickersForTimeframeTdAndCfdMarginsQuery(timeframe, tdCount, cfdMargins);
+        return (List<String>) entityManager.createNativeQuery(query).getResultList();
     }
 
 }

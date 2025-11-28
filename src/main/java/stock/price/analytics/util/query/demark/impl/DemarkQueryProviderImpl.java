@@ -95,4 +95,17 @@ public class DemarkQueryProviderImpl implements DemarkQueryProvider {
                   type = EXCLUDED.type;
                 """;
     }
+
+    @Override
+    public String tickersForTimeframeTdAndCfdMarginsQuery(StockTimeframe timeframe, int tdCount, String cfdMargins) {
+        return STR."""
+                SELECT dm.ticker
+                FROM demark dm
+                JOIN stocks s ON s.ticker = dm.ticker
+                WHERE
+                    s.cfd_margin IN (\{cfdMargins})
+                    AND dm.timeframe = '\{timeframe}'
+                    AND dm.td >= \{tdCount}
+                """;
+    }
 }

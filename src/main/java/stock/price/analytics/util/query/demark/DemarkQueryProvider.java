@@ -6,4 +6,5 @@ public interface DemarkQueryProvider {
 
     String demarkForTimeframeQuery(StockTimeframe timeframe);
 
+    String tickersForTimeframeTdAndCfdMarginsQuery(StockTimeframe timeframe, int tdCount, String cfdMargins);
 }
