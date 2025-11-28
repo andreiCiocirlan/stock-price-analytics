@@ -9,12 +9,13 @@ public class ImportStatusQueryProviderImpl implements ImportStatusQueryProvider 
 
     @Override
     public String checkImportStatusQueryFor(StockTimeframe timeframe, boolean checkFirstImport) {
+        String dbTable = timeframe.dbTableOHLC();
         String timeframePeriod = timeframe.toDateTruncPeriod();
         return STR."""
                 SELECT
                     COUNT(*) = \{checkFirstImport ? "0" : "1"}
                 FROM
-                    daily_prices
+                    \{dbTable}
                 WHERE
                     ticker = 'AAPL'
                     AND date_trunc('\{timeframePeriod}', date) = date_trunc('\{timeframePeriod}', current_date);
