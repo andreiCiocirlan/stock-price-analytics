@@ -8,14 +8,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.service.PriceGapService;
-import stock.price.analytics.service.PriceService;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/price-gaps")
 public class PriceGapsController {
 
-    private final PriceService priceService;
     private final PriceGapService priceGapService;
 
     @PostMapping
