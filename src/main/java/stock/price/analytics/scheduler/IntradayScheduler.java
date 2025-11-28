@@ -28,9 +28,7 @@ public class IntradayScheduler {
     @Scheduled(cron = "${cron.intraday.price.gaps.create}", zone = "${cron.timezone}")
     public void createPriceGapsIntraday() {
         for (StockTimeframe timeframe : StockTimeframe.values()) {
-            if (!priceService.isFirstImportDoneFor(timeframe)) {
-                priceGapService.savePriceGapsTodayFor(timeframe);
-            }
+            priceGapService.savePriceGapsTodayFor(timeframe);
         }
     }
 
