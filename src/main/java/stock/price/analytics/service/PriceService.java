@@ -16,7 +16,6 @@ import stock.price.analytics.util.query.importstatus.ImportStatusQueryProvider;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -25,7 +24,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.time.temporal.TemporalAdjusters.*;
-import static stock.price.analytics.util.DateUtil.convertDateToTimeframe;
 import static stock.price.analytics.util.PricesUtil.getHigherTimeframePricesMapFor;
 import static stock.price.analytics.util.PricesUtil.multiplyWith;
 import static stock.price.analytics.util.TradingDateUtil.isWithinSameTimeframe;
@@ -136,19 +134,12 @@ public class PriceService {
     }
 
     public boolean isFirstImportDoneFor(StockTimeframe timeframe) {
-        return checkImportStatusFor(timeframe, false);
-    }
+        String query = importStatusQueryProvider.checkImportStatusQueryFor(timeframe);
+        Query nativeQuery = entityManager.createNativeQuery(query);
+        Number countResult = (Number) nativeQuery.getSingleResult();
+        int count = countResult.intValue();
 
-    public boolean isFirstImportFor(StockTimeframe timeframe) {
-        return checkImportStatusFor(timeframe, true);
-    }
-
-    // checkFirstImport false -> first import not done for timeframe
-    // checkFirstImport true -> first import done for timeframe
-    private boolean checkImportStatusFor(StockTimeframe timeframe, boolean checkFirstImport) {
-        String query = importStatusQueryProvider.checkImportStatusQueryFor(timeframe, checkFirstImport);
-        Query nativeQuery = entityManager.createNativeQuery(query, Boolean.class);
-        return (Boolean) nativeQuery.getResultList().getFirst();
+        return count > 0;
     }
 
     public List<CandleWithDateDTO> findFor(String ticker, StockTimeframe timeframe) {

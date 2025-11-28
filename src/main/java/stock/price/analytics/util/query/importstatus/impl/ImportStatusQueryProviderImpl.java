@@ -8,12 +8,12 @@ import stock.price.analytics.util.query.importstatus.ImportStatusQueryProvider;
 public class ImportStatusQueryProviderImpl implements ImportStatusQueryProvider {
 
     @Override
-    public String checkImportStatusQueryFor(StockTimeframe timeframe, boolean checkFirstImport) {
+    public String checkImportStatusQueryFor(StockTimeframe timeframe) {
         String dbTable = timeframe.dbTableOHLC();
         String timeframePeriod = timeframe.toDateTruncPeriod();
         return STR."""
                 SELECT
-                    COUNT(*) = \{checkFirstImport ? "0" : "1"}
+                    COUNT(*)
                 FROM
                     \{dbTable}
                 WHERE
