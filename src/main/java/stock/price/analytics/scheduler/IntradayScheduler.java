@@ -21,13 +21,17 @@ public class IntradayScheduler {
     public void updateGapsIntraday() {
         fairValueGapService.saveNewFVGsAndUpdateHighLowAndClosedAllTimeframes();
         fairValueGapService.closeFVGsForAllTimeframes();
+        priceGapService.closePriceGaps();
+    }
+
+    // 10 35,55 9 * * MON-FRI
+    @Scheduled(cron = "${cron.intraday.price.gaps.create}", zone = "${cron.timezone}")
+    public void createPriceGapsIntraday() {
         for (StockTimeframe timeframe : StockTimeframe.values()) {
             if (!priceService.isFirstImportDoneFor(timeframe)) {
                 priceGapService.savePriceGapsTodayFor(timeframe);
             }
         }
-        priceGapService.closePriceGaps();
     }
-
 
 }
