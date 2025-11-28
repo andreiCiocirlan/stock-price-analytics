@@ -6,7 +6,6 @@ import stock.price.analytics.util.query.demark.DemarkQueryProvider;
 
 import java.util.stream.Collectors;
 
-import static stock.price.analytics.util.Constants.CFD_MARGINS_5X_4X;
 import static stock.price.analytics.util.Constants.CFD_MARGINS_5X_4X_3X_2X;
 
 @Component
