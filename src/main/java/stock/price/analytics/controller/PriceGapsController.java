@@ -21,10 +21,9 @@ public class PriceGapsController {
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     public void savePriceGaps() {
-        priceGapService.savePriceGapsTodayFor(StockTimeframe.DAILY);
-        StockTimeframe.higherTimeframes().stream()
-                .filter(priceService::isFirstImportDoneFor)
-                .forEach(priceGapService::savePriceGapsTodayFor);
+        for (StockTimeframe timeframe : StockTimeframe.values()) {
+            priceGapService.savePriceGapsTodayFor(timeframe);
+        }
     }
 
 }
