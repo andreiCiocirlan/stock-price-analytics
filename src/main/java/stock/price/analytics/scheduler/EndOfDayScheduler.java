@@ -40,11 +40,7 @@ public class EndOfDayScheduler {
                         discrepanciesService.updateHTFOpeningPricesDiscrepancyFor(timeframe);
                         discrepanciesService.updateStocksWithOpeningPriceDiscrepancyFor(timeframe);
                     }
-                    priceGapService.savePriceGapsTodayFor(timeframe);
                 });
-
-        // save daily price gaps at EOD
-        priceGapService.savePriceGapsTodayFor(StockTimeframe.DAILY);
 
         // log new high lows this week
         highLowForPeriodService.logNewHighLowsThisWeek();
