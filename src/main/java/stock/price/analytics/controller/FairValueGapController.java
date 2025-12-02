@@ -65,7 +65,7 @@ public class FairValueGapController {
 
     @GetMapping("/alert-fvg-tagged-95th-percentile")
     @ResponseStatus(HttpStatus.OK)
-    public void findUpdatedFVGsHighLowAndClosedFor() {
+    public void logFVGsTagged95thPercentile() {
         fairValueGapService.logFVGsTagged95thPercentile(CFD_MARGINS_5X_4X);
     }
 }
