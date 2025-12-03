@@ -26,4 +26,9 @@ public class DailyPriceJSONController {
         dailyPriceJSONService.saveDailyPriceJSONsFrom(fileName);
     }
 
+    @GetMapping("/log-upcoming-stock-splits")
+    public void logUpcomingStockSplits(@RequestParam("fileName") String fileName) {
+        dailyPriceJSONService.logUpcomingStockSplits(fileName);
+    }
+
 }

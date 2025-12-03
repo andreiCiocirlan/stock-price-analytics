@@ -67,39 +67,53 @@ public class DailyPriceJSONService {
             Response response = objectMapper.readValue(jsonData, Response.class);
             List<DailyPriceJSON> dailyPriceJSONs = response.getQuoteResponse().getResult();
 
-            logUpcomingStockSplits(jsonData, objectMapper, dailyPriceJSONs);
-
             return extractDailyJSONPricesAndSave(dailyPriceJSONs, cacheService.dailyPriceJsonCache());
         } catch (JsonProcessingException ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    private void logUpcomingStockSplits(String jsonData, ObjectMapper objectMapper, List<DailyPriceJSON> dailyPriceJSONs) throws JsonProcessingException {
-        JsonNode rootNode = objectMapper.readTree(jsonData);
-        JsonNode resultArray = rootNode.path("quoteResponse").path("result");
+    public void logUpcomingStockSplits(String fileName) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            SimpleModule module = new SimpleModule();
+            module.addDeserializer(LocalDate.class, new UnixTimestampToLocalDateDeserializer());
+            objectMapper.registerModule(module);
+            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
-        for (int i = 0; i < dailyPriceJSONs.size(); i++) {
-            DailyPriceJSON dailyPrice = dailyPriceJSONs.get(i);
-            JsonNode dailyNode = resultArray.get(i);
-            JsonNode corporateActionsNode = dailyNode.path("corporateActions");
+            String jsonFilePath = String.join("", "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/", fileName, ".json");
+            String jsonData = String.join("", readAllLines(Path.of(jsonFilePath)));
+            Response response = objectMapper.readValue(jsonData, Response.class);
+            List<DailyPriceJSON> dailyPriceJSONs = response.getQuoteResponse().getResult();
 
-            if (corporateActionsNode.isArray()) {
-                for (JsonNode actionNode : corporateActionsNode) {
-                    JsonNode meta = actionNode.path("meta");
-                    if ("SPLIT".equalsIgnoreCase(meta.path("eventType").asText())) {
-                        String splitRatio = meta.path("splitRatio").asText(null);
-                        long dateEpochMs = meta.path("dateEpochMs").asLong(0);
-                        String splitDate = Instant.ofEpochMilli(dateEpochMs)
-                                .atZone(ZoneId.systemDefault())
-                                .toLocalDate()
-                                .format(DateTimeFormatter.ISO_LOCAL_DATE);
+            JsonNode rootNode = objectMapper.readTree(jsonData);
+            JsonNode resultArray = rootNode.path("quoteResponse").path("result");
 
-                        log.warn("Upcoming stock split: {} {} {}", dailyPrice.getSymbol(), splitDate, splitRatio);
-                        break;
+            for (int i = 0; i < dailyPriceJSONs.size(); i++) {
+                DailyPriceJSON dailyPrice = dailyPriceJSONs.get(i);
+                JsonNode dailyNode = resultArray.get(i);
+                JsonNode corporateActionsNode = dailyNode.path("corporateActions");
+
+                if (corporateActionsNode.isArray()) {
+                    for (JsonNode actionNode : corporateActionsNode) {
+                        JsonNode meta = actionNode.path("meta");
+                        if ("SPLIT".equalsIgnoreCase(meta.path("eventType").asText())) {
+                            String splitRatio = meta.path("splitRatio").asText(null);
+                            long dateEpochMs = meta.path("dateEpochMs").asLong(0);
+                            String splitDate = Instant.ofEpochMilli(dateEpochMs)
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDate()
+                                    .format(DateTimeFormatter.ISO_LOCAL_DATE);
+
+                            log.warn("Upcoming stock split: {} {} {}", dailyPrice.getSymbol(), splitDate, splitRatio);
+                            break;
+                        }
                     }
                 }
             }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
