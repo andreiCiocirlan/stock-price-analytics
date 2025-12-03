@@ -113,12 +113,10 @@ public class StockService {
                 .orElseThrow();
     }
 
-    @Transactional
     public void updateStockDailyPricesFor(String ticker) {
         stockRepository.updateStockDailyPricesFor(ticker);
     }
 
-    @Transactional
     public void updateStockHigherTimeframePricesFor(String ticker) {
         stockRepository.updateStockWeeklyPricesFor(ticker);
         stockRepository.updateStockMonthlyPricesFor(ticker);
@@ -126,13 +124,13 @@ public class StockService {
         stockRepository.updateStockYearlyPricesFor(ticker);
     }
 
-    @Transactional
     public void updateHighLowForPeriodPrices(String ticker) {
         stockRepository.updateHighLow4wPricesFor(ticker);
         stockRepository.updateHighLow52wPricesFor(ticker);
         stockRepository.updateHighestLowestPricesFor(ticker);
     }
 
+    @Transactional
     public void splitAdjustFor(String ticker, LocalDate stockSplitDate, double priceMultiplier) {
         priceService.adjustPricesFor(ticker, stockSplitDate, priceMultiplier);
         highLowForPeriodService.saveAllHistoricalHighLowPrices(List.of(ticker), stockSplitDate);

@@ -260,7 +260,6 @@ public class FairValueGapService {
         updateFVGsHighLowAndClosedFor(timeframe, false);
     }
 
-    @Transactional
     public void updateFVGPricesForStockSplit(String ticker, LocalDate stockSplitDate, double stockSplitMultiplier) {
         int updatedRows = fvgRepository.updateFVGPricesForStockSplit(ticker, stockSplitDate, stockSplitMultiplier);
         log.info("updated {} FVG rows for {} and stockSplitDate {}", updatedRows, ticker, stockSplitDate);
