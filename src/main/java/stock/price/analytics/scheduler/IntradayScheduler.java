@@ -24,7 +24,7 @@ public class IntradayScheduler {
         priceGapService.closePriceGaps();
     }
 
-    // 10 35,55 9 * * MON-FRI
+    // 20 35,55 9 * * MON-FRI
     @Scheduled(cron = "${cron.intraday.price.gaps.create}", zone = "${cron.timezone}")
     public void createPriceGapsIntraday() {
         for (StockTimeframe timeframe : StockTimeframe.values()) {
