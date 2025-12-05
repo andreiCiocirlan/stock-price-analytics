@@ -98,6 +98,9 @@ public class DemarkQueryProviderImpl implements DemarkQueryProvider {
 
     @Override
     public String tickersForTimeframeTdAndCfdMarginsQuery(StockTimeframe timeframe, int tdCount, String cfdMargins) {
+        if (cfdMargins.isBlank()) {
+            cfdMargins = "0.2, 0.25, 0.33, 0.5, 0";
+        }
         return STR."""
                 SELECT dm.ticker
                 FROM demark dm

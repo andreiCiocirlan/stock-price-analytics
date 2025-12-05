@@ -22,6 +22,9 @@ public class FvgQueryProviderImpl implements FvgQueryProvider {
         String prefix = timeframe.stockPrefix();
         String dateTruncPeriod = timeframe.toDateTruncPeriod();
         String intervalPeriod = timeframe.toIntervalPeriod();
+        if (cfdMargins.isBlank()) {
+            cfdMargins = "0.2, 0.25, 0.33, 0.5, 0";
+        }
         return STR."""
                 SELECT distinct s.ticker
                 FROM stocks s
@@ -64,6 +67,9 @@ public class FvgQueryProviderImpl implements FvgQueryProvider {
 
     @Override
     public String priceInsideFvgFor(StockTimeframe timeframe, String cfdMargins) {
+        if (cfdMargins.isBlank()) {
+            cfdMargins = "0.2, 0.25, 0.33, 0.5, 0";
+        }
         return STR."""
                 SELECT distinct s.ticker
                 FROM stocks s
