@@ -35,7 +35,7 @@ public class IntradayScheduler {
     // 30 35 9 * * MON-FRI
     @Scheduled(cron = "${cron.intraday.demark.counts.create}", zone = "${cron.timezone}")
     public void createDemarkCountsIntraday() {
-        for (StockTimeframe timeframe : StockTimeframe.values()) {
+        for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
             demarkService.demarkForTimeframe(timeframe);
         }
     }
