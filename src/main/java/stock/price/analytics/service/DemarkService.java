@@ -24,7 +24,7 @@ public class DemarkService {
     public void demarkForTimeframe(StockTimeframe timeframe) {
         String query = demarkQueryProvider.demarkForTimeframeQuery(timeframe);
         int rowsAffected = entityManager.createNativeQuery(query).executeUpdate();
-        log.warn("Inserted/Updated {} {} Demark indicator rows", rowsAffected, timeframe);
+        log.info("Inserted/Updated {} {} Demark indicator rows", rowsAffected, timeframe);
     }
 
     @SuppressWarnings("unchecked")
