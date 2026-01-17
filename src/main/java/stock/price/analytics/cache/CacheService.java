@@ -1,7 +1,5 @@
 package stock.price.analytics.cache;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import stock.price.analytics.model.json.DailyPriceJSON;
 import stock.price.analytics.model.prices.PriceMilestone;
 import stock.price.analytics.model.prices.enums.NewHighLowMilestone;
@@ -15,138 +13,53 @@ import stock.price.analytics.model.prices.ohlc.PriceWithPrevClose;
 import stock.price.analytics.model.prices.ohlc.enums.CandleStickType;
 import stock.price.analytics.model.stocks.Stock;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Collections.emptySet;
-import static stock.price.analytics.model.prices.enums.IntradayPriceSpike.INTRADAY_SPIKE_DOWN;
-import static stock.price.analytics.model.prices.enums.IntradayPriceSpike.INTRADAY_SPIKE_UP;
-import static stock.price.analytics.util.Constants.INTRADAY_SPIKE_PERCENTAGE;
+public interface CacheService {
+    List<DailyPriceJSON> dailyPriceJsonCache();
 
-@Service
-@RequiredArgsConstructor
-public class CacheService {
+    List<DailyPriceJSON> addDailyPricesJSONAndReturn(List<DailyPriceJSON> dailyPriceJsons);
 
-    private final DailyPriceJsonCache dailyPriceJsonCache;
-    private final StocksCache stocksCache;
-    private final PricesCache pricesCache;
-    private final HighLowPricesCache highLowPricesCache;
-    private final PriceMilestoneCache priceMilestoneCache;
-    private final CandleStickCache candleStickCache;
+    List<DailyPrice> getCachedDailyPrices();
 
+    boolean weeklyHighLowDoesntExist();
 
-    public List<DailyPriceJSON> dailyPriceJsonCache() {
-        return dailyPriceJsonCache.getDailyPriceJSONByTicker().values().stream().toList();
-    }
+    List<? extends HighLowForPeriod> highLowForPeriodPricesFor(HighLowPeriod period);
 
-    public List<DailyPriceJSON> addDailyPricesJSONAndReturn(List<DailyPriceJSON> dailyPriceJsons) {
-        return dailyPriceJsonCache.cacheAndReturn(dailyPriceJsons);
-    }
+    List<? extends HighLowForPeriod> prevWeekHighLowForPeriodPricesFor(HighLowPeriod period);
 
-    public List<DailyPrice> getCachedDailyPrices() {
-        return pricesFor(StockTimeframe.DAILY).stream().map(p -> (DailyPrice) p).toList();
-    }
+    List<? extends HighLowForPeriod> highLowForPeriodPricesForNewHighLowMilestone(NewHighLowMilestone newHighLowMilestone);
 
-    public boolean weeklyHighLowDoesntExist() {
-        return !highLowPricesCache.getWeeklyHighLowExists();
-    }
+    List<? extends HighLowForPeriod> highLowForPeriodPricesForPricePerformanceMilestone(PricePerformanceMilestone pricePerformanceMilestone);
 
-    public List<? extends HighLowForPeriod> highLowForPeriodPricesFor(HighLowPeriod period) {
-        return highLowPricesCache.cacheForHighLowPeriod(period, false);
-    }
+    List<? extends HighLowForPeriod> getUpdatedHighLowPricesForTickers(List<DailyPrice> dailyPrices, List<String> tickers, HighLowPeriod highLowPeriod);
 
-    public List<? extends HighLowForPeriod> prevWeekHighLowForPeriodPricesFor(HighLowPeriod period) {
-        return highLowPricesCache.cacheForHighLowPeriod(period, true);
-    }
+    List<String> getNewHighLowsForHLPeriod(HighLowPeriod highLowPeriod);
 
-    public List<? extends HighLowForPeriod> highLowForPeriodPricesForNewHighLowMilestone(NewHighLowMilestone newHighLowMilestone) {
-        return highLowPricesCache.cacheForNewHighLowMilestone(newHighLowMilestone);
-    }
+    List<String> getEqualHighLowsForHLPeriod(HighLowPeriod highLowPeriod);
 
-    public List<? extends HighLowForPeriod> highLowForPeriodPricesForPricePerformanceMilestone(PricePerformanceMilestone pricePerformanceMilestone) {
-        return highLowPricesCache.cacheForPricePerformanceMilestone(pricePerformanceMilestone);
-    }
+    void addHighLowPrices(List<? extends HighLowForPeriod> hlPricesUpdated, HighLowPeriod highLowPeriod);
 
-    public List<? extends HighLowForPeriod> getUpdatedHighLowPricesForTickers(List<DailyPrice> dailyPrices, List<String> tickers, HighLowPeriod highLowPeriod) {
-        return highLowPricesCache.getUpdatedHighLowPricesForTickers(dailyPrices, tickers, highLowPeriod);
-    }
+    Map<String, Stock> getStocksMap();
 
-    public List<String> getNewHighLowsForHLPeriod(HighLowPeriod highLowPeriod) {
-        return new ArrayList<>(highLowPricesCache.getDailyNewHighLowsByHLPeriod().getOrDefault(highLowPeriod, emptySet()));
-    }
+    List<Stock> getCachedStocks();
 
-    public List<String> getEqualHighLowsForHLPeriod(HighLowPeriod highLowPeriod) {
-        return new ArrayList<>(highLowPricesCache.getDailyEqualHighLowsByHLPeriod().getOrDefault(highLowPeriod, emptySet()));
-    }
+    List<String> getCachedTickers();
 
-    public void addHighLowPrices(List<? extends HighLowForPeriod> hlPricesUpdated, HighLowPeriod highLowPeriod) {
-        highLowPricesCache.addHighLowPrices(hlPricesUpdated, highLowPeriod);
-    }
+    void addStocks(List<Stock> stocks);
 
-    public Map<String, Stock> getStocksMap() {
-        return stocksCache.getStocksMap();
-    }
+    List<AbstractPrice> pricesFor(StockTimeframe timeframe);
 
-    public List<Stock> getCachedStocks() {
-        return stocksCache.getCachedStocks();
-    }
+    List<PriceWithPrevClose> pricesWithPrevCloseFor(List<String> tickers, StockTimeframe timeframe);
 
-    public List<String> getCachedTickers() {
-        return stocksCache.getCachedTickers();
-    }
+    void addPricesWithPrevClose(List<PriceWithPrevClose> pricesWithPrevClose, StockTimeframe timeframe);
 
-    public void addStocks(List<Stock> stocks) {
-        stocksCache.addStocks(stocks);
-    }
+    void cachePriceMilestoneTickers(PriceMilestone priceMilestone, List<String> tickers);
 
-    public List<AbstractPrice> pricesFor(StockTimeframe timeframe) {
-        return new ArrayList<>(pricesCache.pricesFor(timeframe));
-    }
+    List<String> tickersFor(PriceMilestone priceMilestone, List<Double> cfdMargins);
 
-    public List<PriceWithPrevClose> pricesWithPrevCloseFor(List<String> tickers, StockTimeframe timeframe) {
-        return pricesCache.pricesWithPrevCloseFor(tickers, timeframe);
-    }
+    void updateIntradayPriceSpikesCache(List<DailyPrice> dailyPrices);
 
-    public void addPricesWithPrevClose(List<PriceWithPrevClose> pricesWithPrevClose, StockTimeframe timeframe) {
-        pricesCache.addPricesWithPrevClose(pricesWithPrevClose, timeframe);
-    }
-
-    public void cachePriceMilestoneTickers(PriceMilestone priceMilestone, List<String> tickers) {
-        priceMilestoneCache.clearTickersByPriceMilestone(priceMilestone);
-        priceMilestoneCache.cachePriceMilestoneTickers(priceMilestone, tickers);
-    }
-
-    public List<String> tickersFor(PriceMilestone priceMilestone, List<Double> cfdMargins) {
-        return getCachedStocks().stream()
-                .filter(stock -> cfdMargins.isEmpty() || cfdMargins.contains(stock.getCfdMargin()))
-                .map(Stock::getTicker)
-                .filter(priceMilestoneCache.tickersFor(priceMilestone)::contains).toList();
-    }
-
-    public void updateIntradayPriceSpikesCache(List<DailyPrice> dailyPrices) {
-        List<String> spikeUpTickers = new ArrayList<>();
-        List<String> spikeDownTickers = new ArrayList<>();
-        for (DailyPrice dailyPrice : dailyPrices) {
-            String ticker = dailyPrice.getTicker();
-            if (getStocksMap().get(ticker) != null) {
-                double oldClosingPrice = getStocksMap().get(ticker).getClose();
-                double newClosingPrice = dailyPrice.getClose();
-                boolean spikeUp = newClosingPrice > oldClosingPrice * (1 + INTRADAY_SPIKE_PERCENTAGE);
-                boolean spikeDown = newClosingPrice < oldClosingPrice * (1 - INTRADAY_SPIKE_PERCENTAGE);
-                if (spikeUp) {
-                    spikeUpTickers.add(ticker);
-                } else if (spikeDown) {
-                    spikeDownTickers.add(ticker);
-                }
-            }
-        }
-        cachePriceMilestoneTickers(INTRADAY_SPIKE_UP, spikeUpTickers);
-        cachePriceMilestoneTickers(INTRADAY_SPIKE_DOWN, spikeDownTickers);
-    }
-
-    public List<String> tickersFor(StockTimeframe timeframe, CandleStickType candleStickType) {
-        return candleStickCache.tickersFor(timeframe, candleStickType);
-    }
-
+    List<String> tickersFor(StockTimeframe timeframe, CandleStickType candleStickType);
 }
