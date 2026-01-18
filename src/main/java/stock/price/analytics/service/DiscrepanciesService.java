@@ -25,7 +25,7 @@ import java.util.function.Supplier;
 public class DiscrepanciesService {
 
     @PersistenceContext
-    private final EntityManager entityManager;
+    private EntityManager entityManager;
     private final PriceDiscrepanciesRepository priceDiscrepanciesRepository;
     private final StockDiscrepanciesRepository stockDiscrepanciesRepository;
     private final FVGRepository fvgRepository;

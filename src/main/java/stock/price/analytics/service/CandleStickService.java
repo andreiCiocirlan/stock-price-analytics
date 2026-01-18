@@ -14,7 +14,7 @@ import java.util.List;
 public class CandleStickService {
 
     @PersistenceContext
-    private final EntityManager entityManager;
+    private EntityManager entityManager;
     private final CandleRangeQueryProvider candleRangeQueryProvider;
 
     @SuppressWarnings("unchecked")

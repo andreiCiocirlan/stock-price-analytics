@@ -30,7 +30,7 @@ import static stock.price.analytics.util.LoggingUtil.logTime;
 public class HighLowForPeriodService {
 
     @PersistenceContext
-    private final EntityManager entityManager;
+    private EntityManager entityManager;
     private final HighLowForPeriodRepository highLowForPeriodRepository;
     private final CacheService cacheService;
     private final AsyncPersistenceService asyncPersistenceService;

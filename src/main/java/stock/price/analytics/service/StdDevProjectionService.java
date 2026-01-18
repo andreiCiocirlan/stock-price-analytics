@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class StdDevProjectionService {
 
     @PersistenceContext
-    private final EntityManager entityManager;
+    private EntityManager entityManager;
     private final StdDevProjectionQueryProvider stdDevProjectionQueryProvider;
 
     public List<StdDevProjectionDTO> getLast3TopProjections(String ticker) {

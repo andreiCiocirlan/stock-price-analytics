@@ -32,7 +32,7 @@ import static stock.price.analytics.util.Constants.*;
 public class FairValueGapService {
 
     @PersistenceContext
-    private final EntityManager entityManager;
+    private EntityManager entityManager;
     private final FVGRepository fvgRepository;
     private final CacheService cacheService;
     private final AsyncPersistenceService asyncPersistenceService;

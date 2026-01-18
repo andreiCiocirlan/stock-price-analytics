@@ -17,7 +17,7 @@ import java.util.List;
 public class DemarkService {
 
     @PersistenceContext
-    private final EntityManager entityManager;
+    private EntityManager entityManager;
     private final DemarkQueryProvider demarkQueryProvider;
 
     @Transactional

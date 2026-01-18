@@ -36,7 +36,7 @@ import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 public class PriceService {
 
     @PersistenceContext
-    private final EntityManager entityManager;
+    private EntityManager entityManager;
 
     private final PriceRepository priceRepository;
     private final DailyPriceRepository dailyPriceRepository;

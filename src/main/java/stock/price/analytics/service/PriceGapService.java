@@ -20,7 +20,7 @@ public class PriceGapService {
     private final PriceGapRepository priceGapRepository;
 
     @PersistenceContext
-    private final EntityManager entityManager;
+    private EntityManager entityManager;
     private final PriceGapsQueryProvider priceGapsQueryProvider;
 
     @Transactional

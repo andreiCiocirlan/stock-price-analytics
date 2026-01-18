@@ -36,7 +36,7 @@ import static stock.price.analytics.util.PricesUtil.getHigherTimeframePricesMapF
 public class TickerService {
 
     @PersistenceContext
-    private final EntityManager entityManager;
+    private EntityManager entityManager;
     private final YahooQuotesClient yahooQuotesClient;
     private final StockService stockService;
     private final PriceService priceService;
