@@ -154,7 +154,7 @@ public class YahooQuotesClient {
         return cookieValue;
     }
 
-    private String getCrumb() {
+    public String getCrumb() {
         while (RETRY_COUNT_CRUMB < MAX_RETRIES_CRUMB) {
             String crumb = null;
             try {
