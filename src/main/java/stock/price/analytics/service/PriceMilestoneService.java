@@ -50,17 +50,6 @@ public class PriceMilestoneService {
         return tickers;
     }
 
-    public Map<PriceMilestone, List<String>> findTickersForMilestones(List<PriceMilestone> priceMilestones, List<Double> cfdMargins) {
-        Map<PriceMilestone, List<String>> tickersByPriceMilestones = new HashMap<>();
-        priceMilestones.forEach(priceMilestone -> {
-            List<String> tickers = findTickersForMilestone(priceMilestone, cfdMargins);
-            if (!tickers.isEmpty()) {
-                tickersByPriceMilestones.put(priceMilestone, tickers);
-            }
-        });
-        return tickersByPriceMilestones;
-    }
-
     public List<String> findTickersForMilestone(PriceMilestone milestone, List<Double> cfdMargins) {
         return switch (milestone) {
             case NewHighLowMilestone newHighLowMilestone ->
