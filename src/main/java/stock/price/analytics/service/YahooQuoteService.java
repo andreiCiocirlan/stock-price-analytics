@@ -46,7 +46,7 @@ public class YahooQuoteService {
         tickersNotImported.removeAll(dailyImportedPrices.stream().map(DailyPrice::getTicker).toList());
 
         String fileName = tradingDateImported(cacheService.dailyPriceJsonCache()).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + ".json";
-        String path = "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/" + fileName;
+        String path = "C:\\Users/andre/IdeaProjects/yahoo-daily-prices/" + fileName;
         writeToFile(path, pricesJSON);
 
         if (!tickersNotImported.isEmpty()) {

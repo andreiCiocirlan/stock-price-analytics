@@ -47,7 +47,7 @@ public class DailyPriceJSONService {
 
     public List<DailyPrice> dailyPricesFromFile(String fileName) {
         try {
-            String jsonFilePath = String.join("", "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/", fileName, ".json");
+            String jsonFilePath = String.join("", "C:\\Users/andre/IdeaProjects/yahoo-daily-prices/", fileName, ".json");
             String jsonData = String.join("", readAllLines(Path.of(jsonFilePath)));
 
             return dailyPricesFrom(jsonData);
@@ -82,7 +82,7 @@ public class DailyPriceJSONService {
             objectMapper.registerModule(module);
             objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 
-            String jsonFilePath = String.join("", "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/", fileName, ".json");
+            String jsonFilePath = String.join("", "C:\\Users/andre/IdeaProjects/yahoo-daily-prices/", fileName, ".json");
             String jsonData = String.join("", readAllLines(Path.of(jsonFilePath)));
             Response response = objectMapper.readValue(jsonData, Response.class);
             List<DailyPriceJSON> dailyPriceJSONs = response.getQuoteResponse().getResult();
@@ -163,7 +163,7 @@ public class DailyPriceJSONService {
 
     public List<DailyPriceJSON> dailyPriceJSONsFromFile(String fileName) {
         try {
-            String jsonFilePath = String.join("", "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/", fileName, ".json");
+            String jsonFilePath = String.join("", "C:\\Users/andre/IdeaProjects/yahoo-daily-prices/", fileName, ".json");
             String jsonData = String.join("", readAllLines(Path.of(jsonFilePath)));
 
             ObjectMapper objectMapper = new ObjectMapper();
@@ -315,7 +315,7 @@ public class DailyPriceJSONService {
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
         try {
-            String path = "C:\\Users/andre/IdeaProjects/stock-price-analytics/yahoo-daily-prices/";
+            String path = "C:\\Users/andre/IdeaProjects/yahoo-daily-prices/";
             objectMapper.writeValue(new File(path + date + ".json"), response);
             log.info("Data exported to JSON file successfully.");
         } catch (IOException e) {
