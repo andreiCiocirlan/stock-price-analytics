@@ -27,7 +27,7 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static stock.price.analytics.util.FileUtil.*;
+import static stock.price.analytics.util.FileUtil.fileExistsFor;
 import static stock.price.analytics.util.PricesUtil.getHigherTimeframePricesMapFor;
 
 @Slf4j
