@@ -13,7 +13,7 @@ public class Application implements ApplicationRunner {
 
     private final CacheInitializationService cacheInitializationService;
 
-    static void main(String[] args) {
+    public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
 
