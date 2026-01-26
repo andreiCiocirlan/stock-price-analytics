@@ -145,40 +145,41 @@ public class YahooQuotesClient {
     }
 
     public String getCrumb() {
-        while (RETRY_COUNT_CRUMB < MAX_RETRIES_CRUMB) {
-            String crumb = null;
-            try {
-                HttpGet request = new HttpGet(QUERY2_BASE_URL + "/v1/test/getcrumb");
-                request.setHeader("Cookie", cookieFromFcYahoo());
-                request.setHeader("User-Agent", USER_AGENT_VALUE);
+        String url = QUERY2_BASE_URL + "/v1/test/getcrumb";
 
-                HttpResponse response = httpClient.execute(request);
+        log.info("Fetching crumb from {}", url);
 
-                int statusCode = response.getStatusLine().getStatusCode();
-                if (HttpStatus.valueOf(statusCode).is2xxSuccessful()) {
-                    HttpEntity entity = response.getEntity();
-                    if (entity != null) {
-                        crumb = EntityUtils.toString(entity);
-                        CRUMB_COOKIE = crumb;
-                    }
-                } else {
-                    RETRY_COUNT_CRUMB++;
-                    log.warn("Non-2xx status code received for crumb. Retrying ({}/{})...", RETRY_COUNT_CRUMB, MAX_RETRIES_CRUMB);
-                    Thread.sleep(1000L * RETRY_COUNT_CRUMB); // Add a backoff delay
-                    continue;
-                }
-            } catch (IOException e) {
-                log.error(e.getMessage());
-                throw new RuntimeException(e);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+        try {
+            HttpGet request = new HttpGet(url);
+            request.setHeader("Cookie", cookieFromFcYahoo());
+            request.setHeader("User-Agent", USER_AGENT_VALUE);
+
+            HttpResponse response = httpClient.execute(request);
+            int statusCode = response.getStatusLine().getStatusCode();
+
+            if (statusCode != 200) {
+                String body = EntityUtils.toString(response.getEntity());
+                throw new RuntimeException(String.format("HTTP %d from crumb endpoint: %s", statusCode, body));
             }
-            log.info("crumb: {}", CRUMB_COOKIE);
+
+            HttpEntity entity = response.getEntity();
+            if (entity == null) {
+                throw new RuntimeException("Empty response entity from crumb endpoint");
+            }
+
+            String crumb = EntityUtils.toString(entity).trim();
+            if (crumb.isEmpty()) {
+                throw new RuntimeException("Empty crumb response body");
+            }
+
+            CRUMB_COOKIE = crumb;
+            log.info("Successfully retrieved crumb: {}", CRUMB_COOKIE);
             return crumb;
+
+        } catch (IOException e) {
+            log.error("IO error fetching crumb: {}", e.getMessage());
+            throw new RuntimeException("Failed to fetch crumb from Yahoo Finance", e);
         }
-        // If we reach this point, all retries have been exhausted
-        log.error("Maximum number of retries reached. Unable to get crumb.");
-        throw new RuntimeException("Unable to get crumb after multiple attempts.");
     }
 
     public void getAllHistoricalPrices_andSaveJSONFileFor(String tickers) {
