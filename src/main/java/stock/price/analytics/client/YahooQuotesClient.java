@@ -12,12 +12,9 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,7 +29,6 @@ import static stock.price.analytics.util.FileUtil.writeToFile;
 public class YahooQuotesClient {
 
     private static final CloseableHttpClient httpClient;
-    private static final int MAX_RETRIES_CRUMB = 5;
     private static final String QUERY1_BASE_URL = "https://query1.finance.yahoo.com";
     private static final String QUERY2_BASE_URL = "https://query2.finance.yahoo.com";
     private static final String V7_FINANCE = "/v7/finance";
@@ -51,8 +47,7 @@ public class YahooQuotesClient {
         }));
     }
 
-    private final RestTemplate restTemplate;
-    private int RETRY_COUNT_CRUMB = 0;
+    private final RestClient restClient;
     private String COOKIE_FC_YAHOO = "A3=d=AQABBOnlcGkCEHdoCk2-i8zNajDWzRMSlfcFEgABAQEpcml6afF3ziMAAAAAgA&S=AQAAAgHfzgCRNADaQ3YuHkqHRts";
     private String CRUMB_COOKIE = "ztjAVP7wZ61";
 
@@ -189,26 +184,18 @@ public class YahooQuotesClient {
         try {
             for (String ticker : tickers.split(",")) {
                 long currentTime = System.currentTimeMillis();
-                ResponseEntity<String> response;
                 try {
-                    HttpHeaders headers = new HttpHeaders();
-                    headers.add("Cookie", COOKIE_FC_YAHOO);
-                    headers.add(HttpHeaders.USER_AGENT, USER_AGENT_VALUE);
+                    String responseBody = restClient.get()
+                            .uri(QUERY1_BASE_URL + V7_FINANCE + "/chart/{ticker}", ticker)
+                            .header(HttpHeaders.COOKIE, COOKIE_FC_YAHOO)
+                            .header(HttpHeaders.USER_AGENT, USER_AGENT_VALUE)
+                            .retrieve()
+                            .body(String.class);
 
-                    org.springframework.http.HttpEntity<String> entity = new org.springframework.http.HttpEntity<>(null, headers);
-                    response = restTemplate.exchange(
-                            QUERY1_BASE_URL + V7_FINANCE + "/chart/{ticker}?range=60y&interval=1d&indicators=quote&includeTimestamps=true",
-                            HttpMethod.GET,
-                            entity,
-                            String.class,
-                            ticker
-                    );
-
-                    String responseBody = response.getBody();
-                    if (responseBody != null) {
+                    if (responseBody != null && !responseBody.trim().isEmpty()) {
                         writeToFile("./all-historical-prices/DAILY/" + ticker + ".json", responseBody);
                     } else {
-                        log.error("response body is null for ticker {}", ticker);
+                        log.error("Empty response body for ticker {}", ticker);
                     }
                 } catch (RestClientException e) {
                     log.error("Failed retrieving prices data for ticker {}: {}", ticker, e.getMessage());
