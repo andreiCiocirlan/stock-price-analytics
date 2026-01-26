@@ -3,18 +3,18 @@ package stock.price.analytics.client;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.Header;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+import stock.price.analytics.util.Constants;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -88,19 +88,15 @@ public class YahooQuotesClient {
         log.info("quotePricesJSON called {} {}", crumb, COOKIE_FC_YAHOO);
 
         try {
-            HttpGet request = new HttpGet(URL);
-            request.setHeader("Cookie", COOKIE_FC_YAHOO);
-            request.setHeader(HttpHeaders.USER_AGENT, USER_AGENT_VALUE);
+            ResponseEntity<String> response = restClient.get()
+                    .uri(URL)
+                    .header("Cookie", COOKIE_FC_YAHOO)
+                    .header(HttpHeaders.USER_AGENT, USER_AGENT_VALUE)
+                    .retrieve()
+                    .toEntity(String.class);
 
-            HttpResponse response = httpClient.execute(request);
-            int statusCode = response.getStatusLine().getStatusCode();
-
-            HttpEntity entity = response.getEntity();
-            if (entity == null) {
-                throw new RuntimeException("Empty response entity received");
-            }
-
-            String quoteResponse = EntityUtils.toString(entity);
+            String quoteResponse = response.getBody();
+            int statusCode = response.getStatusCode().value();
             if (quoteResponse == null || quoteResponse.isEmpty()) {
                 throw new RuntimeException("Empty response body received");
             }
@@ -112,8 +108,8 @@ public class YahooQuotesClient {
             }
 
             return quoteResponse;
-        } catch (IOException e) {
-            log.error("IO error fetching quotes: {}", e.getMessage());
+        } catch (RestClientException e) {
+            log.error("Error fetching quotes: {}", e.getMessage());
             throw new RuntimeException("Failed to fetch quotes from Yahoo Finance", e);
         }
     }
@@ -145,34 +141,22 @@ public class YahooQuotesClient {
         log.info("Fetching crumb from {}", url);
 
         try {
-            HttpGet request = new HttpGet(url);
-            request.setHeader("Cookie", cookieFromFcYahoo());
-            request.setHeader("User-Agent", USER_AGENT_VALUE);
+            String crumb = restClient.get()
+                    .uri(url)
+                    .header(HttpHeaders.COOKIE, cookieFromFcYahoo())
+                    .header(HttpHeaders.USER_AGENT, Constants.USER_AGENT_VALUE)
+                    .retrieve()
+                    .body(String.class);
 
-            HttpResponse response = httpClient.execute(request);
-            int statusCode = response.getStatusLine().getStatusCode();
-
-            if (statusCode != 200) {
-                String body = EntityUtils.toString(response.getEntity());
-                throw new RuntimeException(String.format("HTTP %d from crumb endpoint: %s", statusCode, body));
-            }
-
-            HttpEntity entity = response.getEntity();
-            if (entity == null) {
-                throw new RuntimeException("Empty response entity from crumb endpoint");
-            }
-
-            String crumb = EntityUtils.toString(entity).trim();
-            if (crumb.isEmpty()) {
+            if (crumb == null || crumb.trim().isEmpty()) {
                 throw new RuntimeException("Empty crumb response body");
             }
 
-            CRUMB_COOKIE = crumb;
+            CRUMB_COOKIE = crumb.trim();
             log.info("Successfully retrieved crumb: {}", CRUMB_COOKIE);
-            return crumb;
-
-        } catch (IOException e) {
-            log.error("IO error fetching crumb: {}", e.getMessage());
+            return CRUMB_COOKIE;
+        } catch (RestClientException e) {
+            log.error("Failed to fetch crumb: {}", e.getMessage());
             throw new RuntimeException("Failed to fetch crumb from Yahoo Finance", e);
         }
     }
