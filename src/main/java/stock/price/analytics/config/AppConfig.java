@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
@@ -18,5 +19,17 @@ public class AppConfig {
         requestFactory.setReadTimeout(Duration.ofMinutes(30));
 
         return new RestTemplate(requestFactory);
+    }
+
+    @Bean
+    public RestClient restClient() {
+        SimpleClientHttpRequestFactory  requestFactory =
+                new SimpleClientHttpRequestFactory ();
+        requestFactory.setConnectTimeout(Duration.ofMinutes(30));
+        requestFactory.setReadTimeout(Duration.ofMinutes(30));
+
+        return RestClient.builder()
+                .requestFactory(requestFactory)
+                .build();
     }
 }
