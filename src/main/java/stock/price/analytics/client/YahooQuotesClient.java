@@ -89,48 +89,38 @@ public class YahooQuotesClient {
         String crumb = CRUMB_COOKIE.isEmpty() ? getCrumb() : CRUMB_COOKIE;
         String URL = String.join("", QUERY2_BASE_URL + V7_FINANCE + "/quote?lang=en-US&region=US&corsDomain=finance.yahoo.com&symbols=",
                 tickers, "&crumb=", crumb);
-        String quoteResponse = null;
-        int maxRetries = 3;
-        int retryCount = 0;
 
         log.info("quotePricesJSON called {} {}", crumb, COOKIE_FC_YAHOO);
 
-        while (quoteResponse == null || quoteResponse.isEmpty()) {
-            if (retryCount >= maxRetries) {
-                log.error("Failed to retrieve quote after {} retries.", maxRetries);
-                break; // Exit loop if max retries reached
+        try {
+            HttpGet request = new HttpGet(URL);
+            request.setHeader("Cookie", COOKIE_FC_YAHOO);
+            request.setHeader(HttpHeaders.USER_AGENT, USER_AGENT_VALUE);
+
+            HttpResponse response = httpClient.execute(request);
+            int statusCode = response.getStatusLine().getStatusCode();
+
+            HttpEntity entity = response.getEntity();
+            if (entity == null) {
+                throw new RuntimeException("Empty response entity received");
             }
 
-            try {
-                HttpGet request = new HttpGet(URL);
-
-                request.setHeader("Cookie", COOKIE_FC_YAHOO);
-                request.setHeader(HttpHeaders.USER_AGENT, USER_AGENT_VALUE);
-
-                HttpResponse response = httpClient.execute(request);
-                HttpEntity entity = response.getEntity();
-                if (entity != null) {
-                    quoteResponse = EntityUtils.toString(entity);
-                    if (quoteResponse != null && !quoteResponse.contains("\"error\":null")) {
-                        log.warn("ERROR for URL {}", URL);
-                        log.warn("quoteResponse {}", quoteResponse);
-                    }
-                } else {
-                    log.info("Empty response received. Retrying...");
-                    retryCount++;
-                    Thread.sleep(1000); // Wait for 1 second before retrying
-                }
-            } catch (IOException | InterruptedException e) {
-                log.error(e.getMessage());
-                retryCount++;
-                try {
-                    Thread.sleep(1000); // Wait before retrying
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                }
+            String quoteResponse = EntityUtils.toString(entity);
+            if (quoteResponse == null || quoteResponse.isEmpty()) {
+                throw new RuntimeException("Empty response body received");
             }
+
+            if (statusCode != 200) {
+                log.warn("Non-200 status {} for URL {}", statusCode, URL);
+                log.warn("Response: {}", quoteResponse);
+                throw new RuntimeException(String.format("HTTP %d: %s", statusCode, quoteResponse));
+            }
+
+            return quoteResponse;
+        } catch (IOException e) {
+            log.error("IO error fetching quotes: {}", e.getMessage());
+            throw new RuntimeException("Failed to fetch quotes from Yahoo Finance", e);
         }
-        return quoteResponse;
     }
 
     public String cookieFromFcYahoo() {
