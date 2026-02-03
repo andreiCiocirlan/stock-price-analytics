@@ -16,7 +16,7 @@ import static stock.price.analytics.util.LoggingUtil.logTime;
 @Service
 public class SyncPersistenceService {
 
-    public static final int BATCH_SIZE = 250;
+    public static final int BATCH_SIZE = 100;
 
     public void partitionDataAndSaveNoLogging(List<? extends BusinessEntity> entities, JpaRepository<? extends BusinessEntity, Long> repository) {
         try {
