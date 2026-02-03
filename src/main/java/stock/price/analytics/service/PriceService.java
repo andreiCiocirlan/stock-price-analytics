@@ -155,7 +155,6 @@ public class PriceService {
         return candles;
     }
 
-    @Transactional
     public void updateAllTimeframePrices(List<DailyPrice> importedDailyPrices) {
         List<String> tickers = importedDailyPrices.stream().map(DailyPrice::getTicker).toList();
 
