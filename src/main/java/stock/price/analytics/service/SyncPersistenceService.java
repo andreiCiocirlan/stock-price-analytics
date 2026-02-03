@@ -53,7 +53,7 @@ public class SyncPersistenceService {
             partitions.add(new ArrayList<>(entities.subList(i, Math.min(i + BATCH_SIZE, entities.size()))));
         }
 
-        try (ExecutorService executor = Executors.newFixedThreadPool(10)) {
+        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
             for (List<T> partition : partitions) {
                 executor.execute(() -> {
                     @SuppressWarnings("unchecked")
