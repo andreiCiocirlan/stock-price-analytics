@@ -10,9 +10,9 @@ import java.util.List;
 
 @Slf4j
 @Service
+@Async("virtualThreadTaskExecutor")
 public class AsyncPersistenceService extends SyncPersistenceService {
 
-    @Async
     @Override
     public void partitionDataAndSaveNoLogging(List<? extends BusinessEntity> entities, JpaRepository<? extends BusinessEntity, Long> repository) {
         try {
@@ -22,7 +22,6 @@ public class AsyncPersistenceService extends SyncPersistenceService {
         }
     }
 
-    @Async
     @Override
     public void partitionDataAndSaveWithLogTime(List<? extends BusinessEntity> entities, JpaRepository<? extends BusinessEntity, Long> repository, String functionName) {
         try {
@@ -32,7 +31,6 @@ public class AsyncPersistenceService extends SyncPersistenceService {
         }
     }
 
-    @Async
     @Override
     public void partitionDataAndSave(List<? extends BusinessEntity> entities, JpaRepository<? extends BusinessEntity, Long> repository) {
         try {
