@@ -27,8 +27,7 @@ public class YahooQuotesImportScheduler {
             @Scheduled(cron = "${cron.yahoo.quotes.intraday.at935}", zone = "${cron.timezone}"),            // 0 35,55 9 * * MON-FRI
             @Scheduled(cron = "${cron.yahoo.quotes.intraday.between10and16}", zone = "${cron.timezone}"),   // 0 15,35,55 10-15 * * MON-FRI
             @Scheduled(cron = "${cron.yahoo.quotes.intraday.between16and17}", zone = "${cron.timezone}"),   // 0 15,35 16 * * MON-FRI
-            @Scheduled(cron = "${cron.yahoo.quotes.pre.market.between8and9}", zone = "${cron.timezone}"),   // 0 15,30,45 8 * * MON-FRI
-            @Scheduled(cron = "${cron.yahoo.quotes.pre.market.between9and915}", zone = "${cron.timezone}")  // 0 0,15 9 * * MON-FRI
+            @Scheduled(cron = "${cron.yahoo.quotes.pre.market.between8and915}", zone = "${cron.timezone}")  // 0 0,15 8-9 * * MON-FRI
     })
     public void yahooQuotesImport() {
         String url = String.join("", HTTP_LOCALHOST, serverPort, YAHOO_QUOTES_IMPORT_ENDPOINT);
