@@ -141,6 +141,13 @@ public class DailyPriceJSONService {
                 } else if (tradingDate.isEqual(previousTradingDate)) {
                     log.info("Extracting stock daily prices for ticker {} and date {}", ticker, tradingDate);
                 }
+                // If tradingDate < tradingDateNow but we already have today's data, skip
+                String todayCompositeId = ticker + "_" + tradingDateNow.format(DateTimeFormatter.ISO_LOCAL_DATE);
+                if (tradingDate.isBefore(tradingDateNow) && recentJsonPricesById.containsKey(todayCompositeId)) {
+                    log.info("Skipping historical data for ticker {} date {} - today data {} already exists",
+                            ticker, tradingDate, tradingDateNow);
+                    continue;
+                }
             }
             compareAndAddToList(dailyPriceJson, recentJsonPricesById, dailyJSONPrices, sameDailyPrices, ticker);
         }
