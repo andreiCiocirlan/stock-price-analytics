@@ -13,7 +13,7 @@ public class PreMarketScheduler {
     private final HighLowForPeriodService highLowForPeriodService;
 
     @Schedules({
-            @Scheduled(cron = "${cron.pre.market.alert.between9and915}", zone = "${cron.timezone}") // 10 0,15 9 * * MON-FRI
+            @Scheduled(cron = "${cron.pre.market.alert.between8and915}", zone = "${cron.timezone}") // 10 0,15 9 * * MON-FRI
     })
     public void logNewHighLowsThisWeek() {
         highLowForPeriodService.logNewHighLowsThisWeek();
