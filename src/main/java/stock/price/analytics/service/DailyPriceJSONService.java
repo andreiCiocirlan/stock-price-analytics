@@ -131,6 +131,19 @@ public class DailyPriceJSONService {
             }
             String ticker = dailyPriceJson.getSymbol();
             LocalDate tradingDate = dailyPriceJson.getDate();
+            String compositeId = dailyPriceJson.getCompositeId(); // TGNA_19-03-2026
+
+            Optional<DailyPriceJSON> recentForTicker = recentJsonPrices.stream()
+                    .filter(recent -> recent.getSymbol().equals(ticker) &&
+                                      recent.getDate().isAfter(tradingDate))
+                    .findFirst();
+
+            if (recentForTicker.isPresent()) {
+                log.warn("Skipping {} - newer date {} exists for ticker {}",
+                        compositeId, recentForTicker.get().getDate(), ticker);
+                continue;
+            }
+
             if (!tradingDateNow.equals(tradingDate)) {
                 if (tradingDate == null) {
                     log.warn("trading date missing for ticker {}", ticker);
@@ -140,13 +153,6 @@ public class DailyPriceJSONService {
                     continue;
                 } else if (tradingDate.isEqual(previousTradingDate)) {
                     log.info("Extracting stock daily prices for ticker {} and date {}", ticker, tradingDate);
-                }
-                // If tradingDate < tradingDateNow but we already have today's data, skip
-                String todayCompositeId = ticker + "_" + tradingDateNow.format(DateTimeFormatter.ISO_LOCAL_DATE);
-                if (tradingDate.isBefore(tradingDateNow) && recentJsonPricesById.containsKey(todayCompositeId)) {
-                    log.info("Skipping historical data for ticker {} date {} - today data {} already exists",
-                            ticker, tradingDate, tradingDateNow);
-                    continue;
                 }
             }
             compareAndAddToList(dailyPriceJson, recentJsonPricesById, dailyJSONPrices, sameDailyPrices, ticker);
