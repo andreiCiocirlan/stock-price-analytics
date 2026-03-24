@@ -139,7 +139,7 @@ public class DailyPriceJSONService {
                     .findFirst();
 
             if (recentForTicker.isPresent()) {
-                log.warn("Skipping {} - newer date {} exists for ticker {}",
+                log.info("Skipping {} - newer date {} exists for ticker {}",
                         compositeId, recentForTicker.get().getDate(), ticker);
                 continue;
             }
