@@ -95,6 +95,7 @@ public class DailyPriceJSON implements BusinessEntity {
     private long firstTradeDateMilliseconds;
 
     @JsonProperty("averageDailyVolume3Month")
+    @Column(name = "average_daily_volume3month")
     private long averageDailyVolume3Month;
 
     @JsonProperty("fiftyTwoWeekChangePercent")
@@ -177,6 +178,7 @@ public class DailyPriceJSON implements BusinessEntity {
     private double trailingAnnualDividendYield;
 
     @JsonProperty("averageDailyVolume10Day")
+    @Column(name = "average_daily_volume10day")
     private long averageDailyVolume10Day;
 
     @JsonProperty("fiftyTwoWeekLowChange")
