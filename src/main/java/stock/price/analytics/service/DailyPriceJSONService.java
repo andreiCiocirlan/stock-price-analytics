@@ -325,7 +325,7 @@ public class DailyPriceJSONService {
         SimpleModule module = new SimpleModule();
         module.addSerializer(LocalDate.class, new LocalDateToUnixTimestampSerializer());
         objectMapper.registerModule(module);
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        objectMapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
 
         try {
             String path = "C:\\Users/andre/IdeaProjects/yahoo-daily-prices/";

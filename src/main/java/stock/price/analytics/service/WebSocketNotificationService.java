@@ -2,6 +2,7 @@ package stock.price.analytics.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +17,7 @@ public class WebSocketNotificationService {
 
     public void broadcastDesktopNotification(String title, String message) {
         log.info("{} {}", title, message);
-        this.template.convertAndSend("/topic/desktop-notification", Map.of("title", title, "message", message));
+        this.template.convertAndSend("/topic/desktop-notification", Map.of("title", title, "message", message), new MessageHeaders(Map.of()));
     }
 
     public void broadcastStockChartUpdate() {
