@@ -17,7 +17,7 @@ public class WebSocketNotificationService {
 
     public void broadcastDesktopNotification(String title, String message) {
         log.info("{} {}", title, message);
-        this.template.convertAndSend("/topic/desktop-notification", Map.of("title", title, "message", message), new MessageHeaders(Map.of()));
+        this.template.convertAndSend("/topic/desktop-notification", Map.of("title", title, "message", message));
     }
 
     public void broadcastStockChartUpdate() {
