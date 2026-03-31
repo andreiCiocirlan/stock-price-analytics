@@ -6,7 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
-import stock.price.analytics.service.*;
+import stock.price.analytics.service.DiscrepanciesService;
+import stock.price.analytics.service.HighLowForPeriodService;
+import stock.price.analytics.service.PriceService;
+import stock.price.analytics.service.WebSocketNotificationService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -22,7 +25,6 @@ public class EndOfDayScheduler {
     private final DiscrepanciesService discrepanciesService;
     private final HighLowForPeriodService highLowForPeriodService;
     private final WebSocketNotificationService webSocketNotificationService;
-    private final PriceGapService priceGapService;
 
     // 0 45 16 * * MON-FRI
     @Scheduled(cron = "${cron.post.market.processing}", zone = "${cron.timezone}")
