@@ -124,7 +124,7 @@ public class PriceService {
 
     private List<? extends AbstractPrice> findPreviousSevenDailyPricesForTickers(List<String> tickers) {
         List<DailyPrice> previousSevenDailyPricesForTickers = dailyPriceRepository.findDailyPricesForTickersFromLastWeekToDate(tickers);
-        log.warn("{}", previousSevenDailyPricesForTickers.size());
+
         return previousSevenDailyPricesForTickers
                 .stream()
                 .collect(Collectors.groupingBy(DailyPrice::getTicker))

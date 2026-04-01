@@ -152,7 +152,6 @@ public class CacheInitializationService {
 
     private void initPricesCache(List<String> tickers) {
         for (StockTimeframe timeframe : StockTimeframe.values()) {
-            log.warn("processing {}", timeframe);
             addPricesWithPrevCloseFrom(priceService.previousThreePricesFor(tickers, timeframe));
         }
     }
