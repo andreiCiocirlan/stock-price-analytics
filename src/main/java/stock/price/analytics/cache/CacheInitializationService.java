@@ -54,6 +54,7 @@ public class CacheInitializationService {
 
         List<Stock> stocks = stockRepository.findByXtbStockIsTrueAndDelistedDateIsNull();
         List<String> tickers = stocks.stream().map(Stock::getTicker).toList();
+        log.warn("{}",tickers);
         logTime(() -> initPricesCache(tickers), "initialized prices cache");
         logTime(() -> initStocksCache(stocks), "initialized xtb stocks cache");
         logTime(this::initHighLowPricesCache, "initialized high low prices cache");
