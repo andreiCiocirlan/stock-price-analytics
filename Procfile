@@ -1,5 +1,1 @@
-web: java --enable-preview -Dserver.port=$PORT \
-  -Dspring.datasource.url="jdbc:postgresql://cfqhejne93eh4i.cluster-czz5s0kz4scl.eu-west-1.rds.amazonaws.com:5432/d1iui63linm0gb" \
-  -Dspring.datasource.username="ue8mjtgqcfbpv2" \
-  -Dspring.datasource.password="p48856a8a02bbd4b06213fcc2dbd31392bd8ceb573051097c539b7ddf4d558519" \
-  $JAVA_OPTS -jar target/stock-price-analytics-0.0.1-SNAPSHOT.jar
+web: java --enable-preview -Dserver.port=$PORT -Dspring.datasource.url="jdbc:postgresql://cfqhejne93eh4i.cluster-czz5s0kz4scl.eu-west-1.rds.amazonaws.com:5432/d1iui63linm0gb" -Dspring.datasource.username="ue8mjtgqcfbpv2" -Dspring.datasource.password="p48856a8a02bbd4b06213fcc2dbd31392bd8ceb573051097c539b7ddf4d558519" $JAVA_OPTS -jar target/stock-price-analytics-0.0.1-SNAPSHOT.jar
