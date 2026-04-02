@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.annotation.Schedules;
 import org.springframework.stereotype.Component;
+import stock.price.analytics.cache.CacheInitializationService;
 import stock.price.analytics.service.HighLowForPeriodService;
 
 @Component
@@ -17,6 +18,14 @@ public class PreMarketScheduler {
     })
     public void logNewHighLowsThisWeek() {
         highLowForPeriodService.logNewHighLowsThisWeek();
+    }
+
+    private final CacheInitializationService cacheInitializationService;
+
+    // 0 1 15 * * MON-FRI
+    @Scheduled(cron = "${cron.pre.market.clear.cache.reinit}", zone = "${cron.timezone}")
+    public void clearCachesAndReinitializeEndOfDay() {
+        cacheInitializationService.clearCachesAndReinitialize();
     }
 
 }
