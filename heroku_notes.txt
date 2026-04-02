@@ -19,3 +19,10 @@ pg_restore --verbose --clean --no-acl --no-owner -d postgres://u3rt7gnkp5r56p:p4
 FOR RESTORE (SCHEMA + DATA):
 docker cp "D:\stocks-data\historical_prices\dump\database_dump\stock-data-aug" pgadmin4_container:/var/lib/pgadmin/storage/pgadmin4_pgadmin.org/stock-data-aug
 docker cp "D:\stocks-data\historical_prices\dump\database_dump\stock-data-schema" pgadmin4_container:/var/lib/pgadmin/storage/pgadmin4_pgadmin.org/stock-data-schema
+
+
+FOR HEROKU EXPORT as CSV:
+stop the heroku app: heroku ps:scale web=0 -a stock-price-analytics
+connect to pgAdmin 8889 docker container : http://localhost:8889/browser/
+write the SQL and export as CSV
+don't forget to revert back to 1 web dyno after exiting pgAdmin in order to start heroku app: heroku ps:scale web=1 -a stock-price-analytics
