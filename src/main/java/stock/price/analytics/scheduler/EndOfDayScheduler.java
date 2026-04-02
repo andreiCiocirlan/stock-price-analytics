@@ -62,10 +62,10 @@ public class EndOfDayScheduler {
             List<String> discrepancies = supplier.get();
             discrepanciesMap.put(discrepancyType, discrepancies);
             if (!discrepancies.isEmpty()) {
-                webSocketNotificationService.broadcastDesktopNotification(
-                        "Discrepancy Found",
-                        discrepancyType + " Discrepancies found, check logs! Count: " + discrepancies.size()
-                );
+//                webSocketNotificationService.broadcastDesktopNotification(
+//                        "Discrepancy Found",
+//                        discrepancyType + " Discrepancies found, check logs! Count: " + discrepancies.size()
+//                );
             }
         });
 
