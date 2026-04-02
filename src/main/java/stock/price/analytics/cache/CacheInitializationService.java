@@ -84,7 +84,7 @@ public class CacheInitializationService {
 
     private void initHighLowExists() {
         boolean weeklyHighLowExists = highLowForPeriodService.weeklyHighLowExists();
-        log.info("initialized weeklyHighLowExists {}", weeklyHighLowExists);
+        log.warn("initialized weeklyHighLowExists {}", weeklyHighLowExists);
         highLowPricesCache.setWeeklyHighLowExists(weeklyHighLowExists);
     }
 
