@@ -48,6 +48,22 @@ public class CacheInitializationService {
     private final PriceMilestoneService priceMilestoneService;
     private final CandleStickCache candleStickCache;
 
+    public void clearCachesAndReinitialize() {
+        clearCaches();
+        log.warn("cleared all caches successfully");
+
+        initAllCaches();
+        log.warn("initialized all caches successfully");
+    }
+
+    private void clearCaches() {
+        dailyPriceJsonCache.clearCache();
+        pricesCache.clearCache();
+        highLowPricesCache.clearCache();
+        stocksCache.clearCache();
+        candleStickCache.clearCache();
+    }
+
     @Transactional
     public void initAllCaches() {
         initHighLowExists();

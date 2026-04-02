@@ -134,4 +134,15 @@ final class HighLowPricesCache {
             case HIGH_ALL_TIME_95, LOW_ALL_TIME_95, HIGH_ALL_TIME_90, LOW_ALL_TIME_90 -> highestLowestMap.values();
         });
     }
+
+    public void clearCache() {
+        highestLowestMap.clear();
+        highLow4wMap.clear();
+        highLow52wMap.clear();
+        prevWeekHighestLowestMap.clear();
+        prevWeekHighLow4wMap.clear();
+        prevWeekHighLow52wMap.clear();
+        dailyNewHighLowsByHLPeriod.clear();
+        dailyEqualHighLowsByHLPeriod.clear();
+    }
 }

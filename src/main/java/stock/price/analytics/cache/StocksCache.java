@@ -26,4 +26,8 @@ final class StocksCache {
     List<Stock> getCachedStocks() {
         return new ArrayList<>(getStocksMap().values().stream().toList());
     }
+
+    public void clearCache() {
+        stocksMap.clear();
+    }
 }

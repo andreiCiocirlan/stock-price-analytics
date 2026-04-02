@@ -44,4 +44,14 @@ final class PricesCache {
                 .map(PriceWithPrevClose::price)
                 .toList();
     }
+
+    private void clearCache(StockTimeframe timeframe) {
+        pricesWithPrevCloseByTimeframe.get(timeframe).clear();
+    }
+
+    public void clearCache() {
+        for (StockTimeframe timeframe : values()) {
+            clearCache(timeframe);
+        }
+    }
 }

@@ -23,4 +23,7 @@ final class CandleStickCache {
         return candleStickType + "_" + timeframe;
     }
 
+    public void clearCache() {
+        tickersByCandleStickTypeAndTimeframe.clear();
+    }
 }

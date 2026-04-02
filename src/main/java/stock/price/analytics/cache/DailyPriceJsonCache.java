@@ -43,4 +43,7 @@ final class DailyPriceJsonCache {
         return ticker + "_" + date;
     }
 
+    public void clearCache() {
+        dailyPriceJSONByTicker.clear();
+    }
 }
