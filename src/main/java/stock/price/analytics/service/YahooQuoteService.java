@@ -47,7 +47,7 @@ public class YahooQuoteService {
 
         String fileName = tradingDateImported(cacheService.dailyPriceJsonCache()).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")) + ".json";
         String path = "C:\\Users/andre/IdeaProjects/yahoo-daily-prices/" + fileName;
-//        writeToFile(path, pricesJSON);
+        writeToFile(path, pricesJSON);
 
         if (!tickersNotImported.isEmpty()) {
             log.info("Did not import {} tickers", tickersNotImported.size());
