@@ -18,6 +18,11 @@ public class TickerController {
         tickerService.importAllDataFor(tickers, cfdMargin, shortSell);
     }
 
+    @PostMapping("/update-gaps-demark")
+    public void updateGapsAndDemark() {
+        tickerService.updateGapsAndDemark();
+    }
+
     @DeleteMapping("/delete-data-for-ticker")
     public void deleteAllDataFor(@RequestParam(value = "ticker") String ticker) {
         tickerService.deleteAllDataFor(ticker);

@@ -45,6 +45,20 @@ public class TickerService {
     private final CacheService cacheService;
     private final AsyncPersistenceService asyncPersistenceService;
     private final HighLowForPeriodRepository highLowForPeriodRepository;
+    private final DemarkService demarkService;
+
+    @Transactional
+    public void updateGapsAndDemark() {
+        fairValueGapService.saveNewFVGsAndUpdateHighLowAndClosedAllTimeframes();
+        fairValueGapService.closeFVGsForAllTimeframes();
+        priceGapService.closePriceGaps();
+        for (StockTimeframe timeframe : StockTimeframe.values()) {
+            priceGapService.savePriceGapsTodayFor(timeframe);
+        }
+        for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
+            demarkService.demarkForTimeframe(timeframe);
+        }
+    }
 
     @Transactional
     public void renameTicker(String oldTicker, String newTicker) {
