@@ -170,7 +170,7 @@ public class YahooQuotesClient {
                 long currentTime = System.currentTimeMillis();
                 try {
                     String responseBody = restClient.get()
-                            .uri(QUERY1_BASE_URL + V7_FINANCE + "/chart/{ticker}", ticker)
+                            .uri(QUERY1_BASE_URL + V7_FINANCE + "/chart/{ticker}?range=60y&interval=1d&indicators=quote&includeTimestamps=true", ticker)
                             .header(HttpHeaders.COOKIE, COOKIE_FC_YAHOO)
                             .header(HttpHeaders.USER_AGENT, USER_AGENT_VALUE)
                             .retrieve()
