@@ -23,6 +23,20 @@ public class PriceGapService {
     private EntityManager entityManager;
     private final PriceGapsQueryProvider priceGapsQueryProvider;
 
+    @SuppressWarnings("unchecked")
+    public List<String> gapUpTickersFor(StockTimeframe timeframe, String cfdMargins) {
+        String query = priceGapsQueryProvider.gapUpTickersQueryFor(timeframe, cfdMargins);
+
+        return (List<String>) entityManager.createNativeQuery(query).getResultList();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<String> gapDownTickersFor(StockTimeframe timeframe, String cfdMargins) {
+        String query = priceGapsQueryProvider.gapDownTickersQueryFor(timeframe, cfdMargins);
+
+        return (List<String>) entityManager.createNativeQuery(query).getResultList();
+    }
+
     @Transactional
     public void saveHistoricalPriceGapsFor(List<String> tickers) {
         for (StockTimeframe timeframe : StockTimeframe.values()) {

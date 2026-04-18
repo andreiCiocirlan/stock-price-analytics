@@ -121,6 +121,48 @@ public class PriceGapsQueryProviderImpl implements PriceGapsQueryProvider {
                   status = EXCLUDED.status;
                 """;
     }
+
+    @Override
+    public String gapUpTickersQueryFor(StockTimeframe timeframe, String cfdMargins) {
+        String prefix = timeframe.stockPrefix();
+        String interval = timeframe.toInterval();
+        String intervalPeriod = timeframe.toIntervalPeriod();
+        if (cfdMargins.isBlank()) {
+            cfdMargins = "0.2, 0.25, 0.33, 0.5, 0";
+        }
+
+        return STR."""
+                    SELECT s.ticker FROM price_gaps pg
+                    JOIN stocks s on s.ticker = pg.ticker AND
+                         pg.date = date_trunc('\{intervalPeriod}', s.last_updated) - interval '\{interval}' AND
+                         s.delisted_date is null
+                    WHERE
+                        s.cfd_margin IN (\{cfdMargins}) AND
+                        s.\{prefix}low > pg.close AND
+                        pg.timeframe = '\{timeframe}'
+                """;
+    }
+
+    @Override
+    public String gapDownTickersQueryFor(StockTimeframe timeframe, String cfdMargins) {
+        String prefix = timeframe.stockPrefix();
+        String interval = timeframe.toInterval();
+        String intervalPeriod = timeframe.toIntervalPeriod();
+        if (cfdMargins.isBlank()) {
+            cfdMargins = "0.2, 0.25, 0.33, 0.5, 0";
+        }
+
+        return STR."""
+                    SELECT s.ticker FROM price_gaps pg
+                    JOIN stocks s on s.ticker = pg.ticker AND
+                         pg.date = date_trunc('\{intervalPeriod}', s.last_updated) - interval '\{interval}' AND
+                         s.delisted_date is null
+                    WHERE
+                        s.cfd_margin IN (\{cfdMargins}) AND
+                        s.\{prefix}high < pg.close AND
+                        pg.timeframe = '\{timeframe}'
+                """;
+    }
 }
 
 
