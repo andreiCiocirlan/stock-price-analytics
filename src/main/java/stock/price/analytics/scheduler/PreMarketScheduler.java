@@ -25,7 +25,7 @@ public class PreMarketScheduler {
     // 0 1 15 * * MON-FRI
     @Scheduled(cron = "${cron.pre.market.clear.cache.reinit}", zone = "${cron.timezone}")
     public void clearCachesAndReinitializeEndOfDay() {
-        cacheInitializationService.clearCachesAndReinitialize();
+//        cacheInitializationService.clearCachesAndReinitialize();
     }
 
 }
