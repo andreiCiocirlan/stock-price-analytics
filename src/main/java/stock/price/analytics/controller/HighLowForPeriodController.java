@@ -24,4 +24,9 @@ public class HighLowForPeriodController {
         highLowForPeriodService.saveAllHistoricalHighLowPrices(List.of(ticker), tradingDate);
     }
 
+    @GetMapping("/log-new-hl")
+    @ResponseStatus(HttpStatus.OK)
+    public void logNewHighLowsThisWeek() {
+        highLowForPeriodService.logNewHighLowsThisWeek();
+    }
 }
