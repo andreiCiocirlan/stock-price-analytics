@@ -9,10 +9,7 @@ import java.time.Year;
 import java.time.YearMonth;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAdjusters;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -27,14 +24,31 @@ public final class PricesUtil {
     }
 
     private static List<AbstractPrice> htfPricesForTimeframe(List<DailyPrice> dailyPrices, StockTimeframe stockTimeframe) {
-        return pricesWithPerformance(dailyPrices.stream()
-                .collect(Collectors.groupingBy(
-                        shp -> groupingFunctionFor(stockTimeframe).apply(shp.getDate()) + "-" + shp.getTicker(),
-                        Collectors.collectingAndThen(
-                                Collectors.toList(),
-                                prices -> extractPriceForTimeframe(prices, stockTimeframe)
-                        )
-                )).values().stream().sorted(Comparator.comparing(AbstractPrice::getDate)).toList());
+        List<AbstractPrice> result = new ArrayList<>();
+
+        Map<String, List<DailyPrice>> pricesByTicker = dailyPrices.stream().collect(Collectors.groupingBy(DailyPrice::getTicker));
+
+        for (List<DailyPrice> tickerPrices : pricesByTicker.values()) {
+            List<AbstractPrice> htfPrices =
+                    tickerPrices.stream()
+                            .collect(Collectors.groupingBy(
+                                    price -> groupingFunctionFor(stockTimeframe).apply(price.getDate()),
+                                    Collectors.collectingAndThen(
+                                            Collectors.toList(),
+                                            prices -> extractPriceForTimeframe(prices, stockTimeframe)
+                                    )
+                            ))
+                            .values()
+                            .stream()
+                            .sorted(Comparator.comparing(AbstractPrice::getDate))
+                            .collect(Collectors.toList());
+
+            pricesWithPerformance(htfPrices);
+
+            result.addAll(htfPrices);
+        }
+
+        return result;
     }
 
     private static Function<LocalDate, Temporal> groupingFunctionFor(StockTimeframe stockTimeframe) {
@@ -74,7 +88,13 @@ public final class PricesUtil {
     }
 
     public static <T extends AbstractPrice> List<T> pricesWithPerformance(List<T> prices) {
-        for (int i = prices.size() - 1; i >= 1; i--) {
+        if (prices.isEmpty()) {
+            return prices;
+        }
+
+        prices.getFirst().setPerformance(0);
+
+        for (int i = 1; i < prices.size(); i++) {
             double previousClose = prices.get(i - 1).getClose();
             double performance = ((prices.get(i).getClose() - previousClose) / previousClose) * 100;
             prices.get(i).setPerformance(Math.round(performance * 100.0) / 100.0);
