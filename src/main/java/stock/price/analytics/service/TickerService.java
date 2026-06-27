@@ -130,12 +130,12 @@ public class TickerService {
         // 6. import the json file using /yahoo-quotes/from-file
 
         List<DailyPrice> dailyPricesImported = JsonUtil.getDailyPricesFromJSONFileFor(tickerList);
-        priceService.savePrices(dailyPricesImported);
+        priceService.savePricesInBatches(dailyPricesImported);
         List<AbstractPrice> htfPricesImported = new ArrayList<>();
         for (Map.Entry<StockTimeframe, List<AbstractPrice>> entry : getHigherTimeframePricesMapFor(dailyPricesImported).entrySet()) {
             htfPricesImported.addAll(entry.getValue());
         }
-        priceService.savePrices(htfPricesImported);
+        priceService.savePricesInBatches(htfPricesImported);
         saveHighLowPricesForPeriodFrom(htfPricesImported);
         saveAndUpdateStocksFor(dailyPricesImported, htfPricesImported, lastUpdate);
         priceGapService.saveHistoricalPriceGapsFor(tickerList);

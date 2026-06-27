@@ -29,7 +29,6 @@ import static stock.price.analytics.util.PricesUtil.multiplyWith;
 import static stock.price.analytics.util.TradingDateUtil.isWithinSameTimeframe;
 import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -48,6 +47,7 @@ public class PriceService {
     private final AsyncPersistenceService asyncPersistenceService;
     private final SyncPersistenceService syncPersistenceService;
     private final ImportStatusQueryProvider importStatusQueryProvider;
+    private final PriceBatchSaver priceBatchSaver;
 
     public void adjustPricesFor(String ticker, LocalDate stockSplitDate, double priceMultiplier) {
         List<DailyPrice> dailyPricesToUpdate = dailyPriceRepository.findByTickerAndDateLessThanEqual(ticker, tradingDateNow());
@@ -206,6 +206,13 @@ public class PriceService {
     @Transactional
     public void savePrices(List<? extends AbstractPrice> prices) {
         syncPersistenceService.partitionDataAndSave(prices, priceRepository);
+    }
+
+    public <T extends AbstractPrice> void savePricesInBatches(List<T> prices) {
+        for (int i = 0; i < prices.size(); i += 1000) {
+            List<T> batch = prices.subList(i, Math.min(i + 1000, prices.size()));
+            priceBatchSaver.saveBatch(batch);
+        }
     }
 
 }
