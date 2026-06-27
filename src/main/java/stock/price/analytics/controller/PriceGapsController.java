@@ -2,12 +2,11 @@ package stock.price.analytics.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.service.PriceGapService;
+
+import java.util.Arrays;
 
 @RequiredArgsConstructor
 @RestController
@@ -22,6 +21,12 @@ public class PriceGapsController {
         for (StockTimeframe timeframe : StockTimeframe.values()) {
             priceGapService.savePriceGapsTodayFor(timeframe);
         }
+    }
+
+    @PostMapping("/historical")
+    @ResponseStatus(HttpStatus.OK)
+    public void saveHistoricalPriceGaps(@RequestParam(value = "tickers") String tickers) {
+        priceGapService.saveHistoricalPriceGapsFor(Arrays.asList(tickers.split(",")));
     }
 
 }
