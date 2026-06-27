@@ -14,15 +14,6 @@ import java.nio.file.Paths;
 @Slf4j
 public final class FileUtil {
 
-    public static String readFile(String filePath) {
-        try {
-            return new String(Files.readAllBytes(Paths.get(filePath)));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null; // or handle error as needed
-        }
-    }
-
     public static void writeToFile(String filePath, String jsonData) {
         try {
             File jsonFile = new File(filePath);
