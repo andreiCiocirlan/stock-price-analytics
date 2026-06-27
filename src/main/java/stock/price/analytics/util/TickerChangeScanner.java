@@ -2,7 +2,6 @@ package stock.price.analytics.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import stock.price.analytics.cache.CacheService;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,7 +18,6 @@ import java.util.stream.Stream;
 public class TickerChangeScanner {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static CacheService cacheService;
 
     public static void main(String[] args) throws IOException {
 
