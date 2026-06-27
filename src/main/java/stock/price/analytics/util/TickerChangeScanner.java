@@ -34,8 +34,9 @@ public class TickerChangeScanner {
 
         changes.stream()
                 .sorted(Comparator
-                        .comparing(TickerChange::effectiveDate)
+                        .comparing(TickerChange::effectiveDate).reversed()
                         .thenComparing(TickerChange::oldTicker))
+                .limit(15)
                 .forEach(change -> {
 
                         System.out.printf(
