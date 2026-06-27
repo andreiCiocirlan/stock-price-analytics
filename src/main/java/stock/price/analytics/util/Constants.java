@@ -38,6 +38,7 @@ public final class Constants {
             "fvg",
             "high_low4w",
             "high_low52w",
-            "highest_lowest"
+            "highest_lowest",
+            "demark"
     );
 }
