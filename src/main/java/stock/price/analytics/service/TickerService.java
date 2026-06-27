@@ -75,15 +75,18 @@ public class TickerService {
     }
 
     @Transactional
-    public void deleteAllDataFor(String ticker) {
-        for (String table : Constants.DB_TABLES) {
-            String column = "daily_prices_json".equals(table) ? "symbol" : "ticker";
-            String sql = STR."DELETE FROM \{table} WHERE \{column} = ?1";
+    public void deleteAllDataFor(String tickers) {
+        List<String> tickerList = Arrays.stream(tickers.split(",")).toList();
+        for (String ticker : tickerList) {
+            for (String table : Constants.DB_TABLES) {
+                String column = "daily_prices_json".equals(table) ? "symbol" : "ticker";
+                String sql = STR."DELETE FROM \{table} WHERE \{column} = ?1";
 
-            int rowsAffected = entityManager.createNativeQuery(sql)
-                    .setParameter(1, ticker)
-                    .executeUpdate();
-            log.info("deleted {} rows for {} ", rowsAffected, table);
+                int rowsAffected = entityManager.createNativeQuery(sql)
+                        .setParameter(1, ticker)
+                        .executeUpdate();
+                log.info("deleted {} rows for {} ", rowsAffected, table);
+            }
         }
     }
 

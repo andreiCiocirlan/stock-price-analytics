@@ -23,9 +23,9 @@ public class TickerController {
         tickerService.updateGapsAndDemark();
     }
 
-    @DeleteMapping("/delete-data-for-ticker")
-    public void deleteAllDataFor(@RequestParam(value = "ticker") String ticker) {
-        tickerService.deleteAllDataFor(ticker);
+    @DeleteMapping("/delete-data-for-tickers")
+    public void deleteAllDataFor(@RequestParam(value = "tickers") String tickers) {
+        tickerService.deleteAllDataFor(tickers);
     }
 
     @PutMapping("/rename")
