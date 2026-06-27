@@ -116,19 +116,6 @@ public class TickerService {
             yahooQuotesClient.getAllHistoricalPrices_andSaveJSONFileFor(String.join(",", newTickers));
         }
 
-//        String jsonData = readFile("C:\\Users\\andre\\IdeaProjects\\yahoo-daily-prices\\TEST.json");
-//        List<DailyPrice> dailyPricesImported = JsonUtil.getDailyPricesFromJSONFileFor(tickerList);
-//        String modifiedJsonData = JsonUtil.updateJsonMarketPrices(jsonData, dailyPricesImported.stream().filter(dp -> dp.getDate().isEqual(LocalDate.of(2025,10,23))).toList());
-//        writeToFile("C:\\Users\\andre\\IdeaProjects\\yahoo-daily-prices\\TEST_MODIFIED.json", modifiedJsonData);
-        // update single day steps:
-        // 0. make sure scheduling.enabled = false and comment everything below
-        // 1. dload files for the tickers of that day (delete everything from /DAILY)
-        // 2. create TEST.json with the contents of the daily json file
-        // 3. make sure to use extractDailySinglePricesFrom and set lastIndex accordingly
-        // 4. replace the filtered date for the stream().filter
-        // 5. replace contents of json file using TEST_MODIFIED.json
-        // 6. import the json file using /yahoo-quotes/from-file
-
         List<DailyPrice> dailyPricesImported = JsonUtil.getDailyPricesFromJSONFileFor(tickerList);
         priceService.savePricesInBatches(dailyPricesImported);
         List<AbstractPrice> htfPricesImported = new ArrayList<>();
