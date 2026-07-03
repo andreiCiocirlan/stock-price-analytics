@@ -27,8 +27,8 @@ public class DailyPriceJSONController {
     }
 
     @GetMapping("/log-upcoming-stock-splits")
-    public void logUpcomingStockSplits(@RequestParam("fileName") String fileName) {
-        dailyPriceJSONService.logUpcomingStockSplits(fileName);
+    public void logUpcomingStockSplits(@RequestParam(name = "afterDate") @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate afterDate) {
+        dailyPriceJSONService.logUpcomingStockSplits(afterDate);
     }
 
 }

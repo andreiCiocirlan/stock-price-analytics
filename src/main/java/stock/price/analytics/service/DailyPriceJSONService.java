@@ -20,14 +20,17 @@ import stock.price.analytics.repository.json.DailyPriceJSONRepository;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.nio.file.Files.readAllLines;
 import static stock.price.analytics.util.Constants.MAX_TICKER_COUNT_PRINT;
@@ -73,17 +76,47 @@ public class DailyPriceJSONService {
         }
     }
 
-    public void logUpcomingStockSplits(String fileName) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.registerModule(new JavaTimeModule());
-            SimpleModule module = new SimpleModule();
-            module.addDeserializer(LocalDate.class, new UnixTimestampToLocalDateDeserializer());
-            objectMapper.registerModule(module);
-            objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+    public void logUpcomingStockSplits(LocalDate afterDate) {
+        Path folderPath = Path.of("C:\\Users\\andre\\IdeaProjects\\yahoo-daily-prices");
+        DateTimeFormatter fileDateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-            String jsonFilePath = String.join("", "C:\\Users/andre/IdeaProjects/yahoo-daily-prices/", fileName, ".json");
-            String jsonData = String.join("", readAllLines(Path.of(jsonFilePath)));
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+
+        SimpleModule module = new SimpleModule();
+        module.addDeserializer(LocalDate.class, new UnixTimestampToLocalDateDeserializer());
+        objectMapper.registerModule(module);
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+        Set<String> uniqueSplits = new LinkedHashSet<>();
+
+        try (Stream<Path> paths = Files.list(folderPath)) {
+            paths.filter(Files::isRegularFile)
+                    .filter(path -> hasDateAfter(path.getFileName().toString(), afterDate, fileDateFormatter))
+                    .forEach(path -> collectSplitsAsStrings(path, objectMapper, uniqueSplits));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        uniqueSplits.forEach(log::warn);
+    }
+
+    private boolean hasDateAfter(String fileName, LocalDate afterDate, DateTimeFormatter formatter) {
+        String baseName = fileName.endsWith(".json")
+                ? fileName.substring(0, fileName.length() - 5)
+                : fileName;
+
+        try {
+            LocalDate fileDate = LocalDate.parse(baseName, formatter);
+            return fileDate.isAfter(afterDate);
+        } catch (DateTimeParseException e) {
+            return false;
+        }
+    }
+
+    private void collectSplitsAsStrings(Path filePath, ObjectMapper objectMapper, Set<String> uniqueSplits) {
+        try {
+            String jsonData = Files.readString(filePath);
             Response response = objectMapper.readValue(jsonData, Response.class);
             List<DailyPriceJSON> dailyPriceJSONs = response.getQuoteResponse().getResult();
 
@@ -101,12 +134,20 @@ public class DailyPriceJSONService {
                         if ("SPLIT".equalsIgnoreCase(meta.path("eventType").asText())) {
                             String splitRatio = meta.path("splitRatio").asText(null);
                             long dateEpochMs = meta.path("dateEpochMs").asLong(0);
+
                             String splitDate = Instant.ofEpochMilli(dateEpochMs)
                                     .atZone(ZoneId.systemDefault())
                                     .toLocalDate()
                                     .format(DateTimeFormatter.ISO_LOCAL_DATE);
 
-                            log.warn("Upcoming stock split: {} {} {}", dailyPrice.getSymbol(), splitDate, splitRatio);
+                            String message = String.format(
+                                    "Upcoming stock split: %s %s %s",
+                                    dailyPrice.getSymbol(),
+                                    splitDate,
+                                    splitRatio
+                            );
+
+                            uniqueSplits.add(message);
                             break;
                         }
                     }
