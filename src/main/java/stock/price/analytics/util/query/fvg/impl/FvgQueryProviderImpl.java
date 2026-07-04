@@ -75,7 +75,7 @@ public class FvgQueryProviderImpl implements FvgQueryProvider {
                 FROM stocks s
                 JOIN fvg ON fvg.ticker = s.ticker AND fvg.status = 'OPEN'
                 WHERE s.cfd_margin IN (\{cfdMargins})
-                  AND s.close BETWEEN fvg.low AND fvg.high
+                  AND s.close BETWEEN fvg.unfilled_low1 AND fvg.unfilled_high1
                   AND fvg.timeframe = '\{timeframe}'
                 """;
     }
