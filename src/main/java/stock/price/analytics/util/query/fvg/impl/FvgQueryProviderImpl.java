@@ -22,6 +22,7 @@ public class FvgQueryProviderImpl implements FvgQueryProvider {
         String prefix = timeframe.stockPrefix();
         String dateTruncPeriod = timeframe.toDateTruncPeriod();
         String intervalPeriod = timeframe.toIntervalPeriod();
+        int lookbackCount = timeframe == StockTimeframe.QUARTERLY ? 3 : 1;
         if (cfdMargins.isBlank()) {
             cfdMargins = "0.2, 0.25, 0.33, 0.5, 0";
         }
@@ -32,7 +33,7 @@ public class FvgQueryProviderImpl implements FvgQueryProvider {
                 WHERE s.cfd_margin IN (\{cfdMargins})
                     AND (s.\{prefix}high between fvg.low AND fvg.high OR s.\{prefix}low between fvg.low AND fvg.high)
                     AND fvg.timeframe = '\{timeframe}'
-                    AND fvg.date < date_trunc('\{dateTruncPeriod}', current_date) - interval '2 \{intervalPeriod}'
+                    AND date_trunc('\{dateTruncPeriod}', s.last_updated) > fvg.date + interval '\{lookbackCount} \{intervalPeriod}'
                 """;
     }
 
