@@ -62,7 +62,7 @@ public class TickerService {
 
     @Transactional
     public void renameTicker(String oldTicker, String newTicker) {
-        for (String table : Constants.DB_TABLES) {
+        for (String table : Constants.DB_TABLES_RENAME) {
             String column = "daily_prices_json".equals(table) ? "symbol" : "ticker";
             String sql = STR."UPDATE \{table} SET \{column} = ?2 WHERE \{column} = ?1";
 
@@ -78,9 +78,8 @@ public class TickerService {
     public void deleteAllDataFor(String tickers) {
         List<String> tickerList = Arrays.stream(tickers.split(",")).toList();
         for (String ticker : tickerList) {
-            for (String table : Constants.DB_TABLES) {
-                String column = "daily_prices_json".equals(table) ? "symbol" : "ticker";
-                String sql = STR."DELETE FROM \{table} WHERE \{column} = ?1";
+            for (String table : Constants.DB_TABLES_DELETE) {
+                String sql = STR."DELETE FROM \{table} WHERE ticker = ?1";
 
                 int rowsAffected = entityManager.createNativeQuery(sql)
                         .setParameter(1, ticker)
