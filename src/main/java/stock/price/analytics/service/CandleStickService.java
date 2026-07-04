@@ -24,4 +24,11 @@ public class CandleStickService {
         return (List<String>) entityManager.createNativeQuery(query).getResultList();
     }
 
+    @SuppressWarnings("unchecked")
+    public List<String> trendQueryFor(StockTimeframe timeframe, String cfdMargins, String direction) {
+        String query = candleRangeQueryProvider.trendQuery(timeframe, cfdMargins, direction);
+
+        return (List<String>) entityManager.createNativeQuery(query).getResultList();
+    }
+
 }
