@@ -14,7 +14,7 @@ public record StockHeatmapRequest(
         List<Double> cfdMargins,
         List<String> priceMilestones,
         CandleStickType candleStickType,
-        TradingIdea tradingIdea
+        List<TradingIdea> tradingIdeas
 ) {
     public List<PriceMilestone> priceMilestonesFrom() {
         return PriceMilestoneFactory.priceMilestonesFrom(this.priceMilestones());
@@ -24,7 +24,7 @@ public record StockHeatmapRequest(
         return !this.priceMilestones().isEmpty() || this.candleStickType() != CandleStickType.ANY;
     }
 
-    public boolean hasTradingIdea() {
-        return this.tradingIdea != TradingIdea.NONE;
+    public boolean hasTradingIdeas() {
+        return this.tradingIdeas != null && !this.tradingIdeas.isEmpty();
     }
 }

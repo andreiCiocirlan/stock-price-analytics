@@ -61,6 +61,70 @@ body, html {
     cursor: pointer;
 }
 
+.multi-select-dropdown {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    min-width: 0;
+}
+
+.multi-select-toggle {
+    width: 115px;              /* match your .form-control width */
+    min-width: 115px;
+    max-width: 115px;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 22px;
+}
+
+.multi-select-menu {
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 0;
+    width: max-content;
+    min-width: 100%;
+    max-width: 340px;
+    z-index: 9999;
+    display: none;
+    background-color: #171B26;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+    max-height: 260px;
+    overflow-y: auto;
+    padding: 6px 0;
+}
+
+.multi-select-dropdown.open .multi-select-menu {
+    display: block;
+}
+
+.multi-select-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
+    color: white;
+    font-size: 10px;
+    line-height: 1.2;
+    white-space: normal;
+}
+
+.multi-select-option:hover {
+    background-color: #2C3040;
+}
+
+.multi-select-option input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    margin: 0;
+    flex: 0 0 auto;
+}
+
 .select-item #cfdMargin .btn.active {
     background-color: red;
     font-weight: bold;

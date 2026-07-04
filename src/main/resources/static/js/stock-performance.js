@@ -86,6 +86,27 @@ function fetchBottomProjections(ticker) {
 		.then(response => response.json());
 }
 
+function updateTradingIdeaButtonText() {
+    const tradingDropdown = document.getElementById('trading-ideas-dropdown');
+    const tradingToggle = document.getElementById('trading-ideas-toggle');
+    if (!tradingDropdown || !tradingToggle) return;
+
+    const selected = Array.from(
+        tradingDropdown.querySelectorAll('input[type="checkbox"][data-type="trading-idea"]:checked')
+    ).map(cb => {
+        const label = cb.closest('label');
+        return label ? label.textContent.trim() : cb.value;
+    });
+
+    if (selected.length === 0) {
+        tradingToggle.textContent = 'Select trading ideas';
+    } else if (selected.length === 1) {
+        tradingToggle.textContent = selected[0];
+    } else {
+        tradingToggle.textContent = `${selected.length} selected`;
+    }
+}
+
 export function updateStockPerformanceChartCurrentTimeframe() {
 	updateStockPerformanceChart(currentTimeFrame);
 }
@@ -112,7 +133,9 @@ function updateStockPerformanceChart(timeFrame) {
 
 	if (stockFilters) {
 		const dropdowns = stockFilters.querySelectorAll('select');
-		const priceMilestones = [];
+		const tradingIdeaCheckboxes = document.querySelectorAll('#trading-ideas-dropdown input[type="checkbox"][data-type="trading-idea"]');
+        const priceMilestones = [];
+        const tradingIdeas = [];
 
 		dropdowns.forEach(dropdown => {
 			const selectedValue = dropdown.value;
@@ -125,11 +148,16 @@ function updateStockPerformanceChart(timeFrame) {
 					priceMilestones.push(selectedValue);
 				}
 			}
-			else if (dataType == 'trading-idea') {
-                requestBody.tradingIdea = selectedValue;
-			}
 		});
-		requestBody.priceMilestones = priceMilestones;
+
+		tradingIdeaCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                tradingIdeas.push(checkbox.value);
+            }
+        });
+
+        requestBody.priceMilestones = priceMilestones;
+        requestBody.tradingIdeas = tradingIdeas;
 	}
 
 	fetch('/stock-performance-json', {
@@ -284,6 +312,32 @@ document.addEventListener('DOMContentLoaded', function() {
 	});
 
 	dispatchTimeFrameChangeEvent(selectedValues);
+
+	const tradingDropdown = document.getElementById('trading-ideas-dropdown');
+    const tradingToggle = document.getElementById('trading-ideas-toggle');
+
+    if (tradingDropdown && tradingToggle) {
+        tradingToggle.addEventListener('click', function(event) {
+            event.stopPropagation();
+            tradingDropdown.classList.toggle('open');
+        });
+
+        document.addEventListener('click', function(event) {
+            if (!tradingDropdown.contains(event.target)) {
+                tradingDropdown.classList.remove('open');
+            }
+        });
+
+        const checkboxes = tradingDropdown.querySelectorAll('input[type="checkbox"][data-type="trading-idea"]');
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', () => {
+                updateTradingIdeaButtonText();
+                updateStockPerformanceChart(currentTimeFrame);
+            });
+        });
+
+        updateTradingIdeaButtonText();
+    }
 });
 
 // Call the function to determine the selected timeframe

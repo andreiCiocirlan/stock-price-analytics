@@ -50,20 +50,58 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="trading-idea-type" class="dropdown-label">Trading Idea</label>
-                    <select class="form-control" id="trading-idea-type" data-type="trading-idea">
-                        <option value="NONE">None</option>
-                        <option value="COMPRESSED_PRICE">Compressed Price</option>
-                        <option value="ROCKET_SHIP_TREND">Rocket Ship Trend</option>
-                        <option value="ANVIL_TREND">Anvil Trend</option>
-                        <option value="GAP_UP">Gap Up</option>
-                        <option value="GAP_DOWN">Gap Down</option>
-                        <option value="PRICE_INSIDE_FVG">Price inside FVG</option>
-                        <option value="PRICE_HL_INSIDE_FVG">HL Price inside FVG</option>
-                        <option value="DEMARK_8">DeMark >= 8</option>
-                        <option value="DEMARK_9">DeMark >= 9</option>
-                        <option value="DEMARK_13">DeMark >= 13</option>
-                    </select>
+                    <label class="dropdown-label">Trading Ideas</label>
+
+                    <div class="multi-select-dropdown" id="trading-ideas-dropdown">
+                        <button type="button"
+                                class="form-control multi-select-toggle"
+                                id="trading-ideas-toggle">
+                            Select trading ideas
+                        </button>
+
+                        <div class="multi-select-menu">
+                            <label class="multi-select-option">
+                                <input type="checkbox" data-type="trading-idea" value="COMPRESSED_PRICE">
+                                <span>Compressed Price</span>
+                            </label>
+                            <label class="multi-select-option">
+                                <input type="checkbox" data-type="trading-idea" value="ROCKET_SHIP_TREND">
+                                <span>Rocket Ship Trend</span>
+                            </label>
+                            <label class="multi-select-option">
+                                <input type="checkbox" data-type="trading-idea" value="ANVIL_TREND">
+                                <span>Anvil Trend</span>
+                            </label>
+                            <label class="multi-select-option">
+                                <input type="checkbox" data-type="trading-idea" value="GAP_UP">
+                                <span>Gap Up</span>
+                            </label>
+                            <label class="multi-select-option">
+                                <input type="checkbox" data-type="trading-idea" value="GAP_DOWN">
+                                <span>Gap Down</span>
+                            </label>
+                            <label class="multi-select-option">
+                                <input type="checkbox" data-type="trading-idea" value="PRICE_INSIDE_FVG">
+                                <span>Price inside FVG</span>
+                            </label>
+                            <label class="multi-select-option">
+                                <input type="checkbox" data-type="trading-idea" value="PRICE_HL_INSIDE_FVG">
+                                <span>HL Price inside FVG</span>
+                            </label>
+                            <label class="multi-select-option">
+                                <input type="checkbox" data-type="trading-idea" value="DEMARK_8">
+                                <span>DeMark ≥ 8</span>
+                            </label>
+                            <label class="multi-select-option">
+                                <input type="checkbox" data-type="trading-idea" value="DEMARK_9">
+                                <span>DeMark ≥ 9</span>
+                            </label>
+                            <label class="multi-select-option">
+                                <input type="checkbox" data-type="trading-idea" value="DEMARK_13">
+                                <span>DeMark ≥ 13</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
 
