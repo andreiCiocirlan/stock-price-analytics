@@ -203,11 +203,6 @@ public class PriceService {
         return new PriceWithPrevClose(price, previousClose);
     }
 
-    @Transactional
-    public void savePrices(List<? extends AbstractPrice> prices) {
-        syncPersistenceService.partitionDataAndSave(prices, priceRepository);
-    }
-
     public <T extends AbstractPrice> void savePricesInBatches(List<T> prices) {
         for (int i = 0; i < prices.size(); i += 1000) {
             List<T> batch = prices.subList(i, Math.min(i + 1000, prices.size()));
