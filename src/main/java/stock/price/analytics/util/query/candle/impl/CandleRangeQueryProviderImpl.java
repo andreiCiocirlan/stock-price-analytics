@@ -33,7 +33,7 @@ public class CandleRangeQueryProviderImpl implements CandleRangeQueryProvider {
                     WHERE rn <= 10
                     GROUP BY ticker
                 ),
-                current_quarter AS (
+                current_timeframe AS (
                     SELECT ticker, (\{prefix}high - \{prefix}low) AS current_range
                     FROM stocks
                     WHERE LAST_UPDATED = (
@@ -45,11 +45,11 @@ public class CandleRangeQueryProviderImpl implements CandleRangeQueryProvider {
                 SELECT
                     c.ticker
                 FROM
-                    current_quarter c
+                    current_timeframe c
                 JOIN
                     avg_ranges a ON c.ticker = a.ticker
                 WHERE
-                    c.current_range <= 0.33 * a.avg_range;
+                    c.current_range <= 0.5 * a.avg_range;
                 """;
     }
 
