@@ -140,6 +140,12 @@ public class FairValueGapService {
     }
 
     @SuppressWarnings("unchecked")
+    public List<String> findRecentFVGsForCfdMargins(StockTimeframe timeframe, String cfdMargins) {
+        String query = fvgQueryProvider.findRecentFVGsQueryFrom(timeframe, cfdMargins);
+        return (List<String>) entityManager.createNativeQuery(query, String.class).getResultList();
+    }
+
+    @SuppressWarnings("unchecked")
     private List<FairValueGap> findFVGsForTickersAndTimeframe(List<String> tickers, StockTimeframe timeframe, boolean allHistoricalData) {
         String query = fvgQueryProvider.findFVGsQueryFrom(timeframe, tickers, allHistoricalData);
         return (List<FairValueGap>) entityManager.createNativeQuery(query, FairValueGap.class).getResultList();

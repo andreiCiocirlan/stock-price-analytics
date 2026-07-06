@@ -12,6 +12,7 @@ public enum TradingIdea {
     GAP_UP,
     GAP_DOWN,
     ANVIL_TREND,
-    ROCKET_SHIP_TREND
+    ROCKET_SHIP_TREND,
+    RECENT_FVG
 
 }

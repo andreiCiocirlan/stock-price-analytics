@@ -94,6 +94,7 @@ public class StockHeatmapPerformanceService {
                     case ANVIL_TREND -> candleStickService.trendQueryFor(stockTimeframe, cfdMarginsString, "ANVIL_TREND");
                     case GAP_UP -> priceGapService.gapUpTickersFor(stockTimeframe, cfdMarginsString);
                     case GAP_DOWN -> priceGapService.gapDownTickersFor(stockTimeframe, cfdMarginsString);
+                    case RECENT_FVG -> fairValueGapService.findRecentFVGsForCfdMargins(stockTimeframe, cfdMarginsString);
                     case PRICE_INSIDE_FVG -> fairValueGapService.priceInsideFvgFor(stockTimeframe, cfdMarginsString);
                     case PRICE_HL_INSIDE_FVG -> fairValueGapService.priceHLInsideFvgFor(stockTimeframe, cfdMarginsString);
                     case DEMARK_8 -> demarkService.tickersForTimeframeTdAndCfdMargins(stockTimeframe, 8, cfdMarginsString);

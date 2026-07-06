@@ -67,6 +67,32 @@ public class FvgQueryProviderImpl implements FvgQueryProvider {
     }
 
     @Override
+    public String findRecentFVGsQueryFrom(StockTimeframe timeframe, String cfdMargins) {
+        String intervalPeriod = timeframe.toIntervalPeriod();
+        String dateTruncPeriod = timeframe.toDateTruncPeriod();
+        int lookbackCount = timeframe == StockTimeframe.QUARTERLY ? 3 : 1;
+        if (cfdMargins.isBlank()) {
+            cfdMargins = "0.2, 0.25, 0.33, 0.5, 0";
+        }
+        return STR."""
+                WITH latest_trading_date AS (
+                    SELECT MAX(last_updated)::date AS trading_date
+                    FROM stocks
+                )
+                SELECT DISTINCT s.ticker
+                FROM fvg
+                JOIN stocks s ON s.ticker = fvg.ticker
+                WHERE timeframe = '\{timeframe}'
+                  AND status = 'OPEN'
+                  AND date = (
+                      SELECT date_trunc('\{dateTruncPeriod}', trading_date) - interval '\{lookbackCount} \{intervalPeriod}'
+                      FROM latest_trading_date
+                  )
+                  AND s.cfd_margin in (\{cfdMargins});
+                """;
+    }
+
+    @Override
     public String priceInsideFvgFor(StockTimeframe timeframe, String cfdMargins) {
         String intervalPeriod = timeframe.toIntervalPeriod();
         String dateTruncPeriod = timeframe.toDateTruncPeriod();
