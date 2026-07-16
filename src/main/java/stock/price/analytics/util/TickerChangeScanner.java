@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,6 +19,8 @@ import java.util.stream.Stream;
 public class TickerChangeScanner {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final LocalDate AFTER_DATE = LocalDate.of(2026, 5, 30);
+    private static final DateTimeFormatter FILE_DATE_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
     public static void main(String[] args) throws IOException {
 
@@ -29,6 +32,7 @@ public class TickerChangeScanner {
         try (Stream<Path> files = Files.list(folder)) {
 
             files.filter(path -> path.toString().endsWith(".json"))
+                    .filter(path -> isAfterDate(path, AFTER_DATE))
                     .forEach(path -> scanFile(path, changes));
         }
 
@@ -46,6 +50,24 @@ public class TickerChangeScanner {
                                 change.effectiveDate()
                         );
                 });
+    }
+
+    private static boolean isAfterDate(Path path, LocalDate afterDate) {
+        String fileName = path.getFileName().toString();
+
+        if (!fileName.endsWith(".json")) {
+            return false;
+        }
+
+        String datePart = fileName.substring(0, 10);
+
+        try {
+            LocalDate fileDate = LocalDate.parse(datePart, FILE_DATE_FORMAT);
+            return fileDate.isAfter(afterDate);
+        } catch (Exception e) {
+            System.err.printf("Skipping file with invalid date name: %s%n", fileName);
+            return false;
+        }
     }
 
     private static void scanFile(
