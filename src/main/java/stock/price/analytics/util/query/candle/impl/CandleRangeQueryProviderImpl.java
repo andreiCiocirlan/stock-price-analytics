@@ -57,7 +57,7 @@ public class CandleRangeQueryProviderImpl implements CandleRangeQueryProvider {
     public String trendQuery(StockTimeframe timeframe, String cfdMargins, String direction) {
         String tableName = timeframe.dbTableOHLC();
         String intervalPeriod = timeframe.toIntervalPeriod();
-        int lookbackCount = timeframe == StockTimeframe.QUARTERLY ? 30 : 10;
+        int lookbackCount = timeframe == StockTimeframe.QUARTERLY ? 45 : 15;
 
         if (cfdMargins.isBlank()) {
             cfdMargins = "0.2, 0.25, 0.33, 0.5, 0";
