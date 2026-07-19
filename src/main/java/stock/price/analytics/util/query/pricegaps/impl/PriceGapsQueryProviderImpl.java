@@ -125,16 +125,35 @@ public class PriceGapsQueryProviderImpl implements PriceGapsQueryProvider {
     @Override
     public String gapUpTickersQueryFor(StockTimeframe timeframe, String cfdMargins) {
         String prefix = timeframe.stockPrefix();
-        String interval = timeframe.toInterval();
-        String intervalPeriod = timeframe.toIntervalPeriod();
+        String dbTable = timeframe.dbTableOHLC();
         if (cfdMargins.isBlank()) {
             cfdMargins = "0.2, 0.25, 0.33, 0.5, 0";
         }
 
         return STR."""
-                    SELECT s.ticker FROM price_gaps pg
+                    WITH previous_trading_date AS (
+                        SELECT
+                            ticker,
+                            date,
+                            rn
+                        FROM (
+                            SELECT
+                                p.ticker,
+                                p.date,
+                                ROW_NUMBER() OVER (
+                                    PARTITION BY p.ticker
+                                    ORDER BY p.date DESC
+                                ) AS rn
+                            FROM \{dbTable} p
+                            WHERE p.ticker = 'AAPL'
+                              AND p.date IS NOT NULL
+                        ) sub
+                        WHERE rn = 2
+                    )
+                    SELECT s.ticker
+                    FROM price_gaps pg
                     JOIN stocks s on s.ticker = pg.ticker AND
-                         pg.date = date_trunc('\{intervalPeriod}', s.last_updated) - interval '\{interval}' AND
+                         pg.date = (select date from previous_trading_date) AND
                          s.delisted_date is null
                     WHERE
                         s.cfd_margin IN (\{cfdMargins}) AND
@@ -146,16 +165,35 @@ public class PriceGapsQueryProviderImpl implements PriceGapsQueryProvider {
     @Override
     public String gapDownTickersQueryFor(StockTimeframe timeframe, String cfdMargins) {
         String prefix = timeframe.stockPrefix();
-        String interval = timeframe.toInterval();
-        String intervalPeriod = timeframe.toIntervalPeriod();
+        String dbTable = timeframe.dbTableOHLC();
         if (cfdMargins.isBlank()) {
             cfdMargins = "0.2, 0.25, 0.33, 0.5, 0";
         }
 
         return STR."""
-                    SELECT s.ticker FROM price_gaps pg
+                    WITH previous_trading_date AS (
+                        SELECT
+                            ticker,
+                            date,
+                            rn
+                        FROM (
+                            SELECT
+                                p.ticker,
+                                p.date,
+                                ROW_NUMBER() OVER (
+                                    PARTITION BY p.ticker
+                                    ORDER BY p.date DESC
+                                ) AS rn
+                            FROM \{dbTable} p
+                            WHERE p.ticker = 'AAPL'
+                              AND p.date IS NOT NULL
+                        ) sub
+                        WHERE rn = 2
+                    )
+                    SELECT s.ticker
+                    FROM price_gaps pg
                     JOIN stocks s on s.ticker = pg.ticker AND
-                         pg.date = date_trunc('\{intervalPeriod}', s.last_updated) - interval '\{interval}' AND
+                         pg.date = (select date from previous_trading_date) AND
                          s.delisted_date is null
                     WHERE
                         s.cfd_margin IN (\{cfdMargins}) AND

@@ -68,27 +68,41 @@ public class FvgQueryProviderImpl implements FvgQueryProvider {
 
     @Override
     public String findRecentFVGsQueryFrom(StockTimeframe timeframe, String cfdMargins) {
-        String intervalPeriod = timeframe.toIntervalPeriod();
-        String dateTruncPeriod = timeframe.toDateTruncPeriod();
-        int lookbackCount = timeframe == StockTimeframe.QUARTERLY ? 3 : 1;
+        String dbTable = timeframe.dbTableOHLC();
         if (cfdMargins.isBlank()) {
             cfdMargins = "0.2, 0.25, 0.33, 0.5, 0";
         }
         return STR."""
-                WITH latest_trading_date AS (
-                    SELECT MAX(last_updated)::date AS trading_date
-                    FROM stocks
+                WITH previous_trading_date AS (
+                    SELECT
+                        ticker,
+                        date,
+                        rn
+                    FROM (
+                        SELECT
+                            p.ticker,
+                            p.date,
+                            ROW_NUMBER() OVER (
+                                PARTITION BY p.ticker
+                                ORDER BY p.date DESC
+                            ) AS rn
+                        FROM \{dbTable} p
+                        WHERE p.ticker = 'AAPL'
+                          AND p.date IS NOT NULL
+                    ) sub
+                    WHERE rn = 2
+                ),
+                latest_fvg AS (
+                    SELECT DISTINCT s.ticker
+                    FROM fvg
+                    JOIN stocks s ON s.ticker = fvg.ticker
+                    WHERE fvg.timeframe = '\{timeframe}'
+                      AND fvg.status = 'OPEN'
+                      AND fvg.date = (SELECT date FROM previous_trading_date)
+                      AND s.cfd_margin in (\{cfdMargins})
                 )
-                SELECT DISTINCT s.ticker
-                FROM fvg
-                JOIN stocks s ON s.ticker = fvg.ticker
-                WHERE timeframe = '\{timeframe}'
-                  AND status = 'OPEN'
-                  AND date = (
-                      SELECT date_trunc('\{dateTruncPeriod}', trading_date) - interval '\{lookbackCount} \{intervalPeriod}'
-                      FROM latest_trading_date
-                  )
-                  AND s.cfd_margin in (\{cfdMargins});
+                SELECT ticker
+                FROM latest_fvg;
                 """;
     }
 
