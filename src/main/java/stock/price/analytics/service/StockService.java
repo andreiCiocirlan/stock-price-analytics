@@ -1,5 +1,7 @@
 package stock.price.analytics.service;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,7 @@ import stock.price.analytics.model.prices.ohlc.AbstractPrice;
 import stock.price.analytics.model.prices.ohlc.DailyPrice;
 import stock.price.analytics.model.stocks.Stock;
 import stock.price.analytics.repository.stocks.StockRepository;
+import stock.price.analytics.util.query.stocks.StocksQueryProvider;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -25,6 +28,9 @@ import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
 @RequiredArgsConstructor
 public class StockService {
 
+    @PersistenceContext
+    private final EntityManager entityManager;
+    private final StocksQueryProvider stocksQueryProvider;
     private final PriceService priceService;
     private final HighLowForPeriodService highLowForPeriodService;
     private final FairValueGapService fairValueGapService;
@@ -143,6 +149,17 @@ public class StockService {
             if (stockSplitDate.isEqual(tradingDateNow())) {
                 updateStockDailyPricesFor(ticker);
             }
+        }
+    }
+
+    public void logExtendedAbove200SMA(StockTimeframe timeframe, LocalDate tradingDate, Double cfdMargin) {
+        String query = stocksQueryProvider.findMostExtendedAbove200SMA(timeframe, tradingDate, cfdMargin);
+        log.warn("Top 50 most extended above {} 200 SMA", timeframe);
+
+        @SuppressWarnings("unchecked")
+        List<Object[]> results = entityManager.createNativeQuery(query).getResultList();
+        for (Object[] r : results) {
+            log.warn("{}, {}", r[0], r[1]);
         }
     }
 }
