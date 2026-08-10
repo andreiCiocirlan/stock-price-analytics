@@ -81,20 +81,24 @@ public class HighLowForPeriodService {
     }
 
     public void logNewHighLowsThisWeek() {
-        List<String> newHighLowResult = new ArrayList<>();
-        for (Object[] newHighLowThisWeek : highLowForPeriodRepository.newHighLowsThisWeek()) {
-            boolean isFirst = true;
-            for (Object newHL_col : newHighLowThisWeek) {
-                if (isFirst) {
-                    newHighLowResult.add("\"" + newHL_col + "\"");
-                    isFirst = false;
-                } else {
-                    newHighLowResult.add(String.valueOf(newHL_col));
-                }
-            }
-        }
-        String newHighLowResultFormatted = String.join(" ", newHighLowResult);
+        List<Object[]> results = highLowForPeriodRepository.newHighLowsThisWeek();
 
-        log.warn("-- {}", newHighLowResultFormatted);
+        StringBuilder formatted = new StringBuilder();
+
+        for (Object[] row : results) {
+            formatted.append('"').append(row[0]).append('"');
+
+            for (int i = 1; i < row.length; i++) {
+                formatted.append(" ").append(formatValue(row[i]));
+            }
+
+            formatted.append(System.lineSeparator());
+        }
+
+        log.warn("{}", formatted);
+    }
+
+    private String formatValue(Object value) {
+        return String.format("%4s", value);
     }
 }
