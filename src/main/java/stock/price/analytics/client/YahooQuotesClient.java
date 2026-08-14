@@ -2,13 +2,6 @@ package stock.price.analytics.client;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -16,7 +9,6 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import stock.price.analytics.util.Constants;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,37 +20,13 @@ import static stock.price.analytics.util.FileUtil.writeToFile;
 @RequiredArgsConstructor
 public class YahooQuotesClient {
 
-    private static final CloseableHttpClient httpClient;
     private static final String QUERY1_BASE_URL = "https://query1.finance.yahoo.com";
     private static final String QUERY2_BASE_URL = "https://query2.finance.yahoo.com";
     private static final String V7_FINANCE = "/v7/finance";
 
-    static {
-        httpClient = createHttpClient();
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                if (httpClient != null) {
-                    httpClient.close();
-                }
-            } catch (IOException e) {
-                log.error("Error closing HttpClient", e);
-            }
-        }));
-    }
-
     private final RestClient restClient;
     private String COOKIE_FC_YAHOO = "A3=d=AQABBOnlcGkCEHdoCk2-i8zNajDWzRMSlfcFEgABAQEpcml6afF3ziMAAAAAgA&S=AQAAAgHfzgCRNADaQ3YuHkqHRts";
     private String CRUMB_COOKIE = "ztjAVP7wZ61";
-
-    private static CloseableHttpClient createHttpClient() {
-        RequestConfig requestConfig = RequestConfig.custom()
-                .setCookieSpec(CookieSpecs.STANDARD)
-                .build();
-        return HttpClientBuilder.create()
-                .setDefaultRequestConfig(requestConfig)
-                .build();
-    }
 
     public List<String> quotePricesFor(List<String> tickers) {
         int maxTickersPerRequest = 1700;
@@ -115,24 +83,26 @@ public class YahooQuotesClient {
     }
 
     public String cookieFromFcYahoo() {
-        String cookieValue = null;
-        try {
-            HttpGet request = new HttpGet("https://fc.yahoo.com");
-            request.setHeader(HttpHeaders.USER_AGENT, USER_AGENT_VALUE);
+        ResponseEntity<Void> response = restClient.get()
+                .uri("https://fc.yahoo.com")
+                .header(HttpHeaders.USER_AGENT, USER_AGENT_VALUE)
+                .exchange((_, clientResponse) -> ResponseEntity
+                        .status(clientResponse.getStatusCode())
+                        .headers(clientResponse.getHeaders())
+                        .build());
 
-            HttpResponse response = httpClient.execute(request);
+        List<String> cookies = response.getHeaders().get(HttpHeaders.SET_COOKIE);
 
-            Header[] headers = response.getHeaders("Set-Cookie");
-            if (headers.length == 1) {
-                cookieValue = headers[0].getValue().split(";")[0]; // extracts "A1=...."
-                COOKIE_FC_YAHOO = cookieValue;
-                log.info("cookieFromFcYahoo cookie: {}", COOKIE_FC_YAHOO);
-            }
-        } catch (IOException e) {
-            log.error(e.getMessage());
-            throw new RuntimeException(e);
+        if (cookies != null && !cookies.isEmpty()) {
+            String cookieValue = cookies.getFirst().split(";", 2)[0];
+
+            COOKIE_FC_YAHOO = cookieValue;
+            log.info("cookieFromFcYahoo cookie: {}", COOKIE_FC_YAHOO);
+
+            return cookieValue;
         }
-        return cookieValue;
+
+        throw new RuntimeException("Yahoo did not return a Set-Cookie header");
     }
 
     public String getCrumb() {
