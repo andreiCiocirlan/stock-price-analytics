@@ -1,21 +1,29 @@
 package stock.price.analytics.util.query.fvg.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Component;
 import stock.price.analytics.model.gaps.enums.FvgType;
 import stock.price.analytics.model.prices.enums.PricePerformanceMilestone;
 import stock.price.analytics.model.prices.enums.StockTimeframe;
+import stock.price.analytics.repository.json.DailyPriceJSONRepository;
 import stock.price.analytics.util.query.fvg.FvgQueryProvider;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static stock.price.analytics.util.TradingDateUtil.tradingDateNow;
+
+@RequiredArgsConstructor
 @Component
 public class FvgQueryProviderImpl implements FvgQueryProvider {
 
+    private final DailyPriceJSONRepository dailyPriceJSONRepository;
 
     @Override
     public String priceHLInsideFvgFor(StockTimeframe timeframe, String cfdMargins) {
@@ -139,12 +147,22 @@ public class FvgQueryProviderImpl implements FvgQueryProvider {
         String fvgTypeStr = fvgType.name();
         String highLowWhereClause = highLowWhereClauseFVGsTagged(pricePerformanceMilestone, lowField, highField);
 
+        LocalDate tradingDateNow = tradingDateNow();
+        LocalDate fvgDatePreviousWMQY = switch (timeframe) {
+            case DAILY -> dailyPriceJSONRepository.getPreviousTradingDate();
+            case WEEKLY -> tradingDateNow.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).minusWeeks(1);
+            case MONTHLY -> tradingDateNow.with(TemporalAdjusters.firstDayOfMonth()).minusMonths(1);
+            case QUARTERLY -> LocalDate.of(tradingDateNow.getYear(), tradingDateNow.getMonth().firstMonthOfQuarter().getValue(), 1).minusMonths(3);
+            case YEARLY -> tradingDateNow.with(TemporalAdjusters.firstDayOfYear()).minusYears(1);
+        };
+        String fvgDatePreviousWMQYstr = fvgDatePreviousWMQY.format(DateTimeFormatter.ISO_LOCAL_DATE);
+
         return STR."""
                 SELECT fvg.*
                 FROM stocks s
                 JOIN fvg on fvg.ticker = s.ticker AND fvg.status = 'OPEN' AND fvg.timeframe = '\{timeframe}' and fvg.type = '\{fvgTypeStr}'
-                WHERE
-                s.cfd_margin in (\{cfdMargins})
+                WHERE s.cfd_margin in (\{cfdMargins})
+                AND fvg.date < '\{fvgDatePreviousWMQYstr}'
                 \{highLowWhereClause}
                 AND (s.\{prefix}high between fvg.low AND fvg.high OR s.\{prefix}low between fvg.low AND fvg.high)
                 """;
