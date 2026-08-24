@@ -136,6 +136,9 @@ public class FvgQueryProviderImpl implements FvgQueryProvider {
     @Override
     public String findTickersFVGsTaggedQueryFor(StockTimeframe timeframe, FvgType fvgType, PricePerformanceMilestone pricePerformanceMilestone, String cfdMargins) {
         String prefix = timeframe.stockPrefix();
+        String intervalPeriod = timeframe.toIntervalPeriod();
+        String dateTruncPeriod = timeframe.toDateTruncPeriod();
+        int lookbackCount = timeframe == StockTimeframe.QUARTERLY ? 3 : 1;
         Pair<String, String> queryFields = switch (pricePerformanceMilestone) {
             case HIGH_52W_95, LOW_52W_95, HIGH_52W_90, LOW_52W_90 -> new MutablePair<>("low52w", "high52w");
             case HIGH_4W_95, LOW_4W_95, HIGH_4W_90, LOW_4W_90 -> new MutablePair<>("low4w", "high4w");
@@ -147,24 +150,14 @@ public class FvgQueryProviderImpl implements FvgQueryProvider {
         String fvgTypeStr = fvgType.name();
         String highLowWhereClause = highLowWhereClauseFVGsTagged(pricePerformanceMilestone, lowField, highField);
 
-        LocalDate tradingDateNow = tradingDateNow();
-        LocalDate fvgDatePreviousWMQY = switch (timeframe) {
-            case DAILY -> dailyPriceJSONRepository.getPreviousTradingDate();
-            case WEEKLY -> tradingDateNow.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)).minusWeeks(1);
-            case MONTHLY -> tradingDateNow.with(TemporalAdjusters.firstDayOfMonth()).minusMonths(1);
-            case QUARTERLY -> LocalDate.of(tradingDateNow.getYear(), tradingDateNow.getMonth().firstMonthOfQuarter().getValue(), 1).minusMonths(3);
-            case YEARLY -> tradingDateNow.with(TemporalAdjusters.firstDayOfYear()).minusYears(1);
-        };
-        String fvgDatePreviousWMQYstr = fvgDatePreviousWMQY.format(DateTimeFormatter.ISO_LOCAL_DATE);
-
         return STR."""
                 SELECT fvg.*
                 FROM stocks s
                 JOIN fvg on fvg.ticker = s.ticker AND fvg.status = 'OPEN' AND fvg.timeframe = '\{timeframe}' and fvg.type = '\{fvgTypeStr}'
                 WHERE s.cfd_margin in (\{cfdMargins})
-                AND fvg.date < '\{fvgDatePreviousWMQYstr}'
                 \{highLowWhereClause}
                 AND (s.\{prefix}high between fvg.low AND fvg.high OR s.\{prefix}low between fvg.low AND fvg.high)
+                AND date_trunc('\{dateTruncPeriod}', s.last_updated) > fvg.date + interval '\{lookbackCount} \{intervalPeriod}'
                 """;
     }
 
