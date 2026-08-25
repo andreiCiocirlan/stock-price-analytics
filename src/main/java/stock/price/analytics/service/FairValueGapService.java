@@ -271,13 +271,41 @@ public class FairValueGapService {
         log.info("updated {} FVG rows for {} and stockSplitDate {}", updatedRows, ticker, stockSplitDate);
     }
 
-    public void logFVGsTagged95thPercentile(List<Double> cfdMargins) {
+    public void logFVGsTaggedLongShortSetups(List<Double> cfdMargins) {
         String cfdMargins54 = cfdMargins.stream().map(cfdMargin -> STR."'\{cfdMargin}'").collect(Collectors.joining(", "));
-        for (StockTimeframe timeframe : StockTimeframe.higherTimeframes()) {
+        for (StockTimeframe timeframe : StockTimeframe.values()) {
             for (PricePerformanceMilestone priceMilestone : PricePerformanceMilestone.values()) {
-                for (FvgType fvgType : FvgType.values()) {
+                FvgType fvgType;
+                if (priceMilestone.isHighPercentile()) {
+                    fvgType = BEARISH;
+                } else {
+                    fvgType = BULLISH;
+                }
+                String fvgLabel = fvgLabelFrom(priceMilestone, fvgType, timeframe);
+                log.warn("{}", fvgLabel + findTickersFVGsTaggedFor(timeframe, fvgType, priceMilestone, cfdMargins54));
+            }
+        }
+    }
+
+    public void logFVGsTaggedRocketShipAnvils(List<Double> cfdMargins) {
+        String cfdMargins54 = cfdMargins.stream().map(cfdMargin -> STR."'\{cfdMargin}'").collect(Collectors.joining(", "));
+        List<PricePerformanceMilestone> milestones95 = List.of(
+                PricePerformanceMilestone.HIGH_ALL_TIME_95,
+                PricePerformanceMilestone.LOW_ALL_TIME_95,
+                PricePerformanceMilestone.HIGH_52W_95,
+                PricePerformanceMilestone.LOW_52W_95
+        );
+        for (StockTimeframe timeframe : StockTimeframe.values()) {
+            for (PricePerformanceMilestone priceMilestone : milestones95) {
+                FvgType fvgType;
+                if (priceMilestone.is95thPercentileValue()) {
+                    if (priceMilestone.isHigh95thPercentile()) {
+                        fvgType = BULLISH;
+                    } else {
+                        fvgType = BEARISH;
+                    }
                     String fvgLabel = fvgLabelFrom(priceMilestone, fvgType, timeframe);
-                    log.info("{}", fvgLabel + findTickersFVGsTaggedFor(timeframe, fvgType, priceMilestone, cfdMargins54));
+                    log.warn("{}", fvgLabel + findTickersFVGsTaggedFor(timeframe, fvgType, priceMilestone, cfdMargins54));
                 }
             }
         }
@@ -329,7 +357,7 @@ public class FairValueGapService {
             return String.join(" ", stockTimeframe.name(), "ROCKET SHIP", highLowTimeframeCorrelation, "FVGs:");
         }
 
-        String highLowLabel = isLow95thPercentile ? "Low" : "High";
+        String highLowLabel = pricePerformanceMilestone.isLowPercentile() ? "Low" : "High";
         String mainFvgLabel = switch (pricePerformanceMilestone) {
             case HIGH_52W_95, LOW_52W_95 -> FVG_95TH_PERCENTILE_52W;
             case HIGH_4W_95, LOW_4W_95 -> FVG_95TH_PERCENTILE_4W;

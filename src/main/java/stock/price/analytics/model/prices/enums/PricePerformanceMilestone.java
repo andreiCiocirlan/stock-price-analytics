@@ -27,6 +27,14 @@ public enum PricePerformanceMilestone implements StockPriceMilestone<StockHighLo
         };
     }
 
+    public boolean isLowPercentile() {
+        return List.of(LOW_52W_95, LOW_4W_95, LOW_ALL_TIME_95, LOW_52W_90, LOW_4W_90, LOW_ALL_TIME_90).contains(this);
+    }
+
+    public boolean isHighPercentile() {
+        return List.of(HIGH_52W_95, HIGH_4W_95, HIGH_ALL_TIME_95, HIGH_52W_90, HIGH_4W_90, HIGH_ALL_TIME_90).contains(this);
+    }
+
     public boolean isLow95thPercentile() {
         return List.of(LOW_52W_95, LOW_4W_95, LOW_ALL_TIME_95).contains(this);
     }

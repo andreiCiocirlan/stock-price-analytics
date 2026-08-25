@@ -63,9 +63,15 @@ public class FairValueGapController {
         }
     }
 
-    @GetMapping("/alert-fvg-tagged-95th-percentile")
+    @GetMapping("/alert-fvg-tagged-long-short-setups")
     @ResponseStatus(HttpStatus.OK)
     public void logFVGsTagged95thPercentile() {
-        fairValueGapService.logFVGsTagged95thPercentile(CFD_MARGINS_5X_4X);
+        fairValueGapService.logFVGsTaggedLongShortSetups(CFD_MARGINS_5X_4X);
+    }
+
+    @GetMapping("/alert-fvg-tagged-rocketship-anvil")
+    @ResponseStatus(HttpStatus.OK)
+    public void logFVGsTaggedRocketShipAnvils() {
+        fairValueGapService.logFVGsTaggedRocketShipAnvils(CFD_MARGINS_5X_4X);
     }
 }
