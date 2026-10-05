@@ -6,6 +6,7 @@ public enum TradingIdea {
     COMPRESSED_PRICE,
     PRICE_INSIDE_FVG,
     PRICE_HL_INSIDE_FVG,
+    FVG_ALMOST_CLOSED,
     DEMARK_8,
     DEMARK_9,
     DEMARK_13,

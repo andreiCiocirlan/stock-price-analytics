@@ -115,6 +115,24 @@ public class FvgQueryProviderImpl implements FvgQueryProvider {
     }
 
     @Override
+    public String fvgAlmostClosedFor(StockTimeframe timeframe, String cfdMargins) {
+        if (cfdMargins.isBlank()) {
+            cfdMargins = "0.2, 0.25, 0.33, 0.5, 0";
+        }
+        return STR."""
+                SELECT distinct s.ticker
+                FROM stocks s
+                JOIN fvg ON fvg.ticker = s.ticker AND fvg.status = 'OPEN' AND fvg.timeframe = '\{timeframe}' AND s.cfd_margin in (\{cfdMargins})
+                WHERE unfilled_high1 IS NOT NULL
+                  AND unfilled_low1 IS NOT NULL
+                  AND unfilled_high2 IS NULL
+                  AND unfilled_low2 IS NULL
+                  AND (high - low) > 0
+                  AND (1 - (unfilled_high1 - unfilled_low1) / (high - low)) > 0.9
+                """;
+    }
+
+    @Override
     public String priceInsideFvgFor(StockTimeframe timeframe, String cfdMargins) {
         String intervalPeriod = timeframe.toIntervalPeriod();
         String dateTruncPeriod = timeframe.toDateTruncPeriod();

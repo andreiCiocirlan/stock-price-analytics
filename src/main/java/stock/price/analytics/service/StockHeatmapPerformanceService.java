@@ -97,6 +97,7 @@ public class StockHeatmapPerformanceService {
                     case RECENT_FVG -> fairValueGapService.findRecentFVGsForCfdMargins(stockTimeframe, cfdMarginsString);
                     case PRICE_INSIDE_FVG -> fairValueGapService.priceInsideFvgFor(stockTimeframe, cfdMarginsString);
                     case PRICE_HL_INSIDE_FVG -> fairValueGapService.priceHLInsideFvgFor(stockTimeframe, cfdMarginsString);
+                    case FVG_ALMOST_CLOSED -> fairValueGapService.fvgAlmostClosedFor(stockTimeframe, cfdMarginsString);
                     case DEMARK_8 -> demarkService.tickersForTimeframeTdAndCfdMargins(stockTimeframe, 8, cfdMarginsString);
                     case DEMARK_9 -> demarkService.tickersForTimeframeTdAndCfdMargins(stockTimeframe, 9, cfdMarginsString);
                     case DEMARK_13 -> demarkService.tickersForTimeframeTdAndCfdMargins(stockTimeframe, 13, cfdMarginsString);
