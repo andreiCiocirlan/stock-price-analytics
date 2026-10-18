@@ -1,11 +1,9 @@
 package stock.price.analytics.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import stock.price.analytics.model.dto.StdDevProjectionDTO;
+import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.service.StdDevProjectionService;
 
 import java.util.List;
@@ -17,13 +15,11 @@ public class StdDevProjectionController {
 
     private final StdDevProjectionService stdDevProjectionService;
 
-    @GetMapping("/top/{ticker}")
-    public List<StdDevProjectionDTO> getLast3TopProjections(@PathVariable String ticker) {
-        return stdDevProjectionService.getLast3TopProjections(ticker.toUpperCase());
+    @GetMapping("/confluence/{ticker}")
+    public List<StdDevProjectionDTO> getConfluenceProjections(
+            @PathVariable String ticker,
+            @RequestParam(value = "timeframe") StockTimeframe timeframe) {
+        return stdDevProjectionService.getConfluenceProjections(ticker.toUpperCase(), timeframe);
     }
 
-    @GetMapping("/bottom/{ticker}")
-    public List<StdDevProjectionDTO> getLast3BottomProjections(@PathVariable String ticker) {
-        return stdDevProjectionService.getLast3BottomProjections(ticker.toUpperCase());
-    }
 }

@@ -1,154 +1,121 @@
 package stock.price.analytics.util.query.stddevprojection.impl;
 
 import org.springframework.stereotype.Component;
+import stock.price.analytics.model.prices.enums.StockTimeframe;
 import stock.price.analytics.util.query.stddevprojection.StdDevProjectionQueryProvider;
 
 @Component
 public class StdDevProjectionQueryProviderImpl implements StdDevProjectionQueryProvider {
 
     @Override
-    public String findLast3TopProjections(String ticker) {
+    public String getConfluenceProjections(String ticker, StockTimeframe timeframe) {
         return STR."""
-                    WITH ranked_prices AS (
-                      SELECT
-                        dp.ticker,
-                        dp.date,
-                        dp.high,
-                        dp.low,
-                        dp.close,
-                        ROW_NUMBER() OVER (PARTITION BY dp.ticker ORDER BY dp.date) AS rn
-                      FROM daily_prices dp
-                      JOIN stocks s ON dp.ticker = s.ticker
-                      WHERE s.delisted_date IS NULL
-                      AND dp.ticker = '\{ticker}'
-                      AND dp.date BETWEEN current_date - interval '52 week' AND current_date
-                    ),
-                    local_tops AS (
-                      SELECT
-                        rp.*
-                      FROM ranked_prices rp
-                      WHERE rp.high > COALESCE((
-                        SELECT MAX(high)
-                        FROM ranked_prices
-                        WHERE ticker = rp.ticker
-                          AND rn BETWEEN rp.rn - 3 AND rp.rn + 3
-                          AND rn <> rp.rn
-                      ), 0)
-                    ),
-                    ranked_local_tops AS (
-                      SELECT
-                        lt.*,
-                        ROW_NUMBER() OVER (PARTITION BY lt.ticker ORDER BY lt.high DESC) AS top_rank
-                      FROM local_tops lt
-                    ),
-                    top3_local_tops AS (
-                      SELECT * FROM ranked_local_tops WHERE top_rank <= 5
-                    ),
-                    second_points AS (
-                      SELECT
-                        tlt.ticker,
-                        tlt.rn,
-                        rp.date AS second_point_date,
-                        rp.low AS second_point_min_low,
-                        ROW_NUMBER() OVER (
-                          PARTITION BY tlt.ticker, tlt.rn
-                          ORDER BY rp.low ASC, rp.date ASC
-                        ) AS rn_rank
-                      FROM top3_local_tops tlt
-                      JOIN ranked_prices rp ON rp.ticker = tlt.ticker
-                        AND rp.rn BETWEEN tlt.rn - 3 AND tlt.rn + 3
-                        AND rp.rn <> tlt.rn
-                        AND rp.low < tlt.high  -- second point must be below local top high
+                SELECT
+                   p.pivot_date,
+                   p.point_b_offset,
+                   p.pivot_type,
+                   p.proj_4_0,
+                   p.proj_4_5
+                FROM projected_deviations p
+                JOIN stocks l ON p.ticker = l.ticker
+                WHERE
+                    p.ticker = '\{ticker}'
+                	AND timeframe = '\{timeframe}'
+                    -- Is the current price between the stored 4.0 and 4.5?
+                    AND (
+                        (p.pivot_type = 'LOW' AND l.close BETWEEN p.proj_4_0 AND p.proj_4_5)
+                        OR
+                        (p.pivot_type = 'HIGH' AND l.close BETWEEN p.proj_4_5 AND p.proj_4_0)
                     )
-                    SELECT
-                      tlt.ticker,
-                      tlt.date AS local_top_date,
-                      sp.second_point_date,
-                      sp.second_point_min_low AS level_1,
-                      tlt.high AS level_0,
-                      ABS(tlt.high - sp.second_point_min_low) AS diff,
-                      sp.second_point_min_low - ABS(tlt.high - sp.second_point_min_low) * 1 AS level_plus1,
-                      sp.second_point_min_low - ABS(tlt.high - sp.second_point_min_low) * 2 AS level_plus2,
-                      sp.second_point_min_low - ABS(tlt.high - sp.second_point_min_low) * 2.5 AS level_plus2_5,
-                      sp.second_point_min_low - ABS(tlt.high - sp.second_point_min_low) * 4 AS level_plus4,
-                      sp.second_point_min_low - ABS(tlt.high - sp.second_point_min_low) * 4.5 AS level_plus4_5
-                    FROM top3_local_tops tlt
-                    JOIN second_points sp ON sp.ticker = tlt.ticker AND sp.rn = tlt.rn
-                    WHERE sp.rn_rank = 1
-                    ORDER BY tlt.ticker, tlt.date DESC;
+                ORDER BY PIVOT_DATE;
                 """;
     }
 
     @Override
-    public String findLast3BottomProjections(String ticker) {
+    public String insertStdDevProjections(StockTimeframe timeframe) {
+        String dbTable = timeframe.dbTableOHLC();
         return STR."""
-                    WITH ranked_prices AS (
-                      SELECT
-                        dp.ticker,
-                        dp.date,
-                        dp.high,
-                        dp.low,
-                        dp.close,
-                        ROW_NUMBER() OVER (PARTITION BY dp.ticker ORDER BY dp.date) AS rn
-                      FROM daily_prices dp
-                      JOIN stocks s ON dp.ticker = s.ticker
-                      WHERE s.delisted_date IS NULL
-                      AND dp.ticker = '\{ticker}'
-                      AND dp.date BETWEEN current_date - interval '52 week' AND current_date
+                    INSERT INTO projected_deviations (
+                        ticker, timeframe, pivot_date, pivot_type,
+                        point_a_price, point_b_offset, point_b_source, point_b_price,
+                        proj_4_0, proj_4_5
+                    )
+                    WITH recent_data AS (
+                        SELECT d.*
+                        FROM (SELECT DISTINCT ticker FROM \{dbTable}) t
+                        CROSS JOIN LATERAL (
+                            SELECT * FROM \{dbTable} WHERE ticker = t.ticker ORDER BY date DESC LIMIT 7
+                        ) d
                     ),
-                    local_bottoms AS (
-                      SELECT
-                        rp.*
-                      FROM ranked_prices rp
-                      WHERE rp.low < COALESCE((
-                        SELECT MIN(low)
-                        FROM ranked_prices
-                        WHERE ticker = rp.ticker
-                          AND rn BETWEEN rp.rn - 3 AND rp.rn + 3
-                          AND rn <> rp.rn
-                      ), 999999999)
+                    numbered AS (
+                        SELECT ticker, date, high, low, close,
+                               ROW_NUMBER() OVER (PARTITION BY ticker ORDER BY date ASC) AS rn
+                        FROM recent_data
                     ),
-                    ranked_local_bottoms AS (
-                      SELECT
-                        lb.*,
-                        ROW_NUMBER() OVER (PARTITION BY lb.ticker ORDER BY lb.low ASC) AS bottom_rank
-                      FROM local_bottoms lb
+                    windowed_data AS (
+                        SELECT
+                            ticker, date, rn, high, low, close,
+                            LAG(low, 1)  OVER w AS low_lag1,
+                            LAG(low, 2)  OVER w AS low_lag2,
+                            LAG(low, 3)  OVER w AS low_lag3,
+                            LEAD(low, 1) OVER w AS low_lead1,
+                            LEAD(low, 2) OVER w AS low_lead2,
+                            LEAD(low, 3) OVER w AS low_lead3,
+                            LAG(high, 1)  OVER w AS high_lag1,
+                            LAG(high, 2)  OVER w AS high_lag2,
+                            LAG(high, 3)  OVER w AS high_lag3,
+                            LEAD(high, 1) OVER w AS high_lead1,
+                            LEAD(high, 2) OVER w AS high_lead2,
+                            LEAD(high, 3) OVER w AS high_lead3
+                        FROM numbered
+                        WINDOW w AS (PARTITION BY ticker ORDER BY date)
                     ),
-                    top3_local_bottoms AS (
-                      SELECT * FROM ranked_local_bottoms WHERE bottom_rank <= 5
+                    pivots AS (
+                        SELECT ticker, date AS pivot_date, rn AS pivot_rn, low AS point_a_price, 'LOW' AS pivot_type
+                        FROM windowed_data
+                        WHERE low < low_lag1 AND low < low_lag2 AND low < low_lag3
+                          AND low < low_lead1 AND low < low_lead2 AND low < low_lead3
+                          AND low_lead3 IS NOT NULL AND low <= 1000
+                        UNION ALL
+                        SELECT ticker, date, rn, high, 'HIGH'
+                        FROM windowed_data
+                        WHERE high > high_lag1 AND high > high_lag2 AND high > high_lag3
+                          AND high > high_lead1 AND high > high_lead2 AND high > high_lead3
+                          AND high_lead3 IS NOT NULL AND high <= 1000
                     ),
-                    second_points AS (
-                      SELECT
-                        tlb.ticker,
-                        tlb.rn,
-                        rp.date AS second_point_date,
-                        rp.high AS second_point_max_high,
-                        ROW_NUMBER() OVER (
-                          PARTITION BY tlb.ticker, tlb.rn
-                          ORDER BY rp.high DESC, rp.date ASC
-                        ) AS rn_rank
-                      FROM top3_local_bottoms tlb
-                      JOIN ranked_prices rp ON rp.ticker = tlb.ticker
-                        AND rp.rn BETWEEN tlb.rn - 3 AND tlb.rn + 3
-                        AND rp.rn <> tlb.rn
-                        AND rp.high > tlb.low  -- second point must be above local bottom low
+                    point_b_candidates AS (
+                        SELECT
+                            p.ticker, p.pivot_date, p.pivot_type, p.point_a_price,
+                            o.offset_days,
+                            src.source_type AS point_b_source,
+                            CASE
+                                WHEN p.pivot_type = 'LOW' AND src.source_type = 'WICK'  THEN nh.high
+                                WHEN p.pivot_type = 'LOW' AND src.source_type = 'CLOSE' THEN nh.close
+                                WHEN p.pivot_type = 'HIGH' AND src.source_type = 'WICK'  THEN nl.low
+                                WHEN p.pivot_type = 'HIGH' AND src.source_type = 'CLOSE' THEN nl.close
+                            END AS point_b_price
+                        FROM pivots p
+                        CROSS JOIN (VALUES (-3),(-2),(-1),(1),(2),(3)) AS o(offset_days)
+                        CROSS JOIN (VALUES ('WICK'), ('CLOSE')) AS src(source_type)
+                        LEFT JOIN numbered nh ON nh.ticker = p.ticker AND nh.rn = p.pivot_rn + o.offset_days
+                        LEFT JOIN numbered nl ON nl.ticker = p.ticker AND nl.rn = p.pivot_rn + o.offset_days
+                    ),
+                    raw_calcs AS (
+                        SELECT ticker, pivot_date, pivot_type, point_a_price,
+                               offset_days AS point_b_offset, point_b_source, point_b_price,
+                               ABS(point_a_price - point_b_price) AS vector_price
+                        FROM point_b_candidates
+                        WHERE point_b_price IS NOT NULL
                     )
                     SELECT
-                         tlb.ticker,
-                         tlb.date AS local_bottom_date,
-                         sp.second_point_date,
-                         sp.second_point_max_high AS level_0,
-                         tlb.low AS level_1,
-                         ABS(sp.second_point_max_high - tlb.low) AS diff,
-                         sp.second_point_max_high + ABS(sp.second_point_max_high - tlb.low) * 1 AS level_minus1,
-                         sp.second_point_max_high + ABS(sp.second_point_max_high - tlb.low) * 2 AS level_minus2,
-                         sp.second_point_max_high + ABS(sp.second_point_max_high - tlb.low) * 2.5 AS level_minus2_5,
-                         sp.second_point_max_high + ABS(sp.second_point_max_high - tlb.low) * 4 AS level_minus4,
-                         sp.second_point_max_high + ABS(sp.second_point_max_high - tlb.low) * 4.5 AS level_minus4_5
-                   FROM top3_local_bottoms tlb
-                   JOIN second_points sp ON sp.ticker = tlb.ticker AND sp.rn = tlb.rn
-                   WHERE sp.rn_rank = 1
-                   ORDER BY tlb.ticker, tlb.date DESC;
+                        ticker, '\{timeframe}', pivot_date, pivot_type, point_a_price, point_b_offset, point_b_source, point_b_price,
+                        CASE WHEN pivot_type = 'HIGH' THEN point_b_price - (vector_price * 4.0) ELSE point_b_price + (vector_price * 4.0) END,
+                        CASE WHEN pivot_type = 'HIGH' THEN point_b_price - (vector_price * 4.5) ELSE point_b_price + (vector_price * 4.5) END
+                    FROM raw_calcs
+                    WHERE
+                        (CASE WHEN pivot_type = 'HIGH' THEN point_b_price - (vector_price * 4.0) ELSE point_b_price + (vector_price * 4.0) END) > 0
+                        AND (CASE WHEN pivot_type = 'HIGH' THEN point_b_price - (vector_price * 4.5) ELSE point_b_price + (vector_price * 4.5) END) > 0
+                    ON CONFLICT (ticker, timeframe, pivot_date, pivot_type, point_b_offset, point_b_source) DO NOTHING;
                 """;
     }
 }

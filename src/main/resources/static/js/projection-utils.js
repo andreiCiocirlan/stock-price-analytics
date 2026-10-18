@@ -1,105 +1,168 @@
 export function addProjectionBandsSVG(chart, projections) {
-	if (!chart || !projections || !Array.isArray(projections) || projections.length === 0) return;
-	if (!chart.xAxis || !chart.xAxis[0] || !chart.yAxis || !chart.yAxis[0]) return;
+    if (!chart || !projections || !Array.isArray(projections) || projections.length === 0) return;
+    if (!chart.xAxis || !chart.xAxis[0] || !chart.yAxis || !chart.yAxis[0]) return;
 
-	// Destroy previous group if exists
-	if (chart.customProjectionGroup) {
-		chart.customProjectionGroup.destroy();
-		chart.customProjectionGroup = null; // Clear reference after destroy
-	}
+    if (chart.customProjectionGroup) {
+        chart.customProjectionGroup.destroy();
+        chart.customProjectionGroup = null;
+    }
 
-	const xAxis = chart.xAxis[0];
-	const yAxis = chart.yAxis[0];
-	const minVisible = xAxis.min; // timestamp of left visible edge
-	const maxVisible = xAxis.max; // timestamp of right visible edge
+    const xAxis = chart.xAxis[0];
+    const yAxis = chart.yAxis[0];
+    const minVisible = xAxis.min;
+    const maxVisible = xAxis.max;
 
-	// Create new group and assign it immediately
-	const group = chart.renderer.g('custom-projection-bands').add();
-	chart.customProjectionGroup = group;
+    const mainSeries = chart.series.find(s => s.options.id === 'main-series');
+    if (!mainSeries || !mainSeries.options.data) return;
 
-	// Loop over each projection and draw its bands
-	projections.forEach((proj, index) => {
-		if (!proj) return;
+    const ohlcData = mainSeries.options.data;
+    const timestamps = ohlcData.map(d => d[0]);
 
-		const firstDate = new Date(proj.firstPointDate).getTime();
-		const secondDate = new Date(proj.secondPointDate).getTime();
+    const group = chart.renderer.g('custom-projection-bands').attr({ zIndex: 10 }).add();
+    chart.customProjectionGroup = group;
 
-		// Skip if both projection points are outside the visible range on the right
-		if (firstDate > maxVisible && secondDate > maxVisible) {
-			return; // Do not render this projection band
-		}
+    projections.forEach((proj) => {
+        if (!proj) return;
 
-		// Optionally, also skip if both points are left of visible range (off screen left)
-		if (firstDate < minVisible && secondDate < minVisible) {
-			return;
-		}
+        const pivotDateMs = new Date(proj.pivotDate).getTime();
 
-		// Convert data to pixels
-		const x1 = Math.round(Math.max(0, Math.min(chart.plotWidth, xAxis.toPixels(firstDate))));
-		const x2 = Math.round(Math.max(0, Math.min(chart.plotWidth, xAxis.toPixels(secondDate))));
+        let pivotIndex = timestamps.indexOf(pivotDateMs);
+        if (pivotIndex === -1) {
+            pivotIndex = timestamps.findIndex(ts => Math.abs(ts - pivotDateMs) < 86400000 * 7);
+        }
+        if (pivotIndex === -1) return;
 
-		const yLevels = [
-			{ from: proj.level0, to: proj.level1, color: 'rgba(128,128,128,0.3)', label: '1' },
-			{ from: proj.level1, to: proj.level_minus1, color: 'rgba(128,128,128,0.3)', label: '0' },
-			{ from: proj.level_minus1, to: proj.level_minus2, color: 'rgba(255,255,0,0.3)', label: '-1' },
-			{ from: proj.level_minus2, to: proj.level_minus2_5, color: 'rgba(255,255,0,0.3)', label: '-2' },
-			{ from: proj.level_minus2_5, to: proj.level_minus4, color: 'rgba(255,0,0,0.3)', label: '-2.5' },
-			{ from: proj.level_minus4, to: proj.level_minus4_5, color: 'rgba(255,0,0,0.3)', label: '-4' },
-			{
-				from: proj.level_minus4_5,
-				to: proj.level_minus4_5,
-				color: 'rgba(255,0,0,0.3)',
-				label: '-4.5'
-			}
-		];
+        const pointBIndex = pivotIndex + proj.pointBOffset;
+        if (pointBIndex < 0 || pointBIndex >= ohlcData.length) return;
 
-		yLevels.forEach(({ from, to, color, label }) => {
-			const yFrom = chart.yAxis[0].toPixels(from);
-			const yTo = chart.yAxis[0].toPixels(to);
+        const pointADateMs = ohlcData[pivotIndex][0];
+        const pointBDateMs = ohlcData[pointBIndex][0];
 
-			const rectX = Math.min(x1, x2);
-			const rectY = Math.min(yFrom, yTo);
-			const rectWidth = Math.abs(x2 - x1);
-			const rectHeight = Math.abs(yTo - yFrom);
-			if (rectWidth <= 1) return; // Skip very narrow or zero-width bands
+        if (pointADateMs > maxVisible && pointBDateMs > maxVisible) return;
+        if (pointADateMs < minVisible && pointBDateMs < minVisible) return;
 
-			// Draw rectangle
-			chart.renderer.rect(rectX, rectY, rectWidth, rectHeight)
-				.attr({ fill: color, zIndex: 5 })
-				.add(group);
+        const x1 = Math.round(Math.max(0, Math.min(chart.plotWidth, xAxis.toPixels(pointADateMs))));
+        const x2 = Math.round(Math.max(0, Math.min(chart.plotWidth, xAxis.toPixels(pointBDateMs))));
 
-			// Draw top horizontal line (bold)
-			chart.renderer.path([
-					'M', rectX, rectY,
-					'L', rectX + rectWidth, rectY
-				])
-				.attr({
-					stroke: '#000000',
-					'stroke-width': 2,
-					zIndex: 10
-				})
-				.add(group);
+        const rectX = Math.min(x1, x2);
+        const rectWidth = Math.max(Math.abs(x2 - x1), 2);
 
-			// Draw bottom horizontal line (bold)
-			chart.renderer.path([
-					'M', rectX, rectY + rectHeight,
-					'L', rectX + rectWidth, rectY + rectHeight
-				])
-				.attr({
-					stroke: '#000000',
-					'stroke-width': 2,
-					zIndex: 10
-				})
-				.add(group);
+        // Point A Price (The Pivot Candle)
+        const pivotPrice = proj.pivotType === 'HIGH'
+            ? ohlcData[pivotIndex][2]
+            : ohlcData[pivotIndex][3];
 
-			// Anchor label to top line:
-			const labelX = rectX - 10;
-			const labelY = proj.level0 < proj.level1 ? rectY + rectHeight : rectY + 1;
+        // Point B Price (The Swing Candle / Level 0)
+        const vector = Math.abs(proj.proj40 - proj.proj45) * 2;
+        let pointBPrice;
+        if (proj.pivotType === 'HIGH') {
+            pointBPrice = proj.proj40 + (vector * 4.0);
+        } else {
+            pointBPrice = proj.proj40 - (vector * 4.0);
+        }
 
-			chart.renderer.text(label, labelX, labelY)
-				.css({ color: '#666', fontSize: '10px', fontWeight: 'bold' })
-				.attr({ align: 'right', 'text-anchor': 'end' })
-				.add(group);
-		});
-	});
+        let yLevels;
+        if (proj.pivotType === 'HIGH') {
+            yLevels = [
+                { from: pointBPrice, to: proj.proj40, color: 'rgba(128,128,128,0.3)' },
+                { from: proj.proj40, to: proj.proj45, color: 'rgba(255,0,0,0.3)' }
+            ];
+        } else {
+            yLevels = [
+                { from: pointBPrice, to: proj.proj40, color: 'rgba(128,128,128,0.3)' },
+                { from: proj.proj40, to: proj.proj45, color: 'rgba(255,0,0,0.3)' }
+            ];
+        }
+
+        // 1. Draw the core rectangular bands
+        yLevels.forEach(({ from, to, color }) => {
+            const yFrom = yAxis.toPixels(from);
+            const yTo = yAxis.toPixels(to);
+
+            const rectY = Math.min(yFrom, yTo);
+            const rectHeight = Math.abs(yTo - yFrom);
+
+            if (rectHeight <= 1) return;
+
+            chart.renderer.rect(rectX, rectY, rectWidth, rectHeight)
+                .attr({ fill: color, zIndex: 5 })
+                .add(group);
+        });
+
+        // 2. Draw the Wedge (The Gray Rectangle from Point A to Point B)
+        const yA = yAxis.toPixels(pivotPrice);
+        const yB = yAxis.toPixels(pointBPrice);
+
+        // We use a path to create a polygon that connects Point A to Point B
+        chart.renderer.path([
+            'M', x1, yA, // Start at Point A (Pivot)
+            'L', x2, yB, // Line to Point B (Swing)
+            'L', x2, yB, // Drop down (for LOW) or up (for HIGH)
+            'L', x1, yA, // Return to Point A
+            'Z'          // Close path
+        ]).attr({
+            fill: 'rgba(128,128,128,0.3)',
+            zIndex: 4
+        }).add(group);
+
+        const wedgeRectY = Math.min(yA, yB);
+        const wedgeRectHeight = Math.abs(yA - yB);
+
+        // Check if we need to fill it (if height > 0)
+        if (wedgeRectHeight > 1) {
+            // Because the old image had a horizontal top line at Point A and a horizontal bottom line at Point B
+            // We can just draw a grey rectangle.
+            // But if the lines are angled, a rectangle won't perfectly connect them.
+            // We'll use the polygon to create the vertical connection.
+
+            chart.renderer.path([
+                'M', x1, yA,
+                'L', x2, yA, // Top horizontal (at Pivot level)
+                'L', x2, yB, // Right vertical
+                'L', x1, yB, // Bottom horizontal (at Point B level)
+                'Z'
+            ]).attr({
+                fill: 'rgba(128,128,128,0.3)',
+                zIndex: 4
+            }).add(group);
+        }
+
+        // --- Draw the Labels ---
+        const y0 = yAxis.toPixels(pointBPrice);
+        const y4 = yAxis.toPixels(proj.proj40);
+        const y45 = yAxis.toPixels(proj.proj45);
+
+        chart.renderer.text('0', rectX - 4, y0 + 4)
+            .css({ color: '#FFFFFF', fontSize: '10px', fontWeight: 'bold' })
+            .attr({ align: 'right', 'text-anchor': 'end', zIndex: 20 })
+            .add(group);
+
+        chart.renderer.text(proj.pivotType === 'HIGH' ? '-4' : '4', rectX - 4, y4 + 4)
+            .css({ color: '#FFFFFF', fontSize: '10px', fontWeight: 'bold' })
+            .attr({ align: 'right', 'text-anchor': 'end', zIndex: 20 })
+            .add(group);
+
+        const y45Text = proj.pivotType === 'HIGH' ? y45 - 2 : y45 + 10;
+        chart.renderer.text(proj.pivotType === 'HIGH' ? '-4.5' : '4.5', rectX - 4, y45Text)
+            .css({ color: '#FFFFFF', fontSize: '10px', fontWeight: 'bold' })
+            .attr({ align: 'right', 'text-anchor': 'end', zIndex: 20 })
+            .add(group);
+
+        // --- Draw the horizontal delimiting lines ---
+
+        // Top line at Pivot (Point A)
+        chart.renderer.path(['M', x1, yA, 'L', x2, yA])
+            .attr({ stroke: '#000000', 'stroke-width': 2, zIndex: 15 })
+            .add(group);
+
+        // Bottom line at Point B (Level 0)
+        chart.renderer.path(['M', x1, yB, 'L', x2, yB])
+            .attr({ stroke: '#000000', 'stroke-width': 2, zIndex: 15 })
+            .add(group);
+
+        // Line at 4.5 level
+        chart.renderer.path(['M', x1, y45, 'L', x2, y45])
+            .attr({ stroke: '#000000', 'stroke-width': 2, zIndex: 15 })
+            .add(group);
+    });
 }

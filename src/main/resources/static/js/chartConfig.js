@@ -67,6 +67,9 @@ function seriesConfig(priceData) {
 			id: 'main-series',
 			name: 'Stock Data',
 			type: 'candlestick',
+			dataGrouping: {
+				enabled: false
+			},
 			data: priceData.map(item => [
 				new Date(item.date).getTime(),
 				item.open,
@@ -81,67 +84,117 @@ function seriesConfig(priceData) {
 					'L<span style="color:{point.color}">{point.low:.2f}</span> ' +
 					'C<span style="color:{point.color}">{point.close:.2f}</span></span>'
 			}
-		},
-		{
-			type: 'sma',
-			id: 'sma-200',
-			name: '200 SMA',
-			color: 'red',
-			linkedTo: 'main-series',
-			params: {
-				period: 200
-			},
-			lineWidth: 0.5,
-			marker: {
-				enabled: false
-			},
-			tooltip: {
-				pointFormat: '<span style="font-size:15px;color:red">{series.name}: {point.y:.2f}</span>'
-			}
-		},
-		{
-			type: 'sma',
-			id: 'sma-21',
-			name: '21 SMA',
-			color: 'yellow',
-			linkedTo: 'main-series',
-			params: {
-				period: 21
-			},
-			lineWidth: 0.5,
-			marker: {
-				enabled: false
-			},
-			tooltip: {
-				pointFormat: '<span style="font-size:15px;color:yellow">{series.name}: {point.y:.2f}</span>'
-			}
-		},
-		{
-			type: 'sma',
-			id: 'sma-100',
-			name: '100 SMA',
-			color: 'orange',
-			linkedTo: 'main-series',
-			params: {
-				period: 100
-			},
-			lineWidth: 0.5,
-			marker: {
-				enabled: false
-			},
-			tooltip: {
-				pointFormat: '<span style="font-size:15px;color:orange">{series.name}: {point.y:.2f}</span>'
-			}
-		},
-		{
-            type: 'bb',
-            linkedTo: 'main-series',
-            showInLegend: false
-        }
+		}
+//		,{
+//			type: 'sma',
+//			id: 'sma-200',
+//			name: '200 SMA',
+//			color: 'red',
+//			linkedTo: 'main-series',
+//			params: {
+//				period: 200
+//			},
+//			lineWidth: 0.5,
+//			marker: {
+//				enabled: false
+//			},
+//			tooltip: {
+//				pointFormat: '<span style="font-size:15px;color:red">{series.name}: {point.y:.2f}</span>'
+//			}
+//		},
+//		{
+//			type: 'sma',
+//			id: 'sma-21',
+//			name: '21 SMA',
+//			color: 'yellow',
+//			linkedTo: 'main-series',
+//			params: {
+//				period: 21
+//			},
+//			lineWidth: 0.5,
+//			marker: {
+//				enabled: false
+//			},
+//			tooltip: {
+//				pointFormat: '<span style="font-size:15px;color:yellow">{series.name}: {point.y:.2f}</span>'
+//			}
+//		},
+//		{
+//			type: 'sma',
+//			id: 'sma-100',
+//			name: '100 SMA',
+//			color: 'orange',
+//			linkedTo: 'main-series',
+//			params: {
+//				period: 100
+//			},
+//			lineWidth: 0.5,
+//			marker: {
+//				enabled: false
+//			},
+//			tooltip: {
+//				pointFormat: '<span style="font-size:15px;color:orange">{series.name}: {point.y:.2f}</span>'
+//			}
+//		},
+//		{
+//            type: 'bb',
+//            linkedTo: 'main-series',
+//            showInLegend: false
+//        }
 	]
 }
 
-export function getChartConfig(stockData, priceData, projections) {
+export function getChartConfig(stockData, priceData, projections, timeFrame) {
+    let rangeButtons = [];
+    let selectedButton = 2;
+
+    switch(timeFrame) {
+        case 'weekly':
+            rangeButtons = [
+                { type: 'month', count: 3, text: '3M' },
+                { type: 'month', count: 6, text: '6M' },
+                { type: 'year', count: 2, text: '2Y' },
+                { type: 'all', text: 'All' }
+            ];
+            selectedButton = 2;
+            break;
+        case 'monthly':
+            rangeButtons = [
+                { type: 'year', count: 2, text: '2Y' },
+                { type: 'year', count: 5, text: '5Y' },
+                { type: 'year', count: 10, text: '10Y' },
+                { type: 'all', text: 'All' }
+            ];
+            selectedButton = 1;
+            break;
+        case 'quarterly':
+            rangeButtons = [
+                { type: 'year', count: 5, text: '5Y' },
+                { type: 'year', count: 10, text: '10Y' },
+                { type: 'year', count: 20, text: '20Y' },
+                { type: 'all', text: 'All' }
+            ];
+            selectedButton = 1;
+            break;
+        case 'yearly':
+            rangeButtons = [
+                { type: 'year', count: 10, text: '10Y' },
+                { type: 'year', count: 25, text: '25Y' },
+                { type: 'all', text: 'All' }
+            ];
+            selectedButton = 1;
+            break;
+        default: // daily
+            rangeButtons = [
+                { type: 'month', count: 1, text: '1M' },
+                { type: 'month', count: 3, text: '3M' },
+                { type: 'year', count: 1, text: '1Y' },
+                { type: 'all', text: 'All' }
+            ];
+            selectedButton = 2;
+            break;
+    }
+
 	return {
 		chart: {
 			type: 'candlestick',
@@ -155,7 +208,7 @@ export function getChartConfig(stockData, priceData, projections) {
 				}
 			}
 		},
-		title: { text: `${stockData.ticker}`, style: { color: '#FFFFFF' } },
+		title: { text: `${stockData.ticker} (${timeFrame})`, style: { color: '#FFFFFF' } },
 		navigation: { buttonOptions: { enabled: false } },
 		xAxis: {
 			type: 'datetime',
@@ -199,8 +252,11 @@ export function getChartConfig(stockData, priceData, projections) {
 				groupPadding: 0.02
 			}
 		},
-		rangeSelector: rangeSelect, // your existing external config
 		tooltip: tooltipConfig, // use the external tooltip config
-		series: seriesConfig(priceData)
-	};
+		rangeSelector: {
+            buttons: rangeButtons,
+            selected: selectedButton
+        },
+        series: seriesConfig(priceData)
+    };
 }

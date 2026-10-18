@@ -1,6 +1,8 @@
 package stock.price.analytics.util.query.stddevprojection;
 
+import stock.price.analytics.model.prices.enums.StockTimeframe;
+
 public interface StdDevProjectionQueryProvider {
-    String findLast3TopProjections(String ticker);
-    String findLast3BottomProjections(String ticker);
+    String insertStdDevProjections(StockTimeframe timeframe);
+    String getConfluenceProjections(String ticker, StockTimeframe timeframe);
 }

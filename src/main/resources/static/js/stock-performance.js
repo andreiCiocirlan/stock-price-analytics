@@ -76,16 +76,6 @@ function calculateGridSize(mapSize) {
 	};
 }
 
-function fetchTopProjections(ticker) {
-	return fetch(`/api/projections/top/${ticker}`)
-		.then(response => response.json());
-}
-
-function fetchBottomProjections(ticker) {
-	return fetch(`/api/projections/bottom/${ticker}`)
-		.then(response => response.json());
-}
-
 function updateTradingIdeaButtonText() {
     const tradingDropdown = document.getElementById('trading-ideas-dropdown');
     const tradingToggle = document.getElementById('trading-ideas-toggle');
@@ -230,32 +220,26 @@ function updateStockPerformanceChartWithData(data, timeFrame, numRows, numCols, 
 					return `<span style="font-size: ${fontSize};">${data[this.point.index].ticker}<br>${data[this.point.index].performance}%</span>`;
 				}
 			},
-			point: {
-				events: {
-					click: function() {
-						const projections = [];
-						const ticker = data[this.index].ticker;
-						fetchTopProjections(ticker)
-							.then(topProjections => {
-								// Add top projections to the array
-								projections.push(...topProjections);
-								// Return the bottom projections fetch promise
-								return fetchBottomProjections(ticker);
-							})
-							.then(bottomProjections => {
-								// Add bottom projections to the array
-								projections.push(...bottomProjections);
-								// Now call updateOHLCChart with combined projections
-								updateOHLCChart({ ticker }, projections);
-							})
-							.catch(error => {
-								console.error('Error fetching projections:', error);
-								// Even if error, call update with whatever projections collected so far or empty array
-								updateOHLCChart({ ticker }, projections);
-							});
-					}
-				}
-			},
+            point: {
+                events: {
+                    click: function() {
+                        const ticker = data[this.index].ticker;
+
+                        // 1. Fetch the projections using the CURRENT timeframe
+                        fetch(`/api/projections/confluence/${ticker}?timeframe=${currentTimeFrame}`)
+                            .then(response => response.json())
+                            .then(projections => {
+                                // 2. Pass the ticker, the active timeframe, AND the projections to the chart
+                                updateOHLCChart({ ticker }, currentTimeFrame.toLowerCase(), projections);
+                            })
+                            .catch(error => {
+                                console.error('Error fetching projections:', error);
+                                // Fallback: load chart without projections
+                                updateOHLCChart({ ticker }, currentTimeFrame.toLowerCase(), []);
+                            });
+                    }
+                }
+            },
 			data: data.map((item, index) => [
 				Math.floor(index / numRows),
 				(numRows - 1) - (index % numRows),
