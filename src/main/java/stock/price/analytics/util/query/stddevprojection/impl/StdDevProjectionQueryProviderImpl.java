@@ -16,7 +16,7 @@ public class StdDevProjectionQueryProviderImpl implements StdDevProjectionQueryP
                    p.pivot_type,
                    p.proj_4_0,
                    p.proj_4_5
-                FROM projected_deviations p
+                FROM std_dev p
                 JOIN stocks l ON p.ticker = l.ticker
                 WHERE
                     p.ticker = '\{ticker}'
@@ -35,7 +35,7 @@ public class StdDevProjectionQueryProviderImpl implements StdDevProjectionQueryP
     public String insertStdDevProjections(StockTimeframe timeframe) {
         String dbTable = timeframe.dbTableOHLC();
         return STR."""
-                    INSERT INTO projected_deviations (
+                    INSERT INTO std_dev (
                         ticker, timeframe, pivot_date, pivot_type,
                         point_a_price, point_b_offset, point_b_source, point_b_price,
                         proj_4_0, proj_4_5
